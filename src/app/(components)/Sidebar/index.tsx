@@ -44,7 +44,7 @@ export default function Sidebar() {
 
             {/* Tooltip */}
             <span
-              className="pointer-events-none absolute left-12 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-white px-2 py-1 text-xs text-gray-700 shadow-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition"
+              className="pointer-events-none absolute left-12 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-white px-2 py-1 text-xs text-[#454545] shadow-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition"
             >
               {item.label}
             </span>
