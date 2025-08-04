@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { Download } from 'lucide-react';
 
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Week');
@@ -32,13 +31,6 @@ const Dashboard = () => {
 
   return (
     <div className="mx-10 p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        <div className="flex items-center gap-4">
-        </div>
-      </div>
-
       {/* Time Period Buttons */}
       <div className="flex gap-2 mb-8">
         {periods.map((period) => (
@@ -58,7 +50,7 @@ const Dashboard = () => {
 
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className=" bg-white p-6 rounded-lg shadow-sm">
+        <div className="bg-white p-6 rounded-lg shadow-sm">
           <p className="text-sm text-gray-500 mb-2">Gross revenue</p>
           <p className="text-3xl font-bold text-gray-900">$14,509</p>
         </div>
@@ -79,7 +71,7 @@ const Dashboard = () => {
       {/* Charts and Tables Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Trend Chart */}
-        <div className="border border-black-100 lg:col-span-2 bg-white p-6 rounded-lg shadow-sm">
+        <div className="border border-gray-100 lg:col-span-2 bg-white p-6 rounded-lg shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-semibold text-gray-900">Revenue trend</h2>
             <p className="text-sm text-gray-500">March 15 - March 21</p>

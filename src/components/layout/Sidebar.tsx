@@ -19,7 +19,7 @@ export default function Sidebar() {
   const menuItems = [
     { icon: <Home className="h-6 w-6" />, label: 'Home', link: '/' },
     { icon: <Users className="h-6 w-6" />, label: 'Customers', link: '/customers' },
-    { icon: <Menu className="h-6 w-6" />, label: 'Menu', link: '/menu' },
+    { icon: <Menu className="h-6 w-6" />, label: 'Menu', link: '@/app/(pos)/(menu-management)/menu-management/page.tsx' },
     { icon: <ShoppingCart className="h-6 w-6" />, label: 'Orders', link: '/orders' },
     { icon: <User className="h-6 w-6" />, label: 'Profile', link: '/profile' },
     { icon: <ClipboardList className="h-6 w-6" />, label: 'Inventory', link: '/inventory' },
