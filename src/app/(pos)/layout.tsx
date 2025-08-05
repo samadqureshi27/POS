@@ -1,6 +1,7 @@
-import DashboardWrapper from '@/components/layout/submenus/DashboardWrapper'
-import POSSubmenu from '@/components/layout/submenus/POSSubmenu'
+import DashboardWrapper from '../../components/layout/DashboardWrapper';
+import POSSubmenu from '../../components/layout/submenus/POSSubmenu';
 
+// ...existing code...
 export default function POSLayout({
   children,
 }: {

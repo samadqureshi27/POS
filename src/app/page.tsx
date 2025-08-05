@@ -1,4 +1,5 @@
-import Dashboard from "@/app/(main)/dashboard/page";
+// import Dashboard from "@/app/(main)/dashboard/page";
+import Dashboard from "./(main)/dashboard/page";
 
 
 

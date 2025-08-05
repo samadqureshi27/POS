@@ -4,7 +4,9 @@ import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import CountUp from 'react-countup';
 import { motion } from 'framer-motion'; 
-
+// Update the import path below if the file exists elsewhere, for example:
+// import DashboardWrapper from 'src/components/layout/submenus/DashboardWrapper';
+// Or adjust the path as needed to match your project structure.
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Week');
   const [doNotCompare, setDoNotCompare] = useState(true);
