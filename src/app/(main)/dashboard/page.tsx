@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import CountUp from 'react-countup';
+import { motion } from 'framer-motion'; 
 
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Week');
   const [doNotCompare, setDoNotCompare] = useState(true);
 
-  // Sample data for the revenue trend chart
   const revenueData = [
     { day: 'Mon', date: '15', value: 2000 },
     { day: 'Tue', date: '16', value: 3000 },
@@ -18,7 +19,6 @@ const Dashboard = () => {
     { day: 'Sun', date: '21', value: 7500 },
   ];
 
-  // Best selling items data
   const bestSellingItems = [
     { rank: 1, product: 'Coffee', revenue: '$1,304', sales: 195 },
     { rank: 2, product: 'Grill Sandwich', revenue: '$1,250', sales: 90 },
@@ -29,8 +29,18 @@ const Dashboard = () => {
 
   const periods = ['Today', 'Week', 'Month', 'Quarter', 'Year', 'Custom date'];
 
+  // ✅ Animation variants
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.3, duration: 0.4 },
+    }),
+  };
+
   return (
-    <div className="mx-10 p-6 bg-gray-50 min-h-screen">
+    <div className="mx-10 p-6 bg-gray-50 overflow-hidden h-screen">
       {/* Time Period Buttons */}
       <div className="flex gap-2 mb-8">
         {periods.map((period) => (
@@ -52,19 +62,27 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <p className="text-sm text-gray-500 mb-2">Gross revenue</p>
-          <p className="text-3xl font-bold text-gray-900">$14,509</p>
+          <p className="text-3xl font-bold text-gray-900">
+            <CountUp end={14509} prefix="$" duration={1.5} />
+          </p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <p className="text-sm text-gray-500 mb-2">Avg. order value</p>
-          <p className="text-3xl font-bold text-gray-900">$204</p>
+          <p className="text-3xl font-bold text-gray-900">
+            <CountUp end={204} prefix="$" duration={1.5} />
+          </p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <p className="text-sm text-gray-500 mb-2">Taxes</p>
-          <p className="text-3xl font-bold text-gray-900">$12.1</p>
+          <p className="text-3xl font-bold text-gray-900">
+            <CountUp end={12.1} prefix="$" decimals={1} duration={1.5} />
+          </p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <p className="text-sm text-gray-500 mb-2">Customers</p>
-          <p className="text-3xl font-bold text-gray-900">306</p>
+          <p className="text-3xl font-bold text-gray-900">
+            <CountUp end={306} duration={1.5} />
+          </p>
         </div>
       </div>
 
@@ -76,11 +94,11 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold text-gray-900">Revenue trend</h2>
             <p className="text-sm text-gray-500">March 15 - March 21</p>
           </div>
-          
+
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={revenueData} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
-                <XAxis 
+                <XAxis
                   dataKey="day"
                   axisLine={false}
                   tickLine={false}
@@ -90,46 +108,64 @@ const Dashboard = () => {
                     return `${value}\n${item?.date}`;
                   }}
                 />
-                <YAxis 
+                <YAxis
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 12, fill: '#6B7280' }}
                   tickFormatter={(value) => `${value / 1000}K`}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#CCAB4D" 
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#CCAB4D"
                   strokeWidth={2}
                   dot={{ fill: '#CCAB4D', strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6, fill: '#CCAB4D' }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    padding: '8px',
+                    fontSize: '12px',
+                  }}
+                  labelFormatter={(label, payload) => {
+                    const dataPoint = revenueData.find((d) => d.day === label);
+                    return `${dataPoint?.day} (${dataPoint?.date})`;
+                  }}
+                  formatter={(value: number) => [`$${value}`, 'Revenue']}
+                  cursor={false}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Best Selling Items */}
+        {/* Best Selling Items with Animation */}
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">Best selling items</h2>
-          
           <div className="space-y-1">
-            {/* Table Header */}
             <div className="grid grid-cols-12 gap-2 text-xs text-gray-500 font-medium pb-3 border-b border-gray-100">
               <div className="col-span-1">#</div>
               <div className="col-span-5">Products</div>
               <div className="col-span-3 text-right">Revenue</div>
               <div className="col-span-3 text-right">Sales</div>
             </div>
-            
-            {/* Table Rows */}
-            {bestSellingItems.map((item) => (
-              <div key={item.rank} className="grid grid-cols-12 gap-2 py-3 text-sm border-b border-gray-50 last:border-b-0">
+            {bestSellingItems.map((item, index) => (
+              <motion.div
+                key={item.rank}
+                className="grid grid-cols-12 gap-2 py-3 text-sm border-b border-gray-50 last:border-b-0"
+                custom={index}
+                initial="hidden"
+                animate="visible"
+                variants={itemVariants}
+              >
                 <div className="col-span-1 text-gray-600 font-medium">{item.rank}</div>
                 <div className="col-span-5 text-gray-900">{item.product}</div>
                 <div className="col-span-3 text-right font-medium text-gray-900">{item.revenue}</div>
                 <div className="col-span-3 text-right text-gray-600">{item.sales}</div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

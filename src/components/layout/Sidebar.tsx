@@ -29,7 +29,7 @@ export default function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-12 bg-[#CCAB4D] flex flex-col items-center justify-center ">
       
       {/* Menu Icons with hover tooltips */}
-      <nav className="justify-center flex-1 flex flex-col gap-2">
+      <nav className="justify-center flex-1 flex flex-col gap-2 over">
         {menuItems.map((item, idx) => (
           <Link
             key={idx}
