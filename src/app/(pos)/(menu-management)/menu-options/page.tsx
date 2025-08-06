@@ -2,12 +2,12 @@
 
 import React from 'react';
 
-const PosListPage = () => {
+const MenuOptionsPage = () => {
   return (
     <div className="h-screen flex items-center justify-center bg-white">
-      <h1 className="text-6xl font-bold text-gray-800">POS List</h1>
+      <h1 className="text-6xl font-bold text-gray-800">Menu Options</h1>
     </div>
   );
 };
 
-export default PosListPage;
+export default MenuOptionsPage;

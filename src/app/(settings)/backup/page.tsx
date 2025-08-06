@@ -2,12 +2,12 @@
 
 import React from 'react';
 
-const optionsPage = () => {
+const BackUpPage = () => {
   return (
     <div className="h-screen flex items-center justify-center bg-white">
-      <h1 className="text-6xl font-bold text-gray-800">Options Management</h1>
+      <h1 className="text-6xl font-bold text-gray-800">Backup</h1>
     </div>
   );
 };
 
-export default optionsPage;
+export default BackUpPage;

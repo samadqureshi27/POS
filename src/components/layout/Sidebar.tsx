@@ -17,16 +17,20 @@ import {
 
 export default function Sidebar() {
   const menuItems = [
+    
     { icon: <Home className="h-6 w-6" />, label: 'Home', link: '/' },
-    { icon: <Users className="h-6 w-6" />, label: 'Customers', link: '/customers' },
-    { icon: <Menu className="h-6 w-6" />, label: 'Menu', link: '/menu-management' },
-    { icon: <ShoppingCart className="h-6 w-6" />, label: 'Orders', link: '/orders' },
-    { icon: <ClipboardList className="h-6 w-6" />, label: 'Inventory', link: '/inventory' },
-    { icon: <Settings className="h-6 w-6" />, label: 'Settings', link: '/settings' },
+    { icon: <User className="h-6 w-6" />, label: 'Restaurant Management', link: '/restaurant-management' },
+    { icon: <ChefHat className="h-6 w-6" />, label: 'Menu Management', link: '/menu-management' },
+    { icon: <Users className="h-6 w-6" />, label: 'Recipes Management', link: '/recipes-management' },
+    { icon: <Menu className="h-6 w-6" />, label: 'POS Management', link: '/pos-list' },
+    { icon: <ShoppingCart className="h-6 w-6" />, label: 'Orders Management', link: '/order-management' },
+    { icon: <Pencil className="h-6 w-6" />, label: 'Customer Management', link: '/customer-management' },
+    { icon: <ClipboardList className="h-6 w-6" />, label: 'Branches Management', link: '/branches-management' },
+    { icon: <Settings className="h-6 w-6" />, label: 'Settings', link: '/general-settings' },
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-12 bg-[#CCAB4D] flex flex-col items-center justify-center z-0 ">
+    <aside className="fixed left-0 top-0 h-screen w-16 bg-[#CCAB4D] flex flex-col items-center justify-center z-0 ">
       
       {/* Menu Icons with hover tooltips */}
       <nav className="justify-center flex-1 flex flex-col gap-2 over">
@@ -34,16 +38,17 @@ export default function Sidebar() {
           <Link
             key={idx}
             href={item.link}
-            className="group relative flex items-center justify-center p-1 rounded hover:bg-black/20 transition"
+            className="group relative flex items-center justify-center p-1 rounded hover:bg-[#2e2e2e] transition"
           >
-            <span className="text-black">{item.icon}</span>
+            <span className="text-black group-hover:text-white transition">
+              {item.icon}
+            </span>
 
             {/* Tooltip */}
-            <span
-              className="pointer-events-none absolute left-12 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-white px-2 py-1 text-xs text-[#454545] shadow-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition"
-            >
+            <span className="pointer-events-none absolute left-12 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-white px-2 py-1 text-xs text-[#454545] shadow-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition">
               {item.label}
             </span>
+
             {/* Tooltip arrow */}
             <span
               aria-hidden

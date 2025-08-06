@@ -16,13 +16,16 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
 
       <nav className="bg-neutral-900 text-white">
         <div className="mx-auto max-w-8xl px-3 sm:px-4">
-          <div className="flex h-12 items-center">
+          <div className="flex h-16 items-center">
             {/* Left: logo + brand */}
             <div className="flex items-center gap-2">
-              <LogoMark className="h-5 w-5 text-yellow-500" />
-              <span className="text-[10px] sm:text-xs font-semibold tracking-widest text-gray-300">
-                TTT PLUG
-              </span>
+              <div className="flex items-center gap-2">
+  <img src="/Logos/TTT-logo.png" alt="TTT Logo" className="h-9 w-auto" />
+  <span className="text-[10px] sm:text-xs font-semibold tracking-widest text-gray-300">
+    TTT PLUG
+  </span>
+</div>
+              
             </div>
 
             {/* Center: page title */}
@@ -33,13 +36,13 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
             {/* Right: action icons */}
             <div className="flex items-center gap-2">
               <IconButton ariaLabel="Notifications">
-                <Bell className="h-4 w-4" />
+                <Bell className="h-6 w-6" />
               </IconButton>
               <IconButton ariaLabel="Info">
-                <Info className="h-4 w-4" />
+                <Info className="h-6 w-6" />
               </IconButton>
               <IconButton ariaLabel="Profile" asLink href="/profile">
-                <UserCircle2 className="h-4 w-4" />                                                                    
+                <UserCircle2 className="h-6 w-6" />
               </IconButton>
             </div>
           </div>
@@ -78,22 +81,22 @@ function IconButton({
   );
 }
 
-function LogoMark({ className = '' }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {/* simple emblem */}
-      <path d="M12 3l7 4-7 4-7-4 7-4z" />
-      <path d="M12 11v10" />
-      <path d="M5 9v8l7 4 7-4V9" />
-    </svg>
-  );
-}
+// function LogoMark({ className = '' }: { className?: string }) {
+//   return (
+//     <svg
+//       viewBox="0 0 24 24"
+//       className={className}
+//       fill="none"
+//       stroke="currentColor"
+//       strokeWidth="1.5"
+//       strokeLinecap="round"
+//       strokeLinejoin="round"
+//       aria-hidden="true"
+//     >
+//       {/* simple emblem */}
+//       <path d="M12 3l7 4-7 4-7-4 7-4z" />
+//       <path d="M12 11v10" />
+//       <path d="M5 9v8l7 4 7-4V9" />
+//     </svg>
+//   );
+// }
