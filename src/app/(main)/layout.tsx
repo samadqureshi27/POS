@@ -1,10 +1,9 @@
-import DashboardWrapper from '@/components/layout/submenus/DashboardWrapper'
-
+import React from 'react';
 
 export default function MainLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  return <DashboardWrapper showSubmenu={false}>{children}</DashboardWrapper>
+  return <>{children}</>;
 }

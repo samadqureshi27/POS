@@ -1,18 +1,18 @@
 import React from 'react';
+import MenuSubmenu from '../../../components/layout/submenus/MenuSubmenu';
 
-interface LayoutProps {
+
+export default function MenuLayout({
+  children,
+}: {
   children: React.ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+}) {
   return (
-    <div className="menu-management-layout">
-      {/* Add any menu-management specific layout elements here */}
-      <div className="container mx-auto">
+    <>
+      <MenuSubmenu />
+      <main className="p-6">
         {children}
-      </div>
-    </div>
+      </main>
+    </>
   );
-};
-
-export default Layout;
+}

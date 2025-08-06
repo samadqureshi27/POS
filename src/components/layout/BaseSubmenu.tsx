@@ -1,36 +1,42 @@
-// src/components/layout/BaseSubmenu.tsx
-interface SubmenuConfig {
-  title: string;
-  logo: string;
-  items: { label: string; href: string; }[];
-  actions: string[];
-}
+'use client';
 
-interface BaseSubmenuProps {
-  config: SubmenuConfig;
-  currentPath: string;
-}
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-export default function BaseSubmenu({ config, currentPath }: BaseSubmenuProps) {
+type SubmenuItem = {
+  label: string;
+  href: string;
+  isActive?: boolean;
+};
+
+type BaseSubmenuProps = {
+  items: SubmenuItem[];
+};
+
+export default function BaseSubmenu({ items }: BaseSubmenuProps) {
+  const pathname = usePathname();
+
   return (
-    <div>
-      <h2>{config.title}</h2>
-      <img src={config.logo} alt={config.title} />
-      <nav>
-        {config.items.map((item, index) => (
-          <a 
-            key={index} 
-            href={item.href}
-            className={currentPath === item.href ? 'active' : ''}
-          >
-            {item.label}
-          </a>
-        ))}
+    <div className=" z-40 bg-[#3A3838] px-6 py-3">
+      <nav className="flex gap-2">
+        {items.map((item, idx) => {
+          const isActive = pathname === item.href || item.isActive;
+          return (
+            <Link
+              key={idx}
+              href={item.href}
+              className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                isActive
+                  ? 'bg-gray-200 text-gray-800 shadow-sm'
+                  : 'bg-gray-500 text-white hover:bg-gray-400'
+              }`}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
-      {/* Handle actions */}
-      {config.actions.map((action, index) => (
-        <button key={index}>{action}</button>
-      ))}
     </div>
   );
 }

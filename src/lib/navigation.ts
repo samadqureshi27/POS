@@ -1,81 +1,175 @@
-export const navigationConfig = {
-  pos: {
-    title: "POS Management",
-    logo: "/logos/pos.svg",
-    items: [
-      { label: "POS List", href: "/pos-list" },
-      { label: "Staff Management", href: "/staff-management" },
-      { label: "Menu Management", href: "/menu-management" },
-      { label: "Inventory Management", href: "/inventory-management" },
-      { label: "Recipes Management", href: "/recipes-management" }
-    ],
-    actions: ["New POS", "Settings"]
+// lib/navigation.ts
+export interface NavigationItem {
+  name: string
+  href: string
+  icon?: string
+  children?: NavigationItem[]
+  group?: string
+}
+
+// Define your navigation structure
+export const navigationConfig: NavigationItem[] = [
+  {
+    name: 'Dashboard',
+    href: '/dashboard',
+    group: 'main'
   },
-  
-  staff: {
-    title: "Staff Management",
-    logo: "/logos/staff.svg",
-    items: [
-      { label: "Overview", href: "/staff-management" },
-      { label: "Payroll", href: "/payroll" },
-      { label: "Employee Records", href: "/employee-records" }
-    ],
-    actions: ["Add Employee", "Generate Report"]
+  {
+    name: 'Restaurant Management',
+    href: '/restaurant-management',
+    group: 'main'
   },
-  
-  menu: {
-    title: "Menu Management",
-    logo: "/logos/menu.svg",
-    items: [
-      { label: "Overview", href: "/menu-management" },
-      { label: "Options", href: "/options" },
-      { label: "Category", href: "/category" }
-    ],
-    actions: ["Add Item", "Import Menu"]
+  {
+    name: 'Order Management',
+    href: '/order-management',
+    group: 'main'
   },
-  
-  inventory: {
-    title: "Inventory Management",
-    logo: "/logos/inventory.svg",
-    items: [
-      { label: "Overview", href: "/inventory-management" },
-      { label: "Vendors", href: "/vendors" },
-      { label: "Reports", href: "/reports" }
-    ],
-    actions: ["Add Stock", "Order Supplies"]
+  {
+    name: 'Branches Management',
+    href: '/branches-management',
+    group: 'main'
   },
-  
-  recipes: {
-    title: "Recipes Management",
-    logo: "/logos/recipes.svg",
-    items: [
-      { label: "Overview", href: "/recipes-management" },
-      { label: "Options", href: "/options" },
-      { label: "Ingredients", href: "/ingredients" }
-    ],
-    actions: ["New Recipe", "Import Recipes"]
+  {
+    name: 'Customer Profile',
+    href: '/customer-profile',
+    group: 'main'
   },
-  
-  analytics: {
-    title: "Analytics & Reports",
-    logo: "/logos/analytics.svg",
-    items: [
-      { label: "Overview", href: "/analytics" },
-      { label: "Financial Report", href: "/financial-report" },
-      { label: "Customer Analytics", href: "/customer-analytics" },
-      { label: "Customer Reports", href: "/customer-reports" }
-    ],
-    actions: ["Export Data", "Schedule Report"]
+  {
+    name: 'POS',
+    href: '/pos-list',
+    group: 'pos',
+    children: [
+      {
+        name: 'Staff Management',
+        href: '/staff-management',
+        children: [
+          { name: 'Staff Management', href: '/staff-management' },
+          { name: 'Payroll', href: '/payroll' },
+          { name: 'Employee Records', href: '/employee-records' }
+        ]
+      },
+      {
+        name: 'Menu Management',
+        href: '/menu-management',
+        children: [
+          { name: 'Menu Management', href: '/menu-management' },
+          { name: 'Options', href: '/options' },
+          { name: 'Category', href: '/category' }
+        ]
+      },
+      {
+        name: 'Inventory Management',
+        href: '/inventory-management',
+        children: [
+          { name: 'Inventory Management', href: '/inventory-management' },
+          { name: 'Vendors', href: '/vendors' },
+          { name: 'Reports', href: '/reports' }
+        ]
+      },
+      {
+        name: 'Recipes Management',
+        href: '/recipes-management',
+        children: [
+          { name: 'Recipes Management', href: '/recipes-management' },
+          { name: 'Options', href: '/options' },
+          { name: 'Ingredients', href: '/ingredients' }
+        ]
+      }
+    ]
   },
-  
-  customerManagement: {
-    title: "Customer Management",
-    logo: "/logos/customer.svg",
-    items: [
-      { label: "Overview", href: "/customer-management" },
-      { label: "Customer Details", href: "/customer-details" },
-      { label: "Loyalty Details", href: "/loyalty-details" }
-    ],
-    actions: ["Add Customer", "Import Customers"]
+  {
+    name: 'Analytics',
+    href: '/analytics',
+    group: 'analytics',
+    children: [
+      { name: 'Analytics', href: '/analytics' },
+      { name: 'Financial Report', href: '/financial-report' },
+      { name: 'Customer Analytics', href: '/customer-analytics' },
+      { name: 'Customer Reports', href: '/customer-reports' }
+    ]
+  },
+  {
+    name: 'Customer Management',
+    href: '/customer-management',
+    group: 'customer-management',
+    children: [
+      { name: 'Customer Management', href: '/customer-management' },
+      { name: 'Customer Details', href: '/customer-details' },
+      { name: 'Loyalty Details', href: '/loyalty-details' }
+    ]
   }
+]
+
+// Utility functions for working with paths
+export function findNavigationItem(path: string): NavigationItem | null {
+  function searchInItems(items: NavigationItem[]): NavigationItem | null {
+    for (const item of items) {
+      if (item.href === path) {
+        return item
+      }
+      if (item.children) {
+        const found = searchInItems(item.children)
+        if (found) return found
+      }
+    }
+    return null
+  }
+  
+  return searchInItems(navigationConfig)
+}
+
+export function getPageTitle(path: string): string {
+  const item = findNavigationItem(path)
+  return item?.name || 'Page'
+}
+
+export function getBreadcrumbs(path: string): NavigationItem[] {
+  const breadcrumbs: NavigationItem[] = []
+  
+  function searchInItems(items: NavigationItem[], currentBreadcrumbs: NavigationItem[]): boolean {
+    for (const item of items) {
+      const newBreadcrumbs = [...currentBreadcrumbs, item]
+      
+      if (item.href === path) {
+        breadcrumbs.push(...newBreadcrumbs)
+        return true
+      }
+      
+      if (item.children && searchInItems(item.children, newBreadcrumbs)) {
+        return true
+      }
+    }
+    return false
+  }
+  
+  searchInItems(navigationConfig, [])
+  return breadcrumbs
+}
+
+export function getRouteGroup(path: string): string | null {
+  const item = findNavigationItem(path)
+  return item?.group || null
+}
+
+export function isActivePath(currentPath: string, itemPath: string): boolean {
+  return currentPath === itemPath || currentPath.startsWith(itemPath + '/')
+}
+
+export function getParentNavigation(path: string): NavigationItem | null {
+  function searchInItems(items: NavigationItem[]): NavigationItem | null {
+    for (const item of items) {
+      if (item.children) {
+        for (const child of item.children) {
+          if (child.href === path || (child.children && child.children.some(c => c.href === path))) {
+            return item
+          }
+        }
+        const found = searchInItems(item.children)
+        if (found) return found
+      }
+    }
+    return null
+  }
+  
+  return searchInItems(navigationConfig)
 }

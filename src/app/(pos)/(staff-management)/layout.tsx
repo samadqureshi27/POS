@@ -1,16 +1,17 @@
-import {StaffSubmenu} from '@/components/layout/submenus/StaffSubmenu'
+import React from 'react';
+import StaffSubmenu from '../../../components/layout/submenus/StaffSubmenu';
 
-export default function StaffManagementLayout({
+export default function StaffLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <>
       <StaffSubmenu />
-      <div className="p-6">
+      <main className="p-6">
         {children}
-      </div>
+      </main>
     </>
-  )
+  );
 }

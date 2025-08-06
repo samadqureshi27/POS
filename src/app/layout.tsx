@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-// import DashboardWrapper from "@/components/layout/submenus/DashboardWrapper"
 import DashboardWrapper from "../components/layout/DashboardWrapper";
 
 
@@ -22,15 +21,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        > 
-        <DashboardWrapper>{children}</DashboardWrapper>
+      <body>
+        <DashboardWrapper>
+          {children}
+        </DashboardWrapper>
       </body>
     </html>
   );

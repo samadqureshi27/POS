@@ -1,28 +1,28 @@
-'use client'
-import { usePathname } from 'next/navigation'
-import MainNavbar from './MainNavbar'
-import  Sidebar  from './Sidebar'
+'use client';
 
-interface DashboardWrapperProps {
-  children: React.ReactNode
-  showSubmenu?: boolean
-}
+import React from 'react';
+import Navbar from './MainNavbar';
+import Sidebar from './Sidebar';
 
-export default function DashboardWrapper({ 
-  children, 
-  showSubmenu = false 
-}: DashboardWrapperProps) {
-  const pathname = usePathname()
-  
+type DashboardWrapperProps = {
+  children: React.ReactNode;
+};
+
+export default function DashboardWrapper({ children }: DashboardWrapperProps) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <MainNavbar />
+      {/* Main Navbar - Always visible */}
+      <Navbar />
+      
       <div className="flex">
+        {/* Sidebar - Always visible */}
         <Sidebar />
-        <main className="flex-1">
+        
+        {/* Main Content Area */}
+        <div className="flex-1 ml-12"> {/* ml-12 to account for sidebar width */}
           {children}
-        </main>
+        </div>
       </div>
     </div>
-  )
+  );
 }
