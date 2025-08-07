@@ -18,7 +18,7 @@ import {
 export default function Sidebar() {
   const menuItems = [
     { icon: <Home className="h-6 w-6" />, label: 'Home', link: '/' },
-    { icon: <Users className="h-6 w-6" />, label: 'Customers', link: '/customers' },
+    { icon: <Users className="h-6 w-6" />, label: 'Customers', link: '/branches-management' },
     { icon: <Menu className="h-6 w-6" />, label: 'Menu', link: '/menu-management' },
     { icon: <ShoppingCart className="h-6 w-6" />, label: 'Orders', link: '/orders' },
     { icon: <ClipboardList className="h-6 w-6" />, label: 'Inventory', link: '/inventory' },

@@ -1,10 +1,18 @@
-import DashboardWrapper from '@/components/layout/submenus/DashboardWrapper'
+import React from 'react';
 
-
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return <DashboardWrapper showSubmenu={false}>{children}</DashboardWrapper>
+interface LayoutProps {
+  children: React.ReactNode;
 }
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
+  return (
+    <div className="branch-management-layout">
+      {/* Add any menu-management specific layout elements here */}
+      <div className="container mx-auto">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export default Layout;
