@@ -10,6 +10,7 @@ export default function SettingsSubmenu() {
     { label: 'Notification', href: '/notification' },
     { label: 'Backup', href: '/backup' },
     { label: 'Billing & license', href: '/billing-license' },
+    { label: 'Restaurant', href: '/restaurant-management' },
   ];
 
   return <BaseSubmenu items={items} />;

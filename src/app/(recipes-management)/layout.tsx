@@ -1,15 +1,15 @@
 import React from 'react';
-import MenuSubmenu from '../../../components/layout/submenus/MenuSubmenu';
+import RecipesSubmenu from '../../components/layout/submenus/RecipesSubmenu';
 
 
-export default function MenuLayout({
+export default function RecipesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <>
-      <MenuSubmenu />
+      <RecipesSubmenu />
       <main className="p-6">
         {children}
       </main>
