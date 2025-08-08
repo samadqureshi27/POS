@@ -34,7 +34,7 @@ const Toast = ({
   </div>
 );
 
-const BranchManagementPage = () => {
+const MenuManagement = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -161,7 +161,7 @@ const BranchManagementPage = () => {
   }
 
   return (
-    <div className="mx-10 p-6 pl-20 bg-gray-50 min-h-screen">
+    <div className="mx-10 p-6 bg-gray-50 min-h-screen">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <div className="mb-6">
@@ -362,4 +362,4 @@ const BranchManagementPage = () => {
   );
 };
 
-export default BranchManagementPage;
+export default MenuManagement;

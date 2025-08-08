@@ -34,6 +34,7 @@ export default function Sidebar() {
       
       {/* Menu Icons with hover tooltips */}
       <nav className="justify-center flex-1 flex flex-col gap-2 over">
+      <nav className="justify-center flex-1 flex flex-col gap-2 over">
         {menuItems.map((item, idx) => (
           <Link
             key={idx}
