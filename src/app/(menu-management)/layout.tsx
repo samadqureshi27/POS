@@ -1,14 +1,15 @@
 import React from 'react';
-import StaffSubmenu from '../../../components/layout/submenus/StaffSubmenu';
+import MenuSubmenu from '../../components/layout/submenus/MenuSubmenu';
 
-export default function StaffLayout({
+
+export default function MenuLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <>
-      <StaffSubmenu />
+      <MenuSubmenu />
       <main className="p-6">
         {children}
       </main>

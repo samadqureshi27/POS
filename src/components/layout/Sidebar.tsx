@@ -19,7 +19,6 @@ export default function Sidebar() {
   const menuItems = [
     
     { icon: <Home className="h-6 w-6" />, label: 'Home', link: '/' },
-    { icon: <User className="h-6 w-6" />, label: 'Restaurant Management', link: '/restaurant-management' },
     { icon: <ChefHat className="h-6 w-6" />, label: 'Menu Management', link: '/menu-management' },
     { icon: <Users className="h-6 w-6" />, label: 'Recipes Management', link: '/recipes-management' },
     { icon: <Menu className="h-6 w-6" />, label: 'POS Management', link: '/pos-list' },
