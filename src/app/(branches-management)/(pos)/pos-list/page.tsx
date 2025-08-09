@@ -49,7 +49,7 @@ const PosListPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
     ""
-  ); // NEW STATE
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,138 +87,6 @@ const PosListPage = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // UPDATED FILTER
-  const filteredItems = menuItems.filter((item) => {
-    const matchesName = item.POS_Name.toLowerCase().includes(
-      searchTerm.toLowerCase()
-    );
-    const matchesStatus = statusFilter ? item.Status === statusFilter : true;
-    return matchesName && matchesStatus;
-  });
-
-  const handleDeleteSelected = () => {
-    if (selectedItems.length === 0) return;
-    setActionLoading(true);
-    setTimeout(() => {
-      const remaining = menuItems.filter(
-        (item) => !selectedItems.includes(item["POS-ID"])
-      );
-      setMenuItems(remaining);
-      setSelectedItems([]);
-      setActionLoading(false);
-      showToast("Selected POS deleted successfully.", "success");
-    }, 600);
-  };
-
-  const handleSelectItem = (POSId: number, checked: boolean) => {
-    setSelectedItems(
-      checked
-        ? [...selectedItems, POSId]
-        : selectedItems.filter((id) => id !== POSId)
-    );
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(
-      checked ? filteredItems.map((item) => item["POS-ID"]) : []
-    );
-  };
-
-  const handleSaveBranch = () => {
-    if (!formData.POS_Name) {
-      showToast("Please fill in all required fields.", "error");
-      return;
-    }
-
-    setActionLoading(true);
-    setTimeout(() => {
-      if (editItem) {
-        setMenuItems((prev) =>
-          prev.map((item) =>
-            item["POS-ID"] === editItem["POS-ID"]
-              ? { ...editItem, ...formData }
-              : item
-          )
-        );
-        showToast("POS updated successfully.", "success");
-      } else {
-        const newItem: MenuItem = {
-          "POS-ID": Math.max(0, ...menuItems.map((i) => i["POS-ID"])) + 1,
-          ...formData,
-        };
-        setMenuItems((prev) => [...prev, newItem]);
-        showToast("POS added successfully.", "success");
-      }
-
-      setModalOpen(false);
-      setEditItem(null);
-      setFormData({
-        POS_Name: "",
-        Status: "Active",
-      });
-      setActionLoading(false);
-    }, 1000);
-  };
-
-  const isAllSelected =
-    selectedItems.length === filteredItems.length && filteredItems.length > 0;
-  const isSomeSelected = selectedItems.length > 0;
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading POS...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
-    ""
-  ); // NEW STATE
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<MenuItem | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-
-  const [formData, setFormData] = useState({
-    POS_Name: "",
-    Status: "Active" as "Active" | "Inactive",
-  });
-
-  useEffect(() => {
-    setTimeout(() => {
-      setMenuItems([
-        {
-          "POS-ID": 1,
-          POS_Name: "Main Branch",
-          Status: "Active",
-        },
-        {
-          "POS-ID": 2,
-          POS_Name: "North Branch",
-          Status: "Inactive",
-        },
-      ]);
-      setLoading(false);
-    }, 800);
-  }, []);
-
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  // UPDATED FILTER
   const filteredItems = menuItems.filter((item) => {
     const matchesName = item.POS_Name.toLowerCase().includes(
       searchTerm.toLowerCase()
@@ -567,4 +435,3 @@ const PosListPage = () => {
 };
 
 export default PosListPage;
-
