@@ -1,7 +1,8 @@
 "use client";
+import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -197,10 +198,10 @@ const PosListPage = () => {
 
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl  mb-1">{menuItems.filter((item) => item.Status === "Active").length}</p>
-            <p className="text-1xl text-gray-500 ">
-             Active POS
+            <p className="text-6xl  mb-1">
+              {menuItems.filter((item) => item.Status === "Active").length}
             </p>
+            <p className="text-1xl text-gray-500 ">Active POS</p>
           </div>
         </div>
       </div>
@@ -284,19 +285,43 @@ const PosListPage = () => {
                 {/* Status Column with Filter */}
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
-                    <select
-                      value={statusFilter}
-                      onChange={(e) =>
-                        setStatusFilter(
-                          e.target.value as "" | "Active" | "Inactive"
-                        )
-                      }
-                      className="px-2 py-1 rounded text-sm focus:outline-none"
-                    >
-                      <option value="">Status</option>
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                        {statusFilter || "Status"}
+                        <ChevronDown
+                          size={14}
+                          className="text-gray-500 ml-auto"
+                        />
+                      </DropdownMenu.Trigger>
+
+                      <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                          className="min-w-[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                          sideOffset={6}
+                        >
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+
+                          <DropdownMenu.Item
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            onClick={() => setStatusFilter("")}
+                          >
+                            Status
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            onClick={() => setStatusFilter("Active")}
+                          >
+                            Active
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            onClick={() => setStatusFilter("Inactive")}
+                          >
+                            Inactive
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
