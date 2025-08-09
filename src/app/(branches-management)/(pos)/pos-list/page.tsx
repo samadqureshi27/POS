@@ -1,7 +1,8 @@
 "use client";
+import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -174,6 +175,137 @@ const PosListPage = () => {
     );
   }
 
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
+    ""
+  ); // NEW STATE
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<MenuItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  const [formData, setFormData] = useState({
+    POS_Name: "",
+    Status: "Active" as "Active" | "Inactive",
+  });
+
+  useEffect(() => {
+    setTimeout(() => {
+      setMenuItems([
+        {
+          "POS-ID": 1,
+          POS_Name: "Main Branch",
+          Status: "Active",
+        },
+        {
+          "POS-ID": 2,
+          POS_Name: "North Branch",
+          Status: "Inactive",
+        },
+      ]);
+      setLoading(false);
+    }, 800);
+  }, []);
+
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // UPDATED FILTER
+  const filteredItems = menuItems.filter((item) => {
+    const matchesName = item.POS_Name.toLowerCase().includes(
+      searchTerm.toLowerCase()
+    );
+    const matchesStatus = statusFilter ? item.Status === statusFilter : true;
+    return matchesName && matchesStatus;
+  });
+
+  const handleDeleteSelected = () => {
+    if (selectedItems.length === 0) return;
+    setActionLoading(true);
+    setTimeout(() => {
+      const remaining = menuItems.filter(
+        (item) => !selectedItems.includes(item["POS-ID"])
+      );
+      setMenuItems(remaining);
+      setSelectedItems([]);
+      setActionLoading(false);
+      showToast("Selected POS deleted successfully.", "success");
+    }, 600);
+  };
+
+  const handleSelectItem = (POSId: number, checked: boolean) => {
+    setSelectedItems(
+      checked
+        ? [...selectedItems, POSId]
+        : selectedItems.filter((id) => id !== POSId)
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectedItems(
+      checked ? filteredItems.map((item) => item["POS-ID"]) : []
+    );
+  };
+
+  const handleSaveBranch = () => {
+    if (!formData.POS_Name) {
+      showToast("Please fill in all required fields.", "error");
+      return;
+    }
+
+    setActionLoading(true);
+    setTimeout(() => {
+      if (editItem) {
+        setMenuItems((prev) =>
+          prev.map((item) =>
+            item["POS-ID"] === editItem["POS-ID"]
+              ? { ...editItem, ...formData }
+              : item
+          )
+        );
+        showToast("POS updated successfully.", "success");
+      } else {
+        const newItem: MenuItem = {
+          "POS-ID": Math.max(0, ...menuItems.map((i) => i["POS-ID"])) + 1,
+          ...formData,
+        };
+        setMenuItems((prev) => [...prev, newItem]);
+        showToast("POS added successfully.", "success");
+      }
+
+      setModalOpen(false);
+      setEditItem(null);
+      setFormData({
+        POS_Name: "",
+        Status: "Active",
+      });
+      setActionLoading(false);
+    }, 1000);
+  };
+
+  const isAllSelected =
+    selectedItems.length === filteredItems.length && filteredItems.length > 0;
+  const isSomeSelected = selectedItems.length > 0;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading POS...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 mx-6 bg-gray-50 min-h-screen">
       {toast && (
@@ -197,10 +329,10 @@ const PosListPage = () => {
 
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl  mb-1">{menuItems.filter((item) => item.Status === "Active").length}</p>
-            <p className="text-1xl text-gray-500 ">
-             Active POS
+            <p className="text-6xl  mb-1">
+              {menuItems.filter((item) => item.Status === "Active").length}
             </p>
+            <p className="text-1xl text-gray-500 ">Active POS</p>
           </div>
         </div>
       </div>
@@ -284,19 +416,43 @@ const PosListPage = () => {
                 {/* Status Column with Filter */}
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
-                    <select
-                      value={statusFilter}
-                      onChange={(e) =>
-                        setStatusFilter(
-                          e.target.value as "" | "Active" | "Inactive"
-                        )
-                      }
-                      className="px-2 py-1 rounded text-sm focus:outline-none"
-                    >
-                      <option value="">Status</option>
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                        {statusFilter || "Status"}
+                        <ChevronDown
+                          size={14}
+                          className="text-gray-500 ml-auto"
+                        />
+                      </DropdownMenu.Trigger>
+
+                      <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                          className="min-w-[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                          sideOffset={6}
+                        >
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+
+                          <DropdownMenu.Item
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            onClick={() => setStatusFilter("")}
+                          >
+                            Status
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            onClick={() => setStatusFilter("Active")}
+                          >
+                            Active
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            onClick={() => setStatusFilter("Inactive")}
+                          >
+                            Inactive
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
@@ -411,3 +567,4 @@ const PosListPage = () => {
 };
 
 export default PosListPage;
+
