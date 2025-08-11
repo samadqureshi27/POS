@@ -49,7 +49,7 @@ const PosListPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
     ""
-  ); // NEW STATE
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,7 +87,6 @@ const PosListPage = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // UPDATED FILTER
   const filteredItems = menuItems.filter((item) => {
     const matchesName = item.POS_Name.toLowerCase().includes(
       searchTerm.toLowerCase()
