@@ -128,7 +128,38 @@ export const navigationConfig: NavigationItem[] = [
     name: 'Loyalty Details',
     href: '/loyalty-details',
     group: 'customer-management'
+  },
+  {
+    name: 'General Settings',
+    href: '/general-settings',
+    group: 'settings'
+  },
+  {
+    name: 'Payment Settings',
+    href: '/payment',
+    group: 'settings'
+  },
+  {
+    name: 'Notification Settings',
+    href: '/notification',
+    group: 'settings'
+  },
+  {
+    name: 'Billing & License',
+    href: '/billing-license',
+    group: 'settings'
+  },
+  {
+    name:'Restaurant Management',
+    href: '/restaurant-management',
+    group: 'settings'
+  },
+  {
+    name: 'Back Up',
+    href: '/backup',
+    group: 'settings'
   }
+  
 ]
 
 // Utility function to find navigation item by path
