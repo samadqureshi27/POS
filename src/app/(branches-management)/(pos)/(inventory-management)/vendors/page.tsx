@@ -150,17 +150,26 @@ const vendorsPage = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleDeleteSelected = () => {
-    if (selectedItems.length === 0) return;
-    setActionLoading(true);
-    setTimeout(() => {
-      const remaining = items.filter((it) => !selectedItems.includes(it.ID));
-      setItems(remaining);
-      setSelectedItems([]);
-      setActionLoading(false);
-      showToast("Selected items deleted successfully.", "success");
-    }, 600);
-  };
+ const handleDeleteSelected = () => {
+  if (selectedItems.length === 0) return;
+  setActionLoading(true);
+  setTimeout(() => {
+    // Remove selected items
+    let remaining = items.filter((it) => !selectedItems.includes(it.ID));
+
+    // Reassign IDs sequentially starting from 1
+    remaining = remaining.map((item, index) => ({
+      ...item,
+      ID: `#${String(index + 1).padStart(3, "0")}`,
+    }));
+
+    setItems(remaining);
+    setSelectedItems([]);
+    setActionLoading(false);
+    showToast("Selected items deleted successfully.", "success");
+  }, 600);
+};
+
 
     const handleSelectItem = (id: string, checked: boolean) => {
     setSelectedItems(
