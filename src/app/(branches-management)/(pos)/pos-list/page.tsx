@@ -344,7 +344,7 @@ const PosListPage = () => {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredItems.map((item) => (
-                <tr key={item["POS-ID"]} className="bg-white hover:bg-gray-50">
+                <tr key={item["POS_ID"]} className="bg-white hover:bg-gray-50">
                   <td className="px-4 py-4">
                     <Checkbox
                       checked={selectedItems.includes(item.POS_ID)}
