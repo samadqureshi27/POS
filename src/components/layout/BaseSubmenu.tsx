@@ -18,7 +18,7 @@ export default function BaseSubmenu({ items }: BaseSubmenuProps) {
   const pathname = usePathname();
 
   return (
-    <div className="sticky top-16 z-1 bg-[#2E2E2E] shadow-md">
+    <div className="sticky top-16 z-60 bg-[#2E2E2E] shadow-md">
       <div className="w-full overflow-x-auto scrollbar-hide">
         <nav className="flex gap-2 px-10 py-3 min-w-max ml-8">
           {items.map((item, idx) => {
