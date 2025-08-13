@@ -13,16 +13,16 @@ type DashboardWrapperProps = {
 export default function DashboardWrapper({ children }: DashboardWrapperProps) {
   const { pageTitle } = useNavigation();
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
+    <div className="h-screen flex flex-col bg-gray-50">
       {/* Main Navbar - Always visible */}
       <Navbar title={pageTitle} />
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="">
         {/* Sidebar - Always visible */}
         <Sidebar />
         
         {/* Main Content Area */}
-        <div className="flex-1"> {/* ml-12 to account for sidebar width */}
+        <div className=""> {/* ml-12 to account for sidebar width */}
           {children}
         </div>
       </div>

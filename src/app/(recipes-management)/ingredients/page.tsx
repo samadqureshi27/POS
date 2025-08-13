@@ -99,7 +99,7 @@ const ingredientsManagementPage = () => {
           ID: "#003",
           Name: "French Bread",
 
-          Status: "Active",
+          Status: "Inactive",
           Description: "Bread ",
           Unit: "Kilograms (Kg’s)",
 
@@ -264,6 +264,7 @@ const ingredientsManagementPage = () => {
       </h1>
 
       
+      
 
       {/* Action bar: add, delete, search */}
       <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
@@ -336,48 +337,7 @@ const ingredientsManagementPage = () => {
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
-                  <div className="flex items-center gap-2">
-                    <DropdownMenu.Root>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
-                        {unitFilter || "Unit"}
-                        <ChevronDown
-                          size={14}
-                          className="text-gray-500 ml-auto"
-                        />
-                      </DropdownMenu.Trigger>
-
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                          className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
-                          sideOffset={6}
-                        >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                            onClick={() => setUnitFilter("")}
-                          >
-                            Unit
-                          </DropdownMenu.Item>
-
-                          {Array.from(new Set(items.map((i) => i.Unit))).map(
-                            (unit) => (
-                              <DropdownMenu.Item
-                                key={unit}
-                                className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                                onClick={() => setUnitFilter(unit)}
-                              >
-                                {unit}
-                              </DropdownMenu.Item>
-                            )
-                          )}
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
-                    </DropdownMenu.Root>
-                  </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
-                </th>
+                
 
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
@@ -405,22 +365,18 @@ const ingredientsManagementPage = () => {
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
                             className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
-                            onClick={() => setStatusFilter("Low")}
+                            onClick={() => setStatusFilter("Inactive")}
                           >
-                            Low
+                            Inactive
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-yellow-100 text-yellow-700 rounded outline-none"
-                            onClick={() => setStatusFilter("Medium")}
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green
+                            -100 text-green-700 rounded outline-none"
+                            onClick={() => setStatusFilter("Active")}
                           >
-                            Medium
+                            Active
                           </DropdownMenu.Item>
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
-                            onClick={() => setStatusFilter("High")}
-                          >
-                            High
-                          </DropdownMenu.Item>
+                          
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
@@ -429,21 +385,18 @@ const ingredientsManagementPage = () => {
                 </th>
 
                 <th className="relative px-4 py-3 text-left">
-                  Initial Stock
+                  Description
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  Added Stock
+                  Unit
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  Updated Stock
+                  Priority
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
-                  Threshold
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
-                </th>
+                
 
                 <th className="relative px-4 py-3 text-left">
                   Actions
@@ -470,19 +423,15 @@ const ingredientsManagementPage = () => {
 
                   <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
                   <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.Unit}</td>
+                  
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
                       className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium border
-                  ${item.Status === "Low" ? "text-red-600 border-red-600" : ""}
+                  ${item.Status === "Inactive" ? "text-red-600 border-red-600" : ""}
+                 
                   ${
-                    item.Status === "Medium"
-                      ? "text-yellow-600 border-yellow-600"
-                      : ""
-                  }
-                  ${
-                    item.Status === "High"
+                    item.Status === "Active"
                       ? "text-green-700 border-green-700"
                       : ""
                   }
@@ -493,17 +442,13 @@ const ingredientsManagementPage = () => {
                   </td>
 
                   <td className="px-4 py-4 whitespace-nowrap">
-                    {item.InitialStock}
+                    {item.Description}
                   </td>
+                  <td className="px-4 py-4 whitespace-nowrap">{item.Unit}</td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {item.AddedStock}
+                    {item.Priority}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {item.UpdatedStock}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {item.Threshold}
-                  </td>
+                  
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
@@ -556,9 +501,9 @@ const ingredientsManagementPage = () => {
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded"
                 >
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  
                 </select>
               </div>
 
@@ -590,63 +535,37 @@ const ingredientsManagementPage = () => {
 
               <div>
                 <label className="block text-sm text-gray-600 mb-1">
-                  Initial Stock
+                  Description
                 </label>
                 <input
                   type="text"
-                  value={formData.InitialStock}
+                  value={formData.Description}
                   onChange={(e) =>
-                    setFormData({ ...formData, InitialStock: e.target.value })
+                    setFormData({ ...formData, Description: e.target.value })
                   }
-                  placeholder="Initial stock"
+                  placeholder="Description"
                   className="w-full px-4 py-2 border border-gray-300 rounded"
                 />
               </div>
 
               <div>
                 <label className="block text-sm text-gray-600 mb-1">
-                  Added Stock (block/address)
+                  Priority
                 </label>
                 <input
                   type="text"
-                  value={formData.AddedStock}
+                  value={formData.Priority}
                   onChange={(e) =>
-                    setFormData({ ...formData, AddedStock: e.target.value })
+                    setFormData({ ...formData, Priority: e.target.value })
                   }
-                  placeholder="#777, Block G1, Johartown"
+                  placeholder="Priority"
                   className="w-full px-4 py-2 border border-gray-300 rounded"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Updated Stock (block/address)
-                </label>
-                <input
-                  type="text"
-                  value={formData.UpdatedStock}
-                  onChange={(e) =>
-                    setFormData({ ...formData, UpdatedStock: e.target.value })
-                  }
-                  placeholder="#777, Block G1, Johartown"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                />
-              </div>
+              
 
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Threshold
-                </label>
-                <input
-                  type="text"
-                  value={formData.Threshold}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Threshold: e.target.value })
-                  }
-                  placeholder="Threshold"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                />
-              </div>
+              
             </div>
 
             <div className="flex justify-end gap-2">
