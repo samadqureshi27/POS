@@ -5,7 +5,6 @@ import BaseSubmenu from '../BaseSubmenu';
 
 export default function CustomerMgmtSubmenu() {
   const items = [
-    { label: 'Customer profile', href: '/customer-profile' },
     { label: 'Customer Details', href: '/customer-details' },
     { label: 'Loyalty Details', href: '/loyalty-details' },
   ];

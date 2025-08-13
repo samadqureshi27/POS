@@ -10,7 +10,7 @@ type NavbarProps = {
 
 export default function Navbar({ title = 'Home' }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-2">
+    <header className="sticky top-0 z-70">
       {/* thin top strip */}
       {/* <div className="h-2 bg-[#4a2a2a]" /> */}
 
