@@ -10,11 +10,11 @@ type NavbarProps = {
 
 export default function Navbar({ title = 'Home' }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-40">
+    <header className="sticky top-0 z-2">
       {/* thin top strip */}
       {/* <div className="h-2 bg-[#4a2a2a]" /> */}
 
-      <nav className="bg-neutral-900 text-white">
+      <nav className="bg-[#161616] text-white">
         <div className="mx-auto max-w-8xl px-3 sm:px-4">
           <div className="flex h-16 items-center">
             {/* Left: logo + brand */}
@@ -66,7 +66,7 @@ function IconButton({
   href?: string;
 }) {
   const classes =
-    'inline-flex items-center justify-center rounded-full border border-yellow-600/70 p-1 text-yellow-500 hover:bg-yellow-600/10 transition';
+    'inline-flex items-center justify-center p-1 text-yellow-500 hover:bg-yellow-600/10 transition';
   if (asLink && href) {
     return (
       <Link href={href} aria-label={ariaLabel} className={classes}>

@@ -29,7 +29,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-16 bg-[#CCAB4D] flex flex-col items-center justify-center z-0 ">
+    <aside className="fixed left-0 top-0 h-screen w-16 bg-[#D1AB35] flex flex-col items-center justify-center">
       
       {/* Menu Icons with hover tooltips */}
       <nav className="justify-center flex-1 flex flex-col gap-2 over">
