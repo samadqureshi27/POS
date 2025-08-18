@@ -5,7 +5,7 @@ import BaseSubmenu from '../BaseSubmenu';
 
 export default function AnalyticsSubmenu() {
   const items = [
-    { label: 'Financial Report', href: '/financial-report' },
+    { label: 'Financial Report', href: '/financial-reports' },
     { label: 'Customer Analytics', href: '/customer-analytics' },
     { label: 'Customer Reports', href: '/customer-reports' },
   ];
