@@ -20,13 +20,13 @@ export default function LoginSelection() {
         <div className="flex space-x-8">
           <button
             onClick={() => router.push('/login/admin')}
-            className="bg-gold text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-dark transition-colors"
+            className="bg-gold text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-dark transition-colors"
           >
             ADMIN
           </button>
           <button
             onClick={() => router.push('/login/manager')}
-            className="bg-gold text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-dark transition-colors"
+            className="bg-gold text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-dark transition-colors"
           >
             MANAGER
           </button>
