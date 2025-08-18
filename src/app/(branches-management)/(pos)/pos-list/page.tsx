@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 interface MenuItem {
-  "POS-ID": number;
+  POS_ID: string;
   POS_Name: string;
   Status: "Active" | "Inactive";
 }
@@ -45,7 +45,7 @@ const Toast = ({
 
 const PosListPage = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
     ""
@@ -68,12 +68,12 @@ const PosListPage = () => {
     setTimeout(() => {
       setMenuItems([
         {
-          "POS-ID": 1,
+          POS_ID: "1",
           POS_Name: "Main Branch",
           Status: "Active",
         },
         {
-          "POS-ID": 2,
+          POS_ID: "2",
           POS_Name: "North Branch",
           Status: "Inactive",
         },
@@ -98,10 +98,18 @@ const PosListPage = () => {
   const handleDeleteSelected = () => {
     if (selectedItems.length === 0) return;
     setActionLoading(true);
+
     setTimeout(() => {
-      const remaining = menuItems.filter(
-        (item) => !selectedItems.includes(item["POS-ID"])
+      let remaining = menuItems.filter(
+        (item) => !selectedItems.includes(item.POS_ID)
       );
+
+      // ✅ Ensure POS-ID is a number (matches your MenuItem type)
+      remaining = remaining.map((item, index) => ({
+        ...item,
+        POS_ID: String(index + 1),
+      }));
+
       setMenuItems(remaining);
       setSelectedItems([]);
       setActionLoading(false);
@@ -109,18 +117,14 @@ const PosListPage = () => {
     }, 600);
   };
 
-  const handleSelectItem = (POSId: number, checked: boolean) => {
-    setSelectedItems(
-      checked
-        ? [...selectedItems, POSId]
-        : selectedItems.filter((id) => id !== POSId)
+  const handleSelectItem = (POSId: string, checked: boolean) => {
+    setSelectedItems((prev) =>
+      checked ? [...prev, POSId] : prev.filter((id) => id !== POSId)
     );
   };
 
   const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(
-      checked ? filteredItems.map((item) => item["POS-ID"]) : []
-    );
+    setSelectedItems(checked ? menuItems.map((item) => item.POS_ID) : []);
   };
 
   const handleSaveBranch = () => {
@@ -134,7 +138,7 @@ const PosListPage = () => {
       if (editItem) {
         setMenuItems((prev) =>
           prev.map((item) =>
-            item["POS-ID"] === editItem["POS-ID"]
+            item.POS_ID === editItem.POS_ID
               ? { ...editItem, ...formData }
               : item
           )
@@ -142,7 +146,10 @@ const PosListPage = () => {
         showToast("POS updated successfully.", "success");
       } else {
         const newItem: MenuItem = {
-          "POS-ID": Math.max(0, ...menuItems.map((i) => i["POS-ID"])) + 1,
+          POS_ID: (
+            Math.max(0, ...menuItems.map((i) => Number(i.POS_ID))) + 1
+          ).toString(),
+
           ...formData,
         };
         setMenuItems((prev) => [...prev, newItem]);
@@ -277,6 +284,10 @@ const PosListPage = () => {
                   />
                 </th>
                 <th className="relative px-4 py-3 text-left">
+                  POS ID
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                </th>
+                <th className="relative px-4 py-3 text-left">
                   POS Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
@@ -333,18 +344,22 @@ const PosListPage = () => {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredItems.map((item) => (
-                <tr key={item["POS-ID"]} className="bg-white hover:bg-gray-50">
+                <tr key={item["POS_ID"]} className="bg-white hover:bg-gray-50">
                   <td className="px-4 py-4">
                     <Checkbox
-                      checked={selectedItems.includes(item["POS-ID"])}
+                      checked={selectedItems.includes(item.POS_ID)}
                       onChange={(e) =>
-                        handleSelectItem(item["POS-ID"], e.target.checked)
+                        handleSelectItem(item.POS_ID, e.target.checked)
                       }
                       sx={{
                         color: "#d9d9e1",
                         "&.Mui-checked": { color: "#d9d9e1" },
                       }}
                     />
+                  </td>
+
+                  <td className="px-4 py-2">
+                    {`#${String(item.POS_ID).padStart(3, "0")}`}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     {item.POS_Name}
@@ -359,7 +374,6 @@ const PosListPage = () => {
                       {item.Status}
                     </span>
                   </td>
-
                   <td className="px-4 py-4 whitespace-nowrap">
                     <button
                       onClick={() => {
@@ -435,4 +449,3 @@ const PosListPage = () => {
 };
 
 export default PosListPage;
-

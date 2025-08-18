@@ -22,8 +22,9 @@ export default function Sidebar() {
     { icon: <ChefHat className="h-6 w-6" />, label: 'Menu Management', link: '/menu-management' },
     { icon: <Users className="h-6 w-6" />, label: 'Recipes Management', link: '/recipes-management' },
     { icon: <Menu className="h-6 w-6" />, label: 'POS Management', link: '/pos-list' },
+    { icon: <IdCard className="h-6 w-6" />, label: 'Financial Reports', link: '/financial-reports' },
     { icon: <ShoppingCart className="h-6 w-6" />, label: 'Orders Management', link: '/order-management' },
-    { icon: <Pencil className="h-6 w-6" />, label: 'Customer Management', link: '/customer-management' },
+    { icon: <Pencil className="h-6 w-6" />, label: 'Customer Management', link: '/customer-details' },
     { icon: <ClipboardList className="h-6 w-6" />, label: 'Branches Management', link: '/branches-management' },
     { icon: <Settings className="h-6 w-6" />, label: 'Settings', link: '/general-settings' },
   ];
