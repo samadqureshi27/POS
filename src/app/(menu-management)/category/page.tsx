@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import ButtonPage from "../../../components/layout/UI/button";
 import {
   Plus,
   Trash2,
@@ -18,6 +19,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { Button } from "@mui/material";
 
 interface CategoryItem {
   ID: number;
@@ -241,55 +243,6 @@ const Toast = ({
   </div>
 );
 
-const ToggleSwitch = ({
-  checked,
-  onChange,
-  disabled = false,
-}: {
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  disabled?: boolean;
-}) => {
-  const handleToggle = () => {
-    if (disabled) return;
-    onChange(!checked);
-  };
-
-  return (
-    <label
-      className={`
-      relative inline-block cursor-pointer w-14 h-8
-      ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-    `}
-    >
-      <input
-        type="checkbox"
-        className="sr-only"
-        checked={checked}
-        onChange={handleToggle}
-        disabled={disabled}
-      />
-
-      {/* Slider background */}
-      <span
-        className={`
-        absolute inset-0 rounded-xl transition-colors duration-400
-        ${checked ? "bg-green-500" : "bg-red-600"}
-      `}
-      />
-
-      {/* Slider circle */}
-      <span
-        className={`
-        absolute bg-white rounded-lg transition-transform duration-400
-        h-6 w-6 left-1 bottom-1
-        ${checked ? "translate-x-6" : "translate-x-0"}
-      `}
-      />
-    </label>
-  );
-};
-
 const CategoryPage = () => {
   const [categoryItems, setCategoryItems] = useState<CategoryItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -298,6 +251,7 @@ const CategoryPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingItem, setEditingItem] = useState<CategoryItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -853,7 +807,7 @@ const CategoryPage = () => {
                       Priority: Number(e.target.value) || 1,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   min={1}
                   required
                 />
@@ -864,7 +818,7 @@ const CategoryPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
                 </label>
-                <ToggleSwitch
+                <ButtonPage
                   checked={formData.Status === "Active"}
                   onChange={handleStatusChange}
                 />

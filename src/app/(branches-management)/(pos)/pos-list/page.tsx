@@ -1,9 +1,10 @@
 "use client";
+
+import React from "react";
 import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import React, { useState, useEffect } from "react";
+import ButtonPage from "../../../../components/layout/UI/button";
 import {
   Plus,
   Trash2,
@@ -11,14 +12,138 @@ import {
   AlertCircle,
   CheckCircle,
   X,
-  Info,
   Edit,
+  Save,
 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface MenuItem {
   POS_ID: string;
   POS_Name: string;
   Status: "Active" | "Inactive";
+}
+
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
+
+class PosAPI {
+  private static delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  private static mockData: MenuItem[] = [
+    {
+      POS_ID: "1",
+      POS_Name: "Main Branch",
+      Status: "Active",
+    },
+    {
+      POS_ID: "2",
+      POS_Name: "North Branch",
+      Status: "Inactive",
+    },
+    {
+      POS_ID: "3",
+      POS_Name: "South Branch",
+      Status: "Active",
+    },
+    {
+      POS_ID: "4",
+      POS_Name: "East Branch",
+      Status: "Active",
+    },
+    {
+      POS_ID: "5",
+      POS_Name: "West Branch",
+      Status: "Inactive",
+    },
+  ];
+
+  // GET /api/pos-items/
+  static async getPosItems(): Promise<ApiResponse<MenuItem[]>> {
+    await this.delay(800);
+    return {
+      success: true,
+      data: [...this.mockData],
+      message: "POS items fetched successfully",
+    };
+  }
+
+  // POST /api/pos-items/
+  static async createPosItem(
+    item: Omit<MenuItem, "POS_ID">
+  ): Promise<ApiResponse<MenuItem>> {
+    await this.delay(1000);
+    const newId = (this.mockData.length + 1).toString();
+    const newItem: MenuItem = {
+      ...item,
+      POS_ID: newId,
+    };
+    this.mockData.push(newItem);
+    return {
+      success: true,
+      data: newItem,
+      message: "POS item created successfully",
+    };
+  }
+
+  // PUT /api/pos-items/{id}/
+  static async updatePosItem(
+    id: string,
+    item: Partial<MenuItem>
+  ): Promise<ApiResponse<MenuItem>> {
+    await this.delay(800);
+    const index = this.mockData.findIndex((i) => i.POS_ID === id);
+    if (index === -1) throw new Error("Item not found");
+
+    this.mockData[index] = { ...this.mockData[index], ...item };
+    return {
+      success: true,
+      data: this.mockData[index],
+      message: "POS item updated successfully",
+    };
+  }
+
+  // DELETE /api/pos-items/{id}/
+  static async deletePosItem(id: string): Promise<ApiResponse<null>> {
+    await this.delay(600);
+    const index = this.mockData.findIndex((i) => i.POS_ID === id);
+    if (index === -1) throw new Error("Item not found");
+
+    this.mockData.splice(index, 1);
+
+    // Reassign IDs sequentially
+    this.mockData = this.mockData.map((item, idx) => ({
+      ...item,
+      POS_ID: (idx + 1).toString(),
+    }));
+
+    return {
+      success: true,
+      data: null,
+      message: "POS item deleted successfully",
+    };
+  }
+
+  // DELETE /api/pos-items/bulk-delete/
+  static async bulkDeletePosItems(ids: string[]): Promise<ApiResponse<null>> {
+    await this.delay(1000);
+    this.mockData = this.mockData.filter((item) => !ids.includes(item.POS_ID));
+
+    // Reassign IDs sequentially
+    this.mockData = this.mockData.map((item, idx) => ({
+      ...item,
+      POS_ID: (idx + 1).toString(),
+    }));
+
+    return {
+      success: true,
+      data: null,
+      message: `${ids.length} POS items deleted successfully`,
+    };
+  }
 }
 
 const Toast = ({
@@ -46,124 +171,170 @@ const Toast = ({
 const PosListPage = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
-    ""
-  );
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
+    ""
+  );
 
-  const [formData, setFormData] = useState({
+  // Modal form state
+  const [formData, setFormData] = useState<Omit<MenuItem, "POS_ID">>({
     POS_Name: "",
-    Status: "Active" as "Active" | "Inactive",
+    Status: "Active",
   });
-
-  useEffect(() => {
-    setTimeout(() => {
-      setMenuItems([
-        {
-          POS_ID: "1",
-          POS_Name: "Main Branch",
-          Status: "Active",
-        },
-        {
-          POS_ID: "2",
-          POS_Name: "North Branch",
-          Status: "Inactive",
-        },
-      ]);
-      setLoading(false);
-    }, 800);
-  }, []);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  const filteredItems = menuItems.filter((item) => {
-    const matchesName = item.POS_Name.toLowerCase().includes(
-      searchTerm.toLowerCase()
-    );
-    const matchesStatus = statusFilter ? item.Status === statusFilter : true;
-    return matchesName && matchesStatus;
-  });
+  useEffect(() => {
+    loadPosItems();
+  }, []);
 
-  const handleDeleteSelected = () => {
-    if (selectedItems.length === 0) return;
-    setActionLoading(true);
-
-    setTimeout(() => {
-      let remaining = menuItems.filter(
-        (item) => !selectedItems.includes(item.POS_ID)
-      );
-
-      // ✅ Ensure POS-ID is a number (matches your MenuItem type)
-      remaining = remaining.map((item, index) => ({
-        ...item,
-        POS_ID: String(index + 1),
-      }));
-
-      setMenuItems(remaining);
-      setSelectedItems([]);
-      setActionLoading(false);
-      showToast("Selected POS deleted successfully.", "success");
-    }, 600);
-  };
-
-  const handleSelectItem = (POSId: string, checked: boolean) => {
-    setSelectedItems((prev) =>
-      checked ? [...prev, POSId] : prev.filter((id) => id !== POSId)
-    );
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(checked ? menuItems.map((item) => item.POS_ID) : []);
-  };
-
-  const handleSaveBranch = () => {
-    if (!formData.POS_Name) {
-      showToast("Please fill in all required fields.", "error");
-      return;
-    }
-
-    setActionLoading(true);
-    setTimeout(() => {
-      if (editItem) {
-        setMenuItems((prev) =>
-          prev.map((item) =>
-            item.POS_ID === editItem.POS_ID
-              ? { ...editItem, ...formData }
-              : item
-          )
-        );
-        showToast("POS updated successfully.", "success");
-      } else {
-        const newItem: MenuItem = {
-          POS_ID: (
-            Math.max(0, ...menuItems.map((i) => Number(i.POS_ID))) + 1
-          ).toString(),
-
-          ...formData,
-        };
-        setMenuItems((prev) => [...prev, newItem]);
-        showToast("POS added successfully.", "success");
-      }
-
-      setModalOpen(false);
-      setEditItem(null);
+  // Modal form effect
+  useEffect(() => {
+    if (editingItem) {
+      setFormData({
+        POS_Name: editingItem.POS_Name,
+        Status: editingItem.Status,
+      });
+    } else {
       setFormData({
         POS_Name: "",
         Status: "Active",
       });
+    }
+  }, [editingItem, isModalOpen]);
+
+  const loadPosItems = async () => {
+    try {
+      setLoading(true);
+      const response = await PosAPI.getPosItems();
+      if (response.success) {
+        setMenuItems(response.data);
+      } else {
+        throw new Error(response.message || "Failed to fetch POS items");
+      }
+    } catch (error) {
+      console.error("Error fetching POS items:", error);
+      showToast("Failed to load POS items", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredItems = menuItems.filter((item) => {
+    const matchesSearch = item.POS_Name.toLowerCase().includes(
+      searchTerm.toLowerCase()
+    );
+    const matchesStatus = statusFilter ? item.Status === statusFilter : true;
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleCreateItem = async (itemData: Omit<MenuItem, "POS_ID">) => {
+    try {
+      setActionLoading(true);
+      const response = await PosAPI.createPosItem(itemData);
+      if (response.success) {
+        setMenuItems((prevItems) => [...prevItems, response.data]);
+        setIsModalOpen(false);
+        setSearchTerm("");
+        setStatusFilter("");
+        showToast(response.message || "POS created successfully", "success");
+      }
+    } catch (error) {
+      console.error("Error creating POS:", error);
+      showToast("Failed to create POS", "error");
+    } finally {
       setActionLoading(false);
-    }, 1000);
+    }
+  };
+
+  const handleUpdateItem = async (itemData: Omit<MenuItem, "POS_ID">) => {
+    if (!editingItem) return;
+    try {
+      setActionLoading(true);
+      const response = await PosAPI.updatePosItem(editingItem.POS_ID, itemData);
+      if (response.success) {
+        setMenuItems(
+          menuItems.map((item) =>
+            item.POS_ID === editingItem.POS_ID ? response.data : item
+          )
+        );
+        setIsModalOpen(false);
+        setEditingItem(null);
+        showToast(response.message || "POS updated successfully", "success");
+      }
+    } catch (error) {
+      showToast("Failed to update POS", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedItems.length === 0) return;
+    try {
+      setActionLoading(true);
+      const response = await PosAPI.bulkDeletePosItems(selectedItems);
+      if (response.success) {
+        setMenuItems((prev) => {
+          const remaining = prev.filter((i) => !selectedItems.includes(i.POS_ID));
+          return remaining.map((it, idx) => ({ ...it, POS_ID: (idx + 1).toString() }));
+        });
+        setSelectedItems([]);
+        showToast(response.message || "POS deleted successfully", "success");
+      }
+    } catch (error) {
+      showToast("Failed to delete POS", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectedItems(checked ? filteredItems.map((item) => item.POS_ID) : []);
+  };
+
+  const handleSelectItem = (posId: string, checked: boolean) => {
+    setSelectedItems(
+      checked
+        ? [...selectedItems, posId]
+        : selectedItems.filter((id) => id !== posId)
+    );
+  };
+
+  // Modal form handlers
+  const handleModalSubmit = () => {
+    if (!formData.POS_Name.trim()) {
+      return;
+    }
+
+    if (editingItem) {
+      handleUpdateItem(formData);
+    } else {
+      handleCreateItem(formData);
+    }
+  };
+
+  const handleStatusChange = (isActive: boolean) => {
+    setFormData({
+      ...formData,
+      Status: isActive ? "Active" : "Inactive",
+    });
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingItem(null);
   };
 
   const isAllSelected =
@@ -182,7 +353,7 @@ const PosListPage = () => {
   }
 
   return (
-    <div className="p-6 mx-6 bg-gray-50 min-h-screen">
+    <div className="mx-6 p-6 bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -195,37 +366,29 @@ const PosListPage = () => {
 
       {/* Summary Cards */}
       <div className="flex gap-4 mb-6 pl-20">
-        <div className="flex items-center justify-start flex-1  gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl  mb-1">{menuItems.length}</p>
+            <p className="text-6xl mb-1">{menuItems.length}</p>
             <p className="text-1xl text-gray-500">Total POS</p>
           </div>
         </div>
 
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl  mb-1">
+            <p className="text-6xl mb-1">
               {menuItems.filter((item) => item.Status === "Active").length}
             </p>
-            <p className="text-1xl text-gray-500 ">Active POS</p>
+            <p className="text-1xl text-gray-500">Active POS</p>
           </div>
         </div>
       </div>
 
-      {/* Branch Management */}
+      {/* Action bar */}
       <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3  pl-20">
+        <div className="flex gap-3 pl-20">
           <button
-            onClick={() => {
-              if (selectedItems.length > 0) return;
-              setEditItem(null);
-              setFormData({
-                POS_Name: "",
-                Status: "Active",
-              });
-              setModalOpen(true);
-            }}
+            onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
             className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
               selectedItems.length === 0
@@ -267,20 +430,16 @@ const PosListPage = () => {
         </div>
       </div>
 
-      {/* Branch Table */}
-      <div className="bg-gray-50 rounded-lg ml-20 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+      {/* Table */}
+      <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
+        <div className="overflow-y-auto">
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 text-left">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    sx={{
-                      color: "#2C2C2C",
-                      "&.Mui-checked": { color: "#2C2C2C" },
-                    }}
                   />
                 </th>
                 <th className="relative px-4 py-3 text-left">
@@ -291,8 +450,6 @@ const PosListPage = () => {
                   POS Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-
-                {/* Status Column with Filter */}
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
                     <DropdownMenu.Root>
@@ -332,114 +489,136 @@ const PosListPage = () => {
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
+                    <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-
                 <th className="relative px-4 py-3 text-left">
                   Actions
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredItems.map((item) => (
-                <tr key={item["POS_ID"]} className="bg-white hover:bg-gray-50">
-                  <td className="px-4 py-4">
-                    <Checkbox
-                      checked={selectedItems.includes(item.POS_ID)}
-                      onChange={(e) =>
-                        handleSelectItem(item.POS_ID, e.target.checked)
-                      }
-                      sx={{
-                        color: "#d9d9e1",
-                        "&.Mui-checked": { color: "#d9d9e1" },
-                      }}
-                    />
-                  </td>
 
-                  <td className="px-4 py-2">
-                    {`#${String(item.POS_ID).padStart(3, "0")}`}
+            <tbody className="divide-y divide-gray-100">
+              {filteredItems.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    {searchTerm || statusFilter
+                      ? "No POS match your search criteria."
+                      : "No POS found."}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {item.POS_Name}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
+                </tr>
+              ) : (
+                filteredItems.map((item) => (
+                  <tr key={item.POS_ID} className="bg-white hover:bg-gray-50">
+                    <td className="px-4 py-4">
+                      <Checkbox
+                        checked={selectedItems.includes(item.POS_ID)}
+                        onChange={(e) =>
+                          handleSelectItem(item.POS_ID, e.target.checked)
+                        }
+                      />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {`#${String(item.POS_ID).padStart(3, "0")}`}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                      {item.POS_Name}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
       ${item.Status === "Active" ? "text-green-600 border-green-600" : ""}
       ${item.Status === "Inactive" ? "text-red-600 border-red-600" : ""}
     `}
-                    >
-                      {item.Status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => {
-                        setEditItem(item);
-                        setFormData({
-                          POS_Name: item.POS_Name,
-                          Status: item.Status,
-                        });
-                        setModalOpen(true);
-                      }}
-                      className="text-black hover:text-gray-800 transition-colors"
-                    >
-                      <Edit size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      >
+                        {item.Status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingItem(item);
+                            setIsModalOpen(true);
+                          }}
+                          className="text-gray-600 hover:text-gray-800 p-1"
+                          title="Edit"
+                        >
+                          <Edit size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
       {/* Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-[700px]">
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#ffff] rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
             <h2 className="text-xl font-semibold mb-4">
-              {editItem ? "Edit Branch" : "New Branch"}
+              {editingItem ? "Edit POS" : "Add New POS"}
             </h2>
-            <div className="mb-4 space-y-2">
-              <input
-                type="text"
-                value={formData.POS_Name}
-                onChange={(e) =>
-                  setFormData({ ...formData, POS_Name: e.target.value })
-                }
-                placeholder="Branch Name"
-                className="w-full px-4 py-2 border border-gray-300 rounded"
-              />
-              <select
-                value={formData.Status}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    Status: e.target.value as "Active" | "Inactive",
-                  })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveBranch}
-                className="px-4 py-2 bg-yellow-600 text-white rounded"
-              >
-                {actionLoading ? "Saving..." : "Save"}
-              </button>
+            <div className="space-y-3">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  POS Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.POS_Name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, POS_Name: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  required
+                />
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Status
+                </label>
+                <ButtonPage
+                  checked={formData.Status === "Active"}
+                  onChange={handleStatusChange}
+                />
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 pt-4 justify-end">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
+                >
+                  <X size={12} />
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleModalSubmit}
+                  disabled={!formData.POS_Name.trim()}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${
+                    formData.POS_Name.trim()
+                      ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                >
+                  <Save size={12} />
+                  {editingItem ? "Update" : "Save & Close"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
