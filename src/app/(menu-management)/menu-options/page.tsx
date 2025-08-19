@@ -252,7 +252,6 @@ const CategoryPage = () => {
     OptionPrice: [],
   });
   const [preview, setPreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });

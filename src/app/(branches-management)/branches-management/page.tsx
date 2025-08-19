@@ -1,18 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
+  ChevronDown,
   Plus,
   Trash2,
   Search,
   AlertCircle,
   CheckCircle,
   X,
-  Info,
   Edit,
+  Save,
+  Info,
 } from "lucide-react";
+import Checkbox from "@mui/material/Checkbox";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import ButtonPage from "../../../components/layout/UI/button";
 
-interface MenuItem {
+// Types
+interface BranchItem {
   "Branch-ID": number;
   Branch_Name: string;
   Status: "Active" | "Inactive";
@@ -22,7 +28,107 @@ interface MenuItem {
   postalCode: string;
 }
 
-// Toast Notification
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
+
+// Mock API
+class BranchAPI {
+  private static delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  private static mockData: BranchItem[] = [
+    {
+      "Branch-ID": 1,
+      Branch_Name: "Main Branch",
+      Status: "Active",
+      "Contact-Info": "03001234567",
+      Address: "123 Main St.",
+      email: "main@gmail.com",
+      postalCode: "35346",
+    },
+    {
+      "Branch-ID": 2,
+      Branch_Name: "North Branch",
+      Status: "Inactive",
+      "Contact-Info": "03007654321",
+      Address: "456 North Ave.",
+      email: "north@gmail.com",
+      postalCode: "2335346",
+    },
+    {
+      "Branch-ID": 3,
+      Branch_Name: "South Branch",
+      Status: "Active",
+      "Contact-Info": "03009876543",
+      Address: "789 South Blvd.",
+      email: "south@gmail.com",
+      postalCode: "12345",
+    },
+  ];
+
+  static async getBranchItems(): Promise<ApiResponse<BranchItem[]>> {
+    await this.delay(800);
+    return {
+      success: true,
+      data: [...this.mockData],
+      message: "Branch items fetched successfully",
+    };
+  }
+
+  static async createBranchItem(
+    item: Omit<BranchItem, "Branch-ID">
+  ): Promise<ApiResponse<BranchItem>> {
+    await this.delay(1000);
+    const newId = Math.max(...this.mockData.map(i => i["Branch-ID"]), 0) + 1;
+    const newItem: BranchItem = { ...item, "Branch-ID": newId };
+    this.mockData.push(newItem);
+    return {
+      success: true,
+      data: newItem,
+      message: "Branch item created successfully",
+    };
+  }
+
+  static async updateBranchItem(
+    id: number,
+    item: Partial<BranchItem>
+  ): Promise<ApiResponse<BranchItem>> {
+    await this.delay(800);
+    const index = this.mockData.findIndex((i) => i["Branch-ID"] === id);
+    if (index === -1) throw new Error("Item not found");
+    this.mockData[index] = { ...this.mockData[index], ...item };
+    return {
+      success: true,
+      data: this.mockData[index],
+      message: "Branch item updated successfully",
+    };
+  }
+
+  static async deleteBranchItem(id: number): Promise<ApiResponse<null>> {
+    await this.delay(600);
+    this.mockData = this.mockData
+      .filter((i) => i["Branch-ID"] !== id)
+      .map((item, idx) => ({ ...item, "Branch-ID": idx + 1 }));
+    return { success: true, data: null, message: "Branch item deleted successfully" };
+  }
+
+  static async bulkDeleteBranchItems(ids: number[]): Promise<ApiResponse<null>> {
+    await this.delay(1000);
+    this.mockData = this.mockData
+      .filter((i) => !ids.includes(i["Branch-ID"]))
+      .map((item, idx) => ({ ...item, "Branch-ID": idx + 1 }));
+    return {
+      success: true,
+      data: null,
+      message: `${ids.length} Branch items deleted successfully`,
+    };
+  }
+}
+
+// Toast
 const Toast = ({
   message,
   type,
@@ -33,9 +139,8 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -45,124 +150,66 @@ const Toast = ({
   </div>
 );
 
-const MenuManagement = () => {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+const BranchListPage = () => {
+  const [branchItems, setBranchItems] = useState<BranchItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Debounced search
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [editingItem, setEditingItem] = useState<BranchItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
+    ""
+  );
 
-  const [formData, setFormData] = useState({
+  // Modal form state
+  const [formData, setFormData] = useState<Omit<BranchItem, "Branch-ID">>({
     Branch_Name: "",
-    Status: "Active" as "Active" | "Inactive",
+    Status: "Active",
     "Contact-Info": "",
     Address: "",
     email: "",
     postalCode: "",
   });
 
-  // Load sample data
+  // Debounce search input
   useEffect(() => {
-    setTimeout(() => {
-      setMenuItems([
-        {
-          "Branch-ID": 1,
-          Branch_Name: "Main Branch",
-          Status: "Active",
-          "Contact-Info": "03001234567",
-          Address: "123 Main St.",
-          email: "abd@gmail.com",
-          postalCode: "35346",
-        },
-        {
-          "Branch-ID": 2,
-          Branch_Name: "North Branch",
-          Status: "Inactive",
-          "Contact-Info": "03007654321",
-          Address: "456 North Ave.",
-          email: "abd123@gmail.com",
-          postalCode: "2335346",
-        },
-      ]);
-      setLoading(false);
-    }, 800);
+    const handler = setTimeout(() => setSearchTerm(searchInput), 300);
+    return () => clearTimeout(handler);
+  }, [searchInput]);
+
+  // Auto-close toast
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    loadBranchItems();
   }, []);
 
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  const filteredItems = menuItems.filter((item) =>
-    item.Branch_Name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleDeleteSelected = () => {
-    if (selectedItems.length === 0) return;
-    setActionLoading(true);
-    setTimeout(() => {
-      const remaining = menuItems.filter(
-        (item) => !selectedItems.includes(item["Branch-ID"])
-      );
-      setMenuItems(remaining);
-      setSelectedItems([]);
-      setActionLoading(false);
-      showToast("Selected branches deleted successfully.", "success");
-    }, 600);
-  };
-
-  const handleSelectItem = (branchId: number, checked: boolean) => {
-    setSelectedItems(
-      checked
-        ? [...selectedItems, branchId]
-        : selectedItems.filter((id) => id !== branchId)
-    );
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(
-      checked ? filteredItems.map((item) => item["Branch-ID"]) : []
-    );
-  };
-
-  const handleSaveBranch = () => {
-    if (
-      !formData.Branch_Name ||
-      !formData["Contact-Info"] ||
-      !formData.Address
-    ) {
-      showToast("Please fill in all required fields.", "error");
-      return;
-    }
-
-    setActionLoading(true);
-    setTimeout(() => {
-      if (editItem) {
-        setMenuItems((prev) =>
-          prev.map((item) =>
-            item["Branch-ID"] === editItem["Branch-ID"]
-              ? { ...editItem, ...formData }
-              : item
-          )
-        );
-        showToast("Branch updated successfully.", "success");
-      } else {
-        const newItem: MenuItem = {
-          "Branch-ID": Math.max(0, ...menuItems.map((i) => i["Branch-ID"])) + 1,
-          ...formData,
-        };
-        setMenuItems((prev) => [...prev, newItem]);
-        showToast("Branch added successfully.", "success");
-      }
-
-      setModalOpen(false);
-      setEditItem(null);
+  // Modal form sync
+  useEffect(() => {
+    if (editingItem) {
+      setFormData({
+        Branch_Name: editingItem.Branch_Name,
+        Status: editingItem.Status,
+        "Contact-Info": editingItem["Contact-Info"],
+        Address: editingItem.Address,
+        email: editingItem.email,
+        postalCode: editingItem.postalCode,
+      });
+    } else {
       setFormData({
         Branch_Name: "",
         Status: "Active",
@@ -171,8 +218,119 @@ const MenuManagement = () => {
         email: "",
         postalCode: "",
       });
+    }
+  }, [editingItem, isModalOpen]);
+
+  const showToast = (message: string, type: "success" | "error") =>
+    setToast({ message, type });
+
+  const loadBranchItems = async () => {
+    try {
+      setLoading(true);
+      const response = await BranchAPI.getBranchItems();
+      if (!response.success) throw new Error(response.message);
+      setBranchItems(response.data);
+    } catch {
+      showToast("Failed to load Branch items", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Memoized filtering
+  const filteredItems = useMemo(() => {
+    const s = searchTerm.toLowerCase();
+    return branchItems.filter((item) => {
+      const matchesSearch = item.Branch_Name.toLowerCase().includes(s);
+      const matchesStatus = statusFilter ? item.Status === statusFilter : true;
+      return matchesSearch && matchesStatus;
+    });
+  }, [branchItems, searchTerm, statusFilter]);
+
+  const handleCreateItem = async (itemData: Omit<BranchItem, "Branch-ID">) => {
+    try {
+      setActionLoading(true);
+      const response = await BranchAPI.createBranchItem(itemData);
+      if (response.success) {
+        setBranchItems((prev) => [...prev, response.data]);
+        setIsModalOpen(false);
+        showToast(response.message || "Branch created successfully", "success");
+      }
+    } catch {
+      showToast("Failed to create Branch", "error");
+    } finally {
       setActionLoading(false);
-    }, 1000);
+    }
+  };
+
+  const handleUpdateItem = async (itemData: Omit<BranchItem, "Branch-ID">) => {
+    if (!editingItem) return;
+    try {
+      setActionLoading(true);
+      const response = await BranchAPI.updateBranchItem(editingItem["Branch-ID"], itemData);
+      if (response.success) {
+        setBranchItems((prev) =>
+          prev.map((it) => (it["Branch-ID"] === editingItem["Branch-ID"] ? response.data : it))
+        );
+        setIsModalOpen(false);
+        setEditingItem(null);
+        showToast(response.message || "Branch updated successfully", "success");
+      }
+    } catch {
+      showToast("Failed to update Branch", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedItems.length === 0) return;
+    try {
+      setActionLoading(true);
+      const response = await BranchAPI.bulkDeleteBranchItems(selectedItems);
+      if (response.success) {
+        // Refresh from API (IDs already re-assigned there)
+        const updated = await BranchAPI.getBranchItems();
+        setBranchItems(updated.data);
+        setSelectedItems([]);
+        showToast(response.message || "Branch deleted successfully", "success");
+      }
+    } catch {
+      showToast("Failed to delete Branch", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      setSelectedItems(checked ? filteredItems.map((i) => i["Branch-ID"]) : []);
+    },
+    [filteredItems]
+  );
+
+  const handleSelectItem = useCallback((branchId: number, checked: boolean) => {
+    setSelectedItems((prev) =>
+      checked ? [...prev, branchId] : prev.filter((id) => id !== branchId)
+    );
+  }, []);
+
+  const handleModalSubmit = () => {
+    if (!formData.Branch_Name.trim() || !formData["Contact-Info"].trim() || !formData.Address.trim()) return;
+    if (editingItem) {
+      handleUpdateItem(formData);
+    } else {
+      handleCreateItem(formData);
+    }
+  };
+
+  const handleStatusChange = (isActive: boolean) => {
+    setFormData((prev) => ({ ...prev, Status: isActive ? "Active" : "Inactive" }));
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingItem(null);
   };
 
   const isAllSelected =
@@ -184,14 +342,13 @@ const MenuManagement = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading branches...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-10 p-6 bg-gray-50 min-h-screen">
+    <div className="mx-6 p-6 bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -200,252 +357,343 @@ const MenuManagement = () => {
         />
       )}
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-          Branch Management
-        </h1>
+      <h1 className="text-3xl font-semibold mb-4 pl-20">Branch List</h1>
 
-        <div className="flex relative mb-4">
+      {/* Summary Cards */}
+      <div className="flex gap-4 mb-6 pl-20">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+          <div>
+            <p className="text-6xl mb-1">{branchItems.length}</p>
+            <p className="text-1xl text-gray-500">Total Branches</p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+          <div>
+            <p className="text-6xl mb-1">
+              {branchItems.filter((item) => item.Status === "Active").length}
+            </p>
+            <p className="text-1xl text-gray-500">Active Branches</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Action bar */}
+      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex gap-3 pl-20">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            disabled={selectedItems.length > 0}
+            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${selectedItems.length === 0
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
+          >
+            <Plus size={16} />
+            Add
+          </button>
+
+          <button
+            onClick={handleDeleteSelected}
+            disabled={!isSomeSelected || actionLoading}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSomeSelected && !actionLoading
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
+          >
+            <Trash2 size={16} />
+            {actionLoading ? "Deleting..." : "Delete Selected"}
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative flex-1 min-w-[200px]">
           <Search
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             size={16}
           />
           <input
             type="text"
-            placeholder="Search branches..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            placeholder="Search Branches..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              setEditItem(null);
-              setFormData({
-                Branch_Name: "",
-                Status: "Active",
-                "Contact-Info": "",
-                Address: "",
-                email: "",
-                postalCode: "",
-              });
-              setModalOpen(true);
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
-          >
-            <Plus size={16} />
-            New Branch
-          </button>
-
-          <button
-            onClick={handleDeleteSelected}
-            disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-red-600 text-white hover:bg-red-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            <Trash2 size={16} />
-            {actionLoading ? "Deleting..." : "Delete Selected"}
-          </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+      {/* Table */}
+      <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
+        <div className="max-h-[500px] overflow-y-auto">
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+            <thead className="bg-gray-50 border-b border-gray-200 ">
               <tr>
-                <th className="px-4 py-3">
-                  <input
-                    type="checkbox"
+                <th className="px-4 py-3 text-left">
+                  <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="w-4 h-4 accent-yellow-600 border-gray-300 rounded"
                   />
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="relative px-4 py-3 text-left">
                   Branch ID
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="relative px-4 py-3 text-left">
                   Branch Name
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Status
+                <th className="relative px-4 py-3 text-left">
+                  <div className="flex flex-col gap-1">
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                        {statusFilter || "Status"}
+                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                      </DropdownMenu.Trigger>
+
+                      <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                          className="min-w-[160px] rounded-md bg-white shadow-md border border-gray-200 p-1 z-50"
+                          sideOffset={5}
+                          align="start"
+                        >
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                          <DropdownMenu.Item
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            onClick={() => setStatusFilter("")}
+                          >
+                            Status
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            onClick={() => setStatusFilter("Active")}
+                          >
+                            Active
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            onClick={() => setStatusFilter("Inactive")}
+                          >
+                            Inactive
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
+                    <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="relative px-4 py-3 text-left">
                   Contact Info
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="relative px-4 py-3 text-left">
                   Address
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="relative px-4 py-3 text-left">
                   Details
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="relative px-4 py-3 text-left">
                   Actions
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredItems.map((item) => (
-                <tr key={item["Branch-ID"]} className="hover:bg-gray-50">
-                  <td className="px-4 py-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.includes(item["Branch-ID"])}
-                      onChange={(e) =>
-                        handleSelectItem(item["Branch-ID"], e.target.checked)
-                      }
-                      className="w-4 h-4 accent-yellow-600 border-gray-300 rounded"
-                    />
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    #{item["Branch-ID"].toString().padStart(3, "0")}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {item.Branch_Name}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        item.Status === "Active"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-red-100 text-red-600"
-                      }`}
-                    >
-                      {item.Status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {item["Contact-Info"]}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {item.Address}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <a
-                      href="/pos-list"
-                      className="text-black-600 hover:text-black-800 transition-colors"
-                    >
-                      <Info size={16} />
-                    </a>
-                  </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => {
-                        setEditItem(item);
-                        setFormData({
-                          Branch_Name: item.Branch_Name,
-                          Status: item.Status,
-                          "Contact-Info": item["Contact-Info"],
-                          Address: item.Address,
-                          email: item.email || "",
-                          postalCode: item.postalCode || "",
-                        });
-
-                        setModalOpen(true);
-                      }}
-                      className="text-blue-600 hover:text-blue-800 transition-colors"
-                    >
-                      <Edit size={16} />
-                    </button>
+            <tbody className="divide-y divide-gray-100">
+              {filteredItems.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    {searchTerm || statusFilter
+                      ? "No branches match your search criteria."
+                      : "No branches found."}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredItems.map((item) => (
+                  <tr key={item["Branch-ID"]} className="bg-white hover:bg-gray-50">
+                    <td className="px-4 py-4">
+                      <Checkbox
+                        checked={selectedItems.includes(item["Branch-ID"])}
+                        onChange={(e) =>
+                          handleSelectItem(item["Branch-ID"], e.target.checked)
+                        }
+                      />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {`#${String(item["Branch-ID"]).padStart(3, "0")}`}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                      {item.Branch_Name}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
+                          ${item.Status === "Active" ? "text-green-600 border-green-600" : ""}
+                          ${item.Status === "Inactive" ? "text-red-600 border-red-600" : ""}`}
+                      >
+                        {item.Status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item["Contact-Info"]}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.Address}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <a
+                        href="/pos-list"
+                        className="text-black-600 hover:text-black-800 transition-colors"
+                      >
+                        <Info size={16} />
+                      </a>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingItem(item);
+                            setIsModalOpen(true);
+                          }}
+                          className="text-gray-600 hover:text-gray-800 p-1"
+                          title="Edit"
+                        >
+                          <Edit size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
-
       {/* Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-[700px]">
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#ffff] rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
             <h2 className="text-xl font-semibold mb-4">
-              {editItem ? "Edit Branch" : "New Branch"}
+              {editingItem ? "Edit Branch" : "Add New Branch"}
             </h2>
-            <div className="mb-4 space-y-2">
-              <input
-                type="text"
-                value={formData.Branch_Name}
-                onChange={(e) =>
-                  setFormData({ ...formData, Branch_Name: e.target.value })
-                }
-                placeholder="Branch Name"
-                className="w-full px-4 py-2 border border-gray-300 rounded"
-              />
-              <select
-                value={formData.Status}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    Status: e.target.value as "Active" | "Inactive",
-                  })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-              <input
-                type="text"
-                value={formData["Contact-Info"]}
-                onChange={(e) =>
-                  setFormData({ ...formData, "Contact-Info": e.target.value })
-                }
-                placeholder="Contact Info"
-                className="w-full px-4 py-2 border border-gray-300 rounded"
-              />
-              <input
-                type="text"
-                value={formData.Address}
-                onChange={(e) =>
-                  setFormData({ ...formData, Address: e.target.value })
-                }
-                placeholder="Address"
-                className="w-full px-4 py-2 border border-gray-300 rounded"
-              />
 
-              {/* ✅ Email Field */}
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                placeholder="Email"
-                className="w-full px-4 py-2 border border-gray-300 rounded"
-              />
+            <div className="space-y-3">
+              {/* Branch Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Branch Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.Branch_Name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, Branch_Name: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  required
+                />
+              </div>
 
-              {/* ✅ Postal Code Field */}
-              <input
-                type="text"
-                value={formData.postalCode}
-                onChange={(e) =>
-                  setFormData({ ...formData, postalCode: e.target.value })
-                }
-                placeholder="Postal Code"
-                className="w-full px-4 py-2 border border-gray-300 rounded"
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveBranch}
-                className="px-4 py-2 bg-yellow-600 text-white rounded"
-              >
-                {actionLoading ? "Saving..." : "Save"}
-              </button>
+              {/* Contact Info */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Contact Info
+                </label>
+                <input
+                  type="text"
+                  value={formData["Contact-Info"]}
+                  onChange={(e) =>
+                    setFormData({ ...formData, "Contact-Info": e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  required
+                />
+              </div>
+
+              {/* Address */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  value={formData.Address}
+                  onChange={(e) =>
+                    setFormData({ ...formData, Address: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  required
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                />
+              </div>
+
+              {/* Postal Code */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Postal Code
+                </label>
+                <input
+                  type="text"
+                  value={formData.postalCode}
+                  onChange={(e) =>
+                    setFormData({ ...formData, postalCode: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                />
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Status
+                </label>
+                <ButtonPage
+                  checked={formData.Status === "Active"}
+                  onChange={handleStatusChange}
+                />
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 pt-4 justify-end">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
+                >
+                  <X size={12} />
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleModalSubmit}
+                  disabled={!formData.Branch_Name.trim() || !formData["Contact-Info"].trim() || !formData.Address.trim()}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${formData.Branch_Name.trim() && formData["Contact-Info"].trim() && formData.Address.trim()
+                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                >
+                  <Save size={12} />
+                  {editingItem ? "Update" : "Save & Close"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -454,4 +702,4 @@ const MenuManagement = () => {
   );
 };
 
-export default MenuManagement;
+export default BranchListPage;
