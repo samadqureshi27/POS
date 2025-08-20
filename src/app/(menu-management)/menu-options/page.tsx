@@ -4,7 +4,19 @@ import React from "react";
 import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Plus, Trash2, Search, AlertCircle, CheckCircle, X, Edit, Filter, Save, ImageIcon, } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Search,
+  AlertCircle,
+  CheckCircle,
+  X,
+  Edit,
+  Filter,
+  Save,
+  ImageIcon,
+} from "lucide-react";
+
 import { useState, useEffect, useRef } from "react";
 
 interface MenuItemOptions {
@@ -124,7 +136,10 @@ class MenuAPI {
     item: Omit<MenuItemOptions, "ID">
   ): Promise<ApiResponse<MenuItemOptions>> {
     await this.delay(1000);
-    const newId = this.mockData.length > 0 ? Math.max(...this.mockData.map(i => i.ID)) + 1 : 1;
+    const newId =
+      this.mockData.length > 0
+        ? Math.max(...this.mockData.map((i) => i.ID)) + 1
+        : 1;
     const newItem: MenuItemOptions = {
       ...item,
       ID: newId,
@@ -205,7 +220,6 @@ class MenuAPI {
   }
 }
 
-
 const Toast = ({
   message,
   type,
@@ -216,8 +230,9 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-      }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
+      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -228,20 +243,25 @@ const Toast = ({
 );
 
 const CategoryPage = () => {
-  const [MenuItemOptionss, setMenuItemOptionss] = useState<MenuItemOptions[]>([]);
+  const [MenuItemOptionss, setMenuItemOptionss] = useState<MenuItemOptions[]>(
+    []
+  );
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingItem, setEditingItem] = useState<MenuItemOptions | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  const [activeTab, setActiveTab] = useState(editingItem ? "Option Values" : "Details");
+
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
-  const [DisplayFilter, setDisplayFilter] = useState<"" | "Radio" | "Select" | "Checkbox">(
-    ""
-  );
+  const [DisplayFilter, setDisplayFilter] = useState<
+    "" | "Radio" | "Select" | "Checkbox"
+  >("");
 
   // Modal form state
   const [formData, setFormData] = useState<Omit<MenuItemOptions, "ID">>({
@@ -284,6 +304,13 @@ const CategoryPage = () => {
     }
   }, [editingItem, isModalOpen]);
 
+  useEffect(() => {
+  if (isModalOpen) {
+    setActiveTab(editingItem ? "Option Values" : "Details");
+  }
+}, [isModalOpen, editingItem]);
+
+
   const loadMenuItemOptionss = async () => {
     try {
       setLoading(true);
@@ -305,7 +332,9 @@ const CategoryPage = () => {
     const matchesSearch =
       item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.Priority.toString().includes(searchTerm);
-    const matchesStatus = DisplayFilter ? item.DisplayType === DisplayFilter : true;
+    const matchesStatus = DisplayFilter
+      ? item.DisplayType === DisplayFilter
+      : true;
     return matchesStatus && matchesSearch;
   });
 
@@ -407,7 +436,8 @@ const CategoryPage = () => {
     setEditingItem(null);
   };
 
-  const isAllSelected = selectedItems.length === filteredItems.length && filteredItems.length > 0;
+  const isAllSelected =
+    selectedItems.length === filteredItems.length && filteredItems.length > 0;
   const isSomeSelected = selectedItems.length > 0;
 
   if (loading) {
@@ -440,10 +470,11 @@ const CategoryPage = () => {
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${selectedItems.length === 0
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
+            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
+              selectedItems.length === 0
+                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
           >
             <Plus size={16} />
             Add
@@ -452,10 +483,11 @@ const CategoryPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSomeSelected && !actionLoading
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              isSomeSelected && !actionLoading
+                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -626,123 +658,222 @@ const CategoryPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingItem ? "Edit Category" : "Add New Category"}
-            </h2>
-            <div className="space-y-3">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.Name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Name: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  required
-                />
-              </div>
-
-
-              {/*Display Type DropDown*/}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Display Type
-                </label>
-
-                <DropdownMenu.Root >
-                  <DropdownMenu.Trigger className="w-full px-3 py-2 border border-gray-300 rounded-lg flex items-center justify-between text-sm bg-white outline-none hover:bg-gray-50 focus:ring-2 focus:ring-[#d9d9e1]">
-                    {formData.DisplayType || "Select Display Type"}
-                    <ChevronDown size={14} className="text-gray-500" />
-                  </DropdownMenu.Trigger>
-
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.Content
-                      className="min-w-[220px] rounded-md bg-white shadow-md border border-gray-200 p-1 outline-none ml-45" 
-                      sideOffset={6}
-                    >
-                      <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 mr-90
-                      " />
-
-                      <DropdownMenu.Item
-                        className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                        onClick={() =>
-                          setFormData({ ...formData, DisplayType: "Radio" })
-                        }
-                      >
-                        Radio
-                      </DropdownMenu.Item>
-
-                      <DropdownMenu.Item
-                        className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                        onClick={() =>
-                          setFormData({ ...formData, DisplayType: "Select" })
-                        }
-                      >
-                        Select
-                      </DropdownMenu.Item>
-
-                      <DropdownMenu.Item
-                        className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                        onClick={() =>
-                          setFormData({ ...formData, DisplayType: "Checkbox" })
-                        }
-                      >
-                        Checkbox
-                      </DropdownMenu.Item>
-                    </DropdownMenu.Content>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Root>
-              </div>
-
-              {/* Priority */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Priority
-                </label>
-                <input
-                  type="number"
-                  value={formData.Priority}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      Priority: Number(e.target.value) || 1,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  min={1}
-                  required
-                />
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex gap-3 pt-4 justify-end">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg min-w-[35vw]  max-w-2xl min-h-[60vh] max-h-[95vh] overflow-y-auto shadow-lg relative">
+            {/* Navbar inside modal */}
+            <h1 className="text-2xl pl-5 pt-2 font-medium">{editingItem ? "Edit Option Menu" : "Add  Option Menu"}</h1>
+            <div className="flex w-[250px] items-center justify-center  border-b border-gray-200  mx-auto">
+              {["Details", "Option Values"].map((tab) => (
                 <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeTab === tab
+                      ? "border-b-2 border-black text-black"
+                      : "text-gray-500 hover:text-black hover:bg-gray-50"
+                  }`}
                 >
-                  <X size={12} />
-                  Cancel
+                  {tab}
                 </button>
-                <button
-                  type="button"
-                  onClick={handleModalSubmit}
-                  disabled={!formData.Name.trim() || !formData.DisplayType.trim()}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${formData.Name.trim() && formData.DisplayType.trim()
-                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                >
-                  <Save size={12} />
-                  {editingItem ? "Update" : "Save & Close"}
-                </button>
-              </div>
+              ))}
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 ">
+              {activeTab === "Details" && (
+                <div className="space-y-8">
+                  {/* Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.Name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, Name: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                  {/* Display Type */}
+                  <div>
+                    {" "}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {" "}
+                      Display Type{" "}
+                    </label>{" "}
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger asChild>
+                        <button className="w-full px-3 py-2 border border-gray-300 rounded-lg flex items-center justify-between text-sm bg-white outline-none hover:bg-gray-50 focus:ring-2 focus:ring-[#d9d9e1]">
+                          <span>
+                            {formData.DisplayType || "Select Display Type"}
+                          </span>
+                          <ChevronDown size={14} className="text-gray-500" />
+                        </button>
+                      </DropdownMenu.Trigger>
+
+                      <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                          className="min-w-[220px] rounded-md bg-white shadow-md border border-gray-200 p-1 outline-none ml-45"
+                          sideOffset={6}
+                        >
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 mr-90" />
+                          <DropdownMenu.Item
+                            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            onClick={() =>
+                              setFormData({ ...formData, DisplayType: "Radio" })
+                            }
+                          >
+                            Radio
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item
+                            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            onClick={() =>
+                              setFormData({
+                                ...formData,
+                                DisplayType: "Select",
+                              })
+                            }
+                          >
+                            Select
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item
+                            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            onClick={() =>
+                              setFormData({
+                                ...formData,
+                                DisplayType: "Checkbox",
+                              })
+                            }
+                          >
+                            Checkbox
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
+                  </div>{" "}
+                  {/* Priority */}{" "}
+                  <div>
+                    {" "}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {" "}
+                      Priority{" "}
+                    </label>{" "}
+                    <input
+                      type="number"
+                      value={formData.Priority}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          Priority: Number(e.target.value) || 1,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      min={1}
+                      required
+                    />{" "}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "Option Values" && (
+                <div  overflow-y-auto pr-2>
+                  
+                  {formData.OptionValue.map((opt, idx) => (
+                    <div key={idx} className="flex gap-5 mb-2 items-center ">
+                      {/* Option Name */}
+                      <div className="flex flex-col gap-1">
+                        <h3 className="text-sm font-medium text-gray-700">
+                          Option Value
+                        </h3>
+                        <input
+                          type="text"
+                          value={opt}
+                          onChange={(e) => {
+                            const updated = [...formData.OptionValue];
+                            updated[idx] = e.target.value;
+                            setFormData({ ...formData, OptionValue: updated });
+                          }}
+                          className=" w-[23vw] flex-1 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                        />
+                      </div>
+
+                      {/* Option Price */}
+                      <div className="flex flex-col gap-1">
+                        <h3 className="text-sm font-medium text-gray-700">
+                          Option Price
+                        </h3>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={formData.OptionPrice[idx]}
+                        onChange={(e) => {
+                          const updated = [...formData.OptionPrice];
+                          updated[idx] =
+                            Number(e.target.value.replace(/\D/g, "")) || 0;
+                          setFormData({ ...formData, OptionPrice: updated });
+                        }}
+                        className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      />
+                      </div>
+
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updatedValues = formData.OptionValue.filter(
+                            (_, i) => i !== idx
+                          );
+                          const updatedPrices = formData.OptionPrice.filter(
+                            (_, i) => i !== idx
+                          );
+                          setFormData({
+                            ...formData,
+                            OptionValue: updatedValues,
+                            OptionPrice: updatedPrices,
+                          });
+                        }}
+                        className=" mt-5 text-black border-2 hover:text-gray-700"
+                      >
+                        <X size={24} />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Add Option Button */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        OptionValue: [...formData.OptionValue, ""],
+                        OptionPrice: [...formData.OptionPrice, 0],
+                      })
+                    }
+                    className="mt-2 px-3 py-1 bg-gray-200 rounded text-sm"
+                  >
+                    + Add Option
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Action buttons */}
+            <div className=" fixed bottom-45 right-145 flex justify-end gap-3 p-4 border-t w-[31.5vw] border-gray-200">
+              <button
+                 onClick={handleCloseModal}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleModalSubmit}
+                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-700"
+              >
+                {editingItem ? "Update" : "Save & Close"}
+              </button>
             </div>
           </div>
         </div>
