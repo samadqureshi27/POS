@@ -800,211 +800,215 @@ const inventoryManagementPage = () => {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+    <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+      
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-semibold text-gray-800">
+          {editingItem ? "Edit Inventory Item" : "Add New Inventory Item"}
+        </h2>
+      </div>
 
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                {editingItem ? "Edit Inventory Item" : "Add New Inventory Item"}
-              </h2>
-            </div>
+      {/* Scrollable Content */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1">
+        {/* Item Name */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Item Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.Name}
+            onChange={(e) =>
+              setFormData({ ...formData, Name: e.target.value })
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+            placeholder="Enter item name"
+            required
+          />
+        </div>
 
-            {/* Scrollable Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1">
-              {/* Item Name */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Item Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.Name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Name: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="Enter item name"
-                  required
-                />
+        {/* Unit */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Unit of Measurement
+          </label>
+          <select
+            value={formData.Unit}
+            onChange={(e) =>
+              setFormData({ ...formData, Unit: e.target.value })
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+          >
+            <option value="">Select Unit</option>
+            <option value="Kg">Kilogram (Kg)</option>
+            <option value="g">Gram (g)</option>
+            <option value="Liters">Liters</option>
+            <option value="ml">Milliliter (ml)</option>
+            <option value="Pieces">Pieces</option>
+            <option value="Boxes">Boxes</option>
+            <option value="Packets">Packets</option>
+            <option value="Bottles">Bottles</option>
+          </select>
+        </div>
+
+        {/* Threshold */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Low Stock Threshold
+            <span className="text-xs text-gray-500 ml-1">(Alert when below)</span>
+          </label>
+          <input
+            type="number"
+            value={formData.Threshold}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                Threshold: Number(e.target.value) || 0,
+              })
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+            placeholder="0"
+            min="0"
+          />
+        </div>
+
+        {/* Initial Stock */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Initial Stock
+            <span className="text-xs text-gray-500 ml-1">(Starting quantity)</span>
+          </label>
+          <input
+            type="number"
+            value={formData.InitialStock}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                InitialStock: Number(e.target.value) || 0,
+              })
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+            placeholder="0"
+            min="0"
+          />
+        </div>
+
+        {/* Added Stock */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Additional Stock
+            <span className="text-xs text-gray-500 ml-1">(Stock to add)</span>
+          </label>
+          <input
+            type="number"
+            value={formData.AddedStock}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                AddedStock: Number(e.target.value) || 0,
+              })
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+            placeholder="0"
+            min="0"
+          />
+        </div>
+
+        {/* Current Stock Display */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Total Current Stock
+          </label>
+          <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600">
+            <div className="flex items-center justify-between">
+              <span className="font-medium text-lg">
+                {(formData.InitialStock || 0) + (formData.AddedStock || 0)} {formData.Unit || 'units'}
+              </span>
+              <div className="text-sm text-gray-500">
+                Initial: {formData.InitialStock || 0} + Added: {formData.AddedStock || 0}
               </div>
-
-              {/* Unit */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Unit of Measurement
-                </label>
-                <select
-                  value={formData.Unit}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Unit: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                >
-                  <option value="">Select Unit</option>
-                  <option value="Kg">Kilogram (Kg)</option>
-                  <option value="g">Gram (g)</option>
-                  <option value="Liters">Liters</option>
-                  <option value="ml">Milliliter (ml)</option>
-                  <option value="Pieces">Pieces</option>
-                  <option value="Boxes">Boxes</option>
-                  <option value="Packets">Packets</option>
-                  <option value="Bottles">Bottles</option>
-                </select>
-              </div>
-
-              {/* Threshold */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Low Stock Threshold
-                  <span className="text-xs text-gray-500 ml-1">(Alert when below)</span>
-                </label>
-                <input
-                  type="number"
-                  value={formData.Threshold}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      Threshold: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="0"
-                  min="0"
-                />
-              </div>
-
-              {/* Initial Stock */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Initial Stock
-                  <span className="text-xs text-gray-500 ml-1">(Starting quantity)</span>
-                </label>
-                <input
-                  type="number"
-                  value={formData.InitialStock}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      InitialStock: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="0"
-                  min="0"
-                />
-              </div>
-
-              {/* Added Stock */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional Stock
-                  <span className="text-xs text-gray-500 ml-1">(Stock to add)</span>
-                </label>
-                <input
-                  type="number"
-                  value={formData.AddedStock}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      AddedStock: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="0"
-                  min="0"
-                />
-              </div>
-
-              {/* Current Stock Display */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Total Current Stock
-                </label>
-                <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-lg">
-                      {(formData.InitialStock || 0) + (formData.AddedStock || 0)} {formData.Unit || 'units'}
-                    </span>
-                    <div className="text-sm text-gray-500">
-                      Initial: {formData.InitialStock || 0} + Added: {formData.AddedStock || 0}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stock Status Indicator */}
-              {((formData.InitialStock || 0) + (formData.AddedStock || 0)) > 0 && (
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Status
-                    <span className="text-xs text-gray-500 ml-1">(Auto-calculated based on threshold)</span>
-                  </label>
-                  <div className="flex items-center gap-3 p-3 rounded-lg border bg-gray-50">
-                    <div className={`w-4 h-4 rounded-full ${formData.Status === 'Low'
-                        ? 'bg-red-500'
-                        : formData.Status === 'Medium'
-                          ? 'bg-yellow-500'
-                          : 'bg-green-500'
-                      }`}></div>
-                    <span className={`text-sm font-semibold ${formData.Status === 'Low'
-                        ? 'text-red-600'
-                        : formData.Status === 'Medium'
-                          ? 'text-yellow-600'
-                          : 'text-green-600'
-                      }`}>
-                      {formData.Status.toUpperCase()} STOCK
-                    </span>
-                    <span className="text-xs text-gray-500 ml-auto">
-                      Threshold: {formData.Threshold || 0} {formData.Unit || 'units'}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-
-            </div>
-
-            {/* Fixed Action Buttons */}
-            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <X size={16} />
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleModalSubmit}
-                disabled={
-                  !formData.Name.trim() ||
-                  actionLoading
-                }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
-                    actionLoading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                  }`}
-              >
-                {actionLoading ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
-                    {editingItem ? "Updating..." : "Saving..."}
-                  </>
-                ) : (
-                  <>
-                    <Save size={16} />
-                    {editingItem ? "Update Item" : "Add Item"}
-                  </>
-                )}
-              </button>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Stock Status Indicator */}
+        {((formData.InitialStock || 0) + (formData.AddedStock || 0)) > 0 && (
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Stock Status
+              <span className="text-xs text-gray-500 ml-1">(Auto-calculated based on threshold)</span>
+            </label>
+            <div className="flex items-center gap-3 p-3 rounded-lg border bg-gray-50">
+              <div className={`w-4 h-4 rounded-full ${
+                formData.Status === 'Low'
+                  ? 'bg-red-500'
+                  : formData.Status === 'Medium'
+                    ? 'bg-yellow-500'
+                    : 'bg-green-500'
+              }`}></div>
+              <span className={`text-sm font-semibold ${
+                formData.Status === 'Low'
+                  ? 'text-red-600'
+                  : formData.Status === 'Medium'
+                    ? 'text-yellow-600'
+                    : 'text-green-600'
+              }`}>
+                {formData.Status.toUpperCase()} STOCK
+              </span>
+              <span className="text-xs text-gray-500 ml-auto">
+                Threshold: {formData.Threshold || 0} {formData.Unit || 'units'}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Status Logic Info */}
+        
+      </div>
+
+      {/* Fixed Action Buttons */}
+      <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+        <button
+          type="button"
+          onClick={handleCloseModal}
+          disabled={actionLoading}
+          className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <X size={16} />
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={handleModalSubmit}
+          disabled={
+            !formData.Name.trim() ||
+            actionLoading
+          }
+          className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+            !formData.Name.trim() ||
+            actionLoading
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+          }`}
+        >
+          {actionLoading ? (
+            <>
+              <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+              {editingItem ? "Updating..." : "Saving..."}
+            </>
+          ) : (
+            <>
+              <Save size={16} />
+              {editingItem ? "Update Item" : "Add Item"}
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 
     </div>
