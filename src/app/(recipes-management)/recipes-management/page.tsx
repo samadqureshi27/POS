@@ -262,7 +262,7 @@ const Toast = ({
   </div>
 );
 
-const recipesManagementPage = () => {
+const RecipesManagementPage = () => {
   const [RecipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1226,4 +1226,4 @@ const recipesManagementPage = () => {
   );
 };
 
-export default recipesManagementPage;
+export default RecipesManagementPage;
