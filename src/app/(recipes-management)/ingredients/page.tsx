@@ -4,6 +4,7 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React, { useState, useEffect } from "react";
+import ButtonPage from "@/components/layout/UI/button";
 import {
   Plus,
   Trash2,
@@ -11,6 +12,7 @@ import {
   AlertCircle,
   CheckCircle,
   X,
+  Save,
   Edit,
 } from "lucide-react";
 
@@ -21,7 +23,7 @@ interface InventoryItem {
   Status: "Active" | "Inactive";
   Description: string;
   Unit: string;
-  Priority: string;
+  Priority: number;
 }
 
 const Toast = ({
@@ -34,9 +36,8 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -46,7 +47,7 @@ const Toast = ({
   </div>
 );
 
-const ingredientsManagementPage = () => {
+const IngredientsManagementPage = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,7 +69,7 @@ const ingredientsManagementPage = () => {
     Status: "Inactive",
     Description: "",
     Unit: "",
-    Priority: "",
+    Priority: 0,
   });
 
   // initial dataset (and rows that say "Cell text")
@@ -83,7 +84,7 @@ const ingredientsManagementPage = () => {
           Description: "Bread",
           Unit: "Kilograms (Kg’s)",
 
-          Priority: "1",
+          Priority: 1,
         },
         {
           ID: "#002",
@@ -93,7 +94,7 @@ const ingredientsManagementPage = () => {
           Description: "Bread ",
           Unit: "Kilograms (Kg’s)",
 
-          Priority: "2",
+          Priority: 2,
         },
         {
           ID: "#003",
@@ -103,7 +104,7 @@ const ingredientsManagementPage = () => {
           Description: "Bread ",
           Unit: "Kilograms (Kg’s)",
 
-          Priority: "3",
+          Priority: 3,
         },
       ]);
       setLoading(false);
@@ -177,7 +178,12 @@ const ingredientsManagementPage = () => {
   const handleSelectAll = (checked: boolean) => {
     setSelectedItems(checked ? filteredItems.map((i) => i.ID) : []);
   };
-
+  const handleStatusChange = (isActive: boolean) => {
+    setFormData({
+      ...formData,
+      Status: isActive ? "Active" : "Inactive",
+    });
+  };
   const openAddModal = () => {
     if (selectedItems.length > 0) return; // keep original behaviour (disable add when selections exist)
     // generate next ID like "#006"
@@ -198,7 +204,7 @@ const ingredientsManagementPage = () => {
       Status: "Inactive",
       Description: "",
       Unit: "",
-      Priority: "",
+      Priority: 0,
     });
     setModalOpen(true);
   };
@@ -263,8 +269,8 @@ const ingredientsManagementPage = () => {
         Ingredients
       </h1>
 
-      
-      
+
+
 
       {/* Action bar: add, delete, search */}
       <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
@@ -273,11 +279,10 @@ const ingredientsManagementPage = () => {
           <button
             onClick={openAddModal}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
-              selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${selectedItems.length === 0
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Plus size={16} />
             Add
@@ -286,11 +291,10 @@ const ingredientsManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSomeSelected && !actionLoading
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -337,7 +341,7 @@ const ingredientsManagementPage = () => {
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                
+
 
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
@@ -376,7 +380,7 @@ const ingredientsManagementPage = () => {
                           >
                             Active
                           </DropdownMenu.Item>
-                          
+
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
@@ -396,7 +400,7 @@ const ingredientsManagementPage = () => {
                   Priority
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                
+
 
                 <th className="relative px-4 py-3 text-left">
                   Actions
@@ -423,18 +427,17 @@ const ingredientsManagementPage = () => {
 
                   <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
                   <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
-                  
+
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
                       className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium border
                   ${item.Status === "Inactive" ? "text-red-600 border-red-600" : ""}
                  
-                  ${
-                    item.Status === "Active"
-                      ? "text-green-700 border-green-700"
-                      : ""
-                  }
+                  ${item.Status === "Active"
+                          ? "text-green-700 border-green-700"
+                          : ""
+                        }
                 `}
                     >
                       {item.Status}
@@ -448,7 +451,7 @@ const ingredientsManagementPage = () => {
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                     {item.Priority}
                   </td>
-                  
+
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
@@ -470,72 +473,39 @@ const ingredientsManagementPage = () => {
 
       {/* Modal for Add/Edit */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-[700px]">
-            <h2 className="text-xl font-semibold mb-4">
-              {editItem ? "Edit Item" : "New Item"}
-            </h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">ID</label>
-                <input
-                  type="text"
-                  value={formData.ID}
-                  readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-100"
-                />
-              </div>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                {editItem ? "Edit Item" : "Add New Item"}
+              </h2>
+            </div>
 
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Status
+            {/* Scrollable Content */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1">
+              {/* Name */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name <span className="text-red-500">*</span>
                 </label>
-                <select
-                  value={formData.Status}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      Status: e.target.value as InventoryItem["Status"],
-                    })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  
-                </select>
-              </div>
-
-              <div className="col-span-2">
-                <label className="block text-sm text-gray-600 mb-1">Name</label>
                 <input
                   type="text"
                   value={formData.Name}
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  placeholder="Item name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="Enter item name"
+                  required
                 />
               </div>
 
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Unit</label>
-                <input
-                  type="text"
-                  value={formData.Unit}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Unit: e.target.value })
-                  }
-                  placeholder="Unit (e.g. Kg, Bottles)"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Description
+              {/* Description */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -543,43 +513,101 @@ const ingredientsManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Description: e.target.value })
                   }
-                  placeholder="Description"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="Enter description"
+                  required
                 />
               </div>
 
+              {/* Unit */}
               <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Priority
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Unit
                 </label>
                 <input
                   type="text"
-                  value={formData.Priority}
+                  value={formData.Unit}
                   onChange={(e) =>
-                    setFormData({ ...formData, Priority: e.target.value })
+                    setFormData({ ...formData, Unit: e.target.value })
                   }
-                  placeholder="Priority"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="Unit (e.g. Kg, Bottles)"
                 />
               </div>
 
-              
+              {/* Priority */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Priority
+                </label>
+                <input
+                  type="number"
+                  value={formData.Priority}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      Priority: Number(e.target.value) || 1,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="Priority"
+                  min={1}
+                  required
+                />
+              </div>
 
-              
+              {/* Status */}
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <div className="flex items-center gap-3">
+                 
+                  <ButtonPage
+                    checked={formData.Status === "Active"}
+                    onChange={handleStatusChange}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="flex justify-end gap-2">
+            {/* Fixed Action Buttons */}
+            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
               <button
+                type="button"
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded"
+                disabled={actionLoading}
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                <X size={16} />
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSaveItem}
-                className="px-4 py-2 bg-yellow-600 text-white rounded"
+                disabled={
+                  !formData.Name.trim() ||
+                  !formData.Description.trim() ||
+                  actionLoading
+                }
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
+                  !formData.Description.trim() ||
+                  actionLoading
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
               >
-                {actionLoading ? "Saving..." : "Save"}
+                {actionLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    {editItem ? "Updating..." : "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editItem ? "Update Item" : "Add Item"}
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -589,4 +617,4 @@ const ingredientsManagementPage = () => {
   );
 };
 
-export default ingredientsManagementPage;
+export default IngredientsManagementPage;

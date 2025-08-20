@@ -1,5 +1,5 @@
 import React from 'react';
-import RecipesSubmenu from '../../components/layout/submenus/RecipesSubmenu';
+import RecipesSubmenu from '@/components/layout/submenus/RecipesSubmenu';
 
 
 export default function RecipesLayout({
