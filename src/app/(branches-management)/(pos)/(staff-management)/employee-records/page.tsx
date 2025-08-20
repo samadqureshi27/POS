@@ -21,11 +21,14 @@ interface StaffItem {
   Staff_ID: number;
   Name: string;
   Contact: string;
+  Address: string;
+  CNIC: string;
   Status: "Active" | "Inactive";
   Role: string;
   Salary: string;
   Shift_Start_Time: string;
   Shift_End_Time: string;
+  Access_Code?: string; // Optional 4-digit code for cashiers and managers
 }
 
 interface ApiResponse<T> {
@@ -44,6 +47,8 @@ class StaffAPI {
       Staff_ID: 1,
       Name: "efe",
       Contact: "03001231234",
+      Address: "123 Main Street, Lahore",
+      CNIC: "35202-1234567-8",
       Status: "Inactive",
       Role: "Waiter",
       Salary: "30000",
@@ -54,21 +59,39 @@ class StaffAPI {
       Staff_ID: 2,
       Name: "andd",
       Contact: "03001234567",
+      Address: "456 Park Avenue, Karachi",
+      CNIC: "42101-9876543-2",
       Status: "Inactive",
       Role: "Cashier",
       Salary: "50000",
       Shift_Start_Time: "9:00",
       Shift_End_Time: "6:00",
+      Access_Code: "1234",
     },
     {
       Staff_ID: 3,
       Name: "ghie",
       Contact: "03001231238",
+      Address: "789 Garden Road, Islamabad",
+      CNIC: "61101-5555555-1",
       Status: "Active",
       Role: "Cleaner",
       Salary: "15000",
       Shift_Start_Time: "9:00",
       Shift_End_Time: "6:00",
+    },
+    {
+      Staff_ID: 4,
+      Name: "Ahmed Khan",
+      Contact: "03009876543",
+      Address: "321 Business District, Lahore",
+      CNIC: "35202-9876543-1",
+      Status: "Active",
+      Role: "Manager",
+      Salary: "80000",
+      Shift_Start_Time: "8:00",
+      Shift_End_Time: "8:00",
+      Access_Code: "5678",
     },
   ];
 
@@ -158,7 +181,6 @@ const EmployeeRecordsPage = () => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-
   // Debounced search
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -178,11 +200,14 @@ const EmployeeRecordsPage = () => {
   const [formData, setFormData] = useState<Omit<StaffItem, "Staff_ID">>({
     Name: "",
     Contact: "",
+    Address: "",
+    CNIC: "",
     Status: "Active",
     Role: "",
     Salary: "",
     Shift_Start_Time: "",
     Shift_End_Time: "",
+    Access_Code: "",
   });
 
   // Debounce search input
@@ -209,24 +234,37 @@ const EmployeeRecordsPage = () => {
       setFormData({
         Name: editingItem.Name,
         Contact: editingItem.Contact,
+        Address: editingItem.Address,
+        CNIC: editingItem.CNIC,
         Status: editingItem.Status,
         Role: editingItem.Role,
         Salary: editingItem.Salary,
         Shift_Start_Time: editingItem.Shift_Start_Time,
         Shift_End_Time: editingItem.Shift_End_Time,
+        Access_Code: editingItem.Access_Code || "",
       });
     } else {
       setFormData({
         Name: "",
         Contact: "",
+        Address: "",
+        CNIC: "",
         Status: "Active",
         Role: "",
         Salary: "",
         Shift_Start_Time: "",
         Shift_End_Time: "",
+        Access_Code: "",
       });
     }
   }, [editingItem, isModalOpen]);
+
+  // Clear access code when role is not Cashier or Manager
+  useEffect(() => {
+    if (formData.Role !== "Cashier" && formData.Role !== "Manager") {
+      setFormData(prev => ({ ...prev, Access_Code: "" }));
+    }
+  }, [formData.Role]);
 
   const showToast = (message: string, type: "success" | "error") =>
     setToast({ message, type });
@@ -251,7 +289,9 @@ const EmployeeRecordsPage = () => {
       const matchesSearch =
         item.Name.toLowerCase().includes(s) ||
         item.Role.toLowerCase().includes(s) ||
-        item.Contact.toLowerCase().includes(s);
+        item.Contact.toLowerCase().includes(s) ||
+        item.Address.toLowerCase().includes(s) ||
+        item.CNIC.toLowerCase().includes(s);
       const matchesStatus = statusFilter ? item.Status === statusFilter : true;
       const matchesRole = roleFilter ? item.Role === roleFilter : true;
       return matchesSearch && matchesStatus && matchesRole;
@@ -261,7 +301,13 @@ const EmployeeRecordsPage = () => {
   const handleCreateItem = async (itemData: Omit<StaffItem, "Staff_ID">) => {
     try {
       setActionLoading(true);
-      const response = await StaffAPI.createStaffItem(itemData);
+      // Remove Access_Code if role is not Cashier or Manager
+      const cleanData = { ...itemData };
+      if (cleanData.Role !== "Cashier" && cleanData.Role !== "Manager") {
+        delete cleanData.Access_Code;
+      }
+
+      const response = await StaffAPI.createStaffItem(cleanData);
       if (response.success) {
         setStaffItems((prev) => [...prev, response.data]);
         setIsModalOpen(false);
@@ -278,7 +324,13 @@ const EmployeeRecordsPage = () => {
     if (!editingItem) return;
     try {
       setActionLoading(true);
-      const response = await StaffAPI.updateStaffItem(editingItem.Staff_ID, itemData);
+      // Remove Access_Code if role is not Cashier or Manager
+      const cleanData = { ...itemData };
+      if (cleanData.Role !== "Cashier" && cleanData.Role !== "Manager") {
+        delete cleanData.Access_Code;
+      }
+
+      const response = await StaffAPI.updateStaffItem(editingItem.Staff_ID, cleanData);
       if (response.success) {
         setStaffItems((prev) =>
           prev.map((it) => (it.Staff_ID === editingItem.Staff_ID ? response.data : it))
@@ -327,7 +379,15 @@ const EmployeeRecordsPage = () => {
   }, []);
 
   const handleModalSubmit = () => {
-    if (!formData.Name.trim()) return;
+    if (!formData.Name.trim() || !formData.CNIC.trim()) return;
+
+    // Validate access code if role is Cashier or Manager
+    if ((formData.Role === "Cashier" || formData.Role === "Manager") &&
+      (!formData.Access_Code || formData.Access_Code.length !== 4)) {
+      showToast(`${formData.Role} role requires a 4-digit access code`, "error");
+      return;
+    }
+
     if (editingItem) {
       handleUpdateItem(formData);
     } else {
@@ -342,6 +402,21 @@ const EmployeeRecordsPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
+  };
+
+  // CNIC formatting function
+  const formatCNIC = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '');
+
+    // Apply CNIC format: 35202-1234567-8
+    if (digits.length <= 5) {
+      return digits;
+    } else if (digits.length <= 12) {
+      return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+    } else {
+      return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12, 13)}`;
+    }
   };
 
   const isAllSelected =
@@ -459,6 +534,14 @@ const EmployeeRecordsPage = () => {
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
+                  Address
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                </th>
+                <th className="relative px-4 py-3 text-left">
+                  CNIC
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                </th>
+                <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
@@ -468,7 +551,7 @@ const EmployeeRecordsPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none ml-28"
+                          className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none "
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
@@ -506,7 +589,7 @@ const EmployeeRecordsPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none ml-24"
+                          className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
@@ -546,6 +629,10 @@ const EmployeeRecordsPage = () => {
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
+                  Access Code
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                </th>
+                <th className="relative px-4 py-3 text-left">
                   Actions
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
@@ -556,7 +643,7 @@ const EmployeeRecordsPage = () => {
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={10}
+                    colSpan={13}
                     className="px-4 py-8 text-center text-gray-500"
                   >
                     {searchTerm || statusFilter || roleFilter
@@ -584,6 +671,12 @@ const EmployeeRecordsPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       {item.Contact}
                     </td>
+                    <td className="px-4 py-4 text-sm max-w-[200px] truncate" title={item.Address}>
+                      {item.Address}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.CNIC}
+                    </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
                         className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
@@ -604,6 +697,18 @@ const EmployeeRecordsPage = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                       {item.Shift_End_Time}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {(item.Role === "Cashier" || item.Role === "Manager") && item.Access_Code ? (
+                        <span className={`px-2 py-1 rounded text-xs font-mono ${item.Role === "Cashier"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-purple-100 text-purple-800"
+                          }`}>
+                          {item.Access_Code}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -626,141 +731,285 @@ const EmployeeRecordsPage = () => {
           </table>
         </div>
       </div>
-
       {/* Model */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
-          <div className="bg-[#ffff] rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingItem ? "Edit Staff" : "Add New Staff"}
-            </h2>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71 p-4"
+          onClick={handleCloseModal}
+        >
+          <div
+            className="bg-white rounded-lg min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-xl relative flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
 
-            <div className="space-y-3">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Staff Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.Name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Name: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  required
-                />
-              </div>
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                {editingItem ? "Edit Staff Member" : "Add New Staff Member"}
+              </h2>
+              
+            </div>
 
-              {/* Contact */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact
-                </label>
-                <input
-                  type="text"
-                  value={formData.Contact}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Contact: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                />
-              </div>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <form onSubmit={(e) => { e.preventDefault(); handleModalSubmit(); }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-              {/* Role */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Role
-                </label>
-                <input
-                  type="text"
-                  value={formData.Role}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Role: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                />
-              </div>
+                  {/* Name */}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Staff Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.Name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, Name: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
+                      placeholder="Enter staff name"
+                      required
+                      autoFocus
+                    />
+                  </div>
 
-              {/* Salary */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Salary
-                </label>
-                <input
-                  type="text"
-                  value={formData.Salary}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Salary: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                />
-              </div>
+                  {/* Contact */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Contact Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.Contact}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^\d+\-\s]/g, '');
+                        setFormData({ ...formData, Contact: value });
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
+                      placeholder="03001234567"
+                    />
+                  </div>
 
-              {/* Shift Start Time */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Shift Start Time
-                </label>
-                <input
-                  type="text"
-                  value={formData.Shift_Start_Time}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Shift_Start_Time: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                />
-              </div>
+                  {/* CNIC */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      CNIC <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.CNIC}
+                      onChange={(e) =>
+                        setFormData({ ...formData, CNIC: formatCNIC(e.target.value) })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
+                      placeholder="35202-1234567-8"
+                      maxLength={15}
+                      required
+                    />
+                  </div>
 
-              {/* Shift End Time */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Shift End Time
-                </label>
-                <input
-                  type="text"
-                  value={formData.Shift_End_Time}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Shift_End_Time: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                />
-              </div>
+                  {/* Address */}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Address
+                    </label>
+                    <textarea
+                      value={formData.Address}
+                      onChange={(e) =>
+                        setFormData({ ...formData, Address: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent resize-none transition-colors"
+                      placeholder="Enter complete address"
+                      rows={3}
+                    />
+                  </div>
 
-              {/* Status */}
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <ButtonPage
-                  checked={formData.Status === "Active"}
-                  onChange={handleStatusChange}
-                />
-              </div>
+                  {/* Role Dropdown */}
+                  <div className="flex flex-col gap-1 relative">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Role
+                    </label>
 
-              {/* Action buttons */}
-              <div className="flex gap-3 pt-4 justify-end">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
-                >
-                  <X size={12} />
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleModalSubmit}
-                  disabled={!formData.Name.trim()}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${formData.Name.trim()
-                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                >
-                  <Save size={12} />
-                  {editingItem ? "Update" : "Save & Close"}
-                </button>
-              </div>
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger className="px-3 py-2 rounded-lg text-sm border border-gray-300 bg-white flex items-center gap-2 w-full focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors hover:border-gray-400">
+                        <span className={formData.Role ? "text-gray-900" : "text-gray-500"}>
+                          {formData.Role || "Select Role"}
+                        </span>
+                        <ChevronDown size={16} className="text-gray-500 ml-auto" />
+                      </DropdownMenu.Trigger>
+
+                      <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                          className="min-w-[200px] rounded-md bg-white shadow-lg border border-gray-200 p-1 relative outline-none z-[100] max-h-60 overflow-y-auto"
+                          sideOffset={6}
+                        >
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+
+                          {/* Default Option */}
+                          <DropdownMenu.Item
+                            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none text-gray-500"
+                            onClick={() => setFormData({ ...formData, Role: "" })}
+                          >
+                            Select Role
+                          </DropdownMenu.Item>
+
+                          {/* Role Options */}
+                          {["Manager", "Cashier", "Waiter", "Cleaner", "Chef", "Security"].map(
+                            (role) => (
+                              <DropdownMenu.Item
+                                key={role}
+                                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 hover:text-gray-700 rounded outline-none"
+                                onClick={() => setFormData({ ...formData, Role: role })}
+                              >
+                                {role}
+                              </DropdownMenu.Item>
+                            )
+                          )}
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
+                  </div>
+
+                  {/* Salary */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Salary (PKR)
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.Salary}
+                      onChange={(e) =>
+                        setFormData({ ...formData, Salary: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
+                      placeholder="30000"
+                      min="0"
+                      step="1000"
+                    />
+                  </div>
+
+                  {/* Shift Times */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Shift Start Time
+                    </label>
+                    <input
+                      type="time"
+                      value={formData.Shift_Start_Time}
+                      onChange={(e) =>
+                        setFormData({ ...formData, Shift_Start_Time: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Shift End Time
+                    </label>
+                    <input
+                      type="time"
+                      value={formData.Shift_End_Time}
+                      onChange={(e) =>
+                        setFormData({ ...formData, Shift_End_Time: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
+                    />
+                  </div>
+
+                  {/* Access Code - Only for Cashier and Manager */}
+                  {(formData.Role === "Cashier" || formData.Role === "Manager") && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Access Code <span className="text-red-500">*</span>
+                        <span className="text-xs text-gray-500 ml-1">(4 digits)</span>
+                      </label>
+                      <input
+                        type="password"
+                        value={formData.Access_Code}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                          setFormData({ ...formData, Access_Code: value });
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent font-mono tracking-widest transition-colors"
+                        placeholder="••••"
+                        maxLength={4}
+                        required
+                      />
+                      {formData.Access_Code && formData.Access_Code.length < 4 && (
+                        <p className="text-red-500 text-xs mt-1">
+                          Access code must be exactly 4 digits
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Status Toggle */}
+                  <div className="flex items-center justify-between py-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Status
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`text-sm font-medium ${formData.Status === "Active"
+                            ? "text-green-600"
+                            : "text-red-500"
+                          }`}
+                      >
+                        {formData.Status}
+                      </span>
+                      <ButtonPage
+                        checked={formData.Status === "Active"}
+                        onChange={handleStatusChange}
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              </form>
+            </div>
+
+            {/* Fixed Action Buttons */}
+            <div className="flex gap-3 p-6 justify-end border-t border-gray-200">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                disabled={actionLoading}
+                className="px-6 py-2 border border-gray-300 bg-white rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                onClick={handleModalSubmit}
+                disabled={
+                  !formData.Name.trim() ||
+                  !formData.CNIC.trim() ||
+                  actionLoading ||
+                  ((formData.Role === "Cashier" || formData.Role === "Manager") &&
+                    (!formData.Access_Code || formData.Access_Code.length !== 4))
+                }
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 font-medium ${!formData.Name.trim() ||
+                    !formData.CNIC.trim() ||
+                    actionLoading ||
+                    ((formData.Role === "Cashier" || formData.Role === "Manager") &&
+                      (!formData.Access_Code || formData.Access_Code.length !== 4))
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
+              >
+                {actionLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    {editingItem ? "Updating..." : "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editingItem ? "Update Staff" : "Add Staff"}
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
