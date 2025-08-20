@@ -538,9 +538,9 @@ const CategoryPage = () => {
 
       {/* Table */}
       <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
-        <div className="overflow-y-auto">
+        <div className="max-h-[500px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
               <tr>
                 <th className="px-4 py-3 text-left">
                   <Checkbox
@@ -692,7 +692,7 @@ const CategoryPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
             <h2 className="text-xl font-semibold mb-4">
               {editingItem ? "Edit Category" : "Add New Category"}
@@ -709,7 +709,7 @@ const CategoryPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   required
                 />
               </div>
@@ -724,7 +724,7 @@ const CategoryPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Description: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 h-32 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] h-32 resize-none"
                   required
                 />
               </div>
@@ -789,7 +789,7 @@ const CategoryPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Parent: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                 />
               </div>
 

@@ -9,22 +9,39 @@ interface KeypadProps {
 const Keypad: React.FC<KeypadProps> = ({ onKeyPress, onBackspace }) => {
   const keys = [
     ['1', '2', '3'],
-    ['4', '5', '6'],
+    ['4', '5', '6'], 
     ['7', '8', '9'],
-    ['*', '0', '#']
+    ['0'] // Only 0 in the last row, centered
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
-      {keys.flat().map((key) => (
+    <div className="w-full max-w-[240px] mx-auto">
+      {/* First three rows */}
+      <div className="grid grid-cols-3 gap-5 mb-5">
+        {keys.slice(0, 3).flat().map((key) => (
+          <button
+            key={key}
+            onClick={() => onKeyPress(key)}
+            className="w-16 h-16 flex items-center justify-center text-2xl font-normal text-gray-800 
+                     hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150 rounded-lg"
+          >
+            {key}
+          </button>
+        ))}
+      </div>
+      
+      {/* Last row with only 0 in center */}
+      <div className="grid grid-cols-3 gap-5">
+        <div></div> {/* Empty space */}
         <button
-          key={key}
-          onClick={() => key === '*' ? onBackspace() : onKeyPress(key)}
-          className="h-12 w-12 bg-gray-200 hover:bg-gray-300 rounded-lg text-lg font-semibold transition-colors"
+          onClick={() => onKeyPress('0')}
+          className="w-16 h-16 flex items-center justify-center text-2xl font-normal text-gray-800 
+                   hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150 rounded-lg"
         >
-          {key === '*' ? '⌫' : key}
+          0
         </button>
-      ))}
+        <div></div> {/* Empty space */}
+      </div>
     </div>
   );
 };
