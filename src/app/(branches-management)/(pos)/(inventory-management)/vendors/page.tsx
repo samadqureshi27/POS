@@ -467,8 +467,8 @@ const VendorsPage = () => {
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
             className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
           >
             <Plus size={16} />
@@ -479,8 +479,8 @@ const VendorsPage = () => {
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
           >
             <Trash2 size={16} />
@@ -618,15 +618,21 @@ const VendorsPage = () => {
       {/* Modal for Add/Edit */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingItem ? "Edit Vendor" : "Add New Vendor"}
-            </h2>
-            <div className="space-y-3">
+          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                {editingItem ? "Edit Vendor" : "Add New Vendor"}
+              </h2>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1">
               {/* Company Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Company Name
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -634,15 +640,16 @@ const VendorsPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Company_Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter company name"
                   required
                 />
               </div>
 
               {/* Contact Person Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact Person Name
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Contact Person Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -650,15 +657,17 @@ const VendorsPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter contact person name"
                   required
                 />
               </div>
 
-              {/* Contact */}
+              {/* Contact Number */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Contact Number
+                  <span className="text-xs text-gray-500 ml-1">(Phone/Mobile)</span>
                 </label>
                 <input
                   type="text"
@@ -666,15 +675,16 @@ const VendorsPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Contact: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter contact number"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                  <span className="text-xs text-gray-500 ml-1">(Business email)</span>
                 </label>
                 <input
                   type="email"
@@ -682,48 +692,87 @@ const VendorsPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Email: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter email address"
                 />
               </div>
 
               {/* Address */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Business Address
+                  <span className="text-xs text-gray-500 ml-1">(Complete address)</span>
                 </label>
                 <textarea
-                  placeholder="Enter address here..."
                   value={formData.Address}
                   onChange={(e) =>
                     setFormData({ ...formData, Address: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] h-20 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent h-24 resize-none"
+                  placeholder="Enter complete business address..."
+                  rows="3"
                 />
               </div>
-              {/* Action buttons */}
-              <div className="flex gap-3 pt-4 justify-end">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
-                >
-                  <X size={12} />
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleModalSubmit}
-                  disabled={!formData.Name.trim() || !formData.Company_Name.trim()}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${formData.Name.trim() && formData.Company_Name.trim()
-                      ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                >
-                  <Save size={12} />
-                  {editingItem ? "Update" : "Save & Close"}
-                </button>
-              </div>
+
+              {/* Vendor Status Display */}
+              {formData.Company_Name.trim() && formData.Name.trim() && (
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Vendor Status
+                    <span className="text-xs text-gray-500 ml-1">(Auto-generated)</span>
+                  </label>
+                  <div className="flex items-center gap-3 p-3 rounded-lg border bg-green-50">
+                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                    <span className="text-sm font-semibold text-green-600">
+                      ACTIVE VENDOR
+                    </span>
+                    <span className="text-xs text-gray-500 ml-auto">
+                      Ready for transactions
+                    </span>
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Fixed Action Buttons */}
+            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                disabled={actionLoading}
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X size={16} />
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleModalSubmit}
+                disabled={
+                  !formData.Name.trim() ||
+                  !formData.Company_Name.trim() ||
+                  actionLoading
+                }
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
+                  !formData.Company_Name.trim() ||
+                  actionLoading
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
+              >
+                {actionLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    {editingItem ? "Updating..." : "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editingItem ? "Update Vendor" : "Add Vendor"}
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

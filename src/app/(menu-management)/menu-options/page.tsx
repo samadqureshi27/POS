@@ -238,9 +238,8 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -479,11 +478,10 @@ const CategoryPage = () => {
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
-              selectedItems.length === 0
+            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+              }`}
           >
             <Plus size={16} />
             Add
@@ -492,11 +490,10 @@ const CategoryPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-              isSomeSelected && !actionLoading
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSomeSelected && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -678,11 +675,10 @@ const CategoryPage = () => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                    activeTab === tab
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === tab
                       ? "border-b-2 border-black text-black"
                       : "text-gray-500 hover:text-black hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   {tab}
                 </button>
@@ -788,171 +784,170 @@ const CategoryPage = () => {
                 </div>
               )}
               {activeTab === "Option Values" && (
-                
-  <div className="">
-    {/* Fixed Header */}
-    
-    <div className="border border-gray-200 rounded-t-lg bg-gray-50">
-      <table className="w-full">
-        <thead>
-          <tr>
-            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"><div className="">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData({
-                      ...formData,
-                      OptionValue: [...formData.OptionValue, ""],
-                      OptionPrice: [...formData.OptionPrice, 0],
-                    })
-                  }
-                  className="px-4 py-2 mr-1  bg-black text-white rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  + 
-                </button>
-              </div></th>
-            <th className="w-80 p-3 text-left text-sm font-medium text-gray-700">
-              Option Value
-            </th>
-            <th className="p-3 text-center text-sm font-medium text-gray-700">
-              Option Price
-            </th>
-            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-          </tr>
-        </thead>
-      </table>
-    </div>
 
-   {/* Scrollable Body */}
-<div className="border-l border-r border-b border-gray-200 rounded-b-lg max-h-60 overflow-y-auto bg-white">
-  
-  <DragDropContext
-    onDragEnd={(result: DropResult) => {
-      const { source, destination } = result;
-      if (!destination || source.index === destination.index) return;
+                <div className="">
+                  {/* Fixed Header */}
 
-      const newOptionValue = Array.from(formData.OptionValue);
-      const [movedValue] = newOptionValue.splice(source.index, 1);
-      newOptionValue.splice(destination.index, 0, movedValue);
+                  <div className="border border-gray-200 rounded-t-lg bg-gray-50">
+                    <table className="w-full">
+                      <thead>
+                        <tr>
+                          <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"><div className="">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setFormData({
+                                  ...formData,
+                                  OptionValue: [...formData.OptionValue, ""],
+                                  OptionPrice: [...formData.OptionPrice, 0],
+                                })
+                              }
+                              className="px-4 py-2 mr-1  bg-black text-white rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                              +
+                            </button>
+                          </div></th>
+                          <th className="w-80 p-3 text-left text-sm font-medium text-gray-700">
+                            Option Value
+                          </th>
+                          <th className="p-3 text-center text-sm font-medium text-gray-700">
+                            Option Price
+                          </th>
+                          <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
 
-      const newOptionPrice = Array.from(formData.OptionPrice);
-      const [movedPrice] = newOptionPrice.splice(source.index, 1);
-      newOptionPrice.splice(destination.index, 0, movedPrice);
+                  {/* Scrollable Body */}
+                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg max-h-60 overflow-y-auto bg-white">
 
-      setFormData({
-        ...formData,
-        OptionValue: newOptionValue,
-        OptionPrice: newOptionPrice,
-      });
-    }}
-  >
-    <Droppable droppableId="option-values">
-      {(provided) => (
-        <table className="w-full border-collapse">
-          <tbody ref={provided.innerRef} {...provided.droppableProps}>
-            {formData.OptionValue.map((opt, idx) => (
-              <Draggable
-                key={idx}
-                draggableId={`option-${idx}`}
-                index={idx}
-              >
-                {(provided, snapshot) => (
-                  <tr
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    className={`hover:bg-gray-50 ${
-                      snapshot.isDragging ? "bg-gray-100 shadow-lg" : ""
-                    } border-b border-gray-200`} // <-- Add horizontal line
-                  >
-                    {/* Drag Handle */}
-                    <td
-                      className="p-3 text-center cursor-grab w-12"
-                      {...provided.dragHandleProps}
+                    <DragDropContext
+                      onDragEnd={(result: DropResult) => {
+                        const { source, destination } = result;
+                        if (!destination || source.index === destination.index) return;
+
+                        const newOptionValue = Array.from(formData.OptionValue);
+                        const [movedValue] = newOptionValue.splice(source.index, 1);
+                        newOptionValue.splice(destination.index, 0, movedValue);
+
+                        const newOptionPrice = Array.from(formData.OptionPrice);
+                        const [movedPrice] = newOptionPrice.splice(source.index, 1);
+                        newOptionPrice.splice(destination.index, 0, movedPrice);
+
+                        setFormData({
+                          ...formData,
+                          OptionValue: newOptionValue,
+                          OptionPrice: newOptionPrice,
+                        });
+                      }}
                     >
-                      <Grip size={18} className="text-gray-500 mx-auto" />
-                    </td>
+                      <Droppable droppableId="option-values">
+                        {(provided) => (
+                          <table className="w-full border-collapse">
+                            <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                              {formData.OptionValue.map((opt, idx) => (
+                                <Draggable
+                                  key={idx}
+                                  draggableId={`option-${idx}`}
+                                  index={idx}
+                                >
+                                  {(provided, snapshot) => (
+                                    <tr
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      className={`hover:bg-gray-50 ${snapshot.isDragging ? "bg-gray-100 shadow-lg" : ""
+                                        } border-b border-gray-200`} // <-- Add horizontal line
+                                    >
+                                      {/* Drag Handle */}
+                                      <td
+                                        className="p-3 text-center cursor-grab w-12"
+                                        {...provided.dragHandleProps}
+                                      >
+                                        <Grip size={18} className="text-gray-500 mx-auto" />
+                                      </td>
 
-                    {/* Option Name */}
-                    <td className="min-w-[300px] p-3">
-                      <input
-                        type="text"
-                        value={opt}
-                        onChange={(e) => {
-                          const updated = [...formData.OptionValue];
-                          updated[idx] = e.target.value;
-                          setFormData({
-                            ...formData,
-                            OptionValue: updated,
-                          });
-                        }}
-                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                        placeholder="Enter option value"
-                      />
-                    </td>
+                                      {/* Option Name */}
+                                      <td className="min-w-[300px] p-3">
+                                        <input
+                                          type="text"
+                                          value={opt}
+                                          onChange={(e) => {
+                                            const updated = [...formData.OptionValue];
+                                            updated[idx] = e.target.value;
+                                            setFormData({
+                                              ...formData,
+                                              OptionValue: updated,
+                                            });
+                                          }}
+                                          className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                                          placeholder="Enter option value"
+                                        />
+                                      </td>
 
-                    {/* Option Price */}
-                    <td className="p-3 text-center">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        value={formData.OptionPrice[idx]}
-                        onChange={(e) => {
-                          const updated = [...formData.OptionPrice];
-                          updated[idx] =
-                            Number(e.target.value.replace(/\D/g, "")) || 0;
-                          setFormData({
-                            ...formData,
-                            OptionPrice: updated,
-                          });
-                        }}
-                        className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
-                        placeholder="0"
-                      />
-                    </td>
+                                      {/* Option Price */}
+                                      <td className="p-3 text-center">
+                                        <input
+                                          type="text"
+                                          inputMode="numeric"
+                                          pattern="[0-9]*"
+                                          value={formData.OptionPrice[idx]}
+                                          onChange={(e) => {
+                                            const updated = [...formData.OptionPrice];
+                                            updated[idx] =
+                                              Number(e.target.value.replace(/\D/g, "")) || 0;
+                                            setFormData({
+                                              ...formData,
+                                              OptionPrice: updated,
+                                            });
+                                          }}
+                                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
+                                          placeholder="0"
+                                        />
+                                      </td>
 
-                    {/* Delete Button */}
-                    <td className="p-3 text-center w-12">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updatedValues =
-                            formData.OptionValue.filter((_, i) => i !== idx);
-                          const updatedPrices =
-                            formData.OptionPrice.filter((_, i) => i !== idx);
-                          setFormData({
-                            ...formData,
-                            OptionValue: updatedValues,
-                            OptionPrice: updatedPrices,
-                          });
-                        }}
-                        className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
-                      >
-                        <X size={20} />
-                      </button>
-                    </td>
-                  </tr>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </tbody>
-        </table>
-      )}
-    </Droppable>
-  </DragDropContext>
-</div>
+                                      {/* Delete Button */}
+                                      <td className="p-3 text-center w-12">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const updatedValues =
+                                              formData.OptionValue.filter((_, i) => i !== idx);
+                                            const updatedPrices =
+                                              formData.OptionPrice.filter((_, i) => i !== idx);
+                                            setFormData({
+                                              ...formData,
+                                              OptionValue: updatedValues,
+                                              OptionPrice: updatedPrices,
+                                            });
+                                          }}
+                                          className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                                        >
+                                          <X size={20} />
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </tbody>
+                          </table>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+                  </div>
 
 
-    {/* Add Option Button */}
-  </div>
-)}
+                  {/* Add Option Button */}
+                </div>
+              )}
 
             </div>
 
             {/* Action buttons */}
             <div className=" fixed bottom-41 right-145 flex justify-end gap-3 p-4 border-t w-[31.5vw] border-gray-200">
-              
+
               <button
                 onClick={handleCloseModal}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
