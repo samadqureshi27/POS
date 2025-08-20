@@ -32,6 +32,17 @@ interface ApiResponse<T> {
   success: boolean;
 }
 
+// Function to calculate status based on threshold
+const calculateStatus = (updatedStock: number, threshold: number): "Low" | "Medium" | "High" => {
+  if (updatedStock <= threshold) {
+    return "Low";
+  } else if (updatedStock <= threshold * 1.25) { // 25% above threshold
+    return "Medium";
+  } else {
+    return "High";
+  }
+};
+
 class MenuAPI {
   private static delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -41,7 +52,7 @@ class MenuAPI {
     {
       ID: 1,
       Name: "Espresso Beans",
-      Unit: "Kilograms (Kg’s)",
+      Unit: "Kilograms (Kg's)",
       Status: "High",
       InitialStock: 20,
       AddedStock: 5,
@@ -61,7 +72,7 @@ class MenuAPI {
     {
       ID: 3,
       Name: "Sugar",
-      Unit: "Kilograms (Kg’s)",
+      Unit: "Kilograms (Kg's)",
       Status: "Low",
       InitialStock: 8,
       AddedStock: 2,
@@ -131,14 +142,17 @@ class MenuAPI {
     {
       ID: 10,
       Name: "Butter",
-      Unit: "Kilograms (Kg’s)",
+      Unit: "Kilograms (Kg's)",
       Status: "Low",
       InitialStock: 4,
       AddedStock: 1,
       UpdatedStock: 5,
       Threshold: 6,
     },
-  ];
+  ].map(item => ({
+    ...item,
+    Status: calculateStatus(item.UpdatedStock, item.Threshold)
+  }));
 
   // ✅ GET /api/inventory-items/
   static async getInventoryItems(): Promise<ApiResponse<InventoryItem[]>> {
@@ -156,9 +170,12 @@ class MenuAPI {
   ): Promise<ApiResponse<InventoryItem>> {
     await this.delay(1000);
     const newId = this.mockData.length > 0 ? Math.max(...this.mockData.map(i => i.ID)) + 1 : 1;
+    const updatedStock = item.InitialStock + item.AddedStock;
     const newItem: InventoryItem = {
       ...item,
       ID: newId,
+      UpdatedStock: updatedStock,
+      Status: calculateStatus(updatedStock, item.Threshold),
     };
     this.mockData.push(newItem);
     return {
@@ -177,7 +194,15 @@ class MenuAPI {
     const index = this.mockData.findIndex((i) => i.ID === id);
     if (index === -1) throw new Error("Item not found");
 
-    this.mockData[index] = { ...this.mockData[index], ...item };
+    const updatedStock = (item.InitialStock || 0) + (item.AddedStock || 0);
+    const updatedItem = {
+      ...this.mockData[index],
+      ...item,
+      UpdatedStock: updatedStock,
+      Status: calculateStatus(updatedStock, item.Threshold || this.mockData[index].Threshold),
+    };
+
+    this.mockData[index] = updatedItem;
     return {
       success: true,
       data: this.mockData[index],
@@ -385,7 +410,7 @@ const inventoryManagementPage = () => {
         Status: editingItem.Status,
         InitialStock: editingItem.InitialStock,
         AddedStock: editingItem.AddedStock,
-        UpdatedStock: editingItem.UpdatedStock, // already stored in DB
+        UpdatedStock: editingItem.UpdatedStock,
         Threshold: editingItem.Threshold,
       });
     } else {
@@ -395,20 +420,24 @@ const inventoryManagementPage = () => {
         Status: "Low",
         InitialStock: 0,
         AddedStock: 0,
-        UpdatedStock: 0, // always present
+        UpdatedStock: 0,
         Threshold: 0,
       });
       setPreview(null);
     }
   }, [editingItem, isModalOpen]);
 
-  // Update UpdatedStock whenever InitialStock or AddedStock changes
+  // Update UpdatedStock and Status whenever InitialStock, AddedStock, or Threshold changes
   useEffect(() => {
+    const newUpdatedStock = formData.InitialStock + formData.AddedStock;
+    const newStatus = calculateStatus(newUpdatedStock, formData.Threshold);
+
     setFormData((prev) => ({
       ...prev,
-      UpdatedStock: prev.InitialStock + prev.AddedStock,
+      UpdatedStock: newUpdatedStock,
+      Status: newStatus,
     }));
-  }, [formData.InitialStock, formData.AddedStock]);
+  }, [formData.InitialStock, formData.AddedStock, formData.Threshold]);
 
   const handleModalSubmit = () => {
     if (
@@ -416,14 +445,15 @@ const inventoryManagementPage = () => {
     ) {
       return;
     }
-  const payload = {
-    ...formData,
-    UpdatedStock: formData.InitialStock + formData.AddedStock,
-  };
+    const payload = {
+      ...formData,
+      UpdatedStock: formData.InitialStock + formData.AddedStock,
+      Status: calculateStatus(formData.InitialStock + formData.AddedStock, formData.Threshold),
+    };
     if (editingItem) {
-      handleUpdateItem(formData);
+      handleUpdateItem(payload);
     } else {
-      handleCreateItem(formData);
+      handleCreateItem(payload);
     }
   };
 
@@ -769,19 +799,23 @@ const inventoryManagementPage = () => {
         </div>
       </div>
 
-      {/* Modal for Add/Edit */}
-      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-80">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingItem ? "Edit Inventory Item" : "Add New Inventory Item"}
-            </h2>
-            <div className="space-y-3">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                {editingItem ? "Edit Inventory Item" : "Add New Inventory Item"}
+              </h2>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1">
               {/* Item Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Item Name
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Item Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -789,7 +823,7 @@ const inventoryManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="Enter item name"
                   required
                 />
@@ -797,67 +831,33 @@ const inventoryManagementPage = () => {
 
               {/* Unit */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Unit
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Unit of Measurement
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.Unit}
                   onChange={(e) =>
                     setFormData({ ...formData, Unit: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  placeholder="e.g., Kg, Liters, Pieces"
-                />
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                >
+                  <option value="">Select Unit</option>
+                  <option value="Kg">Kilogram (Kg)</option>
+                  <option value="g">Gram (g)</option>
+                  <option value="Liters">Liters</option>
+                  <option value="ml">Milliliter (ml)</option>
+                  <option value="Pieces">Pieces</option>
+                  <option value="Boxes">Boxes</option>
+                  <option value="Packets">Packets</option>
+                  <option value="Bottles">Bottles</option>
+                </select>
               </div>
 
-
-              {/* Initial Stock */}
+              {/* Threshold */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Initial Stock
-                </label>
-                <input
-                  type="number"
-                  value={formData.InitialStock}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      InitialStock: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  placeholder="0"
-                  min="0"
-                />
-              </div>
-
-              {/* Added Stock */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Added Stock
-                </label>
-                <input
-                  type="number"
-                  value={formData.AddedStock}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      AddedStock: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  placeholder="0"
-                  min="0"
-                />
-              </div>
-
-              {/* Current Stock Display */}
-             
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Threshold
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Low Stock Threshold
+                  <span className="text-xs text-gray-500 ml-1">(Alert when below)</span>
                 </label>
                 <input
                   type="number"
@@ -868,35 +868,139 @@ const inventoryManagementPage = () => {
                       Threshold: Number(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="0"
                   min="0"
                 />
               </div>
 
-              {/* Action buttons */}
-              <div className="flex gap-3 pt-4 justify-end">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
-                >
-                  <X size={12} />
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleModalSubmit}
-                  disabled={!formData.Name.trim()}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${formData.Name.trim()
-                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                >
-                  <Save size={12} />
-                  {editingItem ? "Update" : "Save & Close"}
-                </button>
+              {/* Initial Stock */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Initial Stock
+                  <span className="text-xs text-gray-500 ml-1">(Starting quantity)</span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.InitialStock}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      InitialStock: Number(e.target.value) || 0,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="0"
+                  min="0"
+                />
               </div>
+
+              {/* Added Stock */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Additional Stock
+                  <span className="text-xs text-gray-500 ml-1">(Stock to add)</span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.AddedStock}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      AddedStock: Number(e.target.value) || 0,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="0"
+                  min="0"
+                />
+              </div>
+
+              {/* Current Stock Display */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Total Current Stock
+                </label>
+                <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-lg">
+                      {(formData.InitialStock || 0) + (formData.AddedStock || 0)} {formData.Unit || 'units'}
+                    </span>
+                    <div className="text-sm text-gray-500">
+                      Initial: {formData.InitialStock || 0} + Added: {formData.AddedStock || 0}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stock Status Indicator */}
+              {((formData.InitialStock || 0) + (formData.AddedStock || 0)) > 0 && (
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Stock Status
+                    <span className="text-xs text-gray-500 ml-1">(Auto-calculated based on threshold)</span>
+                  </label>
+                  <div className="flex items-center gap-3 p-3 rounded-lg border bg-gray-50">
+                    <div className={`w-4 h-4 rounded-full ${formData.Status === 'Low'
+                        ? 'bg-red-500'
+                        : formData.Status === 'Medium'
+                          ? 'bg-yellow-500'
+                          : 'bg-green-500'
+                      }`}></div>
+                    <span className={`text-sm font-semibold ${formData.Status === 'Low'
+                        ? 'text-red-600'
+                        : formData.Status === 'Medium'
+                          ? 'text-yellow-600'
+                          : 'text-green-600'
+                      }`}>
+                      {formData.Status.toUpperCase()} STOCK
+                    </span>
+                    <span className="text-xs text-gray-500 ml-auto">
+                      Threshold: {formData.Threshold || 0} {formData.Unit || 'units'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+
+            </div>
+
+            {/* Fixed Action Buttons */}
+            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                disabled={actionLoading}
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X size={16} />
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleModalSubmit}
+                disabled={
+                  !formData.Name.trim() ||
+                  actionLoading
+                }
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
+                    actionLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
+              >
+                {actionLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    {editingItem ? "Updating..." : "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editingItem ? "Update Item" : "Add Item"}
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
