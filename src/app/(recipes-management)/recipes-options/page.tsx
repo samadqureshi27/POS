@@ -190,10 +190,12 @@ const CategoryPage = () => {
   const [RecipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [actionLoading, setActionLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingItem, setEditingItem] = useState<RecipeOption | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(editingItem ? "Option Values" : "Details");
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -234,6 +236,12 @@ const CategoryPage = () => {
       setPreview(null);
     }
   }, [editingItem, isModalOpen]);
+
+   useEffect(() => {
+    if (isModalOpen) {
+      setActiveTab(editingItem ? "Option Values" : "Details");
+    }
+  }, [isModalOpen, editingItem]);
 
   const loadRecipeOptions = async () => {
     try {
