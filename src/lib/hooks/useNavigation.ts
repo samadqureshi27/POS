@@ -1,7 +1,7 @@
 // lib/hooks/useNavigation.ts
 'use client'
 import { usePathname } from 'next/navigation'
-import { findNavigationItem, getPageTitle } from '../../lib/navigation'
+import { findNavigationItem, getPageTitle } from '@/lib/navigation'
 
 export function useNavigation() {
   const pathname = usePathname()
