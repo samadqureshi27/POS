@@ -1,9 +1,9 @@
 "use client";
+
+import React from "react";
 import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import React, { useState, useEffect } from "react";
 import {
   Plus,
   Trash2,
@@ -12,16 +12,202 @@ import {
   CheckCircle,
   X,
   Edit,
+  Filter,
+  Save,
+  ImageIcon,
 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
-interface InventoryItem {
-  ID: string;
+interface RecipeOption {
+  ID: number;
   Name: string;
-
   Status: "Active" | "Inactive";
   Description: string;
 
-  Priority: string;
+  Priority: number;
+}
+
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
+
+class MenuAPI {
+  private static delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  public static mockData: RecipeOption[] = [
+    {
+      ID: 1,
+      Name: "Cheese",
+      Status: "Active",
+      Description: "Bread",
+
+      Priority: 1,
+    },
+    {
+      ID: 2,
+      Name: "Pepperoni",
+      Status: "Active",
+      Description: "Bread ",
+
+      Priority: 2,
+    },
+    {
+      ID: 3,
+      Name: "Mushrooms",
+      Status: "Inactive",
+      Description: "Bread ",
+
+      Priority: 3,
+    },
+    {
+      ID: 4,
+      Name: "Olives",
+      Status: "Inactive",
+      Description: "Bread ",
+
+      Priority: 3,
+    },
+    {
+      ID: 5,
+      Name: "Onions",
+      Status: "Inactive",
+      Description: "Bread ",
+
+      Priority: 4,
+    },
+    {
+      ID: 6,
+      Name: "Green Peppers",
+      Status: "Inactive",
+      Description: "Bread ",
+
+      Priority: 3,
+    },
+    {
+      ID: 7,
+      Name: "Bacon",
+      Status: "Inactive",
+      Description: "Bread ",
+
+      Priority: 3,
+    },
+    {
+      ID: 8,
+      Name: "Pineapple",
+      Status: "Inactive",
+      Description: "Bread ",
+
+      Priority: 3,
+    },
+    {
+      ID: 9,
+      Name: "Tomato",
+      Status: "Inactive",
+      Description: "Bread ",
+
+      Priority: 4,
+    },
+    {
+      ID: 10,
+      Name: "Spinach",
+      Status: "Inactive",
+      Description: "Bread ",
+
+      Priority: 4,
+    },
+  ];
+
+  // ✅ GET /api/menu-items/
+  static async getRecipeOption(): Promise<ApiResponse<RecipeOption[]>> {
+    await this.delay(800);
+    return {
+      success: true,
+      data: [...this.mockData],
+      message: "Menu items fetched successfully",
+    };
+  }
+
+  // ✅ POST /api/menu-items/
+  static async createRecipeOption(
+    item: Omit<RecipeOption, "ID">
+  ): Promise<ApiResponse<RecipeOption>> {
+    await this.delay(1000);
+    const newId =
+      this.mockData.length > 0
+        ? Math.max(...this.mockData.map((i) => i.ID)) + 1
+        : 1;
+    const newItem: RecipeOption = {
+      ...item,
+      ID: newId,
+    };
+    this.mockData.push(newItem);
+    return {
+      success: true,
+      data: newItem,
+      message: "Menu item created successfully",
+    };
+  }
+
+  // ✅ PUT /api/menu-items/{id}/
+  static async updateRecipeOption(
+    id: number,
+    item: Partial<RecipeOption>
+  ): Promise<ApiResponse<RecipeOption>> {
+    await this.delay(800);
+    const index = this.mockData.findIndex((i) => i.ID === id);
+    if (index === -1) throw new Error("Item not found");
+
+    this.mockData[index] = { ...this.mockData[index], ...item };
+    return {
+      success: true,
+      data: this.mockData[index],
+      message: "Menu item updated successfully",
+    };
+  }
+
+  // ✅ DELETE /api/menu-items/{id}/
+  static async deleteRecipeOption(id: number): Promise<ApiResponse<null>> {
+    await this.delay(600);
+    const index = this.mockData.findIndex((i) => i.ID === id);
+    if (index === -1) throw new Error("Item not found");
+
+    this.mockData.splice(index, 1);
+
+    // Reassign IDs sequentially
+    this.mockData = this.mockData.map((item, idx) => ({
+      ...item,
+      ID: idx + 1,
+    }));
+
+    return {
+      success: true,
+      data: null,
+      message: "Menu item deleted successfully",
+    };
+  }
+
+  // ✅ DELETE /api/menu-items/bulk-delete/
+  static async bulkDeleteRecipeOption(
+    ids: number[]
+  ): Promise<ApiResponse<null>> {
+    await this.delay(1000);
+    this.mockData = this.mockData.filter((item) => !ids.includes(item.ID));
+
+    // Reassign IDs sequentially
+    this.mockData = this.mockData.map((item, idx) => ({
+      ...item,
+      ID: idx + 1,
+    }));
+
+    return {
+      success: true,
+      data: null,
+      message: `${ids.length} menu items deleted successfully`,
+    };
+  }
 }
 
 const Toast = ({
@@ -47,190 +233,194 @@ const Toast = ({
 );
 
 const recipesManagementPage = () => {
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [RecipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
     ""
   );
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
-  const [loading, setLoading] = useState(true);
+
   const [actionLoading, setActionLoading] = useState(false);
+  const [selectedName, setSelectedName] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingItem, setEditingItem] = useState<RecipeOption | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(
+    editingItem ? "Recipe Info" : "Recipe Info"
+  );
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
+  const [DisplayFilter, setDisplayFilter] = useState<
+    "" | "Active" | "Inactive"
+  >("");
 
-  const [formData, setFormData] = useState<InventoryItem>({
-    ID: "",
+  // Modal form state
+  const [formData, setFormData] = useState<Omit<RecipeOption, "ID">>({
     Name: "",
+
     Status: "Inactive",
     Description: "",
-    
-    Priority: "",
+
+    Priority: 1,
   });
-
-  // initial dataset (and rows that say "Cell text")
-  useEffect(() => {
-    setTimeout(() => {
-      setItems([
-        {
-          ID: "#001",
-          Name: "Bread",
-
-          Status: "Active",
-          Description: "Bread",
-         
-
-          Priority: "1",
-        },
-        {
-          ID: "#002",
-          Name: "Oat Bread",
-
-          Status: "Active",
-          Description: "Bread ",
-          
-
-          Priority: "2",
-        },
-        {
-          ID: "#003",
-          Name: "French Bread",
-
-          Status: "Inactive",
-          Description: "Bread ",
-          
-
-          Priority: "3",
-        },
-      ]);
-      setLoading(false);
-    }, 800);
-  }, []);
-
-  // Add this state along with statusFilter
-  const [unitFilter, setUnitFilter] = useState("");
-
-  // Update filteredItems to include unitFilter check
-  const filteredItems = items.filter((item) => {
-    const q = searchTerm.trim().toLowerCase();
-    const matchesQuery =
-      q === "" ||
-      item.Name.toLowerCase().includes(q) ||
-      item.ID.toLowerCase().includes(q) 
-    const matchesStatus = statusFilter ? item.Status === statusFilter : true;
-    
-    return matchesQuery && matchesStatus;
-  });
-
-  const itemsWithUsage = items.map((item) => ({
-    ...item,
-    usageCount: Math.floor(Math.random() * 100), // random number 0–99
-  }));
-
-  // Find most used item
-  const mostUsedItem = itemsWithUsage.reduce(
-    (max, item) => (item.usageCount > max.usageCount ? item : max),
-    itemsWithUsage[0] || { usageCount: 0 }
-  );
-
-  // Find least used item
-  const leastUsedItem = itemsWithUsage.reduce(
-    (min, item) => (item.usageCount < min.usageCount ? item : min),
-    itemsWithUsage[0] || { usageCount: 0 }
-  );
+  const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleDeleteSelected = () => {
-    if (selectedItems.length === 0) return;
-    setActionLoading(true);
-    setTimeout(() => {
-      // Remove selected items
-      let remaining = items.filter((it) => !selectedItems.includes(it.ID));
+  useEffect(() => {
+    loadRecipeOptions();
+  }, []);
 
-      // Reassign IDs sequentially starting from 1
-      remaining = remaining.map((item, index) => ({
-        ...item,
-        ID: `#${String(index + 1).padStart(3, "0")}`,
-      }));
+  // Modal form effect
+  useEffect(() => {
+    if (editingItem) {
+      setFormData({
+        Name: editingItem.Name,
+        Status: editingItem.Status,
+        Description: editingItem.Description,
 
-      setItems(remaining);
-      setSelectedItems([]);
-      setActionLoading(false);
-      showToast("Selected items deleted successfully.", "success");
-    }, 600);
+        Priority: editingItem.Priority,
+      });
+    } else {
+      setFormData({
+        Name: "",
+        Status: "Inactive",
+        Description: "",
+
+        Priority: 1,
+      });
+      setPreview(null);
+    }
+  }, [editingItem, isModalOpen]);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      setActiveTab(editingItem ? "Recipe Info" : "Recipe Info");
+    }
+  }, [isModalOpen, editingItem]);
+
+  const loadRecipeOptions = async () => {
+    try {
+      setLoading(true);
+      const response = await MenuAPI.getRecipeOption();
+      if (response.success) {
+        setRecipeOptions(response.data);
+      } else {
+        throw new Error(response.message || "Failed to fetch category items");
+      }
+    } catch (error) {
+      console.error("Error fetching category items:", error);
+      showToast("Failed to load category items", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSelectItem = (id: string, checked: boolean) => {
-    setSelectedItems(
-      checked ? [...selectedItems, id] : selectedItems.filter((i) => i !== id)
+  const filteredItems = RecipeOptions.filter((item) => {
+    const matchesSearch = item.Name.toLowerCase().includes(
+      searchTerm.toLowerCase()
     );
+    return matchesSearch;
+  });
+
+  const handleCreateItem = async (itemData: Omit<RecipeOption, "ID">) => {
+    try {
+      setActionLoading(true);
+      const response = await MenuAPI.createRecipeOption(itemData);
+      if (response.success) {
+        setRecipeOptions((prevItems) => [...prevItems, response.data]);
+        setIsModalOpen(false);
+        setSearchTerm("");
+        setDisplayFilter("");
+        showToast(response.message || "Item created successfully", "success");
+      }
+    } catch (error) {
+      console.error("Error creating item:", error);
+      showToast("Failed to create menu item", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdateItem = async (itemData: Omit<RecipeOption, "ID">) => {
+    if (!editingItem) return;
+    try {
+      setActionLoading(true);
+      const response = await MenuAPI.updateRecipeOption(
+        editingItem.ID,
+        itemData
+      );
+      if (response.success) {
+        setRecipeOptions(
+          RecipeOptions.map((item) =>
+            item.ID === editingItem.ID ? response.data : item
+          )
+        );
+        setIsModalOpen(false);
+        setEditingItem(null);
+        showToast(response.message || "Item updated successfully", "success");
+      }
+    } catch (error) {
+      showToast("Failed to update menu item", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedItems.length === 0) return;
+    try {
+      setActionLoading(true);
+      const response = await MenuAPI.bulkDeleteRecipeOption(selectedItems);
+      if (response.success) {
+        setRecipeOptions((prev) => {
+          const remaining = prev.filter((i) => !selectedItems.includes(i.ID));
+          return remaining.map((it, idx) => ({ ...it, ID: idx + 1 }));
+        });
+        setSelectedItems([]);
+        showToast(response.message || "Items deleted successfully", "success");
+      }
+    } catch (error) {
+      showToast("Failed to delete menu items", "error");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(checked ? filteredItems.map((i) => i.ID) : []);
+    setSelectedItems(checked ? filteredItems.map((item) => item.ID) : []);
   };
 
-  const openAddModal = () => {
-    if (selectedItems.length > 0) return; // keep original behaviour (disable add when selections exist)
-    // generate next ID like "#006"
-    const nextNumber =
-      items
-        .map((i) => {
-          const m = i.ID.match(/\d+/);
-          return m ? parseInt(m[0], 10) : NaN;
-        })
-        .filter((n) => !Number.isNaN(n))
-        .reduce((a, b) => Math.max(a, b), 0) + 1;
-    const nextId = `#${String(nextNumber).padStart(3, "0")}`;
-
-    setEditItem(null);
-    setFormData({
-      ID: nextId,
-      Name: "",
-      Status: "Inactive",
-      Description: "",
-      
-      Priority: "",
-    });
-    setModalOpen(true);
+  const handleSelectItem = (itemId: number, checked: boolean) => {
+    setSelectedItems(
+      checked
+        ? [...selectedItems, itemId]
+        : selectedItems.filter((id) => id !== itemId)
+    );
   };
 
-  const openEditModal = (item: InventoryItem) => {
-    setEditItem(item);
-    setFormData({ ...item });
-    setModalOpen(true);
-  };
-
-  const handleSaveItem = () => {
-    // minimal validation
+  // Modal form handlers
+  const handleModalSubmit = () => {
     if (!formData.Name.trim()) {
-      showToast("Please enter a Name.", "error");
       return;
     }
 
-    setActionLoading(true);
-    setTimeout(() => {
-      if (editItem) {
-        setItems((prev) =>
-          prev.map((it) => (it.ID === editItem.ID ? { ...formData } : it))
-        );
-        showToast("Item updated successfully.", "success");
-      } else {
-        setItems((prev) => [...prev, { ...formData }]);
-        showToast("Item added successfully.", "success");
-      }
-      setModalOpen(false);
-      setEditItem(null);
-      setSelectedItems([]);
-      setActionLoading(false);
-    }, 700);
+    if (editingItem) {
+      handleUpdateItem(formData);
+    } else {
+      handleCreateItem(formData);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingItem(null);
   };
 
   const isAllSelected =
@@ -258,19 +448,14 @@ const recipesManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">
-        Recipes
-      </h1>
-
-      
-      
+      <h1 className="text-3xl font-semibold mb-4 pl-20">Recipes</h1>
 
       {/* Action bar: add, delete, search */}
       <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
         <div className="flex gap-3 pl-20">
           <button
-            onClick={openAddModal}
+            onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
             className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
               selectedItems.length === 0
@@ -316,7 +501,7 @@ const recipesManagementPage = () => {
       <div className="bg-gray-50 rounded-lg ml-20 shadow-sm overflow-x-auto">
         <div className="max-h-[500px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 ">
               <tr>
                 <th className="px-4 py-3 text-left">
                   <Checkbox
@@ -336,7 +521,6 @@ const recipesManagementPage = () => {
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                
 
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
@@ -375,7 +559,6 @@ const recipesManagementPage = () => {
                           >
                             Active
                           </DropdownMenu.Item>
-                          
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
@@ -387,12 +570,11 @@ const recipesManagementPage = () => {
                   Description
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                
+
                 <th className="relative px-4 py-3 text-left">
                   Priority
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                
 
                 <th className="relative px-4 py-3 text-left">
                   Actions
@@ -419,12 +601,15 @@ const recipesManagementPage = () => {
 
                   <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
                   <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
-                  
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
                       className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium border
-                  ${item.Status === "Inactive" ? "text-red-600 border-red-600" : ""}
+                  ${
+                    item.Status === "Inactive"
+                      ? "text-red-600 border-red-600"
+                      : ""
+                  }
                  
                   ${
                     item.Status === "Active"
@@ -440,16 +625,18 @@ const recipesManagementPage = () => {
                   <td className="px-4 py-4 whitespace-nowrap">
                     {item.Description}
                   </td>
-                  
+
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                     {item.Priority}
                   </td>
-                  
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => openEditModal(item)}
+                        onClick={() => {
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
                         className="text-black hover:text-gray-800 transition-colors"
                         title="Edit"
                       >
@@ -464,107 +651,219 @@ const recipesManagementPage = () => {
         </div>
       </div>
 
-      {/* Modal for Add/Edit */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-[700px]">
-            <h2 className="text-xl font-semibold mb-4">
-              {editItem ? "Edit Item" : "New Item"}
-            </h2>
-
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">ID</label>
-                <input
-                  type="text"
-                  value={formData.ID}
-                  readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Status
-                </label>
-                <select
-                  value={formData.Status}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      Status: e.target.value as InventoryItem["Status"],
-                    })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg min-w-[35vw]  max-w-2xl min-h-[60vh] max-h-[95vh] overflow-y-auto shadow-lg relative">
+            {/* Navbar inside modal */}
+            <h1 className="text-2xl pl-5 pt-2 font-medium">
+              {editingItem ? "Edit Option Menu" : "Add  Option Menu"}
+            </h1>
+            <div className="flex w-[350px] items-center justify-center  border-b border-gray-200  mx-auto">
+              {["Recipe Info", " Ingredients", "Recipe Option"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeTab === tab
+                      ? "border-b-2 border-black text-black"
+                      : "text-gray-500 hover:text-black hover:bg-gray-50"
+                  }`}
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  
-                </select>
-              </div>
-
-              <div className="col-span-2">
-                <label className="block text-sm text-gray-600 mb-1">Name</label>
-                <input
-                  type="text"
-                  value={formData.Name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Name: e.target.value })
-                  }
-                  placeholder="Item name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              
-
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  value={formData.Description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Description: e.target.value })
-                  }
-                  placeholder="Description"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Priority
-                </label>
-                <input
-                  type="text"
-                  value={formData.Priority}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Priority: e.target.value })
-                  }
-                  placeholder="Priority"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              
-
-              
+                  {tab}
+                </button>
+              ))}
             </div>
 
-            <div className="flex justify-end gap-2">
+            {/* Modal Content */}
+            <div className="p-6 ">
+              {activeTab === "Recipe Info" && (
+                <div className="space-y-8">
+                  {/* Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Recipe Name
+                    </label>
+                    <div className="flex items-center gap-2 ">
+                      <DropdownMenu.Root>
+                        <DropdownMenu.Trigger
+  className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+>
+  <span className="text-sm">
+    {"Pizza"}
+    {selectedName || ""}
+  </span>
+  <ChevronDown size={16} className="text-gray-500" />
+</DropdownMenu.Trigger>
+
+
+                        <DropdownMenu.Portal>
+                          <DropdownMenu.Content
+                            className="min-w-[240px] rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none"
+                            sideOffset={6}
+                          >
+                            <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+
+                            <DropdownMenu.Item
+                              className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                              onClick={() => setSelectedName("")}
+                            >
+                              None
+                            </DropdownMenu.Item>
+
+                            {Array.from(
+                              new Set(MenuAPI.mockData.map((i) => i.Name))
+                            ).map((name) => (
+                              <DropdownMenu.Item
+                                key={name}
+                                className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
+                                onClick={() => setSelectedName(name)}
+                              >
+                                {name}
+                              </DropdownMenu.Item>
+                            ))}
+                          </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                      </DropdownMenu.Root>
+                    </div>
+                  </div>
+                  {/* Priority */}{" "}
+                  <div>
+                    {" "}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {" "}
+                      Priority{" "}
+                    </label>{" "}
+                    <input
+                      type="number"
+                      value={formData.Priority}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          Priority: Number(e.target.value) || 1,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      min={1}
+                      required
+                    />{" "}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+
+                    <input
+                      type="text"
+                      value={formData.Description}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          Description: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "Ingredients" && (
+                <div overflow-y-auto pr-2>
+                  {formData.OptionValue.map((opt, idx) => (
+                    <div key={idx} className="flex gap-5 mb-2 items-center ">
+                      {/* Option Name */}
+                      <div className="flex flex-col gap-1">
+                        <h3 className="text-sm font-medium text-gray-700">
+                          Option Value
+                        </h3>
+                        <input
+                          type="text"
+                          value={opt}
+                          onChange={(e) => {
+                            const updated = [...formData.OptionValue];
+                            updated[idx] = e.target.value;
+                            setFormData({ ...formData, OptionValue: updated });
+                          }}
+                          className=" w-[23vw] flex-1 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                        />
+                      </div>
+
+                      {/* Option Price */}
+                      <div className="flex flex-col gap-1">
+                        <h3 className="text-sm font-medium text-gray-700">
+                          Option Price
+                        </h3>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          value={formData.OptionPrice[idx]}
+                          onChange={(e) => {
+                            const updated = [...formData.OptionPrice];
+                            updated[idx] =
+                              Number(e.target.value.replace(/\D/g, "")) || 0;
+                            setFormData({ ...formData, OptionPrice: updated });
+                          }}
+                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                        />
+                      </div>
+
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updatedValues = formData.OptionValue.filter(
+                            (_, i) => i !== idx
+                          );
+                          const updatedPrices = formData.OptionPrice.filter(
+                            (_, i) => i !== idx
+                          );
+                          setFormData({
+                            ...formData,
+                            OptionValue: updatedValues,
+                            OptionPrice: updatedPrices,
+                          });
+                        }}
+                        className=" mt-5 text-black border-2 hover:text-gray-700"
+                      >
+                        <X size={24} />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Add Option Button */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        OptionValue: [...formData.OptionValue, ""],
+                        OptionPrice: [...formData.OptionPrice, 0],
+                      })
+                    }
+                    className="mt-2 px-3 py-1 bg-gray-200 rounded text-sm"
+                  >
+                    + Add Option
+                  </button>
+                </div>
+              )}
+            </div>
+            {activeTab === "Recipe Option" && <div>Notes content</div>}
+
+            {/* Action buttons */}
+            <div className=" fixed bottom-45 right-145 flex justify-end gap-3 p-4 border-t w-[31.5vw] border-gray-200">
               <button
-                onClick={() => setModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded"
+                onClick={handleCloseModal}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
-                onClick={handleSaveItem}
-                className="px-4 py-2 bg-yellow-600 text-white rounded"
+                onClick={handleModalSubmit}
+                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-700"
               >
-                {actionLoading ? "Saving..." : "Save"}
+                {editingItem ? "Update" : "Save & Close"}
               </button>
             </div>
           </div>
@@ -573,8 +872,5 @@ const recipesManagementPage = () => {
     </div>
   );
 };
-
-
-
 
 export default recipesManagementPage;

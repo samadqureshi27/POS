@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Plus,
   Trash2,
@@ -15,17 +15,101 @@ import {
 } from "lucide-react";
 
 interface InventoryItem {
-  ID: string;
+  ID: number;
   Name: string;
   Unit: string;
-  
-  InitialStock: string;
-  Purchased:string ;
-  Used: string;
-  Variance: string;
-  Wasteage: string;
-  ClosingStock: string;
-  Total_Value: string;
+  InitialStock: number;
+  Purchased: number;
+  Used: number;
+  Variance: number;
+  Wasteage: number;
+  ClosingStock: number;
+  Total_Value: number;
+}
+
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
+
+class MenuAPI {
+  private static delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  // Dummy inventory data matching the InventoryItem interface
+  private static mockData: InventoryItem[] = [
+    {
+      ID: 1,
+      Name: "Ketchup",
+      Unit: "Kilograms (Kg's)",
+      InitialStock: 12,
+      Purchased: 50,
+      Used: 25,
+      Variance: 5,
+      Wasteage: 5,
+      ClosingStock: 27,
+      Total_Value: 135,
+    },
+    {
+      ID: 2,
+      Name: "Cheese",
+      Unit: "Grams (g)",
+      InitialStock: 500,
+      Purchased: 200,
+      Used: 300,
+      Variance: 10,
+      Wasteage: 5,
+      ClosingStock: 385,
+      Total_Value: 770,
+    },
+    {
+      ID: 3,
+      Name: "Tomato Sauce",
+      Unit: "Liters (L)",
+      InitialStock: 10,
+      Purchased: 15,
+      Used: 20,
+      Variance: 2,
+      Wasteage: 1,
+      ClosingStock: 2,
+      Total_Value: 40,
+    },
+    {
+      ID: 4,
+      Name: "Chicken Breast",
+      Unit: "Kilograms (Kg's)",
+      InitialStock: 20,
+      Purchased: 30,
+      Used: 40,
+      Variance: 3,
+      Wasteage: 2,
+      ClosingStock: 5,
+      Total_Value: 250,
+    },
+    {
+      ID: 5,
+      Name: "Lettuce",
+      Unit: "Pieces",
+      InitialStock: 30,
+      Purchased: 10,
+      Used: 25,
+      Variance: 1,
+      Wasteage: 2,
+      ClosingStock: 12,
+      Total_Value: 24,
+    },
+  ];
+
+  // GET /api/menu-items/
+  static async getInventoryItems(): Promise<ApiResponse<InventoryItem[]>> {
+    await this.delay(800);
+    return {
+      success: true,
+      data: [...this.mockData],
+      message: "Category items fetched successfully",
+    };
+  }
 }
 
 const Toast = ({
@@ -50,207 +134,107 @@ const Toast = ({
   </div>
 );
 
-const reportsPage = () => {
+const ReportsPage = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
-
-  const [formData, setFormData] = useState<InventoryItem>({
-    ID: "",
-    Name: "",
-    Unit: "",
-   
-  InitialStock: "",
-  Purchased:"" ,
-  Used: "",
-  Variance: "",
-  Wasteage: "",
-  ClosingStock: "",
-  Total_Value: "",
-  });
-
-  // initial dataset (and rows that say "Cell text")
-  useEffect(() => {
-    setTimeout(() => {
-      setItems([
-        {
-          ID: "#001",
-          Name: "Ketchup",
-          Unit: "Kilograms (Kg’s)",
-          
-          InitialStock: "12 ",
-          Purchased: "50",
-          Used: "25",
-          Variance: "5",
-          Wasteage: "5",
-          ClosingStock: "5",
-          Total_Value: "5",
-        },
-        {
-          ID: "#002",
-          Name: "Ketchup",
-          Unit: "Kilograms (Kg’s)",
-          
-          InitialStock: "12 ",
-          Purchased: "30",
-          Used: "20",
-          Variance: "5 ",
-          Wasteage: "5 ",
-          ClosingStock: "5 ",
-          Total_Value: "5 ",
-        },
-        {
-          ID: "#003",
-          Name: "Ketchup",
-          Unit: "Kilograms (Kg’s)",
-          
-          InitialStock: "12 ",
-          Purchased: "20",
-          Used: "3",
-          Variance: "5 ",
-          Wasteage: "5 ",
-          ClosingStock: "5 ",
-          Total_Value: "5 ",
-        },
-       
-      ]);
-      setLoading(false);
-    }, 800);
-  }, []);
-
-  // Add this state along with statusFilter
   const [unitFilter, setUnitFilter] = useState("");
 
-  // Update filteredItems to include unitFilter check
-  const filteredItems = items.filter((item) => {
-    const q = searchTerm.trim().toLowerCase();
-    const matchesQuery =
-      q === "" ||
-      item.Name.toLowerCase().includes(q) ||
-      item.ID.toLowerCase().includes(q) ||
-      item.Unit.toLowerCase().includes(q);
-    
-    const matchesUnit = unitFilter ? item.Unit === unitFilter : true;
-    return matchesQuery  && matchesUnit;
-  });
+  useEffect(() => {
+    loadInventoryItems();
+  }, []);
 
-  const itemsWithUsage = items.map((item) => ({
-    ...item,
-    usageCount: Math.floor(Math.random() * 100), // random number 0–99
-  }));
+  const loadInventoryItems = async () => {
+    try {
+      setLoading(true);
+      const response = await MenuAPI.getInventoryItems();
+      if (response.success) {
+        setItems(response.data);
+      } else {
+        throw new Error(response.message || "Failed to fetch category items");
+      }
+    } catch (error) {
+      console.error("Error fetching category items:", error);
+      showToast("Failed to load category items", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Memoized filtered items for better performance
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      const q = searchTerm.trim().toLowerCase();
+      const matchesQuery =
+        q === "" ||
+        item.Name.toLowerCase().includes(q) ||
+        item.ID.toString().includes(q) ||
+        item.Unit.toLowerCase().includes(q);
+
+      const matchesUnit = unitFilter ? item.Unit === unitFilter : true;
+      return matchesQuery && matchesUnit;
+    });
+  }, [items, searchTerm, unitFilter]);
+
+  // Generate consistent usage data using item ID as seed
+  const itemsWithUsage = useMemo(() => {
+    return items.map((item) => {
+      // Use item ID as seed for consistent random numbers
+      const seed = item.ID;
+      const usageCount = Math.floor((seed * 17 + 23) % 100);
+      return {
+        ...item,
+        usageCount,
+      };
+    });
+  }, [items]);
 
   // Find most used item
-  const mostUsedItem = itemsWithUsage.reduce(
-    (max, item) => (item.usageCount > max.usageCount ? item : max),
-    itemsWithUsage[0] || { usageCount: 0 }
-  );
+  const mostUsedItem = useMemo(() => {
+    if (itemsWithUsage.length === 0) return null;
+    return itemsWithUsage.reduce((max, item) =>
+      item.usageCount > max.usageCount ? item : max
+    );
+  }, [itemsWithUsage]);
 
   // Find least used item
-  const leastUsedItem = itemsWithUsage.reduce(
-    (min, item) => (item.usageCount < min.usageCount ? item : min),
-    itemsWithUsage[0] || { usageCount: 0 }
-  );
+  const leastUsedItem = useMemo(() => {
+    if (itemsWithUsage.length === 0) return null;
+    return itemsWithUsage.reduce((min, item) =>
+      item.usageCount < min.usageCount ? item : min
+    );
+  }, [itemsWithUsage]);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleDeleteSelected = () => {
-    if (selectedItems.length === 0) return;
-    setActionLoading(true);
-    setTimeout(() => {
-      const remaining = items.filter((it) => !selectedItems.includes(it.ID));
-      setItems(remaining);
-      setSelectedItems([]);
-      setActionLoading(false);
-      showToast("Selected items deleted successfully.", "success");
-    }, 600);
-  };
-
-  const handleSelectItem = (id: string, checked: boolean) => {
-    setSelectedItems(
-      checked ? [...selectedItems, id] : selectedItems.filter((i) => i !== id)
-    );
-  };
-
   const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(checked ? filteredItems.map((i) => i.ID) : []);
+    setSelectedItems(checked ? filteredItems.map((item) => item.ID) : []);
   };
 
-  const openAddModal = () => {
-    if (selectedItems.length > 0) return; // keep original behaviour (disable add when selections exist)
-    // generate next ID like "#006"
-    const nextNumber =
-      items
-        .map((i) => {
-          const m = i.ID.match(/\d+/);
-          return m ? parseInt(m[0], 10) : NaN;
-        })
-        .filter((n) => !Number.isNaN(n))
-        .reduce((a, b) => Math.max(a, b), 0) + 1;
-    const nextId = `#${String(nextNumber).padStart(3, "0")}`;
-
-    setEditItem(null);
-    setFormData({
-      ID: "",
-    Name: "",
-    Unit: "",
-   
-  InitialStock: "",
-  Purchased:"" ,
-  Used: "",
-  Variance: "",
-  Wasteage: "",
-  ClosingStock: "",
-  Total_Value: "",
-    });
-    setModalOpen(true);
-  };
-
-  const openEditModal = (item: InventoryItem) => {
-    setEditItem(item);
-    setFormData({ ...item });
-    setModalOpen(true);
-  };
-
-  const handleSaveItem = () => {
-    // minimal validation
-    if (!formData.Name.trim()) {
-      showToast("Please enter a Name.", "error");
-      return;
-    }
-
-    setActionLoading(true);
-    setTimeout(() => {
-      if (editItem) {
-        setItems((prev) =>
-          prev.map((it) => (it.ID === editItem.ID ? { ...formData } : it))
-        );
-        showToast("Item updated successfully.", "success");
-      } else {
-        setItems((prev) => [...prev, { ...formData }]);
-        showToast("Item added successfully.", "success");
-      }
-      setModalOpen(false);
-      setEditItem(null);
-      setSelectedItems([]);
-      setActionLoading(false);
-    }, 700);
+  const handleSelectItem = (itemId: number, checked: boolean) => {
+    setSelectedItems(
+      checked
+        ? [...selectedItems, itemId]
+        : selectedItems.filter((id) => id !== itemId)
+    );
   };
 
   const isAllSelected =
     selectedItems.length === filteredItems.length && filteredItems.length > 0;
   const isSomeSelected = selectedItems.length > 0;
+
+  // Get unique units for dropdown
+  const uniqueUnits = useMemo(() => {
+    return Array.from(new Set(items.map((i) => i.Unit)));
+  }, [items]);
 
   if (loading) {
     return (
@@ -273,9 +257,7 @@ const reportsPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">
-        Inventory Report
-      </h1>
+      <h1 className="text-3xl font-semibold mb-4 pl-20">Inventory Report</h1>
 
       {/* Top summary row like the screenshot */}
       <div className="flex gap-4 mb-6 pl-20">
@@ -304,9 +286,6 @@ const reportsPage = () => {
 
       {/* Action bar search */}
       <div className="mb-6 pl-20 flex items-center justify-between gap-4 flex-wrap">
-        
-        
-
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
           <Search
@@ -324,31 +303,18 @@ const reportsPage = () => {
       </div>
 
       {/* Table + filters */}
-      <div className="bg-gray-50 rounded-lg ml-20 shadow-sm overflow-x-auto">
+      <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
         <div className="max-h-[500px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
               <tr>
-                <th className="px-4 py-3 text-left">
-                  <Checkbox
-                    checked={isAllSelected}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    sx={{
-                      color: "#2C2C2C",
-                      "&.Mui-checked": { color: "#2C2C2C" },
-                    }}
-                  />
-                </th>
-                <th className="relative px-4 py-3 text-left">
-                  ID
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
-                </th>
+                <th className="relative px-4 py-3 text-left">ID</th>
                 <th className="relative px-4 py-3 text-left">
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-1">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {unitFilter || "Unit"}
@@ -360,7 +326,7 @@ const reportsPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                          className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none ml-34"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
@@ -369,29 +335,24 @@ const reportsPage = () => {
                             className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
                             onClick={() => setUnitFilter("")}
                           >
-                            Unit
+                            All Units
                           </DropdownMenu.Item>
 
-                          {Array.from(new Set(items.map((i) => i.Unit))).map(
-                            (unit) => (
-                              <DropdownMenu.Item
-                                key={unit}
-                                className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                                onClick={() => setUnitFilter(unit)}
-                              >
-                                {unit}
-                              </DropdownMenu.Item>
-                            )
-                          )}
+                          {uniqueUnits.map((unit) => (
+                            <DropdownMenu.Item
+                              key={unit}
+                              className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
+                              onClick={() => setUnitFilter(unit)}
+                            >
+                              {unit}
+                            </DropdownMenu.Item>
+                          ))}
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-
-                
-
                 <th className="relative px-4 py-3 text-left">
                   Initial Stock
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
@@ -401,23 +362,22 @@ const reportsPage = () => {
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                   Used
+                  Used
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Variance
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-
-                 <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left">
                   Wasteage
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                 <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left">
                   Closing Stock
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                 <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left">
                   Total Value
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
@@ -425,65 +385,62 @@ const reportsPage = () => {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {filteredItems.map((item) => (
-                <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                  <td className="px-4 py-4">
-                    <Checkbox
-                      checked={selectedItems.includes(item.ID)}
-                      onChange={(e) =>
-                        handleSelectItem(item.ID, e.target.checked)
-                      }
-                      sx={{
-                        color: "#d9d9e1",
-                        "&.Mui-checked": { color: "#d9d9e1" },
-                      }}
-                    />
+              {filteredItems.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={10}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    {searchTerm !== "" || unitFilter !== ""
+                      ? "No items match your search criteria."
+                      : "No inventory items found."}
                   </td>
-
-                  <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.Unit}</td>
-
-                  
-
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {item.InitialStock}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {item.Purchased}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {item.Used}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {item.Variance}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {item.Wasteage}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {item.ClosingStock}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {item.Total_Value}
-                  </td>
-
-                  
                 </tr>
-              ))}
+              ) : (
+                filteredItems.map((item) => (
+                  <tr key={item.ID} className="bg-white hover:bg-gray-50">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.ID}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                      {item.Name}
+                    </td>
+                    <td
+                      className="px-4 py-4 text-sm text-gray-600 max-w-xs truncate"
+                      title={item.Unit}
+                    >
+                      {item.Unit}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.InitialStock}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.Purchased}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.Used}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.Variance}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.Wasteage}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.ClosingStock}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      {item.Total_Value}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
-
-      
-         
-      
     </div>
   );
 };
 
-
-
-
-export default reportsPage;
+export default ReportsPage;

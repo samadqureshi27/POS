@@ -4,6 +4,7 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React, { useState, useEffect } from "react";
+
 import {
   Plus,
   Trash2,
@@ -11,18 +12,219 @@ import {
   AlertCircle,
   CheckCircle,
   X,
-  Edit,
+  Edit, Save
 } from "lucide-react";
 
 interface InventoryItem {
-  ID: string;
+  ID: number;
   Name: string;
   Unit: string;
   Status: "Low" | "Medium" | "High";
-  InitialStock: string;
-  AddedStock: string;
-  UpdatedStock: string;
-  Threshold: string;
+  InitialStock: number;
+  AddedStock: number;
+  UpdatedStock: number;
+  Threshold: number;
+}
+
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
+
+class MenuAPI {
+  private static delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  // Mock data for InventoryItem suitable for a coffee shop or restaurant
+  private static mockData: InventoryItem[] = [
+    {
+      ID: 1,
+      Name: "Espresso Beans",
+      Unit: "Kilograms (Kg’s)",
+      Status: "High",
+      InitialStock: 20,
+      AddedStock: 5,
+      UpdatedStock: 25,
+      Threshold: 10,
+    },
+    {
+      ID: 2,
+      Name: "Milk",
+      Unit: "Liters",
+      Status: "Medium",
+      InitialStock: 30,
+      AddedStock: 10,
+      UpdatedStock: 40,
+      Threshold: 15,
+    },
+    {
+      ID: 3,
+      Name: "Sugar",
+      Unit: "Kilograms (Kg’s)",
+      Status: "Low",
+      InitialStock: 8,
+      AddedStock: 2,
+      UpdatedStock: 10,
+      Threshold: 12,
+    },
+    {
+      ID: 4,
+      Name: "Croissants",
+      Unit: "Pieces",
+      Status: "Medium",
+      InitialStock: 50,
+      AddedStock: 20,
+      UpdatedStock: 70,
+      Threshold: 30,
+    },
+    {
+      ID: 5,
+      Name: "Tea Bags",
+      Unit: "Boxes",
+      Status: "High",
+      InitialStock: 15,
+      AddedStock: 5,
+      UpdatedStock: 20,
+      Threshold: 5,
+    },
+    {
+      ID: 6,
+      Name: "Chocolate Syrup",
+      Unit: "Bottles",
+      Status: "Low",
+      InitialStock: 3,
+      AddedStock: 2,
+      UpdatedStock: 5,
+      Threshold: 6,
+    },
+    {
+      ID: 7,
+      Name: "Whipped Cream",
+      Unit: "Cans",
+      Status: "Medium",
+      InitialStock: 10,
+      AddedStock: 5,
+      UpdatedStock: 15,
+      Threshold: 8,
+    },
+    {
+      ID: 8,
+      Name: "Paper Cups",
+      Unit: "Packs",
+      Status: "High",
+      InitialStock: 40,
+      AddedStock: 10,
+      UpdatedStock: 50,
+      Threshold: 20,
+    },
+    {
+      ID: 9,
+      Name: "Vanilla Syrup",
+      Unit: "Bottles",
+      Status: "Medium",
+      InitialStock: 7,
+      AddedStock: 3,
+      UpdatedStock: 10,
+      Threshold: 5,
+    },
+    {
+      ID: 10,
+      Name: "Butter",
+      Unit: "Kilograms (Kg’s)",
+      Status: "Low",
+      InitialStock: 4,
+      AddedStock: 1,
+      UpdatedStock: 5,
+      Threshold: 6,
+    },
+  ];
+
+  // ✅ GET /api/inventory-items/
+  static async getInventoryItems(): Promise<ApiResponse<InventoryItem[]>> {
+    await this.delay(800);
+    return {
+      success: true,
+      data: [...this.mockData],
+      message: "Inventory items fetched successfully",
+    };
+  }
+
+  // ✅ POST /api/inventory-items/
+  static async createInventoryItem(
+    item: Omit<InventoryItem, "ID">
+  ): Promise<ApiResponse<InventoryItem>> {
+    await this.delay(1000);
+    const newId = this.mockData.length > 0 ? Math.max(...this.mockData.map(i => i.ID)) + 1 : 1;
+    const newItem: InventoryItem = {
+      ...item,
+      ID: newId,
+    };
+    this.mockData.push(newItem);
+    return {
+      success: true,
+      data: newItem,
+      message: "Inventory item created successfully",
+    };
+  }
+
+  // ✅ PUT /api/inventory-items/{id}/
+  static async updateInventoryItem(
+    id: number,
+    item: Partial<InventoryItem>
+  ): Promise<ApiResponse<InventoryItem>> {
+    await this.delay(800);
+    const index = this.mockData.findIndex((i) => i.ID === id);
+    if (index === -1) throw new Error("Item not found");
+
+    this.mockData[index] = { ...this.mockData[index], ...item };
+    return {
+      success: true,
+      data: this.mockData[index],
+      message: "Inventory item updated successfully",
+    };
+  }
+
+  // ✅ DELETE /api/inventory-items/{id}/
+  static async deleteInventoryItem(id: number): Promise<ApiResponse<null>> {
+    await this.delay(600);
+    const index = this.mockData.findIndex((i) => i.ID === id);
+    if (index === -1) throw new Error("Item not found");
+
+    this.mockData.splice(index, 1);
+
+    // Reassign IDs sequentially
+    this.mockData = this.mockData.map((item, idx) => ({
+      ...item,
+      ID: idx + 1,
+    }));
+
+    return {
+      success: true,
+      data: null,
+      message: "Inventory item deleted successfully",
+    };
+  }
+
+  // ✅ DELETE /api/inventory-items/bulk-delete/
+  static async bulkDeleteInventoryItem(
+    ids: number[]
+  ): Promise<ApiResponse<null>> {
+    await this.delay(1000);
+    this.mockData = this.mockData.filter((item) => !ids.includes(item.ID));
+
+    // Reassign IDs sequentially
+    this.mockData = this.mockData.map((item, idx) => ({
+      ...item,
+      ID: idx + 1,
+    }));
+
+    return {
+      success: true,
+      data: null,
+      message: `${ids.length} inventory items deleted successfully`,
+    };
+  }
 }
 
 const Toast = ({
@@ -35,9 +237,8 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -48,91 +249,196 @@ const Toast = ({
 );
 
 const inventoryManagementPage = () => {
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [Item, setInventoryItem] = useState<InventoryItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    "" | "Low" | "Medium" | "High"
-  >("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"" | "Low" | "Medium" | "High">("");
+  const [unitFilter, setUnitFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  const [formData, setFormData] = useState<InventoryItem>({
-    ID: "",
+  const [formData, setFormData] = useState<Omit<InventoryItem, "ID">>({
     Name: "",
     Unit: "",
     Status: "Low",
-    InitialStock: "",
-    AddedStock: "",
-    UpdatedStock: "",
-    Threshold: "",
+    InitialStock: 0,
+    AddedStock: 0,
+    UpdatedStock: 0,
+    Threshold: 0,
   });
+  const [preview, setPreview] = useState<string | null>(null);
 
-  // initial dataset (and rows that say "Cell text")
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // load inventory on mount
   useEffect(() => {
-    setTimeout(() => {
-      setItems([
-        {
-          ID: "#001",
-          Name: "Ketchup",
-          Unit: "Kilograms (Kg’s)",
-          Status: "Low",
-          InitialStock: "12",
-          AddedStock: "20",
-          UpdatedStock: "32",
-          Threshold: "45",
-        },
-        {
-          ID: "#002",
-          Name: "Water",
-          Unit: "Bottles",
-          Status: "High",
-          InitialStock: "240",
-          AddedStock: "10",
-          UpdatedStock: "250",
-          Threshold: "50 ",
-        },
-        {
-          ID: "#003",
-          Name: "Salt",
-          Unit: "Kilograms (Kg’s)",
-          Status: "Medium",
-          InitialStock: "30",
-          AddedStock: "#20",
-          UpdatedStock: "#50",
-          Threshold: "45",
-        },
-       
-      ]);
-      setLoading(false);
-    }, 800);
+    loadInventory();
   }, []);
 
-  // Add this state along with statusFilter
-  const [unitFilter, setUnitFilter] = useState("");
+  const loadInventory = async () => {
+    try {
+      setLoading(true);
+      const response = await MenuAPI.getInventoryItems();
+      if (response.success) {
+        setInventoryItem(response.data);
+      } else {
+        throw new Error(response.message || "Failed to fetch inventory items");
+      }
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+      showToast("Failed to load inventory", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Update filteredItems to include unitFilter check
-  const filteredItems = items.filter((item) => {
+  // filter
+  const filteredItems = Item.filter((item) => {
     const q = searchTerm.trim().toLowerCase();
     const matchesQuery =
       q === "" ||
       item.Name.toLowerCase().includes(q) ||
-      item.ID.toLowerCase().includes(q) ||
+      item.ID ||
       item.Unit.toLowerCase().includes(q);
     const matchesStatus = statusFilter ? item.Status === statusFilter : true;
     const matchesUnit = unitFilter ? item.Unit === unitFilter : true;
     return matchesQuery && matchesStatus && matchesUnit;
   });
 
-  const itemsWithUsage = items.map((item) => ({
+  // create
+  const handleCreateItem = async (itemData: Omit<InventoryItem, "ID">) => {
+    try {
+      setActionLoading(true);
+      const response = await MenuAPI.createInventoryItem(itemData);
+      if (response.success) {
+        setInventoryItem((prevItems) => [...prevItems, response.data]);
+        setIsModalOpen(false);
+        setSearchTerm("");
+        showToast(response.message || "Item created successfully", "success");
+      }
+    } catch (error) {
+      console.error("Error creating item:", error);
+      showToast("Failed to create menu item", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdateItem = async (itemData: Omit<InventoryItem, "ID">) => {
+    if (!editingItem) return;
+    try {
+      setActionLoading(true);
+      const response = await MenuAPI.updateInventoryItem(
+        editingItem.ID,
+        itemData
+      );
+      if (response.success) {
+        setInventoryItem(
+          Item.map((item) =>
+            item.ID === editingItem.ID ? response.data : item
+          )
+        );
+        setIsModalOpen(false);
+        setEditingItem(null);
+        showToast(response.message || "Item updated successfully", "success");
+      }
+    } catch (error) {
+      showToast("Failed to update menu item", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedItems.length === 0) return;
+    try {
+      setActionLoading(true);
+      const response = await MenuAPI.bulkDeleteInventoryItem(selectedItems);
+      if (response.success) {
+        setInventoryItem((prev) => {
+          const remaining = prev.filter((i) => !selectedItems.includes(i.ID));
+          return remaining.map((it, idx) => ({ ...it, ID: idx + 1 }));
+        });
+        setSelectedItems([]);
+        showToast(response.message || "Items deleted successfully", "success");
+      }
+    } catch (error) {
+      showToast("Failed to delete menu items", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+
+  // modal form
+  useEffect(() => {
+    if (editingItem) {
+      setFormData({
+        Name: editingItem.Name,
+        Unit: editingItem.Unit,
+        Status: editingItem.Status,
+        InitialStock: editingItem.InitialStock,
+        AddedStock: editingItem.AddedStock,
+        UpdatedStock: editingItem.UpdatedStock, // already stored in DB
+        Threshold: editingItem.Threshold,
+      });
+    } else {
+      setFormData({
+        Name: "",
+        Unit: "",
+        Status: "Low",
+        InitialStock: 0,
+        AddedStock: 0,
+        UpdatedStock: 0, // always present
+        Threshold: 0,
+      });
+      setPreview(null);
+    }
+  }, [editingItem, isModalOpen]);
+
+  // Update UpdatedStock whenever InitialStock or AddedStock changes
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      UpdatedStock: prev.InitialStock + prev.AddedStock,
+    }));
+  }, [formData.InitialStock, formData.AddedStock]);
+
+  const handleModalSubmit = () => {
+    if (
+      !formData.Name.trim()
+    ) {
+      return;
+    }
+  const payload = {
+    ...formData,
+    UpdatedStock: formData.InitialStock + formData.AddedStock,
+  };
+    if (editingItem) {
+      handleUpdateItem(formData);
+    } else {
+      handleCreateItem(formData);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingItem(null);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectedItems(checked ? filteredItems.map((item) => item.ID) : []);
+  };
+  // Add random usage count (0–99) to each item
+  const itemsWithUsage = Item.map((item) => ({
     ...item,
-    usageCount: Math.floor(Math.random() * 100), // random number 0–99
+    usageCount: Math.floor(Math.random() * 100),
   }));
 
   // Find most used item
@@ -146,103 +452,13 @@ const inventoryManagementPage = () => {
     (min, item) => (item.usageCount < min.usageCount ? item : min),
     itemsWithUsage[0] || { usageCount: 0 }
   );
-
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
- const handleDeleteSelected = () => {
-  if (selectedItems.length === 0) return;
-  setActionLoading(true);
-  setTimeout(() => {
-    // Remove selected items
-    let remaining = items.filter((it) => !selectedItems.includes(it.ID));
-
-    // Reassign IDs sequentially starting from 1
-    remaining = remaining.map((item, index) => ({
-      ...item,
-      ID: `#${String(index + 1).padStart(3, "0")}`,
-    }));
-
-    setItems(remaining);
-    setSelectedItems([]);
-    setActionLoading(false);
-    showToast("Selected items deleted successfully.", "success");
-  }, 600);
-};
-
-
-  const handleSelectItem = (id: string, checked: boolean) => {
+  const handleSelectItem = (id: number, checked: boolean) => {
     setSelectedItems(
       checked ? [...selectedItems, id] : selectedItems.filter((i) => i !== id)
     );
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(checked ? filteredItems.map((i) => i.ID) : []);
-  };
-
-  const openAddModal = () => {
-    if (selectedItems.length > 0) return; // keep original behaviour (disable add when selections exist)
-    // generate next ID like "#006"
-    const nextNumber =
-      items
-        .map((i) => {
-          const m = i.ID.match(/\d+/);
-          return m ? parseInt(m[0], 10) : NaN;
-        })
-        .filter((n) => !Number.isNaN(n))
-        .reduce((a, b) => Math.max(a, b), 0) + 1;
-    const nextId = `#${String(nextNumber).padStart(3, "0")}`;
-
-    setEditItem(null);
-    setFormData({
-      ID: nextId,
-      Name: "",
-      Unit: "",
-      Status: "Low",
-      InitialStock: "",
-      AddedStock: "",
-      UpdatedStock: "",
-      Threshold: "",
-    });
-    setModalOpen(true);
-  };
-
-  const openEditModal = (item: InventoryItem) => {
-    setEditItem(item);
-    setFormData({ ...item });
-    setModalOpen(true);
-  };
-
-  const handleSaveItem = () => {
-    // minimal validation
-    if (!formData.Name.trim()) {
-      showToast("Please enter a Name.", "error");
-      return;
-    }
-
-    setActionLoading(true);
-    setTimeout(() => {
-      if (editItem) {
-        setItems((prev) =>
-          prev.map((it) => (it.ID === editItem.ID ? { ...formData } : it))
-        );
-        showToast("Item updated successfully.", "success");
-      } else {
-        setItems((prev) => [...prev, { ...formData }]);
-        showToast("Item added successfully.", "success");
-      }
-      setModalOpen(false);
-      setEditItem(null);
-      setSelectedItems([]);
-      setActionLoading(false);
-    }, 700);
-  };
-
-  const isAllSelected =
-    selectedItems.length === filteredItems.length && filteredItems.length > 0;
+  const isAllSelected = selectedItems.length === filteredItems.length && filteredItems.length > 0;
   const isSomeSelected = selectedItems.length > 0;
 
   if (loading) {
@@ -300,13 +516,12 @@ const inventoryManagementPage = () => {
         {/* Action Buttons */}
         <div className="flex gap-3 pl-20">
           <button
-            onClick={openAddModal}
+            onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
-              selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${selectedItems.length === 0
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Plus size={16} />
             Add
@@ -315,11 +530,10 @@ const inventoryManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSomeSelected && !actionLoading
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -391,7 +605,7 @@ const inventoryManagementPage = () => {
                             Unit
                           </DropdownMenu.Item>
 
-                          {Array.from(new Set(items.map((i) => i.Unit))).map(
+                          {Array.from(new Set(Item.map((i) => i.Unit))).map(
                             (unit) => (
                               <DropdownMenu.Item
                                 key={unit}
@@ -459,7 +673,7 @@ const inventoryManagementPage = () => {
                 </th>
 
                 <th className="relative px-4 py-3 text-left">
-                  Initial Stock
+                  InitialStock
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
@@ -506,16 +720,14 @@ const inventoryManagementPage = () => {
                     <span
                       className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium border
                   ${item.Status === "Low" ? "text-red-600 border-red-600" : ""}
-                  ${
-                    item.Status === "Medium"
-                      ? "text-yellow-600 border-yellow-600"
-                      : ""
-                  }
-                  ${
-                    item.Status === "High"
-                      ? "text-green-700 border-green-700"
-                      : ""
-                  }
+                  ${item.Status === "Medium"
+                          ? "text-yellow-600 border-yellow-600"
+                          : ""
+                        }
+                  ${item.Status === "High"
+                          ? "text-green-700 border-green-700"
+                          : ""
+                        }
                 `}
                     >
                       {item.Status}
@@ -538,8 +750,12 @@ const inventoryManagementPage = () => {
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => openEditModal(item)}
-                        className="text-black hover:text-gray-800 transition-colors"
+                        onClick={
+                          () => {
+                            setEditingItem(item);
+                            setIsModalOpen(true);
+                          }}
+                        className="text-gray-600 hover:text-gray-800 p-1"
                         title="Edit"
                       >
                         <Edit size={16} />
@@ -554,148 +770,139 @@ const inventoryManagementPage = () => {
       </div>
 
       {/* Modal for Add/Edit */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-[700px]">
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-80">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
             <h2 className="text-xl font-semibold mb-4">
-              {editItem ? "Edit Item" : "New Item"}
+              {editingItem ? "Edit Inventory Item" : "Add New Inventory Item"}
             </h2>
-
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="space-y-3">
+              {/* Item Name */}
               <div>
-                <label className="block text-sm text-gray-600 mb-1">ID</label>
-                <input
-                  type="text"
-                  value={formData.ID}
-                  readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Status
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Item Name
                 </label>
-                <select
-                  value={formData.Status}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      Status: e.target.value as InventoryItem["Status"],
-                    })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                >
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                </select>
-              </div>
-
-              <div className="col-span-2">
-                <label className="block text-sm text-gray-600 mb-1">Name</label>
                 <input
                   type="text"
                   value={formData.Name}
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  placeholder="Item name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="Enter item name"
+                  required
                 />
               </div>
 
+              {/* Unit */}
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Unit</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Unit
+                </label>
                 <input
                   type="text"
                   value={formData.Unit}
                   onChange={(e) =>
                     setFormData({ ...formData, Unit: e.target.value })
                   }
-                  placeholder="Unit (e.g. Kg, Bottles)"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="e.g., Kg, Liters, Pieces"
                 />
               </div>
 
+
+              {/* Initial Stock */}
               <div>
-                <label className="block text-sm text-gray-600 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Initial Stock
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   value={formData.InitialStock}
                   onChange={(e) =>
-                    setFormData({ ...formData, InitialStock: e.target.value })
+                    setFormData({
+                      ...formData,
+                      InitialStock: Number(e.target.value) || 0,
+                    })
                   }
-                  placeholder="Initial stock"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="0"
+                  min="0"
                 />
               </div>
 
+              {/* Added Stock */}
               <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Added Stock (block/address)
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Added Stock
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   value={formData.AddedStock}
                   onChange={(e) =>
-                    setFormData({ ...formData, AddedStock: e.target.value })
+                    setFormData({
+                      ...formData,
+                      AddedStock: Number(e.target.value) || 0,
+                    })
                   }
-                  placeholder="#777, Block G1, Johartown"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="0"
+                  min="0"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Updated Stock (block/address)
-                </label>
-                <input
-                  type="text"
-                  value={formData.UpdatedStock}
-                  onChange={(e) =>
-                    setFormData({ ...formData, UpdatedStock: e.target.value })
-                  }
-                  placeholder="#777, Block G1, Johartown"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                />
-              </div>
+              {/* Current Stock Display */}
+             
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Threshold
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   value={formData.Threshold}
                   onChange={(e) =>
-                    setFormData({ ...formData, Threshold: e.target.value })
+                    setFormData({
+                      ...formData,
+                      Threshold: Number(e.target.value) || 0,
+                    })
                   }
-                  placeholder="Threshold"
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="0"
+                  min="0"
                 />
               </div>
-            </div>
 
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveItem}
-                className="px-4 py-2 bg-yellow-600 text-white rounded"
-              >
-                {actionLoading ? "Saving..." : "Save"}
-              </button>
+              {/* Action buttons */}
+              <div className="flex gap-3 pt-4 justify-end">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
+                >
+                  <X size={12} />
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleModalSubmit}
+                  disabled={!formData.Name.trim()}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${formData.Name.trim()
+                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                >
+                  <Save size={12} />
+                  {editingItem ? "Update" : "Save & Close"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+
     </div>
   );
 };
