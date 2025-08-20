@@ -573,19 +573,23 @@ const BranchListPage = () => {
           </table>
         </div>
       </div>
-      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#ffff] rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingItem ? "Edit Branch" : "Add New Branch"}
-            </h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
 
-            <div className="space-y-3">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                {editingItem ? "Edit Branch" : "Add New Branch"}
+              </h2>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 py-2">
               {/* Branch Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Branch Name
+              <div className="md:col-span-2 mt-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Branch Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -593,15 +597,16 @@ const BranchListPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Branch_Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter branch name"
                   required
                 />
               </div>
 
               {/* Contact Info */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact Info
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Contact Info <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -609,31 +614,17 @@ const BranchListPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, "Contact-Info": e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  required
-                />
-              </div>
-
-              {/* Address */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address
-                </label>
-                <input
-                  type="text"
-                  value={formData.Address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Address: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter phone number"
                   required
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email
+                  <span className="text-xs text-gray-500 ml-1">(Optional)</span>
                 </label>
                 <input
                   type="email"
@@ -641,14 +632,32 @@ const BranchListPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter email address"
+                />
+              </div>
+
+              {/* Address */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Address <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={formData.Address}
+                  onChange={(e) =>
+                    setFormData({ ...formData, Address: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent h-32 resize-none"
+                  placeholder="Enter branch address"
+                  required
                 />
               </div>
 
               {/* Postal Code */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Postal Code
+                  <span className="text-xs text-gray-500 ml-1">(Optional)</span>
                 </label>
                 <input
                   type="text"
@@ -656,13 +665,14 @@ const BranchListPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, postalCode: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter postal code"
                 />
               </div>
 
               {/* Status */}
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-gray-700">
                   Status
                 </label>
                 <ButtonPage
@@ -670,30 +680,48 @@ const BranchListPage = () => {
                   onChange={handleStatusChange}
                 />
               </div>
+            </div>
 
-              {/* Action buttons */}
-              <div className="flex gap-3 pt-4 justify-end">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
-                >
-                  <X size={12} />
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleModalSubmit}
-                  disabled={!formData.Branch_Name.trim() || !formData["Contact-Info"].trim() || !formData.Address.trim()}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${formData.Branch_Name.trim() && formData["Contact-Info"].trim() && formData.Address.trim()
-                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                >
-                  <Save size={12} />
-                  {editingItem ? "Update" : "Save & Close"}
-                </button>
-              </div>
+            {/* Fixed Action Buttons */}
+            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                disabled={actionLoading}
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X size={16} />
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleModalSubmit}
+                disabled={
+                  !formData.Branch_Name.trim() ||
+                  !formData["Contact-Info"].trim() ||
+                  !formData.Address.trim() ||
+                  actionLoading
+                }
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Branch_Name.trim() ||
+                    !formData["Contact-Info"].trim() ||
+                    !formData.Address.trim() ||
+                    actionLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
+              >
+                {actionLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    {editingItem ? "Updating..." : "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editingItem ? "Update Branch" : "Save & Close"}
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
