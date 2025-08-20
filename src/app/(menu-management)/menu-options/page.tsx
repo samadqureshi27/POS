@@ -5,16 +5,24 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
+import {
   Plus,
   Trash2,
   Search,
   AlertCircle,
   CheckCircle,
   X,
+  Grip,
   Edit,
   Filter,
   Save,
   ImageIcon,
+  Move,
 } from "lucide-react";
 
 import { useState, useEffect, useRef } from "react";
@@ -252,8 +260,10 @@ const CategoryPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingItem, setEditingItem] = useState<MenuItemOptions | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const [activeTab, setActiveTab] = useState(editingItem ? "Option Values" : "Details");
+
+  const [activeTab, setActiveTab] = useState(
+    editingItem ? "Option Values" : "Details"
+  );
 
   const [toast, setToast] = useState<{
     message: string;
@@ -305,11 +315,10 @@ const CategoryPage = () => {
   }, [editingItem, isModalOpen]);
 
   useEffect(() => {
-  if (isModalOpen) {
-    setActiveTab(editingItem ? "Option Values" : "Details");
-  }
-}, [isModalOpen, editingItem]);
-
+    if (isModalOpen) {
+      setActiveTab(editingItem ? "Option Values" : "Details");
+    }
+  }, [isModalOpen, editingItem]);
 
   const loadMenuItemOptionss = async () => {
     try {
@@ -659,9 +668,11 @@ const CategoryPage = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg min-w-[35vw]  max-w-2xl min-h-[60vh] max-h-[95vh] overflow-y-auto shadow-lg relative">
+          <div className="bg-white rounded-lg min-w-[35vw]  max-w-2xl min-h-[70vh] max-h-[95vh] overflow-y-auto shadow-lg relative">
             {/* Navbar inside modal */}
-            <h1 className="text-2xl pl-5 pt-2 font-medium">{editingItem ? "Edit Option Menu" : "Add  Option Menu"}</h1>
+            <h1 className="text-2xl pl-5 pt-2 font-medium">
+              {editingItem ? "Edit Option Menu" : "Add  Option Menu"}
+            </h1>
             <div className="flex w-[250px] items-center justify-center  border-b border-gray-200  mx-auto">
               {["Details", "Option Values"].map((tab) => (
                 <button
@@ -776,34 +787,111 @@ const CategoryPage = () => {
                   </div>
                 </div>
               )}
-
               {activeTab === "Option Values" && (
-                <div  overflow-y-auto pr-2>
-                  
-                  {formData.OptionValue.map((opt, idx) => (
-                    <div key={idx} className="flex gap-5 mb-2 items-center ">
-                      {/* Option Name */}
-                      <div className="flex flex-col gap-1">
-                        <h3 className="text-sm font-medium text-gray-700">
-                          Option Value
-                        </h3>
-                        <input
-                          type="text"
-                          value={opt}
-                          onChange={(e) => {
-                            const updated = [...formData.OptionValue];
-                            updated[idx] = e.target.value;
-                            setFormData({ ...formData, OptionValue: updated });
-                          }}
-                          className=" w-[23vw] flex-1 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                        />
-                      </div>
+                
+  <div className="">
+    {/* Fixed Header */}
+    
+    <div className="border border-gray-200 rounded-t-lg bg-gray-50">
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"><div className="">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      OptionValue: [...formData.OptionValue, ""],
+                      OptionPrice: [...formData.OptionPrice, 0],
+                    })
+                  }
+                  className="px-4 py-2 mr-1  bg-black text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  + 
+                </button>
+              </div></th>
+            <th className="w-80 p-3 text-left text-sm font-medium text-gray-700">
+              Option Value
+            </th>
+            <th className="p-3 text-center text-sm font-medium text-gray-700">
+              Option Price
+            </th>
+            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+          </tr>
+        </thead>
+      </table>
+    </div>
 
-                      {/* Option Price */}
-                      <div className="flex flex-col gap-1">
-                        <h3 className="text-sm font-medium text-gray-700">
-                          Option Price
-                        </h3>
+   {/* Scrollable Body */}
+<div className="border-l border-r border-b border-gray-200 rounded-b-lg max-h-60 overflow-y-auto bg-white">
+  
+  <DragDropContext
+    onDragEnd={(result: DropResult) => {
+      const { source, destination } = result;
+      if (!destination || source.index === destination.index) return;
+
+      const newOptionValue = Array.from(formData.OptionValue);
+      const [movedValue] = newOptionValue.splice(source.index, 1);
+      newOptionValue.splice(destination.index, 0, movedValue);
+
+      const newOptionPrice = Array.from(formData.OptionPrice);
+      const [movedPrice] = newOptionPrice.splice(source.index, 1);
+      newOptionPrice.splice(destination.index, 0, movedPrice);
+
+      setFormData({
+        ...formData,
+        OptionValue: newOptionValue,
+        OptionPrice: newOptionPrice,
+      });
+    }}
+  >
+    <Droppable droppableId="option-values">
+      {(provided) => (
+        <table className="w-full border-collapse">
+          <tbody ref={provided.innerRef} {...provided.droppableProps}>
+            {formData.OptionValue.map((opt, idx) => (
+              <Draggable
+                key={idx}
+                draggableId={`option-${idx}`}
+                index={idx}
+              >
+                {(provided, snapshot) => (
+                  <tr
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    className={`hover:bg-gray-50 ${
+                      snapshot.isDragging ? "bg-gray-100 shadow-lg" : ""
+                    } border-b border-gray-200`} // <-- Add horizontal line
+                  >
+                    {/* Drag Handle */}
+                    <td
+                      className="p-3 text-center cursor-grab w-12"
+                      {...provided.dragHandleProps}
+                    >
+                      <Grip size={18} className="text-gray-500 mx-auto" />
+                    </td>
+
+                    {/* Option Name */}
+                    <td className="min-w-[300px] p-3">
+                      <input
+                        type="text"
+                        value={opt}
+                        onChange={(e) => {
+                          const updated = [...formData.OptionValue];
+                          updated[idx] = e.target.value;
+                          setFormData({
+                            ...formData,
+                            OptionValue: updated,
+                          });
+                        }}
+                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                        placeholder="Enter option value"
+                      />
+                    </td>
+
+                    {/* Option Price */}
+                    <td className="p-3 text-center">
                       <input
                         type="text"
                         inputMode="numeric"
@@ -813,57 +901,60 @@ const CategoryPage = () => {
                           const updated = [...formData.OptionPrice];
                           updated[idx] =
                             Number(e.target.value.replace(/\D/g, "")) || 0;
-                          setFormData({ ...formData, OptionPrice: updated });
+                          setFormData({
+                            ...formData,
+                            OptionPrice: updated,
+                          });
                         }}
-                        className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                        className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
+                        placeholder="0"
                       />
-                      </div>
+                    </td>
 
-                      {/* Delete Button */}
+                    {/* Delete Button */}
+                    <td className="p-3 text-center w-12">
                       <button
                         type="button"
                         onClick={() => {
-                          const updatedValues = formData.OptionValue.filter(
-                            (_, i) => i !== idx
-                          );
-                          const updatedPrices = formData.OptionPrice.filter(
-                            (_, i) => i !== idx
-                          );
+                          const updatedValues =
+                            formData.OptionValue.filter((_, i) => i !== idx);
+                          const updatedPrices =
+                            formData.OptionPrice.filter((_, i) => i !== idx);
                           setFormData({
                             ...formData,
                             OptionValue: updatedValues,
                             OptionPrice: updatedPrices,
                           });
                         }}
-                        className=" mt-5 text-black border-2 hover:text-gray-700"
+                        className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
                       >
-                        <X size={24} />
+                        <X size={20} />
                       </button>
-                    </div>
-                  ))}
+                    </td>
+                  </tr>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </tbody>
+        </table>
+      )}
+    </Droppable>
+  </DragDropContext>
+</div>
 
-                  {/* Add Option Button */}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFormData({
-                        ...formData,
-                        OptionValue: [...formData.OptionValue, ""],
-                        OptionPrice: [...formData.OptionPrice, 0],
-                      })
-                    }
-                    className="mt-2 px-3 py-1 bg-gray-200 rounded text-sm"
-                  >
-                    + Add Option
-                  </button>
-                </div>
-              )}
+
+    {/* Add Option Button */}
+  </div>
+)}
+
             </div>
 
             {/* Action buttons */}
-            <div className=" fixed bottom-45 right-145 flex justify-end gap-3 p-4 border-t w-[31.5vw] border-gray-200">
+            <div className=" fixed bottom-41 right-145 flex justify-end gap-3 p-4 border-t w-[31.5vw] border-gray-200">
+              
               <button
-                 onClick={handleCloseModal}
+                onClick={handleCloseModal}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Cancel
