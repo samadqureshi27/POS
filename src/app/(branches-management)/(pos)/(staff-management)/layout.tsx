@@ -1,5 +1,5 @@
 import React from 'react';
-import StaffSubmenu from '../../../../components/layout/submenus/StaffSubmenu';
+import StaffSubmenu from '@/components/layout/submenus/StaffSubmenu';
 
 export default function StaffLayout({
   children,

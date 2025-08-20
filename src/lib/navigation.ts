@@ -158,6 +158,16 @@ export const navigationConfig: NavigationItem[] = [
     name: 'Back Up',
     href: '/backup',
     group: 'settings'
+  },
+  {
+    name: 'Recipies Options',
+    href: '/recipes-options',
+    group: 'recipes'
+  },
+  {
+    name: 'Menu Options',
+    href: '/menu-options',
+    group: 'menu'
   }
   
 ]
