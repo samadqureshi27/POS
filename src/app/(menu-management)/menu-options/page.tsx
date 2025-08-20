@@ -668,7 +668,7 @@ const CategoryPage = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg min-w-[35vw]  max-w-2xl min-h-[70vh] max-h-[95vh] overflow-y-auto shadow-lg relative">
+          <div className="bg-white rounded-lg min-w-[37vw]  max-w-2xl min-h-[70vh] max-h-[95vh] overflow-y-auto shadow-lg relative">
             {/* Navbar inside modal */}
             <h1 className="text-2xl pl-5 pt-2 font-medium">
               {editingItem ? "Edit Option Menu" : "Add  Option Menu"}
@@ -796,7 +796,7 @@ const CategoryPage = () => {
       <table className="w-full">
         <thead>
           <tr>
-            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"><div className="">
+            <th className="w-8 p-2   text-center text-sm font-medium text-gray-700"><div className="">
                 <button
                   type="button"
                   onClick={() =>
@@ -806,9 +806,9 @@ const CategoryPage = () => {
                       OptionPrice: [...formData.OptionPrice, 0],
                     })
                   }
-                  className="px-4 py-2 mr-1  bg-black text-white rounded-lg hover:bg-gray-700 transition-colors"
+                  className="w-8 px-1 py-1  text-center   text-black rounded-lg hover:bg-gray-400 transition-colors cursor-pointer"
                 >
-                  + 
+                  <Plus size={20} className="text-center " />
                 </button>
               </div></th>
             <th className="w-80 p-3 text-left text-sm font-medium text-gray-700">
@@ -926,7 +926,7 @@ const CategoryPage = () => {
                             OptionPrice: updatedPrices,
                           });
                         }}
-                        className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                        className="text-black  px-2 py-1 rounded hover:text-gray-700"
                       >
                         <X size={20} />
                       </button>
