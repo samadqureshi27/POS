@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import DashboardWrapper from "../components/layout/DashboardWrapper";
-import { ConditionalLayoutWrapper } from '../components/layout/ConditionalLayoutWrapper';
+import DashboardWrapper from "@/components/layout/DashboardWrapper";
+import { ConditionalLayoutWrapper } from '@/components/layout/ConditionalLayoutWrapper';
 
 
 const geistSans = Geist({

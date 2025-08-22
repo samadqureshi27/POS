@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import POSSubmenu from '../../../components/layout/submenus/POSSubmenu';
+import POSSubmenu from '@/components/layout/submenus/POSSubmenu';
 
 export default function POSLayout({
   children,
