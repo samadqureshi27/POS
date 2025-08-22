@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ButtonPage from "../../../components/layout/UI/button";
+import ButtonPage from "@/components/layout/UI/button";
 import {
   Plus,
   Trash2,

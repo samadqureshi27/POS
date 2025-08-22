@@ -1,5 +1,5 @@
 import React from 'react';
-import AnalyticsSubmenu from '../../components/layout/submenus/AnalyticsSubmenu';
+import AnalyticsSubmenu from '@/components/layout/submenus/AnalyticsSubmenu';
 
 export default function AnalyticsLayout({
   children,

@@ -47,7 +47,7 @@ const Toast = ({
   </div>
 );
 
-const ingredientsManagementPage = () => {
+const IngredientsManagementPage = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -617,4 +617,4 @@ const ingredientsManagementPage = () => {
   );
 };
 
-export default ingredientsManagementPage;
+export default IngredientsManagementPage;

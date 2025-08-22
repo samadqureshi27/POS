@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ButtonPage from "../../../../../components/layout/UI/button";
+import ButtonPage from "@/components/layout/UI/button";
 
 // Types
 interface StaffItem {
