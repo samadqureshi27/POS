@@ -33,6 +33,8 @@ interface RecipeOption {
   Description: string;
   OptionValue: string[];
   OptionPrice: number[];
+  IngredientValue: string[];
+  IngredientPrice: number[];
   Priority: number;
 }
 
@@ -54,6 +56,8 @@ class MenuAPI {
       Description: "Bread",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 1,
     },
     {
@@ -63,6 +67,8 @@ class MenuAPI {
       Description: "Bread ",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 2,
     },
     {
@@ -72,6 +78,8 @@ class MenuAPI {
       Description: "Bread ",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -81,6 +89,8 @@ class MenuAPI {
       Description: "Bread ",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -90,6 +100,8 @@ class MenuAPI {
       Description: "Bread ",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 4,
     },
     {
@@ -99,6 +111,8 @@ class MenuAPI {
       Description: "Bread ",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -108,6 +122,8 @@ class MenuAPI {
       Description: "Bread ",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -117,6 +133,8 @@ class MenuAPI {
       Description: "Bread ",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -126,6 +144,8 @@ class MenuAPI {
       Description: "Bread ",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 4,
     },
     {
@@ -135,6 +155,8 @@ class MenuAPI {
       Description: "Bread ",
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
+      IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
+  IngredientPrice: [0, 0.5, 1],
       Priority: 4,
     },
   ];
@@ -212,6 +234,8 @@ class MenuAPI {
       ID: idx + 1,
       OptionValue: item.OptionValue ?? [],
       OptionPrice: item.OptionPrice ?? [],
+       IngredientValueValue: item.IngredientValue ?? [],
+      IngredientPrice: item.IngredientPrice ?? [],
     }));
 
     return {
@@ -270,6 +294,8 @@ const RecipesManagementPage = () => {
     Description: "",
     OptionValue: [],
     OptionPrice: [],
+    IngredientValue: [],
+    IngredientPrice: [],
     Priority: 1,
   });
   const [preview, setPreview] = useState<string | null>(null);
@@ -293,6 +319,8 @@ const RecipesManagementPage = () => {
         Description: editingItem.Description,
         OptionValue: editingItem.OptionValue || [],
         OptionPrice: editingItem.OptionPrice || [],
+          IngredientValue: editingItem.IngredientValue || [],
+        IngredientPrice: editingItem.IngredientPrice || [],
         Priority: editingItem.Priority,
       });
     } else {
@@ -302,6 +330,9 @@ const RecipesManagementPage = () => {
         Description: "",
         OptionValue: [],
         OptionPrice: [],
+        IngredientValue: [],
+    IngredientPrice: [],
+        
         Priority: 1,
       });
       setPreview(null);
@@ -967,14 +998,14 @@ const RecipesManagementPage = () => {
                               key={i}
                               className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
                               onClick={() => {
-                                if (!formData.OptionValue.includes(item)) {
+                                if (!formData.IngredientValue.includes(item)) {
                                   setFormData({
                                     ...formData,
-                                    OptionValue: [
-                                      ...formData.OptionValue,
+                                    IngredientValue: [
+                                      ...formData.IngredientValue,
                                       item,
                                     ],
-                                    OptionPrice: [...formData.OptionPrice, 0],
+                                    IngredientPrice: [...formData.IngredientPrice, 0],
                                   });
                                 }
                               }}
@@ -1013,14 +1044,14 @@ const RecipesManagementPage = () => {
                         if (!destination || source.index === destination.index)
                           return;
 
-                        const newOptionValue = Array.from(formData.OptionValue);
+                        const newOptionValue = Array.from(formData.IngredientValue);
                         const [movedValue] = newOptionValue.splice(
                           source.index,
                           1
                         );
                         newOptionValue.splice(destination.index, 0, movedValue);
 
-                        const newOptionPrice = Array.from(formData.OptionPrice);
+                        const newOptionPrice = Array.from(formData.IngredientPrice);
                         const [movedPrice] = newOptionPrice.splice(
                           source.index,
                           1
@@ -1029,8 +1060,8 @@ const RecipesManagementPage = () => {
 
                         setFormData({
                           ...formData,
-                          OptionValue: newOptionValue,
-                          OptionPrice: newOptionPrice,
+                          IngredientValue: newOptionValue,
+                          IngredientPrice: newOptionPrice,
                         });
                       }}
                     >
@@ -1041,7 +1072,7 @@ const RecipesManagementPage = () => {
                               ref={provided.innerRef}
                               {...provided.droppableProps}
                             >
-                              {formData.OptionValue.map((opt, idx) => (
+                              {formData.IngredientValue.map((opt, idx) => (
                                 <Draggable
                                   key={idx}
                                   draggableId={`ingredient-${idx}`}
@@ -1085,10 +1116,10 @@ const RecipesManagementPage = () => {
                                           type="text"
                                           inputMode="numeric"
                                           pattern="[0-9]*"
-                                          value={formData.OptionPrice[idx]}
+                                          value={formData.IngredientPrice[idx]}
                                           onChange={(e) => {
                                             const updated = [
-                                              ...formData.OptionPrice,
+                                              ...formData.IngredientPrice,
                                             ];
                                             updated[idx] =
                                               Number(
@@ -1099,7 +1130,7 @@ const RecipesManagementPage = () => {
                                               ) || 0;
                                             setFormData({
                                               ...formData,
-                                              OptionPrice: updated,
+                                              IngredientPrice: updated,
                                             });
                                           }}
                                           className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
@@ -1113,17 +1144,17 @@ const RecipesManagementPage = () => {
                                           type="button"
                                           onClick={() => {
                                             const updatedValues =
-                                              formData.OptionValue.filter(
+                                              formData.IngredientValue.filter(
                                                 (_, i) => i !== idx
                                               );
                                             const updatedPrices =
-                                              formData.OptionPrice.filter(
+                                              formData.IngredientPrice.filter(
                                                 (_, i) => i !== idx
                                               );
                                             setFormData({
                                               ...formData,
-                                              OptionValue: updatedValues,
-                                              OptionPrice: updatedPrices,
+                                              IngredientValue: updatedValues,
+                                              IngredientPrice: updatedPrices,
                                             });
                                           }}
                                           className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
