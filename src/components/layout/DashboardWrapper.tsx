@@ -1,31 +1,39 @@
+// Fixed DashboardWrapper.tsx
 'use client';
 
 import React from 'react';
 import Navbar from './MainNavbar';
 import Sidebar from './Sidebar';
-
-import { useNavigation } from '../../lib/hooks/useNavigation'; 
+import { useNavigation } from '@/lib/hooks/useNavigation';
 
 type DashboardWrapperProps = {
   children: React.ReactNode;
+  hasSubmenu?: boolean; // 🔴 NEW: Add this prop to indicate if page has submenu
 };
 
-export default function DashboardWrapper({ children }: DashboardWrapperProps) {
+export default function DashboardWrapper({ children, hasSubmenu = false }: DashboardWrapperProps) {
   const { pageTitle } = useNavigation();
+
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      {/* Main Navbar - Always visible */}
+    // 🔴 CHANGED: Added min-h-screen and bg-gray-50
+    <div className="min-h-screen bg-gray-50">
       <Navbar title={pageTitle} />
+      <Sidebar />
       
-      <div className="">
-        {/* Sidebar - Always visible */}
-        <Sidebar />
-        
-        {/* Main Content Area */}
-        <div className=""> {/* ml-12 to account for sidebar width */}
+      {/* Main content area with proper spacing */}
+      {/* 🔴 CHANGED: Complete className overhaul */}
+      <main className={`
+        md:ml-16 
+        ${hasSubmenu ? 'pt-28' : 'pt-16'}
+        pb-20 md:pb-4
+        min-h-screen
+        overflow-y-auto
+      `}>
+        {/* 🔴 CHANGED: Added wrapper div */}
+        <div className="w-full h-full">
           {children}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
