@@ -1,64 +1,344 @@
-// app/(main)/restaurant-profile/page.tsx
 "use client";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import {
+  Save,
+  Store,
+  Mail,
+  Phone,
+  MapPin,
+  Image,
+  CheckCircle,
+  AlertCircle,
+  X,
+  ChevronDown,
+  Globe,
+  Clock,
+  Upload,
+  Camera,
+  Trash2,
+  Building,
+  Users,
+  Award,
+} from "lucide-react";
 
-import React, { useState, ChangeEvent, useRef } from "react";
-import { Image as ImageIcon } from "lucide-react";
-
-// Fake API
-const fakeApi = {
-  saveRestaurantProfile: async (data: Omit<RestaurantData, "logo">) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        localStorage.setItem("restaurantProfile", JSON.stringify(data));
-        resolve(true);
-      }, 1000);
-    });
-  },
-};
-
+// Types
 interface RestaurantData {
   name: string;
   type: string;
   contact: string;
   email: string;
   address: string;
+  description: string;
+  website: string;
+  openingTime: string;
+  closingTime: string;
   logo: File | null;
 }
 
-export default function RestaurantProfile() {
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
+
+// Mock API
+class RestaurantAPI {
+  private static delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  private static mockData: Omit<RestaurantData, "logo"> = {
+    name: "Sample Restaurant",
+    type: "Both",
+    contact: "+1 (555) 123-4567",
+    email: "info@samplerestaurant.com",
+    address: "123 Main Street, City, State 12345",
+    description: "A cozy restaurant serving delicious food with exceptional service.",
+    website: "www.samplerestaurant.com",
+    openingTime: "09:00",
+    closingTime: "22:00",
+  };
+
+  static async getProfile(): Promise<ApiResponse<Omit<RestaurantData, "logo">>> {
+    await this.delay(800);
+    const data = this.mockData;
+    return {
+      success: true,
+      data,
+      message: "Profile loaded successfully",
+    };
+  }
+
+  static async updateProfile(
+    data: Omit<RestaurantData, "logo">
+  ): Promise<ApiResponse<Omit<RestaurantData, "logo">>> {
+    await this.delay(1000);
+    this.mockData = { ...this.mockData, ...data };
+    return {
+      success: true,
+      data,
+      message: "Restaurant profile updated successfully",
+    };
+  }
+}
+
+interface ToastProps {
+  message: string;
+  type: "success" | "error";
+  onClose: () => void;
+  isVisible: boolean;
+}
+
+// Enhanced Toast Component with advanced animations (matching backup page)
+const Toast = React.memo<ToastProps>(({ message, type, onClose, isVisible }) => (
+  <div
+    className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${
+      isVisible 
+        ? 'translate-x-0 opacity-100 scale-100' 
+        : 'translate-x-full opacity-0 scale-95'
+    } ${
+      type === "success" 
+        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200" 
+        : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
+    }`}
+    style={{
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255, 255, 255, 0.2)'
+    }}
+  >
+    <div className={`flex-shrink-0 p-1 rounded-full ${type === "success" ? "bg-green-400/20" : "bg-red-400/20"}`}>
+      {type === "success" ? (
+        <CheckCircle size={20} className="text-white" />
+      ) : (
+        <AlertCircle size={20} className="text-white" />
+      )}
+    </div>
+    
+    <div className="flex-1">
+      <p className="font-medium text-sm">{message}</p>
+    </div>
+    
+    <button 
+      onClick={onClose} 
+      className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200" 
+      aria-label="Close"
+    >
+      <X size={16} className="text-white" />
+    </button>
+  </div>
+));
+
+// Enhanced Dropdown Component
+const RestaurantDropdown = ({
+  value,
+  options,
+  onValueChange,
+  placeholder,
+}: {
+  value: string;
+  options: { value: string; label: string }[];
+  onValueChange: (value: string) => void;
+  placeholder: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent bg-white text-left flex items-center justify-between hover:border-gray-400 transition-all duration-200"
+      >
+        <span className={value ? "text-gray-900" : "text-gray-500"}>
+          {options.find((opt) => opt.value === value)?.label || placeholder}
+        </span>
+        <ChevronDown 
+          size={16} 
+          className={`text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} 
+        />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto backdrop-blur-sm">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              className="w-full px-4 py-3 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg"
+              onClick={() => {
+                onValueChange(option.value);
+                setIsOpen(false);
+              }}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// SIMPLIFIED Input Component with custom focus
+const SimpleInput = ({
+  label,
+  required = false,
+  ...props
+}: {
+  label: string;
+  required?: boolean;
+} & React.InputHTMLAttributes<HTMLInputElement>) => (
+  <div className="space-y-2">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      {label}
+      {required && <span className="text-red-500 ml-1">*</span>}
+    </label>
+    <input
+      {...props}
+      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-all duration-200 hover:border-gray-400"
+    />
+  </div>
+);
+
+// SIMPLIFIED Textarea Component with custom focus
+const SimpleTextarea = ({
+  label,
+  required = false,
+  ...props
+}: {
+  label: string;
+  required?: boolean;
+} & React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
+  <div className="space-y-2">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      {label}
+      {required && <span className="text-red-500 ml-1">*</span>}
+    </label>
+    <textarea
+      {...props}
+      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-all duration-200 hover:border-gray-400 resize-none"
+    />
+  </div>
+);
+
+const RestaurantProfilePage = () => {
   const [formData, setFormData] = useState<RestaurantData>({
     name: "",
     type: "",
     contact: "",
     email: "",
     address: "",
+    description: "",
+    website: "",
+    openingTime: "",
+    closingTime: "",
     logo: null,
   });
-
+  
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  
+  // Advanced toast state management (matching backup page)
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error"; id: number } | null>(null);
+  const [toastVisible, setToastVisible] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  // Advanced toast management with animations (matching backup page)
+  const showToast = useCallback((message: string, type: "success" | "error") => {
+    const id = Date.now();
+    setToast({ message, type, id });
+    setToastVisible(true);
+
+    // Auto hide after 4 seconds
+    setTimeout(() => {
+      setToastVisible(false);
+    }, 4000);
+
+    // Remove from DOM after animation completes
+    setTimeout(() => {
+      setToast(null);
+    }, 4500);
+  }, []);
+
+  const hideToast = useCallback(() => {
+    setToastVisible(false);
+    setTimeout(() => {
+      setToast(null);
+    }, 500);
+  }, []);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+      const response = await RestaurantAPI.getProfile();
+      if (!response.success) throw new Error(response.message);
+      setFormData(prev => ({ ...prev, ...response.data }));
+    } catch {
+      showToast("Failed to load restaurant profile", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setHasChanges(true);
+  };
+
+  const handleDropdownChange = (key: keyof RestaurantData, value: string) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+    setHasChanges(true);
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file && file.type.startsWith("image/")) {
-      setFormData((prev) => ({ ...prev, logo: file }));
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("File size must be less than 5MB", "error");
+        return;
+      }
+      setFormData(prev => ({ ...prev, logo: file }));
       setPreviewUrl(URL.createObjectURL(file));
+      setHasChanges(true);
+      showToast("Logo uploaded successfully!", "success");
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
     }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith("image/")) {
-      setFormData((prev) => ({ ...prev, logo: file }));
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("File size must be less than 5MB", "error");
+        return;
+      }
+      setFormData(prev => ({ ...prev, logo: file }));
       setPreviewUrl(URL.createObjectURL(file));
+      setHasChanges(true);
+      showToast("Logo uploaded successfully!", "success");
     }
   };
 
@@ -66,179 +346,341 @@ export default function RestaurantProfile() {
     fileInputRef.current?.click();
   };
 
-  const handleReset = () => {
-    setFormData({
-      name: "",
-      type: "",
-      contact: "",
-      email: "",
-      address: "",
-      logo: null,
-    });
+  const removeLogo = () => {
+    setFormData(prev => ({ ...prev, logo: null }));
     setPreviewUrl(null);
+    setHasChanges(true);
+    showToast("Logo removed successfully", "success");
   };
 
-  const handleSubmit = async () => {
-    const { name, type, contact, email, address, logo } = formData;
-
-    // Validation check
-    if (!name || !type || !contact || !email || !address || !logo) {
-      alert("❌ Please fill in all fields and upload a logo before saving.");
+  const handleSave = async () => {
+    // Validation
+    const requiredFields = ['name', 'type', 'contact', 'email', 'address'];
+    const missingFields = requiredFields.filter(field => !formData[field as keyof RestaurantData]);
+    
+    if (missingFields.length > 0) {
+      showToast("Please fill in all required fields", "error");
       return;
     }
 
-    // Simulated API Save
-    const dataToSave = { ...formData, logo: undefined }; // exclude logo file
-    await fakeApi.saveRestaurantProfile(dataToSave);
-    alert("✅ Restaurant profile saved (via fake API)!");
+    if (!formData.email.includes('@')) {
+      showToast("Please enter a valid email address", "error");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const { logo, ...dataToSave } = formData;
+      const response = await RestaurantAPI.updateProfile(dataToSave);
+      if (response.success) {
+        setHasChanges(false);
+        showToast(response.message || "Restaurant profile updated successfully! ✨", "success");
+      }
+    } catch {
+      showToast("Failed to save restaurant profile", "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  return (
-    <div className="min-h-screen pl-30 bg-gray-50 px-10 py-8">
-      <h1 className="text-3xl font-bold mb-6">Restaurant Profile</h1>
+  const restaurantTypeOptions = [
+    { value: "Dine In", label: "🍽️ Dine In" },
+    { value: "Take Away", label: "🥡 Take Away" },
+    { value: "Both", label: "🍽️🥡 Both (Dine In & Take Away)" },
+    { value: "Delivery Only", label: "🚚 Delivery Only" },
+  ];
 
-      <div className="flex flex-wrap gap-8">
-        {/* Left Form Fields */}
-        <div className="flex-1 min-w-[300px] max-w-lg space-y-3">
-          <p className="text-xl">NAME</p>
-          <input
-            name="name"
-            type="text"
-            placeholder="Name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border rounded-md"
-          />
-          <p className="text-xl">Type</p>
-          <div className="relative w-full">
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 pr-10 border rounded-md appearance-none"
+  const getOperatingStatus = () => {
+    if (!formData.openingTime || !formData.closingTime) return null;
+    
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    const openTime = parseInt(formData.openingTime.split(':')[0]) * 60 + parseInt(formData.openingTime.split(':')[1]);
+    const closeTime = parseInt(formData.closingTime.split(':')[0]) * 60 + parseInt(formData.closingTime.split(':')[1]);
+    
+    const isOpen = currentTime >= openTime && currentTime <= closeTime;
+    
+    return {
+      isOpen,
+      status: isOpen ? "Open Now" : "Closed",
+      color: isOpen ? "text-green-600 bg-green-100" : "text-red-600 bg-red-100"
+    };
+  };
+
+  const operatingStatus = getOperatingStatus();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading Restaurant Profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={hideToast}
+          isVisible={toastVisible}
+        />
+      )}
+
+      <div className="ml-10 max-w-[1500px] mx-auto px-6 lg:px-8">
+        {/* Header - Consistent with Billing & License page */}
+        <div className="flex items-center justify-between mb-12">
+          <h1 className="text-3xl font-semibold text-gray-900">Restaurant Profile</h1>
+          <div className="flex gap-3">
+            <button
+              onClick={handleSave}
+              disabled={!hasChanges || saving}
+              className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-colors ${
+                hasChanges && !saving
+                  ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
             >
-              <option value="">Select Type</option>
-              <option value="Dine In">Dine In</option>
-              <option value="Take Away">Take Away</option>
-              <option value="Both">Both</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-              <svg
-                className="w-4 h-4 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M19 9l-7 7-7-7"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              {saving ? (
+                <>
+                  <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={16} />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Three cards in a row with equal height */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Basic Information Card */}
+          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
+            <div className="flex items-center gap-2 mb-8">
+              <Store className="text-black" size={24} />
+              <h2 className="text-xl font-semibold">Basic Information</h2>
+            </div>
+
+            <div className="space-y-6 flex-grow">
+              <SimpleInput
+                label="Restaurant Name"
+                required
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Enter restaurant name"
+              />
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Restaurant Type <span className="text-red-500">*</span>
+                </label>
+                <RestaurantDropdown
+                  value={formData.type}
+                  options={restaurantTypeOptions}
+                  onValueChange={(value) => handleDropdownChange("type", value)}
+                  placeholder="Select restaurant type"
                 />
-              </svg>
+              </div>
+
+              <SimpleTextarea
+                label="Description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Brief description of your restaurant"
+                rows={3}
+              />
+
+              <SimpleInput
+                label="Website"
+                type="url"
+                name="website"
+                value={formData.website}
+                onChange={handleInputChange}
+                placeholder="www.yourrestaurant.com"
+              />
             </div>
           </div>
 
-          <p className="text-xl">Contact</p>
-          <input
-            name="contact"
-            type="text"
-            placeholder="Contact Info"
-            value={formData.contact}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border rounded-md"
-          />
-          <p className="text-xl">Email</p>
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border rounded-md"
-          />
-          <p className="text-xl">Address</p>
-          <input
-            name="address"
-            type="text"
-            placeholder="Address"
-            value={formData.address}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border rounded-md"
-          />
-        </div>
+          {/* Contact Information Card */}
+          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
+            <div className="flex items-center gap-2 mb-8">
+              <Phone className="text-black" size={24} />
+              <h2 className="text-xl font-semibold">Contact Information</h2>
+            </div>
 
-        {/* Right File Upload */}
-        <div className="flex-1 min-w-[300px] pr-20">
-          <label className="block text-xl font-semibold mb-2 text-gray-700">
-            Logo
-          </label>
-          <div
-            className="relative border-2 border-dashed border-gray-300 rounded-lg p-8 h-[355px] bg-white flex flex-col justify-center items-center hover:bg-gray-50 transition"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleDrop}
-          >
-            {previewUrl ? (
-              <>
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="max-h-40 object-contain mb-4"
-                />
-                <button
-                  onClick={() => {
-                    setFormData((prev) => ({ ...prev, logo: null }));
-                    setPreviewUrl(null);
-                  }}
-                  className="absolute top-3 right-3 text-gray-500 text-2xl hover:text-gray-800"
-                  title="Remove image"
-                >
-                  ×
-                </button>
-              </>
-            ) : (
-              <>
-                <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
-                <p className="text-gray-500 text-base text-center">
-                  Drag and drop your logo here
-                </p>
-                <button
-                  type="button"
+            <div className="space-y-6 flex-grow">
+              <SimpleInput
+                label="Contact Number"
+                required
+                type="tel"
+                name="contact"
+                value={formData.contact}
+                onChange={handleInputChange}
+                placeholder="+1 (555) 123-4567"
+              />
+
+              <SimpleInput
+                label="Email Address"
+                required
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="info@restaurant.com"
+              />
+
+              <SimpleTextarea
+                label="Address"
+                required
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                placeholder="123 Main Street, City, State, ZIP Code"
+                rows={3}
+              />
+            </div>
+          </div>
+
+          {/* Logo & Hours Card */}
+          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
+            <div className="flex items-center gap-2 mb-8">
+              <Image className="text-black" size={24} />
+              <h2 className="text-xl font-semibold">Logo & Hours</h2>
+            </div>
+
+            <div className="space-y-6 flex-grow">
+              {/* Logo Upload Section */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Restaurant Logo
+                </label>
+                <div
+                  className={`relative border-2 border-dashed rounded-lg p-6 bg-gray-50 flex flex-col justify-center items-center hover:bg-gray-100 transition-all duration-300 cursor-pointer ${
+                    dragActive ? "border-gray-500 bg-blue-50" : "border-gray-300"
+                  }`}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
                   onClick={handleClickUpload}
-                  className="mt-3 px-4 py-2 bg-[#D1AB35] text-white rounded hover:bg-yellow-600"
                 >
-                  Click to Upload
-                </button>
-              </>
-            )}
+                  {previewUrl ? (
+                    <div className="relative group">
+                      <img
+                        src={previewUrl}
+                        alt="Restaurant Logo"
+                        className="max-h-32 max-w-full object-contain mb-4 rounded-lg shadow-md"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleClickUpload();
+                          }}
+                          className="bg-white text-gray-900 rounded-lg p-2 hover:bg-gray-100 transition-colors"
+                          title="Change logo"
+                        >
+                          <Camera size={16} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeLogo();
+                          }}
+                          className="bg-red-500 text-white rounded-lg p-2 hover:bg-red-600 transition-colors"
+                          title="Remove logo"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      <p className="text-sm text-gray-600 text-center mt-2">Click to change logo</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="p-3 bg-white rounded-full shadow-md mb-4">
+                        <Upload className="w-6 h-6 text-gray-400" />
+                      </div>
+                      <p className="text-gray-700 text-center text-sm font-medium mb-2">
+                        Drag and drop your logo here
+                      </p>
+                      <p className="text-xs text-gray-500 mb-4">
+                        or click to browse files
+                      </p>
+                      <div className="px-4 py-2 bg-[#2C2C2C] text-white hover:bg-gray-700 text-xs font-medium rounded-lg transition-colors">
+                        Upload Logo
+                      </div>
+                    </>
+                  )}
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleLogoChange}
-              className="hidden"
-              title="Upload Logo"
-            />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoChange}
+                    className="hidden"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 text-center">
+                  Supported formats: JPG, PNG, GIF (Max 5MB)
+                </p>
+              </div>
+
+              {/* Operating Hours Section */}
+              <div className="pt-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock className="text-black" size={20} />
+                  <h3 className="font-medium text-gray-900">Operating Hours</h3>
+                  {operatingStatus && (
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${operatingStatus.color} ml-auto`}>
+                      {operatingStatus.status}
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <SimpleInput
+                    label="Opening Time"
+                    type="time"
+                    name="openingTime"
+                    value={formData.openingTime}
+                    onChange={handleInputChange}
+                  />
+
+                  <SimpleInput
+                    label="Closing Time"
+                    type="time"
+                    name="closingTime"
+                    value={formData.closingTime}
+                    onChange={handleInputChange}
+                  />
+
+                  {formData.openingTime && formData.closingTime && (
+                    <div className="bg-gray-50 rounded-lg p-3 border">
+                      <p className="text-xs font-medium text-gray-700 mb-1">Daily Hours</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {formData.openingTime} - {formData.closingTime}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Buttons */}
-      <div className="mt-8 pl-283 py-20 flex gap-9">
-        <button
-          onClick={handleReset}
-          className="px-15 py-3 rounded-md bg-white shadow-md hover:shadow-lg hover:bg-gray-100"
-        >
-          Reset
-        </button>
-        <button
-          onClick={handleSubmit}
-          className="px-15 py-3 bg-[#D1AB35] text-white shadow-md hover:shadow-lg rounded-md hover:bg-yellow-600"
-        >
-          Save
-        </button>
-      </div>
     </div>
   );
-}
+};
+
+export default RestaurantProfilePage;
