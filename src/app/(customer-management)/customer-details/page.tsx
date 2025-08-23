@@ -131,8 +131,9 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-      }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
+      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -145,10 +146,8 @@ const Toast = ({
 const CustomerManagementPage = () => {
   const [customerItems, setCustomerItems] = useState<CustomerItem[]>([]);
   const [loading, setLoading] = useState(true);
-  // Debounced search
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -248,16 +247,16 @@ const CustomerManagementPage = () => {
         </div>
       </div>
 
-     <div className="mb-6 mx-20">
+      <div className="mb-6 pl-20 flex items-center justify-between gap-4 flex-wrap">
         {/* Search Bar */}
-        <div className="relative w-full">
+        <div className="relative flex-1 min-w-[200px]">
           <Search
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             size={16}
           />
           <input
             type="text"
-            placeholder="Search Customers..."
+            placeholder="Search customers..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
@@ -276,20 +275,17 @@ const CustomerManagementPage = () => {
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Contact
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Email
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
-                  Address
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
-                </th>
+                
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
                     <DropdownMenu.Root>
@@ -325,25 +321,22 @@ const CustomerManagementPage = () => {
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
-                    <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
                   </div>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Last Ordered Date
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Total Orders
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Total Spent
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
-                  Registration Date
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
-                </th>
+                
               </tr>
             </thead>
 
@@ -374,9 +367,7 @@ const CustomerManagementPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       {item.Email}
                     </td>
-                    <td className="px-4 py-4 text-sm max-w-[200px] truncate" title={item.Address}>
-                      {item.Address}
-                    </td>
+                    
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
                         className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
@@ -395,9 +386,7 @@ const CustomerManagementPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       PKR {item.Total_Spent.toLocaleString()}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {item.Registration_Date}
-                    </td>
+                    
                   </tr>
                 ))
               )}
