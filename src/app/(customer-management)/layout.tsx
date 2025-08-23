@@ -1,5 +1,5 @@
 import React from 'react';
-import CustomerMgmtSubmenu from '../../components/layout/submenus/CustomerMgmtSubmenu';
+import CustomerMgmtSubmenu from '@/components/layout/submenus/CustomerMgmtSubmenu';
 
 
 export default function CustomerMgmtLayout({

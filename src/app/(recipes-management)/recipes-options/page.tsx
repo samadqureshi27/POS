@@ -190,10 +190,12 @@ const CategoryPage = () => {
   const [RecipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [actionLoading, setActionLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingItem, setEditingItem] = useState<RecipeOption | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(editingItem ? "Option Values" : "Details");
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -234,6 +236,12 @@ const CategoryPage = () => {
       setPreview(null);
     }
   }, [editingItem, isModalOpen]);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      setActiveTab(editingItem ? "Option Values" : "Details");
+    }
+  }, [isModalOpen, editingItem]);
 
   const loadRecipeOptions = async () => {
     try {
@@ -336,7 +344,7 @@ const CategoryPage = () => {
   // Modal form handlers
   const handleModalSubmit = () => {
     if (
-      !formData.Name.trim() 
+      !formData.Name.trim()
     ) {
       return;
     }
@@ -444,7 +452,7 @@ const CategoryPage = () => {
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                
+
                 <th className="relative px-4 py-3 text-left">
                   Price
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
@@ -485,10 +493,10 @@ const CategoryPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                       {item.Name}
                     </td>
-                   
+
 
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      ${item.price} 
+                      ${item.price}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -514,16 +522,22 @@ const CategoryPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingItem ? "Edit Category" : "Add New Category"}
-            </h2>
-            <div className="space-y-3">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                {editingItem ? "Edit Category" : "Add New Category"}
+              </h2>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="grid grid-cols-1 gap-2  overflow-y-auto pr-1 py-2">
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
+                  Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -532,53 +546,66 @@ const CategoryPage = () => {
                     setFormData({ ...formData, Name: e.target.value })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="Enter category name"
                   required
                 />
               </div>
-             
+
               {/* Price */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Priority
+                  Price <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
                   value={formData.price}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      price: Number(e.target.value) || 1,
-                    })
+                    setFormData({ ...formData, price: Number(e.target.value) })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  min={1}
+                  placeholder="Enter price"
                   required
                 />
               </div>
+            </div>
 
-              {/* Action buttons */}
-              <div className="flex gap-3 pt-4 justify-end">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
-                >
-                  <X size={12} />
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleModalSubmit}
-                  disabled={!formData.Name.trim()}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${formData.Name.trim() 
-                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                >
-                  <Save size={12} />
-                  {editingItem ? "Update" : "Save & Close"}
-                </button>
-              </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                disabled={actionLoading}
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X size={16} />
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleModalSubmit}
+                disabled={
+                  !formData.Name.trim() ||
+                  actionLoading
+                }
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
+                    actionLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
+              >
+                {actionLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    {editingItem ? "Updating..." : "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editingItem ? "Update" : "Save & Close"}
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

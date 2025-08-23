@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ButtonPage from "../../../components/layout/UI/button";
+import ButtonPage from "@/components/layout/UI/button";
 import {
   Plus,
   Trash2,
@@ -416,7 +416,7 @@ const CategoryPage = () => {
     ) {
       return;
     }
-    
+
     if (editingItem) {
       handleUpdateItem(formData);
     } else {
@@ -538,9 +538,9 @@ const CategoryPage = () => {
 
       {/* Table */}
       <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
-        <div className="overflow-y-auto">
+        <div className="max-h-[500px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
               <tr>
                 <th className="px-4 py-3 text-left">
                   <Checkbox
@@ -692,16 +692,22 @@ const CategoryPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingItem ? "Edit Category" : "Add New Category"}
-            </h2>
-            <div className="space-y-3">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                {editingItem ? "Edit Category" : "Add New Category"}
+              </h2>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 py-2">
               {/* Name */}
-              <div>
+              <div className="md:col-span-2 mt-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
+                  Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -709,28 +715,30 @@ const CategoryPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="Enter category name"
                   required
                 />
               </div>
 
               {/* Description */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
+                  Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   value={formData.Description}
                   onChange={(e) =>
                     setFormData({ ...formData, Description: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 h-32 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] h-32 resize-none"
+                  placeholder="Enter description"
                   required
                 />
               </div>
 
               {/* Image Upload with Drag & Drop */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Image
                 </label>
@@ -789,7 +797,8 @@ const CategoryPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Parent: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="Parent category"
                 />
               </div>
 
@@ -808,14 +817,15 @@ const CategoryPage = () => {
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="Priority"
                   min={1}
                   required
                 />
               </div>
 
               {/* Status */}
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-gray-700">
                   Status
                 </label>
                 <ButtonPage
@@ -823,30 +833,46 @@ const CategoryPage = () => {
                   onChange={handleStatusChange}
                 />
               </div>
+            </div>
 
-              {/* Action buttons */}
-              <div className="flex gap-3 pt-4 justify-end">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
-                >
-                  <X size={12} />
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleModalSubmit}
-                  disabled={!formData.Name.trim() || !formData.Description.trim()}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${formData.Name.trim() && formData.Description.trim()
-                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                >
-                  <Save size={12} />
-                  {editingItem ? "Update" : "Save & Close"}
-                </button>
-              </div>
+            {/* Fixed Action Buttons */}
+            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                disabled={actionLoading}
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X size={16} />
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleModalSubmit}
+                disabled={
+                  !formData.Name.trim() ||
+                  !formData.Description.trim() ||
+                  actionLoading
+                }
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
+                    !formData.Description.trim() ||
+                    actionLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
+              >
+                {actionLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    {editingItem ? "Updating..." : "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editingItem ? "Update" : "Save & Close"}
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

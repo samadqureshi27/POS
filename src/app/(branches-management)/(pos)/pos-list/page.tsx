@@ -1,11 +1,8 @@
 "use client";
 
-import React from "react";
-import { ChevronDown } from "lucide-react";
-import Checkbox from "@mui/material/Checkbox";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ButtonPage from "../../../../components/layout/UI/button";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
+  ChevronDown,
   Plus,
   Trash2,
   Search,
@@ -15,8 +12,11 @@ import {
   Edit,
   Save,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import Checkbox from "@mui/material/Checkbox";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import ButtonPage from "@/components/layout/UI/button";
 
+// Types
 interface MenuItem {
   POS_ID: string;
   POS_Name: string;
@@ -29,39 +29,19 @@ interface ApiResponse<T> {
   success: boolean;
 }
 
+// Mock API
 class PosAPI {
   private static delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
   private static mockData: MenuItem[] = [
-    {
-      POS_ID: "1",
-      POS_Name: "Main Branch",
-      Status: "Active",
-    },
-    {
-      POS_ID: "2",
-      POS_Name: "North Branch",
-      Status: "Inactive",
-    },
-    {
-      POS_ID: "3",
-      POS_Name: "South Branch",
-      Status: "Active",
-    },
-    {
-      POS_ID: "4",
-      POS_Name: "East Branch",
-      Status: "Active",
-    },
-    {
-      POS_ID: "5",
-      POS_Name: "West Branch",
-      Status: "Inactive",
-    },
+    { POS_ID: "1", POS_Name: "Main Branch", Status: "Active" },
+    { POS_ID: "2", POS_Name: "North Branch", Status: "Inactive" },
+    { POS_ID: "3", POS_Name: "South Branch", Status: "Active" },
+    { POS_ID: "4", POS_Name: "East Branch", Status: "Active" },
+    { POS_ID: "5", POS_Name: "West Branch", Status: "Inactive" },
   ];
 
-  // GET /api/pos-items/
   static async getPosItems(): Promise<ApiResponse<MenuItem[]>> {
     await this.delay(800);
     return {
@@ -71,16 +51,12 @@ class PosAPI {
     };
   }
 
-  // POST /api/pos-items/
   static async createPosItem(
     item: Omit<MenuItem, "POS_ID">
   ): Promise<ApiResponse<MenuItem>> {
     await this.delay(1000);
     const newId = (this.mockData.length + 1).toString();
-    const newItem: MenuItem = {
-      ...item,
-      POS_ID: newId,
-    };
+    const newItem: MenuItem = { ...item, POS_ID: newId };
     this.mockData.push(newItem);
     return {
       success: true,
@@ -89,7 +65,6 @@ class PosAPI {
     };
   }
 
-  // PUT /api/pos-items/{id}/
   static async updatePosItem(
     id: string,
     item: Partial<MenuItem>
@@ -97,7 +72,6 @@ class PosAPI {
     await this.delay(800);
     const index = this.mockData.findIndex((i) => i.POS_ID === id);
     if (index === -1) throw new Error("Item not found");
-
     this.mockData[index] = { ...this.mockData[index], ...item };
     return {
       success: true,
@@ -106,38 +80,19 @@ class PosAPI {
     };
   }
 
-  // DELETE /api/pos-items/{id}/
   static async deletePosItem(id: string): Promise<ApiResponse<null>> {
     await this.delay(600);
-    const index = this.mockData.findIndex((i) => i.POS_ID === id);
-    if (index === -1) throw new Error("Item not found");
-
-    this.mockData.splice(index, 1);
-
-    // Reassign IDs sequentially
-    this.mockData = this.mockData.map((item, idx) => ({
-      ...item,
-      POS_ID: (idx + 1).toString(),
-    }));
-
-    return {
-      success: true,
-      data: null,
-      message: "POS item deleted successfully",
-    };
+    this.mockData = this.mockData
+      .filter((i) => i.POS_ID !== id)
+      .map((item, idx) => ({ ...item, POS_ID: (idx + 1).toString() }));
+    return { success: true, data: null, message: "POS item deleted successfully" };
   }
 
-  // DELETE /api/pos-items/bulk-delete/
   static async bulkDeletePosItems(ids: string[]): Promise<ApiResponse<null>> {
     await this.delay(1000);
-    this.mockData = this.mockData.filter((item) => !ids.includes(item.POS_ID));
-
-    // Reassign IDs sequentially
-    this.mockData = this.mockData.map((item, idx) => ({
-      ...item,
-      POS_ID: (idx + 1).toString(),
-    }));
-
+    this.mockData = this.mockData
+      .filter((i) => !ids.includes(i.POS_ID))
+      .map((item, idx) => ({ ...item, POS_ID: (idx + 1).toString() }));
     return {
       success: true,
       data: null,
@@ -146,6 +101,7 @@ class PosAPI {
   }
 }
 
+// Toast
 const Toast = ({
   message,
   type,
@@ -156,9 +112,8 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -173,7 +128,11 @@ const PosListPage = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Debounced search
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<{
@@ -190,16 +149,25 @@ const PosListPage = () => {
     Status: "Active",
   });
 
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => setSearchTerm(searchInput), 300);
+    return () => clearTimeout(handler);
+  }, [searchInput]);
+
+  // Auto-close toast
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [toast]);
 
   useEffect(() => {
     loadPosItems();
   }, []);
 
-  // Modal form effect
+  // Modal form sync
   useEffect(() => {
     if (editingItem) {
       setFormData({
@@ -207,51 +175,46 @@ const PosListPage = () => {
         Status: editingItem.Status,
       });
     } else {
-      setFormData({
-        POS_Name: "",
-        Status: "Active",
-      });
+      setFormData({ POS_Name: "", Status: "Active" });
     }
   }, [editingItem, isModalOpen]);
+
+  const showToast = (message: string, type: "success" | "error") =>
+    setToast({ message, type });
 
   const loadPosItems = async () => {
     try {
       setLoading(true);
       const response = await PosAPI.getPosItems();
-      if (response.success) {
-        setMenuItems(response.data);
-      } else {
-        throw new Error(response.message || "Failed to fetch POS items");
-      }
-    } catch (error) {
-      console.error("Error fetching POS items:", error);
+      if (!response.success) throw new Error(response.message);
+      setMenuItems(response.data);
+    } catch {
       showToast("Failed to load POS items", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredItems = menuItems.filter((item) => {
-    const matchesSearch = item.POS_Name.toLowerCase().includes(
-      searchTerm.toLowerCase()
-    );
-    const matchesStatus = statusFilter ? item.Status === statusFilter : true;
-    return matchesSearch && matchesStatus;
-  });
+  // Memoized filtering
+  const filteredItems = useMemo(() => {
+    const s = searchTerm.toLowerCase();
+    return menuItems.filter((item) => {
+      const matchesSearch = item.POS_Name.toLowerCase().includes(s);
+      const matchesStatus = statusFilter ? item.Status === statusFilter : true;
+      return matchesSearch && matchesStatus;
+    });
+  }, [menuItems, searchTerm, statusFilter]);
 
   const handleCreateItem = async (itemData: Omit<MenuItem, "POS_ID">) => {
     try {
       setActionLoading(true);
       const response = await PosAPI.createPosItem(itemData);
       if (response.success) {
-        setMenuItems((prevItems) => [...prevItems, response.data]);
+        setMenuItems((prev) => [...prev, response.data]);
         setIsModalOpen(false);
-        setSearchTerm("");
-        setStatusFilter("");
         showToast(response.message || "POS created successfully", "success");
       }
-    } catch (error) {
-      console.error("Error creating POS:", error);
+    } catch {
       showToast("Failed to create POS", "error");
     } finally {
       setActionLoading(false);
@@ -264,16 +227,14 @@ const PosListPage = () => {
       setActionLoading(true);
       const response = await PosAPI.updatePosItem(editingItem.POS_ID, itemData);
       if (response.success) {
-        setMenuItems(
-          menuItems.map((item) =>
-            item.POS_ID === editingItem.POS_ID ? response.data : item
-          )
+        setMenuItems((prev) =>
+          prev.map((it) => (it.POS_ID === editingItem.POS_ID ? response.data : it))
         );
         setIsModalOpen(false);
         setEditingItem(null);
         showToast(response.message || "POS updated successfully", "success");
       }
-    } catch (error) {
+    } catch {
       showToast("Failed to update POS", "error");
     } finally {
       setActionLoading(false);
@@ -286,38 +247,34 @@ const PosListPage = () => {
       setActionLoading(true);
       const response = await PosAPI.bulkDeletePosItems(selectedItems);
       if (response.success) {
-        setMenuItems((prev) => {
-          const remaining = prev.filter((i) => !selectedItems.includes(i.POS_ID));
-          return remaining.map((it, idx) => ({ ...it, POS_ID: (idx + 1).toString() }));
-        });
+        // Refresh from API (IDs already re-assigned there)
+        const updated = await PosAPI.getPosItems();
+        setMenuItems(updated.data);
         setSelectedItems([]);
         showToast(response.message || "POS deleted successfully", "success");
       }
-    } catch (error) {
+    } catch {
       showToast("Failed to delete POS", "error");
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(checked ? filteredItems.map((item) => item.POS_ID) : []);
-  };
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      setSelectedItems(checked ? filteredItems.map((i) => i.POS_ID) : []);
+    },
+    [filteredItems]
+  );
 
-  const handleSelectItem = (posId: string, checked: boolean) => {
-    setSelectedItems(
-      checked
-        ? [...selectedItems, posId]
-        : selectedItems.filter((id) => id !== posId)
+  const handleSelectItem = useCallback((posId: string, checked: boolean) => {
+    setSelectedItems((prev) =>
+      checked ? [...prev, posId] : prev.filter((id) => id !== posId)
     );
-  };
+  }, []);
 
-  // Modal form handlers
   const handleModalSubmit = () => {
-    if (!formData.POS_Name.trim()) {
-      return;
-    }
-
+    if (!formData.POS_Name.trim()) return;
     if (editingItem) {
       handleUpdateItem(formData);
     } else {
@@ -326,10 +283,7 @@ const PosListPage = () => {
   };
 
   const handleStatusChange = (isActive: boolean) => {
-    setFormData({
-      ...formData,
-      Status: isActive ? "Active" : "Inactive",
-    });
+    setFormData((prev) => ({ ...prev, Status: isActive ? "Active" : "Inactive" }));
   };
 
   const handleCloseModal = () => {
@@ -346,7 +300,6 @@ const PosListPage = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading POS...</p>
         </div>
       </div>
     );
@@ -385,16 +338,14 @@ const PosListPage = () => {
 
       {/* Action bar */}
       <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        {/* Action Buttons */}
         <div className="flex gap-3 pl-20">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
-              selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${selectedItems.length === 0
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Plus size={16} />
             Add
@@ -403,11 +354,10 @@ const PosListPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSomeSelected && !actionLoading
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -423,8 +373,8 @@ const PosListPage = () => {
           <input
             type="text"
             placeholder="Search POS..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
         </div>
@@ -432,9 +382,9 @@ const PosListPage = () => {
 
       {/* Table */}
       <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
-        <div className="overflow-y-auto">
+        <div className="max-h-[500px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50 border-b border-gray-200 ">
               <tr>
                 <th className="px-4 py-3 text-left">
                   <Checkbox
@@ -455,19 +405,15 @@ const PosListPage = () => {
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
-                        <ChevronDown
-                          size={14}
-                          className="text-gray-500 ml-auto"
-                        />
+                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
                       </DropdownMenu.Trigger>
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                          className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none ml-80"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-
                           <DropdownMenu.Item
                             className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
                             onClick={() => setStatusFilter("")}
@@ -531,9 +477,8 @@ const PosListPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
                         className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
-      ${item.Status === "Active" ? "text-green-600 border-green-600" : ""}
-      ${item.Status === "Inactive" ? "text-red-600 border-red-600" : ""}
-    `}
+                          ${item.Status === "Active" ? "text-green-600 border-green-600" : ""}
+                          ${item.Status === "Inactive" ? "text-red-600 border-red-600" : ""}`}
                       >
                         {item.Status}
                       </span>
@@ -562,12 +507,17 @@ const PosListPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#ffff] rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingItem ? "Edit POS" : "Add New POS"}
-            </h2>
-            <div className="space-y-3">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] overflow-y-auto shadow-lg relative flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">
+                {editingItem ? "Edit POS" : "Add New POS"}
+              </h2>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-3 flex-1 overflow-y-auto">
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -594,35 +544,45 @@ const PosListPage = () => {
                   onChange={handleStatusChange}
                 />
               </div>
+            </div>
 
-              {/* Action buttons */}
-              <div className="flex gap-3 pt-4 justify-end">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
-                >
-                  <X size={12} />
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleModalSubmit}
-                  disabled={!formData.POS_Name.trim()}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 ${
-                    formData.POS_Name.trim()
-                      ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            {/* Action Buttons pinned bottom-right */}
+            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                disabled={actionLoading}
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X size={16} />
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleModalSubmit}
+                disabled={!formData.POS_Name.trim() || actionLoading}
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.POS_Name.trim() || actionLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
                   }`}
-                >
-                  <Save size={12} />
-                  {editingItem ? "Update" : "Save & Close"}
-                </button>
-              </div>
+              >
+                {actionLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    {editingItem ? "Updating..." : "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editingItem ? "Update Staff" : "Add Staff"}
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 };
