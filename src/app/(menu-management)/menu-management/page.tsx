@@ -24,6 +24,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { grey } from "@mui/material/colors";
 
 interface MenuItem {
   ID: number;
@@ -701,7 +702,7 @@ Displaycat: "Var",
   }
 
   return (
-    <div className="p-6 mx-6 bg-gray-50 min-h-screen overflow-y-auto">
+    <div className="p-5 mx-6 bg-gray-50 min-w-full h-full overflow-y-auto">
       {toast && (
         <Toast
           message={toast.message}
@@ -710,15 +711,15 @@ Displaycat: "Var",
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">Menu Management</h1>
+      <h1 className="text-3xl font-semibold mb-8 pl-4">Menu Management</h1>
 
       {/* Action bar */}
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex gap-3 pl-20">
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex gap-3 pl-4 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
               selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -731,7 +732,7 @@ Displaycat: "Var",
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
               isSomeSelected && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -743,49 +744,91 @@ Displaycat: "Var",
         </div>
 
         <div className="relative flex-1 min-w-[200px]">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-          <input
-            type="text"
-            placeholder="Search Menu Items..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-        </div>
+  <input
+    type="text"
+    placeholder="Search Menu Items..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+  />
+  <Search
+    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+    size={16}
+  />
+</div>
       </div>
 
       {/* Table */}
-      <div className="bg-gray-50 rounded-lg ml-20 shadow-sm overflow-x-auto">
-        <div className="max-h-[500px] overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] ml-4 shadow-sm ">
+        <div className="max-h-[500px] rounded-sm overflow-y-auto">
+          <table className="min-w-full divide-y divide-gray-200   table-fixed">
+            <thead className="bg-white border-b border-gray-200  py-50 sticky top-0">
               <tr>
-                <th className="px-4 py-3 text-left">
-                  <Checkbox
-                    checked={isAllSelected}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    sx={{
-                      color: "#2C2C2C",
-                      "&.Mui-checked": { color: "#2C2C2C" },
-                    }}
-                  />
-                </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="px-6 py-6 text-left w-[2.5px]">
+  <Checkbox
+  checked={isAllSelected}
+  onChange={(e) => handleSelectAll(e.target.checked)}
+  disableRipple
+  sx={{
+    transform: "scale(1.5)", // size adjustment
+    p: 0, // remove extra padding
+  }}
+  icon={
+    // unchecked grey box
+    <svg width="20" height="20" viewBox="0 0 24 24">
+      <rect
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="3"
+        ry="3"
+        fill="#e0e0e0"   // grey inside
+        stroke="#d1d1d1" // border grey
+        strokeWidth="2"
+      />
+    </svg>
+  }
+  checkedIcon={
+    // checked with tick
+    <svg width="20" height="20" viewBox="0 0 24 24">
+      <rect
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="3"
+        ry="3"
+        fill="#e0e0e0"   // grey inside
+        stroke="#2C2C2C" // dark border
+        strokeWidth="2"
+      />
+      <path
+        d="M9 12.5l2 2 4-4.5"
+        fill="none"
+        stroke="#2C2C2C"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  }
+/>
+
+</th>
+                <th className="relative text-gray-500 px-4 py-3 text-left">
                   ID
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute  left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative text-gray-500 px-4 py-3 text-left">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative text-gray-500 px-4 py-3 text-left">
                   Price
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative text-gray-500 px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
@@ -820,13 +863,13 @@ Displaycat: "Var",
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative text-gray-500 px-4 py-3 text-left">
                   Stock Qty
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-gray-500 text-left">
                   <div className="flex items-center gap-2">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
@@ -864,44 +907,84 @@ Displaycat: "Var",
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-gray-500 text-left">
                   Actions
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y  divide-gray-300">
               {filteredItems.map((item) => (
                 <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                  <td className="px-4 py-4">
+                  <td className="px-6 py-8">
                     <Checkbox
-                      checked={selectedItems.includes(item.ID)}
-                      onChange={(e) =>
-                        handleSelectItem(item.ID, e.target.checked)
-                      }
-                      sx={{
-                        color: "#d9d9e1",
-                        "&.Mui-checked": { color: "#d9d9e1" },
-                      }}
-                    />
+  checked={selectedItems.includes(item.ID)}
+  onChange={(e) => handleSelectItem(item.ID, e.target.checked)}
+  disableRipple
+  sx={{
+    p: 0, // remove extra padding
+    transform: "scale(1.5)", // optional size tweak
+  }}
+  icon={
+    // unchecked grey box
+    <svg width="20" height="20" viewBox="0 0 24 24">
+      <rect
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="3"
+        ry="3"
+        fill="#e0e0e0"   // grey inside
+        stroke="#d1d1d1" // border grey
+        strokeWidth="2"
+      />
+    </svg>
+  }
+  checkedIcon={
+    // checked with tick
+    <svg width="20" height="20" viewBox="0 0 24 24">
+      <rect
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="3"
+        ry="3"
+        fill="#e0e0e0"   // grey inside
+        stroke="#2C2C2C" // dark border
+        strokeWidth="2"
+      />
+      <path
+        d="M9 12.5l2 2 4-4.5"
+        fill="none"
+        stroke="#2C2C2C"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  }
+/>
+
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">${item.Price}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 text-gray-500 whitespace-nowrap">{item.ID}</td>
+                  <td className="px-4 py-4 text-gray-500 whitespace-nowrap">{item.Name}</td>
+                  <td className="px-4 py-4 text-gray-500 whitespace-nowrap">${item.Price}</td>
+                  <td className="px-4 py-4 text-gray-500 whitespace-nowrap">
                     {item.Category}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 text-gray-500 whitespace-nowrap">
                     {item.StockQty}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
-                      className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium border ${
+                      className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium  ${
                         item.Status === "Inactive"
-                          ? "text-red-600 border-red-600"
-                          : "text-green-700 border-green-700"
+                          ? "text-red-400 "
+                          : "text-green-400"
                       }`}
                     >
                       {item.Status}
