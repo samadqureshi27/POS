@@ -17,15 +17,15 @@ import {
 
 export default function Sidebar() {
   const menuItems = [
-    { icon: <Home className="h-6 w-6 md:h-7 md:w-7 stroke-[2.5]" />, label: 'Home', link: '/' },
-    { icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[2.5]" />, label: 'Menu Management', link: '/menu-management' },
-    { icon: <Package2 className="h-6 w-6 md:h-7 md:w-7 stroke-[2.5]" />, label: 'Recipes Management', link: '/recipes-management' },
-    { icon: <AlignJustify className="h-6 w-6 md:h-7 md:w-7 stroke-[2.5]" />, label: 'POS Management', link: '/pos-list' },
-    { icon: <DollarSign className="h-6 w-6 md:h-7 md:w-7 stroke-[2.5]" />, label: 'Financial Reports', link: '/financial-reports' },
-    { icon: <ShoppingCart className="h-6 w-6 md:h-7 md:w-7 stroke-[2.5]" />, label: 'Orders Management', link: '/order-management' },
-    { icon: <User className="h-6 w-6 md:h-7 md:w-7 stroke-[2.5]" />, label: 'Customer Management', link: '/customer-details' },
-    { icon: <Building2 className="h-6 w-6 md:h-7 md:w-7 stroke-[2.5]" />, label: 'Branches Management', link: '/branches-management' },
-    { icon: <Settings className="h-6 w-6 md:h-7 md:w-7 stroke-[2.5]" />, label: 'Settings', link: '/general-settings' },
+    { icon: <Home className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Home', link: '/' },
+    { icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Menu Management', link: '/menu-management' },
+    { icon: <Package2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Recipes Management', link: '/recipes-management' },
+    { icon: <AlignJustify className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'POS Management', link: '/pos-list' },
+    { icon: <DollarSign className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Financial Reports', link: '/financial-reports' },
+    { icon: <ShoppingCart className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Orders Management', link: '/order-management' },
+    { icon: <User className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Customer Management', link: '/customer-details' },
+    { icon: <Building2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Branches Management', link: '/branches-management' },
+    { icon: <Settings className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Settings', link: '/general-settings' },
   ];
 
   return (
