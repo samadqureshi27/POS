@@ -57,7 +57,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 1,
     },
     {
@@ -68,7 +68,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 2,
     },
     {
@@ -79,7 +79,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -90,7 +90,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -101,7 +101,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 4,
     },
     {
@@ -112,7 +112,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -123,7 +123,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -134,7 +134,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 3,
     },
     {
@@ -145,7 +145,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 4,
     },
     {
@@ -156,7 +156,7 @@ class MenuAPI {
       OptionValue: ["Mozzarella", "Cheddar", "Parmesan"],
       OptionPrice: [0, 0.5, 1],
       IngredientValue: ["Mozzarella", "Cheddar", "Parmesan"],
-  IngredientPrice: [0, 0.5, 1],
+      IngredientPrice: [0, 0.5, 1],
       Priority: 4,
     },
   ];
@@ -234,7 +234,7 @@ class MenuAPI {
       ID: idx + 1,
       OptionValue: item.OptionValue ?? [],
       OptionPrice: item.OptionPrice ?? [],
-       IngredientValueValue: item.IngredientValue ?? [],
+      IngredientValueValue: item.IngredientValue ?? [],
       IngredientPrice: item.IngredientPrice ?? [],
     }));
 
@@ -319,7 +319,7 @@ const RecipesManagementPage = () => {
         Description: editingItem.Description,
         OptionValue: editingItem.OptionValue || [],
         OptionPrice: editingItem.OptionPrice || [],
-          IngredientValue: editingItem.IngredientValue || [],
+        IngredientValue: editingItem.IngredientValue || [],
         IngredientPrice: editingItem.IngredientPrice || [],
         Priority: editingItem.Priority,
       });
@@ -331,8 +331,8 @@ const RecipesManagementPage = () => {
         OptionValue: [],
         OptionPrice: [],
         IngredientValue: [],
-    IngredientPrice: [],
-        
+        IngredientPrice: [],
+
         Priority: 1,
       });
       setPreview(null);
@@ -459,7 +459,7 @@ const RecipesManagementPage = () => {
       handleCreateItem(formData);
     }
   };
-   const handleStatusChange = (isActive: boolean) => {
+  const handleStatusChange = (isActive: boolean) => {
     setFormData({
       ...formData,
       Status: isActive ? "Active" : "Inactive",
@@ -487,7 +487,7 @@ const RecipesManagementPage = () => {
   }
 
   return (
-    <div className="p-6 mx-6 bg-gray-50 min-h-screen overflow-y-auto">
+    <div className="bg-gray-50 min-w-full h-full overflow-y-auto">
       {toast && (
         <Toast
           message={toast.message}
@@ -496,16 +496,16 @@ const RecipesManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">Recipes</h1>
+      <h1 className="text-3xl font-semibold mt-14 mb-8">Recipes</h1>
 
       {/* Action bar: add, delete, search */}
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 pl-20">
+        <div className="flex gap-3 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
               selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -518,7 +518,7 @@ const RecipesManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
               isSomeSelected && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -531,43 +531,84 @@ const RecipesManagementPage = () => {
 
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
           <input
             type="text"
-            placeholder="Search Ingredients..."
+            placeholder="Search Recipe Items..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
           />
         </div>
       </div>
 
       {/* Table + filters */}
-      <div className="bg-gray-50 rounded-lg ml-20 shadow-sm overflow-x-auto">
-        <div className="max-h-[500px] overflow-y-auto">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
+        <div className="max-h-[500px] rounded-sm overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-4 py-3 text-left">
+                <th className="px-6 py-6 text-left  w-[2.5px] ">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
+                    disableRipple
                     sx={{
-                      color: "#2C2C2C",
-                      "&.Mui-checked": { color: "#2C2C2C" },
+                      transform: "scale(1.5)", // size adjustment
+                      p: 0, // remove extra padding
                     }}
+                    icon={
+                      // unchecked grey box
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#d1d1d1" // border grey
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    }
+                    checkedIcon={
+                      // checked with tick
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#2C2C2C" // dark border
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12.5l2 2 4-4.5"
+                          fill="none"
+                          stroke="#2C2C2C"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
                   />
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   ID
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
@@ -592,13 +633,13 @@ const RecipesManagementPage = () => {
                             Status
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
                             onClick={() => setStatusFilter("Inactive")}
                           >
                             Inactive
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
                             onClick={() => setStatusFilter("Active")}
                           >
                             Active
@@ -607,45 +648,86 @@ const RecipesManagementPage = () => {
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Description
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Priority
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Actions
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y text-gray-500 divide-gray-300">
               {filteredItems.map((item) => (
                 <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                  <td className="px-4 py-4">
+                  <td className="px-6 py-8">
                     <Checkbox
                       checked={selectedItems.includes(item.ID)}
                       onChange={(e) =>
                         handleSelectItem(item.ID, e.target.checked)
                       }
+                      disableRipple
                       sx={{
-                        color: "#d9d9e1",
-                        "&.Mui-checked": { color: "#d9d9e1" },
+                        p: 0, // remove extra padding
+                        transform: "scale(1.5)", // optional size tweak
                       }}
+                      icon={
+                        // unchecked grey box
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="3"
+                            ry="3"
+                            fill="#e0e0e0" // grey inside
+                            stroke="#d1d1d1" // border grey
+                            strokeWidth="2"
+                          />
+                        </svg>
+                      }
+                      checkedIcon={
+                        // checked with tick
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="3"
+                            ry="3"
+                            fill="#e0e0e0" // grey inside
+                            stroke="#2C2C2C" // dark border
+                            strokeWidth="2"
+                          />
+                          <path
+                            d="M9 12.5l2 2 4-4.5"
+                            fill="none"
+                            stroke="#2C2C2C"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      }
                     />
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
                   <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
-                      className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium border ${
+                      className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium  ${
                         item.Status === "Inactive"
-                          ? "text-red-600 border-red-600"
-                          : "text-green-700 border-green-700"
+                          ? "text-red-400 "
+                          : "text-green-400 "
                       }`}
                     >
                       {item.Status}
@@ -725,7 +807,7 @@ const RecipesManagementPage = () => {
                       required
                     />
                   </div>
-                  
+
                   {/* Priority */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -745,10 +827,7 @@ const RecipesManagementPage = () => {
                       required
                     />
                   </div>
-                  
-                  
-               
-                  
+
                   {/* Description */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -767,19 +846,19 @@ const RecipesManagementPage = () => {
                       placeholder="Enter description"
                     />
                   </div>
-                     {/* Status */}
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <ButtonPage
-                  checked={formData.Status === "Active"}
-                  onChange={handleStatusChange}
-                />
-              </div>
+                  {/* Status */}
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <ButtonPage
+                      checked={formData.Status === "Active"}
+                      onChange={handleStatusChange}
+                    />
+                  </div>
                 </div>
               )}
-              
+
               {activeTab === "Recipe Option" && (
                 <div className="">
                   {/* Add Ingredient Button */}
@@ -977,7 +1056,7 @@ const RecipesManagementPage = () => {
                   </div>
                 </div>
               )}
-              
+
               {activeTab === "Ingredients" && (
                 <div className="">
                   {/* Add Ingredient Button */}
@@ -1005,7 +1084,10 @@ const RecipesManagementPage = () => {
                                       ...formData.IngredientValue,
                                       item,
                                     ],
-                                    IngredientPrice: [...formData.IngredientPrice, 0],
+                                    IngredientPrice: [
+                                      ...formData.IngredientPrice,
+                                      0,
+                                    ],
                                   });
                                 }
                               }}
@@ -1044,14 +1126,18 @@ const RecipesManagementPage = () => {
                         if (!destination || source.index === destination.index)
                           return;
 
-                        const newOptionValue = Array.from(formData.IngredientValue);
+                        const newOptionValue = Array.from(
+                          formData.IngredientValue
+                        );
                         const [movedValue] = newOptionValue.splice(
                           source.index,
                           1
                         );
                         newOptionValue.splice(destination.index, 0, movedValue);
 
-                        const newOptionPrice = Array.from(formData.IngredientPrice);
+                        const newOptionPrice = Array.from(
+                          formData.IngredientPrice
+                        );
                         const [movedPrice] = newOptionPrice.splice(
                           source.index,
                           1
@@ -1195,10 +1281,13 @@ const RecipesManagementPage = () => {
                     : "bg-black text-white hover:bg-gray-700"
                 }`}
               >
-                {actionLoading 
-                  ? (editingItem ? "Updating..." : "Saving...") 
-                  : (editingItem ? "Update" : "Save & Close")
-                }
+                {actionLoading
+                  ? editingItem
+                    ? "Updating..."
+                    : "Saving..."
+                  : editingItem
+                  ? "Update"
+                  : "Save & Close"}
               </button>
             </div>
           </div>

@@ -118,6 +118,53 @@ class StaffAPI {
   }
 }
 
+// Custom DatePicker Component
+const DatePicker = ({ selected, onChange, dateFormat, placeholderText, className }: {
+  selected: Date | null;
+  onChange: (date: Date | null) => void;
+  dateFormat: string;
+  placeholderText: string;
+  className: string;
+}) => {
+  const formatDate = (date: Date): string => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const parseDate = (dateString: string): Date | null => {
+    const parts = dateString.split('/');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+        return new Date(year, month, day);
+      }
+    }
+    return null;
+  };
+
+  return (
+    <input
+      type="date"
+      value={selected ? selected.toISOString().split('T')[0] : ''}
+      onChange={(e) => {
+        const value = e.target.value;
+        if (value) {
+          const date = new Date(value);
+          onChange(date);
+        } else {
+          onChange(null);
+        }
+      }}
+      className={className}
+      placeholder={placeholderText}
+    />
+  );
+};
+
 // Toast Component
 const Toast = ({
   message,
@@ -159,6 +206,7 @@ const StaffManagementPage = () => {
   // Time period filter
   const timePeriodOptions = ["Today", "Week", "Month", "Quarter", "Year", "Custom date"];
   const [activeTimePeriod, setActiveTimePeriod] = useState("Week");
+  const [customDate, setCustomDate] = useState<Date | null>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -205,9 +253,18 @@ const StaffManagementPage = () => {
         item.STAFF_ID.toLowerCase().includes(s);
       const matchesStatus = statusFilter ? item.Status === statusFilter : true;
       const matchesRole = roleFilter ? item.Role === roleFilter : true;
-      return matchesSearch && matchesStatus && matchesRole;
+      
+      // Custom date filtering
+      let matchesDate = true;
+      if (activeTimePeriod === "Custom date" && customDate) {
+        const itemDate = new Date(item.JoinDate);
+        const selectedDate = new Date(customDate);
+        matchesDate = itemDate.toDateString() === selectedDate.toDateString();
+      }
+      
+      return matchesSearch && matchesStatus && matchesRole && matchesDate;
     });
-  }, [staffItems, searchTerm, statusFilter, roleFilter]);
+  }, [staffItems, searchTerm, statusFilter, roleFilter, activeTimePeriod, customDate]);
 
   // Calculate summary data
   const summaryData = useMemo(() => {
@@ -244,7 +301,7 @@ const StaffManagementPage = () => {
   }
 
   return (
-    <div className="mx-6 p-6 bg-gray-50 min-h-screen">
+    <div className=" p-6 bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -253,15 +310,15 @@ const StaffManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">Staff Management</h1>
+      <h1 className="text-3xl font-semibold mt-14 mb-8 ">Staff Management</h1>
 
       {/* Time Period Filter */}
-      <div className="flex gap-2 pl-20 mb-5">
+      <div className="flex gap-2  mb-5">
         {timePeriodOptions.map((option) => (
           <button
             key={option}
             onClick={() => setActiveTimePeriod(option)}
-            className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors ${activeTimePeriod === option
+            className={`px-4 py-2 rounded-sm text-sm font-medium border transition-colors ${activeTimePeriod === option
                 ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
                 : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
               }`}
@@ -269,32 +326,42 @@ const StaffManagementPage = () => {
             {option}
           </button>
         ))}
+         {/* Show calendar if "Custom date" is active */}
+                {activeTimePeriod === "Custom date" && (
+                  <DatePicker
+                    selected={customDate}
+                    onChange={(date: Date | null) => setCustomDate(date)}
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Select date"
+                    className="ml-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  />
+                )}
       </div>
 
       {/* Summary Cards */}
-      <div className="flex gap-12 mb-10 pl-20">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+      <div className="flex gap-13 mb-8">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">{summaryData.totalStaff}</p>
             <p className="text-1xl text-gray-500">Total Staff</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">{summaryData.paidStaff}</p>
             <p className="text-1xl text-gray-500">Paid Staff</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">${summaryData.totalSalaries.toLocaleString()}</p>
             <p className="text-1xl text-gray-500">Total Payroll</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm ml-1 p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">${summaryData.unpaidSalaries.toLocaleString()}</p>
             <p className="text-1xl text-gray-500">Pending Payments</p>
@@ -303,38 +370,38 @@ const StaffManagementPage = () => {
       </div>
 
       {/* Search Bar */}
-     <div className="mb-4 ml-20">
-        <div className="relative">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-          <input
-            type="text"
-            placeholder="Search Staff..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-        </div>
+     <div className="mb-8 ">
+        <div className="relative flex-1 min-w-[200px]">
+                  <input
+                    type="text"
+                    placeholder="Search Staff..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  />
+                  <Search
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={16}
+                  />
+                </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
-        <div className="max-h-[500px] overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+     <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
+              <div className="max-h-[500px] rounded-sm overflow-y-auto">
+                <table className="min-w-full divide-y divide-gray-200   table-fixed">
+                  <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-6 py-6 text-left">
                   Staff ID
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Contact
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
@@ -371,7 +438,7 @@ const StaffManagementPage = () => {
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
@@ -394,13 +461,13 @@ const StaffManagementPage = () => {
                             Status
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
                             onClick={() => setStatusFilter("Paid")}
                           >
                             Paid
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
                             onClick={() => setStatusFilter("Unpaid")}
                           >
                             Unpaid
@@ -409,31 +476,31 @@ const StaffManagementPage = () => {
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Salary
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Join Date
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Details
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y text-gray-500  divide-gray-300">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
                     colSpan={8}
                     className="px-4 py-8 text-center text-gray-500"
                   >
-                    {searchTerm || statusFilter || roleFilter
+                    {searchTerm || statusFilter || roleFilter || (activeTimePeriod === "Custom date" && customDate)
                       ? "No staff members match your search criteria."
                       : "No staff members found."}
                   </td>
@@ -441,7 +508,7 @@ const StaffManagementPage = () => {
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item.STAFF_ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-6 py-8 whitespace-nowrap text-sm">
                       {`#${String(item.STAFF_ID).padStart(3, "0")}`}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
@@ -455,11 +522,11 @@ const StaffManagementPage = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border ${item.Status === "Paid"
-                            ? "text-green-600 border-green-600"
+                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium  ${item.Status === "Paid"
+                            ? "text-green-400 border-green-600"
                             : ""
                           } ${item.Status === "Unpaid"
-                            ? "text-red-600 border-red-600"
+                            ? "text-red-400 border-red-600"
                             : ""
                           }`}
                       >
