@@ -144,6 +144,40 @@ class MenuAPI {
     item: Omit<MenuItemOptions, "ID">
   ): Promise<ApiResponse<MenuItemOptions>> {
     await this.delay(1000);
+    
+    // Validation
+    if (!item.Name || item.Name.trim().length === 0) {
+      throw new Error("Name is required");
+    }
+    
+    if (!["Radio", "Select", "Checkbox"].includes(item.DisplayType)) {
+      throw new Error("Invalid DisplayType");
+    }
+    
+    if (!item.Priority || item.Priority < 1) {
+      throw new Error("Priority must be at least 1");
+    }
+    
+    // Check for duplicate priority
+    if (this.mockData.some(existing => existing.Priority === item.Priority)) {
+      throw new Error("Priority already exists");
+    }
+    
+    // Ensure OptionValue and OptionPrice arrays have same length
+    if (item.OptionValue.length !== item.OptionPrice.length) {
+      throw new Error("OptionValue and OptionPrice arrays must have the same length");
+    }
+    
+    // Validate option values are not empty
+    if (item.OptionValue.some(val => !val || val.trim().length === 0)) {
+      throw new Error("All option values must be non-empty");
+    }
+    
+    // Validate prices are non-negative
+    if (item.OptionPrice.some(price => price < 0)) {
+      throw new Error("All prices must be non-negative");
+    }
+
     const newId =
       this.mockData.length > 0
         ? Math.max(...this.mockData.map((i) => i.ID)) + 1
@@ -151,8 +185,9 @@ class MenuAPI {
     const newItem: MenuItemOptions = {
       ...item,
       ID: newId,
-      OptionValue: item.OptionValue ?? [],
-      OptionPrice: item.OptionPrice ?? [],
+      Name: item.Name.trim(),
+      OptionValue: item.OptionValue.filter(v => v.trim() !== "").map(v => v.trim()),
+      OptionPrice: item.OptionPrice.filter((_, index) => item.OptionValue[index] && item.OptionValue[index].trim() !== ""),
     };
     this.mockData.push(newItem);
     return {
@@ -171,11 +206,55 @@ class MenuAPI {
     const index = this.mockData.findIndex((i) => i.ID === id);
     if (index === -1) throw new Error("Item not found");
 
+    // Validation
+    if (item.Name !== undefined) {
+      if (!item.Name || item.Name.trim().length === 0) {
+        throw new Error("Name is required");
+      }
+    }
+    
+    if (item.DisplayType !== undefined) {
+      if (!["Radio", "Select", "Checkbox"].includes(item.DisplayType)) {
+        throw new Error("Invalid DisplayType");
+      }
+    }
+    
+    if (item.Priority !== undefined) {
+      if (!item.Priority || item.Priority < 1) {
+        throw new Error("Priority must be at least 1");
+      }
+      // Check for duplicate priority (excluding current item)
+      if (this.mockData.some(existing => existing.ID !== id && existing.Priority === item.Priority)) {
+        throw new Error("Priority already exists");
+      }
+    }
+    
+    if (item.OptionValue && item.OptionPrice) {
+      // Ensure arrays have same length
+      if (item.OptionValue.length !== item.OptionPrice.length) {
+        throw new Error("OptionValue and OptionPrice arrays must have the same length");
+      }
+      
+      // Validate option values are not empty
+      if (item.OptionValue.some(val => !val || val.trim().length === 0)) {
+        throw new Error("All option values must be non-empty");
+      }
+      
+      // Validate prices are non-negative
+      if (item.OptionPrice.some(price => price < 0)) {
+        throw new Error("All prices must be non-negative");
+      }
+    }
+
+    // Clean data
     if (item.OptionValue) {
-      item.OptionValue = item.OptionValue.filter((v) => v.trim() !== "");
+      item.OptionValue = item.OptionValue.filter((v) => v.trim() !== "").map(v => v.trim());
     }
     if (item.OptionPrice) {
       item.OptionPrice = item.OptionPrice.filter((p) => p >= 0);
+    }
+    if (item.Name) {
+      item.Name = item.Name.trim();
     }
 
     this.mockData[index] = { ...this.mockData[index], ...item };
@@ -212,6 +291,11 @@ class MenuAPI {
     ids: number[]
   ): Promise<ApiResponse<null>> {
     await this.delay(1000);
+    
+    if (!ids || ids.length === 0) {
+      throw new Error("No items selected for deletion");
+    }
+    
     this.mockData = this.mockData.filter((item) => !ids.includes(item.ID));
 
     // Reassign IDs sequentially
@@ -226,6 +310,43 @@ class MenuAPI {
       message: `${ids.length} menu items deleted successfully`,
     };
   }
+
+  // ✅ GET /api/menu-items/{id}/
+  static async getMenuItemOptionsById(id: number): Promise<ApiResponse<MenuItemOptions>> {
+    await this.delay(500);
+    const item = this.mockData.find((i) => i.ID === id);
+    if (!item) throw new Error("Item not found");
+
+    return {
+      success: true,
+      data: item,
+      message: "Menu item fetched successfully",
+    };
+  }
+
+  // ✅ PUT /api/menu-items/reorder/
+  static async reorderMenuItemOptions(
+    reorderedItems: { ID: number; Priority: number }[]
+  ): Promise<ApiResponse<MenuItemOptions[]>> {
+    await this.delay(800);
+    
+    // Update priorities
+    reorderedItems.forEach(({ ID, Priority }) => {
+      const item = this.mockData.find(i => i.ID === ID);
+      if (item) {
+        item.Priority = Priority;
+      }
+    });
+
+    // Sort by priority
+    this.mockData.sort((a, b) => a.Priority - b.Priority);
+
+    return {
+      success: true,
+      data: [...this.mockData],
+      message: "Menu items reordered successfully",
+    };
+  }
 }
 
 const Toast = ({
@@ -236,24 +357,49 @@ const Toast = ({
   message: string;
   type: "success" | "error";
   onClose: () => void;
-}) => (
-  <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
-    }`}
-  >
-    {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-    <span>{message}</span>
-    <button onClick={onClose} className="ml-2">
-      <X size={16} />
-    </button>
-  </div>
-);
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation
+    setTimeout(() => setIsVisible(true), 10);
+  }, []);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Wait for exit animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+      } ${
+        isVisible && !isClosing
+          ? "translate-x-0 opacity-100"
+          : isClosing
+          ? "translate-x-full opacity-0"
+          : "translate-x-full opacity-0"
+      }`}
+    >
+      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      <span>{message}</span>
+      <button 
+        onClick={handleClose} 
+        className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 
 const CategoryPage = () => {
-  const [MenuItemOptionss, setMenuItemOptionss] = useState<MenuItemOptions[]>(
-    []
-  );
+  const [MenuItemOptionss, setMenuItemOptionss] = useState<MenuItemOptions[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -261,9 +407,7 @@ const CategoryPage = () => {
   const [editingItem, setEditingItem] = useState<MenuItemOptions | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [activeTab, setActiveTab] = useState(
-    editingItem ? "Option Values" : "Details"
-  );
+  const [activeTab, setActiveTab] = useState("Details");
 
   const [toast, setToast] = useState<{
     message: string;
@@ -281,7 +425,6 @@ const CategoryPage = () => {
     OptionValue: [],
     OptionPrice: [],
   });
-  const [preview, setPreview] = useState<string | null>(null);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -298,40 +441,42 @@ const CategoryPage = () => {
       setFormData({
         Name: editingItem.Name,
         DisplayType: editingItem.DisplayType,
-        OptionValue: editingItem.OptionValue,
-        OptionPrice: editingItem.OptionPrice,
+        OptionValue: [...editingItem.OptionValue], // Create new arrays to avoid reference issues
+        OptionPrice: [...editingItem.OptionPrice],
         Priority: editingItem.Priority,
       });
+      setActiveTab("Details");
     } else {
+      // When creating new item, calculate next available priority
+      const maxPriority = MenuItemOptionss.length > 0 
+        ? Math.max(...MenuItemOptionss.map(item => item.Priority)) 
+        : 0;
+      
       setFormData({
         Name: "",
         DisplayType: "Radio",
         OptionValue: [],
         OptionPrice: [],
-        Priority: 1,
+        Priority: maxPriority + 1,
       });
-      setPreview(null);
+      setActiveTab("Details");
     }
-  }, [editingItem, isModalOpen]);
-
-  useEffect(() => {
-    if (isModalOpen) {
-      setActiveTab(editingItem ? "Option Values" : "Details");
-    }
-  }, [isModalOpen, editingItem]);
+  }, [editingItem, isModalOpen, MenuItemOptionss]);
 
   const loadMenuItemOptionss = async () => {
     try {
       setLoading(true);
       const response = await MenuAPI.getMenuItemOptions();
       if (response.success) {
-        setMenuItemOptionss(response.data);
+        // Sort by priority
+        const sortedData = response.data.sort((a, b) => a.Priority - b.Priority);
+        setMenuItemOptionss(sortedData);
       } else {
-        throw new Error(response.message || "Failed to fetch category items");
+        throw new Error(response.message || "Failed to fetch menu items");
       }
     } catch (error) {
-      console.error("Error fetching category items:", error);
-      showToast("Failed to load category items", "error");
+      console.error("Error fetching menu items:", error);
+      showToast(error instanceof Error ? error.message : "Failed to load menu items", "error");
     } finally {
       setLoading(false);
     }
@@ -352,15 +497,19 @@ const CategoryPage = () => {
       setActionLoading(true);
       const response = await MenuAPI.createMenuItemOptions(itemData);
       if (response.success) {
-        setMenuItemOptionss((prevItems) => [...prevItems, response.data]);
+        setMenuItemOptionss((prevItems) => {
+          const newItems = [...prevItems, response.data];
+          return newItems.sort((a, b) => a.Priority - b.Priority);
+        });
         setIsModalOpen(false);
+        setEditingItem(null);
         setSearchTerm("");
         setDisplayFilter("");
         showToast(response.message || "Item created successfully", "success");
       }
     } catch (error) {
       console.error("Error creating item:", error);
-      showToast("Failed to create menu item", "error");
+      showToast(error instanceof Error ? error.message : "Failed to create menu item", "error");
     } finally {
       setActionLoading(false);
     }
@@ -375,17 +524,19 @@ const CategoryPage = () => {
         itemData
       );
       if (response.success) {
-        setMenuItemOptionss(
-          MenuItemOptionss.map((item) =>
+        setMenuItemOptionss(prev => {
+          const updated = prev.map(item =>
             item.ID === editingItem.ID ? response.data : item
-          )
-        );
+          );
+          return updated.sort((a, b) => a.Priority - b.Priority);
+        });
         setIsModalOpen(false);
         setEditingItem(null);
         showToast(response.message || "Item updated successfully", "success");
       }
     } catch (error) {
-      showToast("Failed to update menu item", "error");
+      console.error("Error updating item:", error);
+      showToast(error instanceof Error ? error.message : "Failed to update menu item", "error");
     } finally {
       setActionLoading(false);
     }
@@ -393,19 +544,22 @@ const CategoryPage = () => {
 
   const handleDeleteSelected = async () => {
     if (selectedItems.length === 0) return;
+    
     try {
       setActionLoading(true);
       const response = await MenuAPI.bulkDeleteMenuItemOptions(selectedItems);
       if (response.success) {
         setMenuItemOptionss((prev) => {
           const remaining = prev.filter((i) => !selectedItems.includes(i.ID));
-          return remaining.map((it, idx) => ({ ...it, ID: idx + 1 }));
+          return remaining.map((item, idx) => ({ ...item, ID: idx + 1 }))
+            .sort((a, b) => a.Priority - b.Priority);
         });
         setSelectedItems([]);
         showToast(response.message || "Items deleted successfully", "success");
       }
     } catch (error) {
-      showToast("Failed to delete menu items", "error");
+      console.error("Error deleting items:", error);
+      showToast(error instanceof Error ? error.message : "Failed to delete menu items", "error");
     } finally {
       setActionLoading(false);
     }
@@ -422,28 +576,38 @@ const CategoryPage = () => {
         : selectedItems.filter((id) => id !== itemId)
     );
   };
+
   const isFormValid = () => {
     if (!formData.Name.trim()) return false;
     if (!formData.DisplayType.trim()) return false;
     if (formData.Priority < 1) return false;
 
-    // Check option values (must not be empty if OptionValues tab is used)
-    for (let i = 0; i < formData.OptionValue.length; i++) {
-      if (!formData.OptionValue[i].trim()) return false;
-      if (formData.OptionPrice[i] == null || formData.OptionPrice[i] < 0)
-        return false;
+    // If there are option values, validate them
+    if (formData.OptionValue.length > 0) {
+      // Check that arrays have same length
+      if (formData.OptionValue.length !== formData.OptionPrice.length) return false;
+      
+      // Check option values (must not be empty if provided)
+      for (let i = 0; i < formData.OptionValue.length; i++) {
+        if (!formData.OptionValue[i] || !formData.OptionValue[i].trim()) return false;
+        if (formData.OptionPrice[i] == null || formData.OptionPrice[i] < 0) return false;
+      }
     }
+
+    // Check for duplicate priority (excluding current item when editing)
+    const duplicatePriority = MenuItemOptionss.some(item => 
+      item.Priority === formData.Priority && 
+      (!editingItem || item.ID !== editingItem.ID)
+    );
+    if (duplicatePriority) return false;
 
     return true;
   };
 
   // Modal form handlers
   const handleModalSubmit = () => {
-    if (
-      !formData.Name.trim() ||
-      !formData.DisplayType.trim() ||
-      formData.Priority < 1
-    ) {
+    if (!isFormValid()) {
+      showToast("Please fix form errors before submitting", "error");
       return;
     }
 
@@ -457,6 +621,25 @@ const CategoryPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
+    setActiveTab("Details");
+  };
+
+  // Add option value/price pair
+  const addOptionPair = () => {
+    setFormData({
+      ...formData,
+      OptionValue: [...formData.OptionValue, ""],
+      OptionPrice: [...formData.OptionPrice, 0],
+    });
+  };
+
+  // Remove option value/price pair
+  const removeOptionPair = (index: number) => {
+    setFormData({
+      ...formData,
+      OptionValue: formData.OptionValue.filter((_, i) => i !== index),
+      OptionPrice: formData.OptionPrice.filter((_, i) => i !== index),
+    });
   };
 
   const isAllSelected =
@@ -468,7 +651,7 @@ const CategoryPage = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading categories...</p>
+          <p className="mt-4 text-gray-600">Loading menu options...</p>
         </div>
       </div>
     );
@@ -492,9 +675,9 @@ const CategoryPage = () => {
         <div className="flex gap-3 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
-            disabled={selectedItems.length > 0}
+            disabled={selectedItems.length > 0 || actionLoading}
             className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0
+              selectedItems.length === 0 && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
@@ -534,10 +717,10 @@ const CategoryPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm ">
         <div className=" max-h-[500px] rounded-sm overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+            <thead className="bg-white border-b text-gray-500 border-gray-200 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
@@ -545,11 +728,10 @@ const CategoryPage = () => {
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     disableRipple
                     sx={{
-                      transform: "scale(1.5)", // size adjustment
-                      p: 0, // remove extra padding
+                      transform: "scale(1.5)",
+                      p: 0,
                     }}
                     icon={
-                      // unchecked grey box
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -558,14 +740,13 @@ const CategoryPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#d1d1d1" // border grey
+                          fill="#e0e0e0"
+                          stroke="#d1d1d1"
                           strokeWidth="2"
                         />
                       </svg>
                     }
                     checkedIcon={
-                      // checked with tick
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -574,8 +755,8 @@ const CategoryPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#2C2C2C" // dark border
+                          fill="#e0e0e0"
+                          stroke="#2C2C2C"
                           strokeWidth="2"
                         />
                         <path
@@ -680,11 +861,10 @@ const CategoryPage = () => {
                         }
                         disableRipple
                         sx={{
-                          p: 0, // remove extra padding
-                          transform: "scale(1.5)", // optional size tweak
+                          p: 0,
+                          transform: "scale(1.5)",
                         }}
                         icon={
-                          // unchecked grey box
                           <svg width="20" height="20" viewBox="0 0 24 24">
                             <rect
                               x="3"
@@ -693,14 +873,13 @@ const CategoryPage = () => {
                               height="18"
                               rx="3"
                               ry="3"
-                              fill="#e0e0e0" // grey inside
-                              stroke="#d1d1d1" // border grey
+                              fill="#e0e0e0"
+                              stroke="#d1d1d1"
                               strokeWidth="2"
                             />
                           </svg>
                         }
                         checkedIcon={
-                          // checked with tick
                           <svg width="20" height="20" viewBox="0 0 24 24">
                             <rect
                               x="3"
@@ -709,8 +888,8 @@ const CategoryPage = () => {
                               height="18"
                               rx="3"
                               ry="3"
-                              fill="#e0e0e0" // grey inside
-                              stroke="#2C2C2C" // dark border
+                              fill="#e0e0e0"
+                              stroke="#2C2C2C"
                               strokeWidth="2"
                             />
                             <path
@@ -736,7 +915,6 @@ const CategoryPage = () => {
                         className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium
       ${item.DisplayType === "Radio" ? "text-green-400 " : ""}
       ${item.DisplayType === "Select" ? "text-red-400 " : ""}
-      
       ${item.DisplayType === "Checkbox" ? "text-blue-400 " : ""}
     `}
                       >
@@ -833,7 +1011,7 @@ const CategoryPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[220px] rounded-md bg-white shadow-md border border-gray-200 p-1 outline-none"
+                          className="min-w-[220px] rounded-md bg-white shadow-md border border-gray-200 p-1 outline-none z-72"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />

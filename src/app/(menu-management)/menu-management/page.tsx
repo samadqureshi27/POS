@@ -33,7 +33,7 @@ interface MenuItem {
   Category: string;
   StockQty: string;
   Status: "Active" | "Inactive";
-  status: string[];
+  status: ("Active" | "Inactive")[]; // Fixed: should be array of status values
   Description?: string;
   MealType?: string;
   Priority?: number;
@@ -52,7 +52,7 @@ interface MenuItem {
   MealPrice?: number[];
   PName?: string[];
   PPrice?: number[];
-  OverRide?: string[];
+  OverRide?: ("Active" | "Inactive")[]; // Fixed: should be array of status values
   ShowOnMain?: "Active" | "Inactive";
   SubTBE?: "Active" | "Inactive";
   Deal?: "Active" | "Inactive";
@@ -75,14 +75,12 @@ const Toggle = ({
 }) => (
   <button
     onClick={() => onChange(!checked)}
-    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-      checked ? "bg-black" : "bg-gray-200"
-    }`}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${checked ? "bg-black" : "bg-gray-200"
+      }`}
   >
     <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-        checked ? "translate-x-6" : "translate-x-1"
-      }`}
+      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${checked ? "translate-x-6" : "translate-x-1"
+        }`}
     />
   </button>
 );
@@ -108,10 +106,17 @@ class MenuAPI {
       StaffPick: "Active",
       DisplayType: "Radio",
       Displaycat: "Var",
+      SpecialStartDate: "2025-01-01", // Added missing field
+      SpecialEndDate: "2025-12-31", // Added missing field
+      SpecialPrice: 20, // Added missing field
       OptionValue: ["Regular", "Large"],
       OptionPrice: [0, 3],
-      OverRide: ["Inactive", "Active", "Inactive"], // toggle per row
-      status: ["Active", "Inactive", "Active"],
+      MealValue: ["Single", "Combo"], // Added missing field
+      MealPrice: [0, 5], // Added missing field
+      PName: ["Basic", "Premium"], // Added missing field
+      PPrice: [0, 8], // Added missing field
+      OverRide: ["Inactive", "Active"],
+      status: ["Active", "Inactive"],
       ShowOnMain: "Inactive",
       SubTBE: "Inactive",
       Deal: "Inactive",
@@ -133,9 +138,16 @@ class MenuAPI {
       Featured: "Active",
       StaffPick: "Active",
       DisplayType: "Select",
-      OptionValue: ["Small", "Medium", "Large"], // names
-      OptionPrice: [5.99, 7.99, 9.99], // prices
-      OverRide: ["Inactive", "Active", "Inactive"], // toggle per row
+      SpecialStartDate: "2025-06-01",
+      SpecialEndDate: "2025-08-31",
+      SpecialPrice: 45,
+      OptionValue: ["Small", "Medium", "Large"],
+      OptionPrice: [5.99, 7.99, 9.99],
+      MealValue: ["Light", "Full"],
+      MealPrice: [0, 10],
+      PName: ["Standard", "Deluxe"],
+      PPrice: [0, 12],
+      OverRide: ["Inactive", "Active", "Inactive"],
       status: ["Active", "Inactive", "Active"],
       ShowOnMain: "Inactive",
       SubTBE: "Inactive",
@@ -158,9 +170,16 @@ class MenuAPI {
       Featured: "Active",
       StaffPick: "Active",
       DisplayType: "Checkbox",
-      OptionValue: ["Small", "Medium", "Large"], // names
-      OptionPrice: [5.99, 7.99, 9.99], // prices
-      OverRide: ["Inactive", "Active", "Inactive"], // toggle per row
+      SpecialStartDate: "",
+      SpecialEndDate: "",
+      SpecialPrice: 0,
+      OptionValue: ["Small", "Medium", "Large"],
+      OptionPrice: [5.99, 7.99, 9.99],
+      MealValue: ["Solo", "Meal Deal"],
+      MealPrice: [0, 6],
+      PName: ["Regular", "Gourmet"],
+      PPrice: [0, 5],
+      OverRide: ["Inactive", "Active", "Inactive"],
       status: ["Active", "Inactive", "Active"],
       ShowOnMain: "Inactive",
       SubTBE: "Inactive",
@@ -182,9 +201,16 @@ class MenuAPI {
       Featured: "Active",
       StaffPick: "Active",
       DisplayType: "Radio",
-      OptionValue: ["Small", "Medium", "Large"], // names
-      OptionPrice: [5.99, 7.99, 9.99], // prices
-      OverRide: ["Inactive", "Active", "Inactive"], // toggle per row
+      SpecialStartDate: "2025-03-01",
+      SpecialEndDate: "2025-05-31",
+      SpecialPrice: 6,
+      OptionValue: ["Small", "Medium", "Large"],
+      OptionPrice: [5.99, 7.99, 9.99],
+      MealValue: ["6 pieces", "12 pieces"],
+      MealPrice: [0, 8],
+      PName: ["Mild", "Hot", "BBQ"],
+      PPrice: [0, 1, 2],
+      OverRide: ["Inactive", "Active", "Inactive"],
       status: ["Active", "Inactive", "Active"],
       ShowOnMain: "Inactive",
       Displaycat: "Var",
@@ -208,14 +234,20 @@ class MenuAPI {
       Featured: "Active",
       StaffPick: "Active",
       DisplayType: "Select",
-      OptionValue: ["Small", "Medium", "Large"], // names
-      OptionPrice: [5.99, 7.99, 9.99], // prices
-      OverRide: ["Inactive", "Active", "Inactive"], // toggle per row
+      SpecialStartDate: "",
+      SpecialEndDate: "",
+      SpecialPrice: 0,
+      OptionValue: ["Small", "Medium", "Large"],
+      OptionPrice: [5.99, 7.99, 9.99],
+      MealValue: ["Slice", "Whole Cake"],
+      MealPrice: [0, 25],
+      PName: ["Regular", "With Ice Cream"],
+      PPrice: [0, 3],
+      OverRide: ["Inactive", "Active", "Inactive"],
       status: ["Active", "Inactive", "Active"],
       ShowOnMain: "Inactive",
       Deal: "Inactive",
       Special: "Inactive",
-
       SubTBE: "Inactive",
     },
     {
@@ -234,9 +266,16 @@ class MenuAPI {
       Featured: "Active",
       StaffPick: "Active",
       DisplayType: "Radio",
-      OptionValue: ["Small", "Medium", "Large"], // names
-      OptionPrice: [5.99, 7.99, 9.99], // prices
-      OverRide: ["Inactive", "Active", "Inactive"], // toggle per row
+      SpecialStartDate: "2025-04-15",
+      SpecialEndDate: "2025-06-15",
+      SpecialPrice: 65,
+      OptionValue: ["Small", "Medium", "Large"],
+      OptionPrice: [5.99, 7.99, 9.99],
+      MealValue: ["Fillet", "Whole Fish"],
+      MealPrice: [0, 20],
+      PName: ["Plain", "Herb Crusted", "Teriyaki"],
+      PPrice: [0, 5, 8],
+      OverRide: ["Inactive", "Active", "Inactive"],
       status: ["Active", "Inactive", "Active"],
       ShowOnMain: "Inactive",
       SubTBE: "Inactive",
@@ -259,9 +298,16 @@ class MenuAPI {
       Featured: "Active",
       StaffPick: "Active",
       DisplayType: "Select",
-      OptionValue: ["Small", "Medium", "Large"], // names
-      OptionPrice: [5.99, 7.99, 9.99], // prices
-      OverRide: ["Inactive", "Active", "Inactive"], // toggle per row
+      SpecialStartDate: "",
+      SpecialEndDate: "",
+      SpecialPrice: 0,
+      OptionValue: ["Small", "Medium", "Large"],
+      OptionPrice: [5.99, 7.99, 9.99],
+      MealValue: ["Regular", "Decaf"],
+      MealPrice: [0, 0],
+      PName: ["No Sugar", "1 Sugar", "2 Sugars"],
+      PPrice: [0, 0, 0],
+      OverRide: ["Inactive", "Active", "Inactive"],
       status: ["Active", "Inactive", "Active"],
       ShowOnMain: "Inactive",
       SubTBE: "Inactive",
@@ -284,9 +330,16 @@ class MenuAPI {
       Featured: "Active",
       StaffPick: "Active",
       DisplayType: "Radio",
-      OptionValue: ["Small", "Medium", "Large"], // names
-      OptionPrice: [5.99, 7.99, 9.99], // prices
-      OverRide: ["Inactive", "Active", "Inactive"], // toggle per row
+      SpecialStartDate: "",
+      SpecialEndDate: "",
+      SpecialPrice: 0,
+      OptionValue: ["Small", "Medium", "Large"],
+      OptionPrice: [5.99, 7.99, 9.99],
+      MealValue: ["Plain", "Seasoned"],
+      MealPrice: [0, 1],
+      PName: ["Regular", "Sweet Potato"],
+      PPrice: [0, 2],
+      OverRide: ["Inactive", "Active", "Inactive"],
       status: ["Active", "Inactive", "Active"],
       ShowOnMain: "Inactive",
       SubTBE: "Inactive",
@@ -317,6 +370,13 @@ class MenuAPI {
       ID: newId,
       OptionValue: item.OptionValue || ["Regular"],
       OptionPrice: item.OptionPrice || [0],
+      MealValue: item.MealValue || [], // Fixed: initialize empty arrays
+      MealPrice: item.MealPrice || [],
+      PName: item.PName || [],
+      PPrice: item.PPrice || [],
+      SpecialStartDate: item.SpecialStartDate || "",
+      SpecialEndDate: item.SpecialEndDate || "",
+      SpecialPrice: item.SpecialPrice || 0,
     };
     this.mockData.push(newItem);
     return {
@@ -386,21 +446,45 @@ const Toast = ({
 }: {
   message: string;
   type: "success" | "error";
-
   onClose: () => void;
-}) => (
-  <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
-    }`}
-  >
-    {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-    <span>{message}</span>
-    <button onClick={onClose} className="ml-2">
-      <X size={16} />
-    </button>
-  </div>
-);
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation
+    setTimeout(() => setIsVisible(true), 10);
+  }, []);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Wait for exit animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+        } ${isVisible && !isClosing
+          ? "translate-x-0 opacity-100"
+          : isClosing
+            ? "translate-x-full opacity-0"
+            : "translate-x-full opacity-0"
+        }`}
+    >
+      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      <span>{message}</span>
+      <button
+        onClick={handleClose}
+        className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 
 const MenuManagementPage = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -422,7 +506,7 @@ const MenuManagementPage = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Modal form state
+  // Modal form state - Fixed initialization
   const [formData, setFormData] = useState<Omit<MenuItem, "ID">>({
     Name: "",
     Price: 0,
@@ -441,8 +525,8 @@ const MenuManagementPage = () => {
     SpecialStartDate: "",
     SpecialEndDate: "",
     SpecialPrice: 0,
-    status: [],
-    OverRide: [],
+    status: [], // Fixed: initialize as empty array
+    OverRide: [], // Fixed: initialize as empty array
     OptionValue: [],
     OptionPrice: [],
     MealValue: [],
@@ -477,13 +561,13 @@ const MenuManagementPage = () => {
         MealType: editingItem.MealType || "Morning",
         Priority: editingItem.Priority || 1,
         MinimumQuantity: editingItem.MinimumQuantity || 0,
-        ShowOnMenu: editingItem.ShowOnMenu,
-        Featured: editingItem.Featured,
-        StaffPick: editingItem.StaffPick,
-        ShowOnMain: editingItem.ShowOnMain,
-        Deal: editingItem.Deal,
-        Special: editingItem.Special,
-        SubTBE: editingItem.SubTBE,
+        ShowOnMenu: editingItem.ShowOnMenu || "Inactive",
+        Featured: editingItem.Featured || "Inactive",
+        StaffPick: editingItem.StaffPick || "Inactive",
+        ShowOnMain: editingItem.ShowOnMain || "Inactive",
+        Deal: editingItem.Deal || "Inactive",
+        Special: editingItem.Special || "Inactive",
+        SubTBE: editingItem.SubTBE || "Inactive",
         DisplayType: editingItem.DisplayType || "Radio",
         Displaycat: editingItem.Displaycat || "Var",
         SpecialStartDate: editingItem.SpecialStartDate || "",
@@ -525,7 +609,6 @@ const MenuManagementPage = () => {
         MealPrice: [],
         PName: [],
         PPrice: [],
-
         ShowOnMain: "Inactive",
         SubTBE: "Inactive",
         Deal: "Inactive",
@@ -646,6 +729,25 @@ const MenuManagementPage = () => {
     }
   };
 
+  // Added individual delete function with toast
+  const handleDeleteItem = async (itemId: number) => {
+    try {
+      setActionLoading(true);
+      const response = await MenuAPI.deleteMenuItem(itemId);
+      if (response.success) {
+        setMenuItems((prev) => {
+          const remaining = prev.filter((i) => i.ID !== itemId);
+          return remaining.map((it, idx) => ({ ...it, ID: idx + 1 }));
+        });
+        showToast(response.message || "Item deleted successfully", "success");
+      }
+    } catch (error) {
+      showToast("Failed to delete menu item", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleSelectAll = (checked: boolean) => {
     setSelectedItems(checked ? filteredItems.map((item) => item.ID) : []);
   };
@@ -703,7 +805,7 @@ const MenuManagementPage = () => {
   }
 
   return (
-    <div className="  bg-gray-50 min-w-full h-full overflow-y-auto">
+    <div className="bg-gray-50 min-w-full h-full overflow-y-auto">
       {toast && (
         <Toast
           message={toast.message}
@@ -712,19 +814,18 @@ const MenuManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mt-14 mb-8 ">Menu Management</h1>
+      <h1 className="text-3xl font-semibold mt-14 mb-8">Menu Management</h1>
 
       {/* Action bar */}
-      <div className="mb-8 flex   items-center justify-between gap-4 flex-wrap">
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex gap-3 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0
+            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+              }`}
           >
             <Plus size={16} />
             Add
@@ -733,11 +834,10 @@ const MenuManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
-              isSomeSelected && !actionLoading
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -760,10 +860,10 @@ const MenuManagementPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm">
         <div className="max-h-[500px] rounded-sm overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200   table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
@@ -771,11 +871,10 @@ const MenuManagementPage = () => {
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     disableRipple
                     sx={{
-                      transform: "scale(1.5)", // size adjustment
-                      p: 0, // remove extra padding
+                      transform: "scale(1.5)",
+                      p: 0,
                     }}
                     icon={
-                      // unchecked grey box
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -784,14 +883,13 @@ const MenuManagementPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#d1d1d1" // border grey
+                          fill="#e0e0e0"
+                          stroke="#d1d1d1"
                           strokeWidth="2"
                         />
                       </svg>
                     }
                     checkedIcon={
-                      // checked with tick
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -800,8 +898,8 @@ const MenuManagementPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#2C2C2C" // dark border
+                          fill="#e0e0e0"
+                          stroke="#2C2C2C"
                           strokeWidth="2"
                         />
                         <path
@@ -816,27 +914,24 @@ const MenuManagementPage = () => {
                     }
                   />
                 </th>
-                <th className="relative  px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left">
                   ID
-                  <span className="absolute  left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
-                <th className="relative  px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left">
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative  px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left">
                   Price
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative  px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {categoryFilter || "Category"}
-                        <ChevronDown
-                          size={14}
-                          className="text-gray-500 ml-auto"
-                        />
+                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
@@ -865,19 +960,16 @@ const MenuManagementPage = () => {
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
-                <th className="relative  px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left">
                   Stock Qty
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3  text-left">
+                <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
-                        <ChevronDown
-                          size={14}
-                          className="text-gray-500 ml-auto"
-                        />
+                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
@@ -909,13 +1001,13 @@ const MenuManagementPage = () => {
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3  text-left">
+                <th className="relative px-4 py-3 text-left">
                   Actions
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y text-gray-500  divide-gray-300">
+            <tbody className="divide-y text-gray-500 divide-gray-300">
               {filteredItems.map((item) => (
                 <tr key={item.ID} className="bg-white hover:bg-gray-50">
                   <td className="px-6 py-8">
@@ -926,11 +1018,10 @@ const MenuManagementPage = () => {
                       }
                       disableRipple
                       sx={{
-                        p: 0, // remove extra padding
-                        transform: "scale(1.5)", // optional size tweak
+                        p: 0,
+                        transform: "scale(1.5)",
                       }}
                       icon={
-                        // unchecked grey box
                         <svg width="20" height="20" viewBox="0 0 24 24">
                           <rect
                             x="3"
@@ -939,14 +1030,13 @@ const MenuManagementPage = () => {
                             height="18"
                             rx="3"
                             ry="3"
-                            fill="#e0e0e0" // grey inside
-                            stroke="#d1d1d1" // border grey
+                            fill="#e0e0e0"
+                            stroke="#d1d1d1"
                             strokeWidth="2"
                           />
                         </svg>
                       }
                       checkedIcon={
-                        // checked with tick
                         <svg width="20" height="20" viewBox="0 0 24 24">
                           <rect
                             x="3"
@@ -955,8 +1045,8 @@ const MenuManagementPage = () => {
                             height="18"
                             rx="3"
                             ry="3"
-                            fill="#e0e0e0" // grey inside
-                            stroke="#2C2C2C" // dark border
+                            fill="#e0e0e0"
+                            stroke="#2C2C2C"
                             strokeWidth="2"
                           />
                           <path
@@ -971,28 +1061,17 @@ const MenuManagementPage = () => {
                       }
                     />
                   </td>
-                  <td className="px-4 py-4  whitespace-nowrap">
-                    {item.ID}
-                  </td>
-                  <td className="px-4 py-4  whitespace-nowrap">
-                    {item.Name}
-                  </td>
-                  <td className="px-4 py-4  whitespace-nowrap">
-                    ${item.Price}
-                  </td>
-                  <td className="px-4 py-4  whitespace-nowrap">
-                    {item.Category}
-                  </td>
-                  <td className="px-4 py-4  whitespace-nowrap">
-                    {item.StockQty}
-                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
+                  <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
+                  <td className="px-4 py-4 whitespace-nowrap">${item.Price}</td>
+                  <td className="px-4 py-4 whitespace-nowrap">{item.Category}</td>
+                  <td className="px-4 py-4 whitespace-nowrap">{item.StockQty}</td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
-                      className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium  ${
-                        item.Status === "Inactive"
-                          ? "text-red-400 "
+                      className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium ${item.Status === "Inactive"
+                          ? "text-red-400"
                           : "text-green-400"
-                      }`}
+                        }`}
                     >
                       {item.Status}
                     </span>
@@ -1009,6 +1088,7 @@ const MenuManagementPage = () => {
                       >
                         <Edit size={16} />
                       </button>
+
                     </div>
                   </td>
                 </tr>
@@ -1017,6 +1097,8 @@ const MenuManagementPage = () => {
           </table>
         </div>
       </div>
+
+      {/* Modal remains the same from here... */}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
@@ -1040,11 +1122,10 @@ const MenuManagementPage = () => {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`flex-1 px-2 py-3 text-xs font-medium transition-colors ${
-                      activeTab === tab
+                    className={`flex-1 px-2 py-3 text-xs font-medium transition-colors ${activeTab === tab
                         ? "border-b-2 border-black text-black"
                         : "text-gray-500 hover:text-black hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     {tab}
                   </button>
@@ -1494,11 +1575,10 @@ const MenuManagementPage = () => {
                                     <tr
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
-                                      className={`hover:bg-gray-50 ${
-                                        snapshot.isDragging
+                                      className={`hover:bg-gray-50 ${snapshot.isDragging
                                           ? "bg-gray-100 shadow-lg"
                                           : ""
-                                      } border-b border-gray-200`}
+                                        } border-b border-gray-200`}
                                     >
                                       {/* Drag Handle */}
                                       <td
@@ -1724,11 +1804,10 @@ const MenuManagementPage = () => {
                                     <tr
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
-                                      className={`hover:bg-gray-50 ${
-                                        snapshot.isDragging
+                                      className={`hover:bg-gray-50 ${snapshot.isDragging
                                           ? "bg-gray-100 shadow-lg"
                                           : ""
-                                      } border-b border-gray-200`}
+                                        } border-b border-gray-200`}
                                     >
                                       {/* Drag Handle */}
                                       <td
@@ -2007,11 +2086,10 @@ const MenuManagementPage = () => {
                                     <tr
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
-                                      className={`hover:bg-gray-50 ${
-                                        snapshot.isDragging
+                                      className={`hover:bg-gray-50 ${snapshot.isDragging
                                           ? "bg-gray-100 shadow-lg"
                                           : ""
-                                      } border-b border-gray-200`}
+                                        } border-b border-gray-200`}
                                     >
                                       {/* Drag Handle */}
                                       <td
@@ -2113,11 +2191,10 @@ const MenuManagementPage = () => {
                 type="button"
                 onClick={handleModalSubmit}
                 disabled={actionLoading || !isFormValid()}
-                className={`px-4 py-2 min-w-[120px] rounded-lg transition-colors text-white ${
-                  actionLoading || !isFormValid()
+                className={`px-4 py-2 min-w-[120px] rounded-lg transition-colors text-white ${actionLoading || !isFormValid()
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-black hover:bg-gray-700"
-                }`}
+                  }`}
               >
                 {actionLoading ? (
                   <div className="flex items-center gap-2 justify-center">
@@ -2134,6 +2211,7 @@ const MenuManagementPage = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

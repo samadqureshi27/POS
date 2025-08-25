@@ -38,6 +38,12 @@ interface RecipeOption {
   Priority: number;
 }
 
+interface Ingredient {
+  ID: number;
+  Name: string;
+  Unit: string;
+}
+
 interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -161,12 +167,35 @@ class MenuAPI {
     },
   ];
 
+  // Mock ingredients data with units
+  public static mockIngredients: Ingredient[] = [
+    { ID: 1, Name: "Tomato", Unit: "kg" },
+    { ID: 2, Name: "Cheese", Unit: "g" },
+    { ID: 3, Name: "Onion", Unit: "pieces" },
+    { ID: 4, Name: "Lettuce", Unit: "g" },
+    { ID: 5, Name: "Chicken", Unit: "kg" },
+    { ID: 6, Name: "Beef", Unit: "kg" },
+    { ID: 7, Name: "Flour", Unit: "g" },
+    { ID: 8, Name: "Sugar", Unit: "g" },
+    { ID: 9, Name: "Salt", Unit: "g" },
+    { ID: 10, Name: "Pepper", Unit: "g" },
+  ];
+
   static async getRecipeOption(): Promise<ApiResponse<RecipeOption[]>> {
     await this.delay(800);
     return {
       success: true,
       data: [...this.mockData],
       message: "Menu items fetched successfully",
+    };
+  }
+
+  static async getIngredients(): Promise<ApiResponse<Ingredient[]>> {
+    await this.delay(600);
+    return {
+      success: true,
+      data: [...this.mockIngredients],
+      message: "Ingredients fetched successfully",
     };
   }
 
@@ -234,7 +263,7 @@ class MenuAPI {
       ID: idx + 1,
       OptionValue: item.OptionValue ?? [],
       OptionPrice: item.OptionPrice ?? [],
-      IngredientValueValue: item.IngredientValue ?? [],
+      IngredientValue: item.IngredientValue ?? [],
       IngredientPrice: item.IngredientPrice ?? [],
     }));
 
@@ -246,8 +275,6 @@ class MenuAPI {
   }
 }
 
-const ingredientOptions = ["Tomato", "Cheese", "Onion", "Lettuce"];
-
 const Toast = ({
   message,
   type,
@@ -256,22 +283,50 @@ const Toast = ({
   message: string;
   type: "success" | "error";
   onClose: () => void;
-}) => (
-  <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
-  >
-    {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-    <span>{message}</span>
-    <button onClick={onClose} className="ml-2">
-      <X size={16} />
-    </button>
-  </div>
-);
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation
+    setTimeout(() => setIsVisible(true), 10);
+  }, []);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Wait for exit animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+      } ${
+        isVisible && !isClosing
+          ? "translate-x-0 opacity-100"
+          : isClosing
+          ? "translate-x-full opacity-0"
+          : "translate-x-full opacity-0"
+      }`}
+    >
+      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      <span>{message}</span>
+      <button 
+        onClick={handleClose} 
+        className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 
 const RecipesManagementPage = () => {
   const [RecipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
@@ -308,7 +363,19 @@ const RecipesManagementPage = () => {
 
   useEffect(() => {
     loadRecipeOptions();
+    loadIngredients();
   }, []);
+
+  const loadIngredients = async () => {
+    try {
+      const response = await MenuAPI.getIngredients();
+      if (response.success) {
+        setIngredients(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching ingredients:", error);
+    }
+  };
 
   // Modal form effect
   useEffect(() => {
@@ -332,7 +399,6 @@ const RecipesManagementPage = () => {
         OptionPrice: [],
         IngredientValue: [],
         IngredientPrice: [],
-
         Priority: 1,
       });
       setPreview(null);
@@ -874,24 +940,24 @@ const RecipesManagementPage = () => {
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                          {ingredientOptions.map((item, i) => (
+                          {ingredients.map((ingredient) => (
                             <DropdownMenu.Item
-                              key={i}
+                              key={ingredient.ID}
                               className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
                               onClick={() => {
-                                if (!formData.OptionValue.includes(item)) {
+                                if (!formData.OptionValue.includes(ingredient.Name)) {
                                   setFormData({
                                     ...formData,
                                     OptionValue: [
                                       ...formData.OptionValue,
-                                      item,
+                                      ingredient.Name,
                                     ],
                                     OptionPrice: [...formData.OptionPrice, 0],
                                   });
                                 }
                               }}
                             >
-                              {item}
+                              {ingredient.Name}
                             </DropdownMenu.Item>
                           ))}
                         </DropdownMenu.Content>
@@ -1072,17 +1138,18 @@ const RecipesManagementPage = () => {
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                          {ingredientOptions.map((item, i) => (
+                          {ingredients.map((ingredient) => (
                             <DropdownMenu.Item
-                              key={i}
+                              key={ingredient.ID}
                               className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
                               onClick={() => {
-                                if (!formData.IngredientValue.includes(item)) {
+                                if (!formData.IngredientValue.includes(ingredient.Name)) {
+                                  const ingredientWithUnit = `${ingredient.Name} (${ingredient.Unit})`;
                                   setFormData({
                                     ...formData,
                                     IngredientValue: [
                                       ...formData.IngredientValue,
-                                      item,
+                                      ingredientWithUnit,
                                     ],
                                     IngredientPrice: [
                                       ...formData.IngredientPrice,
@@ -1092,7 +1159,7 @@ const RecipesManagementPage = () => {
                                 }
                               }}
                             >
-                              {item}
+                              {ingredient.Name} ({ingredient.Unit})
                             </DropdownMenu.Item>
                           ))}
                         </DropdownMenu.Content>
