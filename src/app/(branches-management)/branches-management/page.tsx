@@ -351,7 +351,7 @@ const BranchListPage = () => {
   }
 
   return (
-    <div className="mx-6 p-6 bg-gray-50 min-h-screen">
+    <div className=" p-6 bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -565,9 +565,9 @@ const BranchListPage = () => {
                   <tr key={item["Branch-ID"]} className="bg-white hover:bg-gray-50">
                     <td className="px-6 py-8">
                                                             <Checkbox
-                                                              checked={selectedItems.includes(item.ID)}
+                                                              checked={selectedItems.includes(item["Branch-ID"])}
                                                               onChange={(e) =>
-                                                                handleSelectItem(item.ID, e.target.checked)
+                                                                handleSelectItem(item["Branch-ID"], e.target.checked)
                                                               }
                                                               disableRipple
                                                               sx={{
