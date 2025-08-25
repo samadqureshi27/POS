@@ -241,7 +241,7 @@ const NotificationSettingsPage = () => {
   if (!settings) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 w-[92.5vw]">
       {toast && (
         <Toast
           message={toast.message}
@@ -251,7 +251,7 @@ const NotificationSettingsPage = () => {
         />
       )}
 
-      <div className="ml-10 max-w-[1500px] mx-auto px-6 lg:px-8">
+      <div className="mt-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-semibold text-gray-900">Notification Settings</h1>
@@ -259,7 +259,7 @@ const NotificationSettingsPage = () => {
             <button
               onClick={handleSave}
               disabled={!hasChanges || saving}
-              className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
                 hasChanges && !saving
                   ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -282,7 +282,7 @@ const NotificationSettingsPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Order Management Notifications */}
-          <div className="bg-white rounded-md p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-6">
               <ShoppingCart className="text-black" size={20} />
               <h2 className="text-lg font-semibold">Order Management</h2>
@@ -340,7 +340,7 @@ const NotificationSettingsPage = () => {
           </div>
 
           {/* Table & Reservation Notifications */}
-          <div className="bg-white rounded-md p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-6">
               <Calendar className="text-black" size={20} />
               <h2 className="text-lg font-semibold">Table & Reservations</h2>
@@ -386,7 +386,7 @@ const NotificationSettingsPage = () => {
           </div>
 
           {/* Kitchen & Inventory Notifications */}
-          <div className="bg-white rounded-md p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-6">
               <Utensils className="text-black" size={20} />
               <h2 className="text-lg font-semibold">Kitchen & Inventory</h2>
@@ -432,7 +432,7 @@ const NotificationSettingsPage = () => {
           </div>
 
           {/* Payment Notifications */}
-          <div className="bg-white rounded-md p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-6">
               <CreditCard className="text-black" size={20} />
               <h2 className="text-lg font-semibold">Payment Alerts</h2>
@@ -478,7 +478,7 @@ const NotificationSettingsPage = () => {
           </div>
 
           {/* Customer Service Notifications */}
-          <div className="bg-white rounded-md p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-6">
               <MessageSquare className="text-black" size={20} />
               <h2 className="text-lg font-semibold">Customer Service</h2>
@@ -512,7 +512,7 @@ const NotificationSettingsPage = () => {
           </div>
 
           {/* Notification Preferences */}
-          <div className="bg-white rounded-md p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-6">
               <Settings className="text-black" size={20} />
               <h2 className="text-lg font-semibold">Preferences</h2>

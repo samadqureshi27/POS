@@ -133,7 +133,9 @@ class SettingsAPI {
   }
 
   // PUT /api/settings/
-  static async updateSettings(settings: Partial<GeneralSettings>): Promise<ApiResponse<GeneralSettings>> {
+  static async updateSettings(
+    settings: Partial<GeneralSettings>
+  ): Promise<ApiResponse<GeneralSettings>> {
     await this.delay(1000);
     this.mockSettings = { ...this.mockSettings, ...settings };
     return {
@@ -156,103 +158,114 @@ class SettingsAPI {
 }
 
 // Enhanced Toast Component with animations
-const Toast = React.memo<ToastProps>(({ message, type, onClose, isVisible }) => (
-  <div
-    className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${
-      isVisible 
-        ? 'translate-x-0 opacity-100 scale-100' 
-        : 'translate-x-full opacity-0 scale-95'
-    } ${
-      type === "success" 
-        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200" 
-        : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
-    }`}
-    style={{
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.2)'
-    }}
-  >
-    <div className={`flex-shrink-0 p-1 rounded-full ${type === "success" ? "bg-green-400/20" : "bg-red-400/20"}`}>
-      {type === "success" ? (
-        <CheckCircle size={20} className="text-white" />
-      ) : (
-        <AlertCircle size={20} className="text-white" />
-      )}
-    </div>
-    
-    <div className="flex-1">
-      <p className="font-medium text-sm">{message}</p>
-    </div>
-    
-    <button 
-      onClick={onClose} 
-      className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200" 
-      aria-label="Close"
+const Toast = React.memo<ToastProps>(
+  ({ message, type, onClose, isVisible }) => (
+    <div
+      className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${
+        isVisible
+          ? "translate-x-0 opacity-100 scale-100"
+          : "translate-x-full opacity-0 scale-95"
+      } ${
+        type === "success"
+          ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200"
+          : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
+      }`}
+      style={{
+        backdropFilter: "blur(10px)",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
+      }}
     >
-      <X size={16} className="text-white" />
-    </button>
-  </div>
-));
-
-const SettingsDropdown = React.memo<DropdownProps>(({ value, options, onValueChange, placeholder }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleToggle = useCallback(() => setIsOpen(prev => !prev), []);
-  const handleSelect = useCallback((optionValue: string) => {
-    onValueChange(optionValue);
-    setIsOpen(false);
-  }, [onValueChange]);
-
-  const selectedLabel = useMemo(
-    () => options.find(opt => opt.value === value)?.label || placeholder,
-    [options, value, placeholder]
-  );
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (!target.closest('.dropdown-container')) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [isOpen]);
-
-  return (
-    <div className="relative dropdown-container">
-      <button
-        type="button"
-        onClick={handleToggle}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white text-left flex items-center justify-between"
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
+      <div
+        className={`flex-shrink-0 p-1 rounded-full ${
+          type === "success" ? "bg-green-400/20" : "bg-red-400/20"
+        }`}
       >
-        {selectedLabel}
-        <ChevronDown size={16} className="text-gray-400" />
-      </button>
+        {type === "success" ? (
+          <CheckCircle size={20} className="text-white" />
+        ) : (
+          <AlertCircle size={20} className="text-white" />
+        )}
+      </div>
 
-      {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              className="w-full px-3 py-2 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
-              onClick={() => handleSelect(option.value)}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex-1">
+        <p className="font-medium text-sm">{message}</p>
+      </div>
+
+      <button
+        onClick={onClose}
+        className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200"
+        aria-label="Close"
+      >
+        <X size={16} className="text-white" />
+      </button>
     </div>
-  );
-});
+  )
+);
+
+const SettingsDropdown = React.memo<DropdownProps>(
+  ({ value, options, onValueChange, placeholder }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleToggle = useCallback(() => setIsOpen((prev) => !prev), []);
+    const handleSelect = useCallback(
+      (optionValue: string) => {
+        onValueChange(optionValue);
+        setIsOpen(false);
+      },
+      [onValueChange]
+    );
+
+    const selectedLabel = useMemo(
+      () => options.find((opt) => opt.value === value)?.label || placeholder,
+      [options, value, placeholder]
+    );
+
+    // Close dropdown on outside click
+    useEffect(() => {
+      if (!isOpen) return;
+
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as Element;
+        if (!target.closest(".dropdown-container")) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }, [isOpen]);
+
+    return (
+      <div className="relative dropdown-container">
+        <button
+          type="button"
+          onClick={handleToggle}
+          className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white text-left flex items-center justify-between"
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+        >
+          {selectedLabel}
+          <ChevronDown size={16} className="text-gray-400" />
+        </button>
+
+        {isOpen && (
+          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className="w-full px-3 py-2 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                onClick={() => handleSelect(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
 
 // Main Component
 const GeneralSettingsPage = () => {
@@ -261,27 +274,34 @@ const GeneralSettingsPage = () => {
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error"; id: number } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+    id: number;
+  } | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
 
   const api = useMemo(() => SettingsAPI, []);
 
   // Enhanced toast management with animations
-  const showToast = useCallback((message: string, type: "success" | "error") => {
-    const id = Date.now();
-    setToast({ message, type, id });
-    setToastVisible(true);
+  const showToast = useCallback(
+    (message: string, type: "success" | "error") => {
+      const id = Date.now();
+      setToast({ message, type, id });
+      setToastVisible(true);
 
-    // Auto hide after 4 seconds
-    setTimeout(() => {
-      setToastVisible(false);
-    }, 4000);
+      // Auto hide after 4 seconds
+      setTimeout(() => {
+        setToastVisible(false);
+      }, 4000);
 
-    // Remove from DOM after animation completes
-    setTimeout(() => {
-      setToast(null);
-    }, 4500);
-  }, []);
+      // Remove from DOM after animation completes
+      setTimeout(() => {
+        setToast(null);
+      }, 4500);
+    },
+    []
+  );
 
   const hideToast = useCallback(() => {
     setToastVisible(false);
@@ -307,11 +327,14 @@ const GeneralSettingsPage = () => {
     loadSettings();
   }, [loadSettings]);
 
-  const handleSettingChange = useCallback((key: keyof GeneralSettings, value: any) => {
-    if (!settings) return;
-    setSettings(prev => prev ? { ...prev, [key]: value } : null);
-    setHasChanges(true);
-  }, [settings]);
+  const handleSettingChange = useCallback(
+    (key: keyof GeneralSettings, value: any) => {
+      if (!settings) return;
+      setSettings((prev) => (prev ? { ...prev, [key]: value } : null));
+      setHasChanges(true);
+    },
+    [settings]
+  );
 
   const handleSave = useCallback(async () => {
     if (!settings) return;
@@ -320,7 +343,10 @@ const GeneralSettingsPage = () => {
       const response = await api.updateSettings(settings);
       if (response.success) {
         setHasChanges(false);
-        showToast(response.message || "Settings saved successfully! 🎉", "success");
+        showToast(
+          response.message || "Settings saved successfully! 🎉",
+          "success"
+        );
       }
     } catch {
       showToast("Failed to save settings. Please try again.", "error");
@@ -336,7 +362,10 @@ const GeneralSettingsPage = () => {
       if (response.success) {
         setSettings(response.data);
         setHasChanges(false);
-        showToast(response.message || "Settings reset to defaults successfully! ✨", "success");
+        showToast(
+          response.message || "Settings reset to defaults successfully! ✨",
+          "success"
+        );
       }
     } catch {
       showToast("Failed to reset settings. Please try again.", "error");
@@ -359,7 +388,7 @@ const GeneralSettingsPage = () => {
   if (!settings) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen w-[92.5vw] bg-gray-50  ">
       {toast && (
         <Toast
           message={toast.message}
@@ -369,14 +398,16 @@ const GeneralSettingsPage = () => {
         />
       )}
 
-      <div className="ml-10 max-w-[1500px] mx-auto px-6 lg:px-8">
+      <div className="mt-20    ">
         <div className="flex items-center justify-between mb-12">
-          <h1 className="text-3xl font-semibold text-gray-900">General Settings</h1>
-          <div className="flex gap-3">
+          <h1 className="text-3xl font-semibold text-gray-900">
+            General Settings
+          </h1>
+          <div className="flex gap-3 ">
             <button
               onClick={handleResetToDefaults}
               disabled={resetting}
-              className="flex items-center gap-2 px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {resetting ? (
                 <>
@@ -390,10 +421,11 @@ const GeneralSettingsPage = () => {
             <button
               onClick={handleSave}
               disabled={!hasChanges || saving}
-              className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-colors ${hasChanges && !saving
+              className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
+                hasChanges && !saving
                   ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
+              }`}
             >
               {saving ? (
                 <>
@@ -410,9 +442,9 @@ const GeneralSettingsPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 ">
           {/* Currency & Pricing Card */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[500px]">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
             <div className="flex items-center gap-2 mb-8">
               <DollarSign className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Currency & Pricing</h2>
@@ -420,24 +452,32 @@ const GeneralSettingsPage = () => {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Currency</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Currency
+                </label>
                 <SettingsDropdown
                   value={settings.currency}
                   options={OPTIONS.currency}
-                  onValueChange={(value) => handleSettingChange("currency", value)}
+                  onValueChange={(value) =>
+                    handleSettingChange("currency", value)
+                  }
                   placeholder="Select Currency"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Currency Position</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Currency Position
+                </label>
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center">
                     <input
                       type="radio"
                       value="before"
                       checked={settings.currencyPosition === "before"}
-                      onChange={(e) => handleSettingChange("currencyPosition", e.target.value)}
+                      onChange={(e) =>
+                        handleSettingChange("currencyPosition", e.target.value)
+                      }
                       className="mr-2 text-blue-600"
                     />
                     Before amount ($100.00)
@@ -447,7 +487,9 @@ const GeneralSettingsPage = () => {
                       type="radio"
                       value="after"
                       checked={settings.currencyPosition === "after"}
-                      onChange={(e) => handleSettingChange("currencyPosition", e.target.value)}
+                      onChange={(e) =>
+                        handleSettingChange("currencyPosition", e.target.value)
+                      }
                       className="mr-2 text-blue-600"
                     />
                     After amount (100.00$)
@@ -456,34 +498,45 @@ const GeneralSettingsPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Decimal Places</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Decimal Places
+                </label>
                 <input
                   type="number"
                   min="0"
                   max="4"
                   value={settings.decimalPlaces}
-                  onChange={(e) => handleSettingChange("decimalPlaces", parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "decimalPlaces",
+                      parseInt(e.target.value)
+                    )
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Default Tax Rate (%)</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Default Tax Rate (%)
+                </label>
                 <input
                   type="number"
                   step="0.1"
                   min="0"
                   max="100"
                   value={settings.taxRate}
-                  onChange={(e) => handleSettingChange("taxRate", parseFloat(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  onChange={(e) =>
+                    handleSettingChange("taxRate", parseFloat(e.target.value))
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                 />
               </div>
             </div>
           </div>
 
           {/* Regional Settings Card */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[500px]">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
             <div className="flex items-center gap-2 mb-8">
               <Globe className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Regional Settings</h2>
@@ -491,44 +544,60 @@ const GeneralSettingsPage = () => {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Language</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Language
+                </label>
                 <SettingsDropdown
                   value={settings.language}
                   options={OPTIONS.language}
-                  onValueChange={(value) => handleSettingChange("language", value)}
+                  onValueChange={(value) =>
+                    handleSettingChange("language", value)
+                  }
                   placeholder="Select Language"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Timezone</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Timezone
+                </label>
                 <SettingsDropdown
                   value={settings.timezone}
                   options={OPTIONS.timezone}
-                  onValueChange={(value) => handleSettingChange("timezone", value)}
+                  onValueChange={(value) =>
+                    handleSettingChange("timezone", value)
+                  }
                   placeholder="Select Timezone"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Date Format</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Date Format
+                </label>
                 <SettingsDropdown
                   value={settings.dateFormat}
                   options={OPTIONS.dateFormat}
-                  onValueChange={(value) => handleSettingChange("dateFormat", value)}
+                  onValueChange={(value) =>
+                    handleSettingChange("dateFormat", value)
+                  }
                   placeholder="Select Date Format"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Time Format</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Time Format
+                </label>
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center">
                     <input
                       type="radio"
                       value="12"
                       checked={settings.timeFormat === "12"}
-                      onChange={(e) => handleSettingChange("timeFormat", e.target.value)}
+                      onChange={(e) =>
+                        handleSettingChange("timeFormat", e.target.value)
+                      }
                       className="mr-2 text-blue-600"
                     />
                     12-hour (3:30 PM)
@@ -538,7 +607,9 @@ const GeneralSettingsPage = () => {
                       type="radio"
                       value="24"
                       checked={settings.timeFormat === "24"}
-                      onChange={(e) => handleSettingChange("timeFormat", e.target.value)}
+                      onChange={(e) =>
+                        handleSettingChange("timeFormat", e.target.value)
+                      }
                       className="mr-2 text-blue-600"
                     />
                     24-hour (15:30)
@@ -549,7 +620,7 @@ const GeneralSettingsPage = () => {
           </div>
 
           {/* Receipt Settings Card */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[500px]">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
             <div className="flex items-center gap-2 mb-8">
               <Printer className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Receipt Settings</h2>
@@ -558,42 +629,59 @@ const GeneralSettingsPage = () => {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-500">Auto Print Receipts</label>
-                  <p className="text-xs text-gray-500">Print receipt after each sale</p>
+                  <label className="block text-sm font-medium text-gray-500">
+                    Auto Print Receipts
+                  </label>
+                  <p className="text-xs text-gray-500">
+                    Print receipt after each sale
+                  </p>
                 </div>
                 <ButtonPage
                   checked={settings.autoPrintReceipts}
-                  onChange={(isActive) => handleSettingChange("autoPrintReceipts", isActive)}
+                  onChange={(isActive) =>
+                    handleSettingChange("autoPrintReceipts", isActive)
+                  }
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Receipt Copies</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Receipt Copies
+                </label>
                 <input
                   type="number"
                   min="1"
                   max="5"
                   value={settings.receiptCopies}
-                  onChange={(e) => handleSettingChange("receiptCopies", parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "receiptCopies",
+                      parseInt(e.target.value)
+                    )
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Receipt Footer Message</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Receipt Footer Message
+                </label>
                 <textarea
                   value={settings.receiptFooter}
-                  onChange={(e) => handleSettingChange("receiptFooter", e.target.value)}
+                  onChange={(e) =>
+                    handleSettingChange("receiptFooter", e.target.value)
+                  }
                   rows={3}
                   placeholder="Thank you message..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                 />
               </div>
             </div>
           </div>
 
           {/* Security & Access Card */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[500px]">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
             <div className="flex items-center gap-2 mb-8">
               <Shield className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Security & Access</h2>
@@ -602,43 +690,64 @@ const GeneralSettingsPage = () => {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-500">Manager Approval for Refunds</label>
-                  <p className="text-xs text-gray-500">Require manager password for refunds</p>
+                  <label className="block text-sm font-medium text-gray-500">
+                    Manager Approval for Refunds
+                  </label>
+                  <p className="text-xs text-gray-500">
+                    Require manager password for refunds
+                  </p>
                 </div>
                 <ButtonPage
                   checked={settings.requireManagerForRefunds}
-                  onChange={(isActive) => handleSettingChange("requireManagerForRefunds", isActive)}
+                  onChange={(isActive) =>
+                    handleSettingChange("requireManagerForRefunds", isActive)
+                  }
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-500">Manager Approval for Discounts</label>
-                  <p className="text-xs text-gray-500">Require manager password for discounts</p>
+                  <label className="block text-sm font-medium text-gray-500">
+                    Manager Approval for Discounts
+                  </label>
+                  <p className="text-xs text-gray-500">
+                    Require manager password for discounts
+                  </p>
                 </div>
                 <ButtonPage
                   checked={settings.requireManagerForDiscounts}
-                  onChange={(isActive) => handleSettingChange("requireManagerForDiscounts", isActive)}
+                  onChange={(isActive) =>
+                    handleSettingChange("requireManagerForDiscounts", isActive)
+                  }
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Session Timeout (minutes)</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  Session Timeout (minutes)
+                </label>
                 <input
                   type="number"
                   min="5"
                   max="240"
                   value={settings.sessionTimeout}
-                  onChange={(e) => handleSettingChange("sessionTimeout", parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "sessionTimeout",
+                      parseInt(e.target.value)
+                    )
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                 />
-                <p className="text-xs text-gray-500 mt-1">Auto logout after inactivity</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Auto logout after inactivity
+                </p>
               </div>
             </div>
           </div>
 
           {/* Notifications & Alerts Card */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[500px]">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
             <div className="flex items-center gap-2 mb-8">
               <Bell className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Notifications & Alerts</h2>
@@ -647,23 +756,35 @@ const GeneralSettingsPage = () => {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-500">Enable Notifications</label>
-                  <p className="text-xs text-gray-500">Show system alerts and updates</p>
+                  <label className="block text-sm font-medium text-gray-500">
+                    Enable Notifications
+                  </label>
+                  <p className="text-xs text-gray-500">
+                    Show system alerts and updates
+                  </p>
                 </div>
                 <ButtonPage
                   checked={settings.enableNotifications}
-                  onChange={(isActive) => handleSettingChange("enableNotifications", isActive)}
+                  onChange={(isActive) =>
+                    handleSettingChange("enableNotifications", isActive)
+                  }
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-500">Enable Sound Effects</label>
-                  <p className="text-xs text-gray-500">Play sounds for transactions and alerts</p>
+                  <label className="block text-sm font-medium text-gray-500">
+                    Enable Sound Effects
+                  </label>
+                  <p className="text-xs text-gray-500">
+                    Play sounds for transactions and alerts
+                  </p>
                 </div>
                 <ButtonPage
                   checked={settings.enableSounds}
-                  onChange={(isActive) => handleSettingChange("enableSounds", isActive)}
+                  onChange={(isActive) =>
+                    handleSettingChange("enableSounds", isActive)
+                  }
                 />
               </div>
             </div>
