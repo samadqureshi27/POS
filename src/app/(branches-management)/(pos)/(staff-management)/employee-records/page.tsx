@@ -138,7 +138,11 @@ class StaffAPI {
     this.mockData = this.mockData
       .filter((i) => i.Staff_ID !== id)
       .map((item, idx) => ({ ...item, Staff_ID: idx + 1 }));
-    return { success: true, data: null, message: "Staff item deleted successfully" };
+    return {
+      success: true,
+      data: null,
+      message: "Staff item deleted successfully",
+    };
   }
 
   static async bulkDeleteStaffItems(ids: number[]): Promise<ApiResponse<null>> {
@@ -165,8 +169,9 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-      }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
+      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -262,7 +267,7 @@ const EmployeeRecordsPage = () => {
   // Clear access code when role is not Cashier or Manager
   useEffect(() => {
     if (formData.Role !== "Cashier" && formData.Role !== "Manager") {
-      setFormData(prev => ({ ...prev, Access_Code: "" }));
+      setFormData((prev) => ({ ...prev, Access_Code: "" }));
     }
   }, [formData.Role]);
 
@@ -330,10 +335,15 @@ const EmployeeRecordsPage = () => {
         delete cleanData.Access_Code;
       }
 
-      const response = await StaffAPI.updateStaffItem(editingItem.Staff_ID, cleanData);
+      const response = await StaffAPI.updateStaffItem(
+        editingItem.Staff_ID,
+        cleanData
+      );
       if (response.success) {
         setStaffItems((prev) =>
-          prev.map((it) => (it.Staff_ID === editingItem.Staff_ID ? response.data : it))
+          prev.map((it) =>
+            it.Staff_ID === editingItem.Staff_ID ? response.data : it
+          )
         );
         setIsModalOpen(false);
         setEditingItem(null);
@@ -382,9 +392,14 @@ const EmployeeRecordsPage = () => {
     if (!formData.Name.trim() || !formData.CNIC.trim()) return;
 
     // Validate access code if role is Cashier or Manager
-    if ((formData.Role === "Cashier" || formData.Role === "Manager") &&
-      (!formData.Access_Code || formData.Access_Code.length !== 4)) {
-      showToast(`${formData.Role} role requires a 4-digit access code`, "error");
+    if (
+      (formData.Role === "Cashier" || formData.Role === "Manager") &&
+      (!formData.Access_Code || formData.Access_Code.length !== 4)
+    ) {
+      showToast(
+        `${formData.Role} role requires a 4-digit access code`,
+        "error"
+      );
       return;
     }
 
@@ -396,7 +411,10 @@ const EmployeeRecordsPage = () => {
   };
 
   const handleStatusChange = (isActive: boolean) => {
-    setFormData((prev) => ({ ...prev, Status: isActive ? "Active" : "Inactive" }));
+    setFormData((prev) => ({
+      ...prev,
+      Status: isActive ? "Active" : "Inactive",
+    }));
   };
 
   const handleCloseModal = () => {
@@ -407,7 +425,7 @@ const EmployeeRecordsPage = () => {
   // CNIC formatting function
   const formatCNIC = (value: string) => {
     // Remove all non-digits
-    const digits = value.replace(/\D/g, '');
+    const digits = value.replace(/\D/g, "");
 
     // Apply CNIC format: 35202-1234567-8
     if (digits.length <= 5) {
@@ -415,7 +433,10 @@ const EmployeeRecordsPage = () => {
     } else if (digits.length <= 12) {
       return `${digits.slice(0, 5)}-${digits.slice(5)}`;
     } else {
-      return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12, 13)}`;
+      return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(
+        12,
+        13
+      )}`;
     }
   };
 
@@ -435,7 +456,7 @@ const EmployeeRecordsPage = () => {
   }
 
   return (
-    <div className="mx-6 p-6 bg-gray-50 min-h-screen">
+    <div className=" p-6 bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -444,18 +465,18 @@ const EmployeeRecordsPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">Staff Management</h1>
+      <h1 className="text-3xl font-semibold mb-8 mt-14">Staff Management</h1>
 
       {/* Summary Cards */}
-      <div className="flex gap-4 mb-6 pl-20">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+      <div className="flex gap-4 mb-8">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">{staffItems.length}</p>
             <p className="text-1xl text-gray-500">Total Staff</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">
               {staffItems.filter((item) => item.Status === "Active").length}
@@ -466,15 +487,16 @@ const EmployeeRecordsPage = () => {
       </div>
 
       {/* Action bar */}
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex gap-3 pl-20">
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex gap-3 h-[40px] ">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${selectedItems.length === 0
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
+            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
+              selectedItems.length === 0
+                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
           >
             <Plus size={16} />
             Add
@@ -483,10 +505,11 @@ const EmployeeRecordsPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSomeSelected && !actionLoading
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
+              isSomeSelected && !actionLoading
+                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -504,49 +527,97 @@ const EmployeeRecordsPage = () => {
             placeholder="Search Staff..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full pl-10 pr-4 py-2 h-[40px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
-        <div className="max-h-[500px] overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
+        <div className="max-h-[500px] rounded-sm overflow-y-auto">
+          <table className="min-w-full divide-y divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-4 py-3 text-left">
+                <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
+                    disableRipple
+                    sx={{
+                      transform: "scale(1.5)", // size adjustment
+                      p: 0, // remove extra padding
+                    }}
+                    icon={
+                      // unchecked grey box
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#d1d1d1" // border grey
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    }
+                    checkedIcon={
+                      // checked with tick
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#2C2C2C" // dark border
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12.5l2 2 4-4.5"
+                          fill="none"
+                          stroke="#2C2C2C"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
                   />
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Staff ID
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Contact
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Address
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   CNIC
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
-                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                        <ChevronDown
+                          size={14}
+                          className="text-gray-500 ml-auto"
+                        />
                       </DropdownMenu.Trigger>
 
                       <DropdownMenu.Portal>
@@ -562,13 +633,13 @@ const EmployeeRecordsPage = () => {
                             Status
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
                             onClick={() => setStatusFilter("Active")}
                           >
                             Active
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
                             onClick={() => setStatusFilter("Inactive")}
                           >
                             Inactive
@@ -576,7 +647,7 @@ const EmployeeRecordsPage = () => {
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
-                    <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </div>
                 </th>
                 <th className="relative px-4 py-3 text-left">
@@ -584,7 +655,10 @@ const EmployeeRecordsPage = () => {
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {roleFilter || "Role"}
-                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                        <ChevronDown
+                          size={14}
+                          className="text-gray-500 ml-auto"
+                        />
                       </DropdownMenu.Trigger>
 
                       <DropdownMenu.Portal>
@@ -599,47 +673,47 @@ const EmployeeRecordsPage = () => {
                           >
                             Role
                           </DropdownMenu.Item>
-                          {Array.from(new Set(staffItems.map((i) => i.Role))).map(
-                            (role) => (
-                              <DropdownMenu.Item
-                                key={role}
-                                className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                                onClick={() => setRoleFilter(role)}
-                              >
-                                {role}
-                              </DropdownMenu.Item>
-                            )
-                          )}
+                          {Array.from(
+                            new Set(staffItems.map((i) => i.Role))
+                          ).map((role) => (
+                            <DropdownMenu.Item
+                              key={role}
+                              className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
+                              onClick={() => setRoleFilter(role)}
+                            >
+                              {role}
+                            </DropdownMenu.Item>
+                          ))}
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
-                    <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </div>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Salary
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Shift Start Time
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Shift End Time
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Access Code
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Actions
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y text-gray-500  divide-gray-300">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
@@ -654,11 +728,56 @@ const EmployeeRecordsPage = () => {
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item.Staff_ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-8">
                       <Checkbox
-                        checked={selectedItems.includes(item.Staff_ID)}
+                        checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
-                          handleSelectItem(item.Staff_ID, e.target.checked)
+                          handleSelectItem(item.ID, e.target.checked)
+                        }
+                        disableRipple
+                        sx={{
+                          p: 0, // remove extra padding
+                          transform: "scale(1.5)", // optional size tweak
+                        }}
+                        icon={
+                          // unchecked grey box
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#d1d1d1" // border grey
+                              strokeWidth="2"
+                            />
+                          </svg>
+                        }
+                        checkedIcon={
+                          // checked with tick
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#2C2C2C" // dark border
+                              strokeWidth="2"
+                            />
+                            <path
+                              d="M9 12.5l2 2 4-4.5"
+                              fill="none"
+                              stroke="#2C2C2C"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
                         }
                       />
                     </td>
@@ -671,7 +790,10 @@ const EmployeeRecordsPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       {item.Contact}
                     </td>
-                    <td className="px-4 py-4 text-sm max-w-[200px] truncate" title={item.Address}>
+                    <td
+                      className="px-4 py-4 text-sm max-w-[200px] truncate"
+                      title={item.Address}
+                    >
                       {item.Address}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
@@ -679,9 +801,17 @@ const EmployeeRecordsPage = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
-                          ${item.Status === "Active" ? "text-green-600 border-green-600" : ""}
-                          ${item.Status === "Inactive" ? "text-red-600 border-red-600" : ""}`}
+                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
+                          ${
+                            item.Status === "Active"
+                              ? "text-green-400 border-green-600"
+                              : ""
+                          }
+                          ${
+                            item.Status === "Inactive"
+                              ? "text-red-400 border-red-600"
+                              : ""
+                          }`}
                       >
                         {item.Status}
                       </span>
@@ -699,11 +829,15 @@ const EmployeeRecordsPage = () => {
                       {item.Shift_End_Time}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      {(item.Role === "Cashier" || item.Role === "Manager") && item.Access_Code ? (
-                        <span className={`px-2 py-1 rounded text-xs font-mono ${item.Role === "Cashier"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-purple-100 text-purple-800"
-                          }`}>
+                      {(item.Role === "Cashier" || item.Role === "Manager") &&
+                      item.Access_Code ? (
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-mono ${
+                            item.Role === "Cashier"
+                              ? "bg-blue-100 text-blue-400"
+                              : "bg-purple-100 text-purple-400"
+                          }`}
+                        >
                           {item.Access_Code}
                         </span>
                       ) : (
@@ -741,20 +875,22 @@ const EmployeeRecordsPage = () => {
             className="bg-white rounded-lg min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-xl relative flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-2xl font-semibold text-gray-800">
                 {editingItem ? "Edit Staff Member" : "Add New Staff Member"}
               </h2>
-              
             </div>
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto p-6">
-              <form onSubmit={(e) => { e.preventDefault(); handleModalSubmit(); }}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleModalSubmit();
+                }}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                   {/* Name */}
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -782,7 +918,7 @@ const EmployeeRecordsPage = () => {
                       type="tel"
                       value={formData.Contact}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/[^\d+\-\s]/g, '');
+                        const value = e.target.value.replace(/[^\d+\-\s]/g, "");
                         setFormData({ ...formData, Contact: value });
                       }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
@@ -799,7 +935,10 @@ const EmployeeRecordsPage = () => {
                       type="text"
                       value={formData.CNIC}
                       onChange={(e) =>
-                        setFormData({ ...formData, CNIC: formatCNIC(e.target.value) })
+                        setFormData({
+                          ...formData,
+                          CNIC: formatCNIC(e.target.value),
+                        })
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
                       placeholder="35202-1234567-8"
@@ -832,10 +971,17 @@ const EmployeeRecordsPage = () => {
 
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-3 py-2 rounded-lg text-sm border border-gray-300 bg-white flex items-center gap-2 w-full focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors hover:border-gray-400">
-                        <span className={formData.Role ? "text-gray-900" : "text-gray-500"}>
+                        <span
+                          className={
+                            formData.Role ? "text-gray-900" : "text-gray-500"
+                          }
+                        >
                           {formData.Role || "Select Role"}
                         </span>
-                        <ChevronDown size={16} className="text-gray-500 ml-auto" />
+                        <ChevronDown
+                          size={16}
+                          className="text-gray-500 ml-auto"
+                        />
                       </DropdownMenu.Trigger>
 
                       <DropdownMenu.Portal>
@@ -848,23 +994,32 @@ const EmployeeRecordsPage = () => {
                           {/* Default Option */}
                           <DropdownMenu.Item
                             className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none text-gray-500"
-                            onClick={() => setFormData({ ...formData, Role: "" })}
+                            onClick={() =>
+                              setFormData({ ...formData, Role: "" })
+                            }
                           >
                             Select Role
                           </DropdownMenu.Item>
 
                           {/* Role Options */}
-                          {["Manager", "Cashier", "Waiter", "Cleaner", "Chef", "Security"].map(
-                            (role) => (
-                              <DropdownMenu.Item
-                                key={role}
-                                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 hover:text-gray-700 rounded outline-none"
-                                onClick={() => setFormData({ ...formData, Role: role })}
-                              >
-                                {role}
-                              </DropdownMenu.Item>
-                            )
-                          )}
+                          {[
+                            "Manager",
+                            "Cashier",
+                            "Waiter",
+                            "Cleaner",
+                            "Chef",
+                            "Security",
+                          ].map((role) => (
+                            <DropdownMenu.Item
+                              key={role}
+                              className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 hover:text-gray-700 rounded outline-none"
+                              onClick={() =>
+                                setFormData({ ...formData, Role: role })
+                              }
+                            >
+                              {role}
+                            </DropdownMenu.Item>
+                          ))}
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
@@ -897,7 +1052,10 @@ const EmployeeRecordsPage = () => {
                       type="time"
                       value={formData.Shift_Start_Time}
                       onChange={(e) =>
-                        setFormData({ ...formData, Shift_Start_Time: e.target.value })
+                        setFormData({
+                          ...formData,
+                          Shift_Start_Time: e.target.value,
+                        })
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
                     />
@@ -911,24 +1069,32 @@ const EmployeeRecordsPage = () => {
                       type="time"
                       value={formData.Shift_End_Time}
                       onChange={(e) =>
-                        setFormData({ ...formData, Shift_End_Time: e.target.value })
+                        setFormData({
+                          ...formData,
+                          Shift_End_Time: e.target.value,
+                        })
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
                     />
                   </div>
 
                   {/* Access Code - Only for Cashier and Manager */}
-                  {(formData.Role === "Cashier" || formData.Role === "Manager") && (
+                  {(formData.Role === "Cashier" ||
+                    formData.Role === "Manager") && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Access Code <span className="text-red-500">*</span>
-                        <span className="text-xs text-gray-500 ml-1">(4 digits)</span>
+                        <span className="text-xs text-gray-500 ml-1">
+                          (4 digits)
+                        </span>
                       </label>
                       <input
                         type="password"
                         value={formData.Access_Code}
                         onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                          const value = e.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 4);
                           setFormData({ ...formData, Access_Code: value });
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent font-mono tracking-widest transition-colors"
@@ -936,11 +1102,12 @@ const EmployeeRecordsPage = () => {
                         maxLength={4}
                         required
                       />
-                      {formData.Access_Code && formData.Access_Code.length < 4 && (
-                        <p className="text-red-500 text-xs mt-1">
-                          Access code must be exactly 4 digits
-                        </p>
-                      )}
+                      {formData.Access_Code &&
+                        formData.Access_Code.length < 4 && (
+                          <p className="text-red-500 text-xs mt-1">
+                            Access code must be exactly 4 digits
+                          </p>
+                        )}
                     </div>
                   )}
 
@@ -951,10 +1118,11 @@ const EmployeeRecordsPage = () => {
                     </label>
                     <div className="flex items-center gap-3">
                       <span
-                        className={`text-sm font-medium ${formData.Status === "Active"
+                        className={`text-sm font-medium ${
+                          formData.Status === "Active"
                             ? "text-green-600"
                             : "text-red-500"
-                          }`}
+                        }`}
                       >
                         {formData.Status}
                       </span>
@@ -964,7 +1132,6 @@ const EmployeeRecordsPage = () => {
                       />
                     </div>
                   </div>
-
                 </div>
               </form>
             </div>
@@ -986,17 +1153,22 @@ const EmployeeRecordsPage = () => {
                   !formData.Name.trim() ||
                   !formData.CNIC.trim() ||
                   actionLoading ||
-                  ((formData.Role === "Cashier" || formData.Role === "Manager") &&
-                    (!formData.Access_Code || formData.Access_Code.length !== 4))
+                  ((formData.Role === "Cashier" ||
+                    formData.Role === "Manager") &&
+                    (!formData.Access_Code ||
+                      formData.Access_Code.length !== 4))
                 }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 font-medium ${!formData.Name.trim() ||
-                    !formData.CNIC.trim() ||
-                    actionLoading ||
-                    ((formData.Role === "Cashier" || formData.Role === "Manager") &&
-                      (!formData.Access_Code || formData.Access_Code.length !== 4))
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 font-medium ${
+                  !formData.Name.trim() ||
+                  !formData.CNIC.trim() ||
+                  actionLoading ||
+                  ((formData.Role === "Cashier" ||
+                    formData.Role === "Manager") &&
+                    (!formData.Access_Code ||
+                      formData.Access_Code.length !== 4))
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                  }`}
+                }`}
               >
                 {actionLoading ? (
                   <>
@@ -1014,7 +1186,6 @@ const EmployeeRecordsPage = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

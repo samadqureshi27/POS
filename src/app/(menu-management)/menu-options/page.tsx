@@ -239,7 +239,7 @@ const Toast = ({
 }) => (
   <div
     className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
     }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
@@ -422,6 +422,20 @@ const CategoryPage = () => {
         : selectedItems.filter((id) => id !== itemId)
     );
   };
+  const isFormValid = () => {
+    if (!formData.Name.trim()) return false;
+    if (!formData.DisplayType.trim()) return false;
+    if (formData.Priority < 1) return false;
+
+    // Check option values (must not be empty if OptionValues tab is used)
+    for (let i = 0; i < formData.OptionValue.length; i++) {
+      if (!formData.OptionValue[i].trim()) return false;
+      if (formData.OptionPrice[i] == null || formData.OptionPrice[i] < 0)
+        return false;
+    }
+
+    return true;
+  };
 
   // Modal form handlers
   const handleModalSubmit = () => {
@@ -461,7 +475,7 @@ const CategoryPage = () => {
   }
 
   return (
-    <div className="mx-6 p-6 bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-w-full h-full overflow-y-auto">
       {toast && (
         <Toast
           message={toast.message}
@@ -470,16 +484,16 @@ const CategoryPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">Menu Options</h1>
+      <h1 className="text-3xl font-semibold mt-14 mb-8 ">Menu Options</h1>
 
       {/* Action bar */}
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 pl-20">
+        <div className="flex gap-3 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
               selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -492,7 +506,7 @@ const CategoryPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
               isSomeSelected && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -505,39 +519,84 @@ const CategoryPage = () => {
 
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
           <input
             type="text"
-            placeholder="Search POS..."
+            placeholder="Search Menu Options..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
-        <div className="overflow-y-auto">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
+        <div className=" max-h-[500px] rounded-sm overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-4 py-3 text-left">
+                <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
+                    disableRipple
+                    sx={{
+                      transform: "scale(1.5)", // size adjustment
+                      p: 0, // remove extra padding
+                    }}
+                    icon={
+                      // unchecked grey box
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#d1d1d1" // border grey
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    }
+                    checkedIcon={
+                      // checked with tick
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#2C2C2C" // dark border
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12.5l2 2 4-4.5"
+                          fill="none"
+                          stroke="#2C2C2C"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
                   />
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   ID
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
@@ -564,19 +623,19 @@ const CategoryPage = () => {
                             Display Type
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
                             onClick={() => setDisplayFilter("Radio")}
                           >
                             Radio
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
                             onClick={() => setDisplayFilter("Select")}
                           >
                             Select
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-blue-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-blue-400 rounded outline-none"
                             onClick={() => setDisplayFilter("Checkbox")}
                           >
                             Checkbox
@@ -584,21 +643,21 @@ const CategoryPage = () => {
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
-                    <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </div>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Priority
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Actions
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y text-gray-500 divide-gray-100">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
@@ -613,11 +672,56 @@ const CategoryPage = () => {
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-8">
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
                           handleSelectItem(item.ID, e.target.checked)
+                        }
+                        disableRipple
+                        sx={{
+                          p: 0, // remove extra padding
+                          transform: "scale(1.5)", // optional size tweak
+                        }}
+                        icon={
+                          // unchecked grey box
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#d1d1d1" // border grey
+                              strokeWidth="2"
+                            />
+                          </svg>
+                        }
+                        checkedIcon={
+                          // checked with tick
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#2C2C2C" // dark border
+                              strokeWidth="2"
+                            />
+                            <path
+                              d="M9 12.5l2 2 4-4.5"
+                              fill="none"
+                              stroke="#2C2C2C"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
                         }
                       />
                     </td>
@@ -629,11 +733,11 @@ const CategoryPage = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
-      ${item.DisplayType === "Radio" ? "text-green-600 border-green-600" : ""}
-      ${item.DisplayType === "Select" ? "text-red-600 border-red-600" : ""}
+                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium
+      ${item.DisplayType === "Radio" ? "text-green-400 " : ""}
+      ${item.DisplayType === "Select" ? "text-red-400 " : ""}
       
-      ${item.DisplayType === "Checkbox" ? "text-blue-600 border-blue-600" : ""}
+      ${item.DisplayType === "Checkbox" ? "text-blue-400 " : ""}
     `}
                       >
                         {item.DisplayType}
@@ -667,30 +771,34 @@ const CategoryPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg min-w-[37vw]  max-w-2xl min-h-[70vh] max-h-[95vh] overflow-y-auto shadow-lg relative">
-            {/* Navbar inside modal */}
-            <h1 className="text-2xl pl-5 pt-2 font-medium">
-              {editingItem ? "Edit Option Menu" : "Add  Option Menu"}
-            </h1>
-            <div className="flex w-[250px] items-center justify-center  border-b border-gray-200  mx-auto">
-              {["Details", "Option Values"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                    activeTab === tab
-                      ? "border-b-2 border-black text-black"
-                      : "text-gray-500 hover:text-black hover:bg-gray-50"
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+          <div className="bg-white rounded-lg w-[37vw] max-w-2xl h-[70vh] shadow-lg flex flex-col">
+            {/* Modal Header - Fixed */}
+            <div className="flex-shrink-0">
+              <h1 className="text-2xl pl-5 pt-2 font-medium">
+                {editingItem ? "Edit Option Menu" : "Add Option Menu"}
+              </h1>
+
+              {/* Tab Navigation */}
+              <div className="flex w-[250px] items-center justify-center border-b border-gray-200 mx-auto">
+                {["Details", "Option Values"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                      activeTab === tab
+                        ? "border-b-2 border-black text-black"
+                        : "text-gray-500 hover:text-black hover:bg-gray-50"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Modal Content */}
-            <div className="p-6 ">
+            {/* Modal Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6">
               {activeTab === "Details" && (
                 <div className="space-y-8">
                   {/* Name */}
@@ -704,16 +812,15 @@ const CategoryPage = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, Name: e.target.value })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                     />
                   </div>
+
                   {/* Display Type */}
                   <div>
-                    {" "}
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {" "}
-                      Display Type{" "}
-                    </label>{" "}
+                      Display Type
+                    </label>
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger asChild>
                         <button className="w-full px-3 py-2 border border-gray-300 rounded-lg flex items-center justify-between text-sm bg-white outline-none hover:bg-gray-50 focus:ring-2 focus:ring-[#d9d9e1]">
@@ -726,10 +833,10 @@ const CategoryPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[220px] rounded-md bg-white shadow-md border border-gray-200 p-1 outline-none ml-45"
+                          className="min-w-[220px] rounded-md bg-white shadow-md border border-gray-200 p-1 outline-none"
                           sideOffset={6}
                         >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 mr-90" />
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
                           <DropdownMenu.Item
                             className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
                             onClick={() =>
@@ -763,14 +870,13 @@ const CategoryPage = () => {
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
-                  </div>{" "}
-                  {/* Priority */}{" "}
+                  </div>
+
+                  {/* Priority */}
                   <div>
-                    {" "}
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {" "}
-                      Priority{" "}
-                    </label>{" "}
+                      Priority
+                    </label>
                     <input
                       type="number"
                       value={formData.Priority}
@@ -783,176 +889,197 @@ const CategoryPage = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                       min={1}
                       required
-                    />{" "}
+                    />
                   </div>
                 </div>
               )}
+
               {activeTab === "Option Values" && (
-                
-  <div className="">
-    {/* Fixed Header */}
-    
-    <div className="border border-gray-200 rounded-t-lg bg-gray-50">
-      <table className="w-full">
-        <thead>
-          <tr>
-            <th className="w-8 p-2   text-center text-sm font-medium text-gray-700"><div className="">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData({
-                      ...formData,
-                      OptionValue: [...formData.OptionValue, ""],
-                      OptionPrice: [...formData.OptionPrice, 0],
-                    })
-                  }
-                  className="w-8 px-1 py-1  text-center   text-black rounded-lg hover:bg-gray-400 transition-colors cursor-pointer"
-                >
-                  <Plus size={20} className="text-center " />
-                </button>
-              </div></th>
-            <th className="w-80 p-3 text-left text-sm font-medium text-gray-700">
-              Option Value
-            </th>
-            <th className="p-3 text-center text-sm font-medium text-gray-700">
-              Option Price
-            </th>
-            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-          </tr>
-        </thead>
-      </table>
-    </div>
+                <div className="space-y-4">
+                  {/* Fixed Header */}
+                  <div className="border border-gray-200 rounded-t-lg bg-gray-50">
+                    <table className="w-full">
+                      <thead>
+                        <tr>
+                          <th className="w-8 p-2 text-center text-sm font-medium text-gray-700">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setFormData({
+                                  ...formData,
+                                  OptionValue: [...formData.OptionValue, ""],
+                                  OptionPrice: [...formData.OptionPrice, 0],
+                                })
+                              }
+                              className="w-8 h-8 flex items-center justify-center text-black rounded-lg hover:bg-gray-200 transition-colors"
+                            >
+                              <Plus size={18} />
+                            </button>
+                          </th>
+                          <th className="w-80 p-3 text-left text-sm font-medium text-gray-700">
+                            Option Value
+                          </th>
+                          <th className="p-3 text-center text-sm font-medium text-gray-700">
+                            Option Price
+                          </th>
+                          <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
 
-   {/* Scrollable Body */}
-<div className="border-l border-r border-b border-gray-200 rounded-b-lg max-h-60 overflow-y-auto bg-white">
-  
-  <DragDropContext
-    onDragEnd={(result: DropResult) => {
-      const { source, destination } = result;
-      if (!destination || source.index === destination.index) return;
+                  {/* Scrollable Body */}
+                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg max-h-60 overflow-y-auto bg-white">
+                    <DragDropContext
+                      onDragEnd={(result) => {
+                        const { source, destination } = result;
+                        if (!destination || source.index === destination.index)
+                          return;
 
-      const newOptionValue = Array.from(formData.OptionValue);
-      const [movedValue] = newOptionValue.splice(source.index, 1);
-      newOptionValue.splice(destination.index, 0, movedValue);
+                        const newOptionValue = Array.from(formData.OptionValue);
+                        const [movedValue] = newOptionValue.splice(
+                          source.index,
+                          1
+                        );
+                        newOptionValue.splice(destination.index, 0, movedValue);
 
-      const newOptionPrice = Array.from(formData.OptionPrice);
-      const [movedPrice] = newOptionPrice.splice(source.index, 1);
-      newOptionPrice.splice(destination.index, 0, movedPrice);
+                        const newOptionPrice = Array.from(formData.OptionPrice);
+                        const [movedPrice] = newOptionPrice.splice(
+                          source.index,
+                          1
+                        );
+                        newOptionPrice.splice(destination.index, 0, movedPrice);
 
-      setFormData({
-        ...formData,
-        OptionValue: newOptionValue,
-        OptionPrice: newOptionPrice,
-      });
-    }}
-  >
-    <Droppable droppableId="option-values">
-      {(provided) => (
-        <table className="w-full border-collapse">
-          <tbody ref={provided.innerRef} {...provided.droppableProps}>
-            {formData.OptionValue.map((opt, idx) => (
-              <Draggable
-                key={idx}
-                draggableId={`option-${idx}`}
-                index={idx}
-              >
-                {(provided, snapshot) => (
-                  <tr
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    className={`hover:bg-gray-50 ${
-                      snapshot.isDragging ? "bg-gray-100 shadow-lg" : ""
-                    } border-b border-gray-200`} // <-- Add horizontal line
-                  >
-                    {/* Drag Handle */}
-                    <td
-                      className="p-3 text-center cursor-grab w-12"
-                      {...provided.dragHandleProps}
+                        setFormData({
+                          ...formData,
+                          OptionValue: newOptionValue,
+                          OptionPrice: newOptionPrice,
+                        });
+                      }}
                     >
-                      <Grip size={18} className="text-gray-500 mx-auto" />
-                    </td>
+                      <Droppable droppableId="option-values">
+                        {(provided) => (
+                          <table className="w-full border-collapse">
+                            <tbody
+                              ref={provided.innerRef}
+                              {...provided.droppableProps}
+                            >
+                              {formData.OptionValue.map((opt, idx) => (
+                                <Draggable
+                                  key={idx}
+                                  draggableId={`option-${idx}`}
+                                  index={idx}
+                                >
+                                  {(provided, snapshot) => (
+                                    <tr
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      className={`hover:bg-gray-50 ${
+                                        snapshot.isDragging
+                                          ? "bg-gray-100 shadow-lg"
+                                          : ""
+                                      } border-b border-gray-200`}
+                                    >
+                                      {/* Drag Handle */}
+                                      <td
+                                        className="p-3 text-center cursor-grab w-12"
+                                        {...provided.dragHandleProps}
+                                      >
+                                        <Grip
+                                          size={18}
+                                          className="text-gray-500 mx-auto"
+                                        />
+                                      </td>
 
-                    {/* Option Name */}
-                    <td className="min-w-[300px] p-3">
-                      <input
-                        type="text"
-                        value={opt}
-                        onChange={(e) => {
-                          const updated = [...formData.OptionValue];
-                          updated[idx] = e.target.value;
-                          setFormData({
-                            ...formData,
-                            OptionValue: updated,
-                          });
-                        }}
-                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                        placeholder="Enter option value"
-                      />
-                    </td>
+                                      {/* Option Name */}
+                                      <td className="min-w-[300px] p-3">
+                                        <input
+                                          type="text"
+                                          value={opt}
+                                          onChange={(e) => {
+                                            const updated = [
+                                              ...formData.OptionValue,
+                                            ];
+                                            updated[idx] = e.target.value;
+                                            setFormData({
+                                              ...formData,
+                                              OptionValue: updated,
+                                            });
+                                          }}
+                                          className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                                          placeholder="Enter option value"
+                                        />
+                                      </td>
 
-                    {/* Option Price */}
-                    <td className="p-3 text-center">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        value={formData.OptionPrice[idx]}
-                        onChange={(e) => {
-                          const updated = [...formData.OptionPrice];
-                          updated[idx] =
-                            Number(e.target.value.replace(/\D/g, "")) || 0;
-                          setFormData({
-                            ...formData,
-                            OptionPrice: updated,
-                          });
-                        }}
-                        className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
-                        placeholder="0"
-                      />
-                    </td>
+                                      {/* Option Price */}
+                                      <td className="p-3 text-center">
+                                        <input
+                                          type="text"
+                                          inputMode="numeric"
+                                          pattern="[0-9]*"
+                                          value={formData.OptionPrice[idx]}
+                                          onChange={(e) => {
+                                            const updated = [
+                                              ...formData.OptionPrice,
+                                            ];
+                                            updated[idx] =
+                                              Number(
+                                                e.target.value.replace(
+                                                  /\D/g,
+                                                  ""
+                                                )
+                                              ) || 0;
+                                            setFormData({
+                                              ...formData,
+                                              OptionPrice: updated,
+                                            });
+                                          }}
+                                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
+                                          placeholder="0"
+                                        />
+                                      </td>
 
-                    {/* Delete Button */}
-                    <td className="p-3 text-center w-12">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updatedValues =
-                            formData.OptionValue.filter((_, i) => i !== idx);
-                          const updatedPrices =
-                            formData.OptionPrice.filter((_, i) => i !== idx);
-                          setFormData({
-                            ...formData,
-                            OptionValue: updatedValues,
-                            OptionPrice: updatedPrices,
-                          });
-                        }}
-                        className="text-black  px-2 py-1 rounded hover:text-gray-700"
-                      >
-                        <X size={20} />
-                      </button>
-                    </td>
-                  </tr>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </tbody>
-        </table>
-      )}
-    </Droppable>
-  </DragDropContext>
-</div>
-
-
-    {/* Add Option Button */}
-  </div>
-)}
-
+                                      {/* Delete Button */}
+                                      <td className="p-3 text-center w-12">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const updatedValues =
+                                              formData.OptionValue.filter(
+                                                (_, i) => i !== idx
+                                              );
+                                            const updatedPrices =
+                                              formData.OptionPrice.filter(
+                                                (_, i) => i !== idx
+                                              );
+                                            setFormData({
+                                              ...formData,
+                                              OptionValue: updatedValues,
+                                              OptionPrice: updatedPrices,
+                                            });
+                                          }}
+                                          className="text-black px-2 py-1 rounded hover:text-gray-700"
+                                        >
+                                          <X size={20} />
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </tbody>
+                          </table>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Action buttons */}
-            <div className=" fixed bottom-41 right-145 flex justify-end gap-3 p-4 border-t w-[31.5vw] border-gray-200">
-              
+            {/* Action buttons - Fixed at bottom */}
+            <div className="flex-shrink-0 flex justify-end gap-3 p-4 border-t border-gray-200 bg-white">
               <button
                 onClick={handleCloseModal}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
@@ -961,7 +1088,12 @@ const CategoryPage = () => {
               </button>
               <button
                 onClick={handleModalSubmit}
-                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-700"
+                disabled={!isFormValid()}
+                className={`px-4 py-2 rounded-lg ${
+                  isFormValid()
+                    ? "bg-black text-white hover:bg-gray-700"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
               >
                 {editingItem ? "Update" : "Save & Close"}
               </button>
