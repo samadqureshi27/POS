@@ -301,7 +301,7 @@ const StaffManagementPage = () => {
   }
 
   return (
-    <div className=" p-6 bg-gray-50 min-h-screen">
+    <div className="  bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -310,7 +310,7 @@ const StaffManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mt-14 mb-8 ">Staff Management</h1>
+      <h1 className="text-3xl font-semibold mt-20 mb-8 ">Staff Management</h1>
 
       {/* Time Period Filter */}
       <div className="flex gap-2  mb-5">

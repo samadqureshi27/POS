@@ -456,7 +456,7 @@ const EmployeeRecordsPage = () => {
   }
 
   return (
-    <div className=" p-6 bg-gray-50 min-h-screen">
+    <div className=" bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -465,7 +465,7 @@ const EmployeeRecordsPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-8 mt-14">Staff Management</h1>
+      <h1 className="text-3xl font-semibold mb-8 mt-20">Staff Management</h1>
 
       {/* Summary Cards */}
       <div className="flex gap-4 mb-8">
@@ -730,9 +730,9 @@ const EmployeeRecordsPage = () => {
                   <tr key={item.Staff_ID} className="bg-white hover:bg-gray-50">
                     <td className="px-6 py-8">
                       <Checkbox
-                        checked={selectedItems.includes(item.ID)}
+                        checked={selectedItems.includes(item.Staff_ID)}
                         onChange={(e) =>
-                          handleSelectItem(item.ID, e.target.checked)
+                          handleSelectItem(item.Staff_ID, e.target.checked)
                         }
                         disableRipple
                         sx={{
