@@ -185,6 +185,7 @@ const IngredientsManagementPage = () => {
       Status: isActive ? "Active" : "Inactive",
     });
   };
+  
   const openAddModal = () => {
     if (selectedItems.length > 0) return; // keep original behaviour (disable add when selections exist)
     // generate next ID like "#006"
@@ -209,6 +210,19 @@ const IngredientsManagementPage = () => {
     });
     setModalOpen(true);
   };
+   // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (modalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [modalOpen]);
 
   const openEditModal = (item: InventoryItem) => {
     setEditItem(item);
@@ -222,6 +236,7 @@ const IngredientsManagementPage = () => {
       showToast("Please enter a Name.", "error");
       return;
     }
+    
 
     setActionLoading(true);
     setTimeout(() => {
@@ -317,8 +332,8 @@ const IngredientsManagementPage = () => {
 
       {/* Table + filters */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className="max-h-[58vh] rounded-sm overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200   table-fixed">
+        <div className=" rounded-sm ">
+          <table className="min-w-full divide-y max-h-[800px] divide-gray-200   table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-6 text-left w-[2.5px]">
@@ -558,7 +573,7 @@ const IngredientsManagementPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
-                {editItem ? "Edit Item" : "Add New Item"}
+                {editItem ? "Edit Ingredients" : "Add New Ingredients"}
               </h2>
             </div>
 
