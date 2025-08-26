@@ -312,10 +312,14 @@ const Toast = ({
           : "translate-x-full opacity-0"
       }`}
     >
-      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      {type === "success" ? (
+        <CheckCircle size={16} />
+      ) : (
+        <AlertCircle size={16} />
+      )}
       <span>{message}</span>
-      <button 
-        onClick={handleClose} 
+      <button
+        onClick={handleClose}
         className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
       >
         <X size={16} />
@@ -365,6 +369,20 @@ const RecipesManagementPage = () => {
     loadRecipeOptions();
     loadIngredients();
   }, []);
+
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
 
   const loadIngredients = async () => {
     try {
@@ -599,7 +617,7 @@ const RecipesManagementPage = () => {
           display: none !important;
         }
       `}</style>
-      
+
       {toast && (
         <Toast
           message={toast.message}
@@ -875,10 +893,10 @@ const RecipesManagementPage = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg min-w-[37vw] max-w-2xl min-h-[70vh] max-h-[70vh] overflow-hidden shadow-lg relative">
+          <div className="bg-white rounded-lg w-[37vw] max-w-2xl min-h-[70vh] max-h-[70vh] overflow-hidden shadow-lg relative">
             {/* Navbar inside modal */}
             <h1 className="text-2xl pl-5 pt-2 font-medium">
-              {editingItem ? "Edit Option Menu" : "Add Option Menu"}
+              {editingItem ? "Edit Recipe" : "Add Recipe"}
             </h1>
             <div className="flex w-[350px] items-center justify-center border-b border-gray-200 mx-auto">
               {["Recipe Info", "Ingredients", "Recipe Option"].map((tab) => (
@@ -980,37 +998,45 @@ const RecipesManagementPage = () => {
                         <span className="text-sm">Add New Recipe Options</span>
                         <ChevronDown size={16} className="text-gray-500" />
                       </DropdownMenu.Trigger>
+
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[510px] rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 modal-scroll z-100"
+                          className="min-w-[510px] rounded-md bg-white shadow-lg border border-gray-200 p-1 outline-none overflow-visible z-[99999]"
                           sideOffset={6}
+                          avoidCollisions={true}
+                          collisionPadding={20}
                         >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                          {ingredients.map((ingredient) => (
-                            <DropdownMenu.Item
-                              key={ingredient.ID}
-                              className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                              onClick={() => {
-                                if (!formData.OptionValue.includes(ingredient.Name)) {
-                                  setFormData({
-                                    ...formData,
-                                    OptionValue: [
-                                      ...formData.OptionValue,
-                                      ingredient.Name,
-                                    ],
-                                    OptionPrice: [...formData.OptionPrice, 0],
-                                  });
-                                }
-                              }}
-                            >
-                              {ingredient.Name}
-                            </DropdownMenu.Item>
-                          ))}
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                          <div className="max-h-60 overflow-y-auto">
+                            {ingredients.map((ingredient) => (
+                              <DropdownMenu.Item
+                                key={ingredient.ID}
+                                className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none select-none"
+                                onSelect={() => {
+                                  if (
+                                    !formData.OptionValue.includes(
+                                      ingredient.Name
+                                    )
+                                  ) {
+                                    setFormData({
+                                      ...formData,
+                                      OptionValue: [
+                                        ...formData.OptionValue,
+                                        ingredient.Name,
+                                      ],
+                                      OptionPrice: [...formData.OptionPrice, 0],
+                                    });
+                                  }
+                                }}
+                              >
+                                {ingredient.Name}
+                              </DropdownMenu.Item>
+                            ))}
+                          </div>
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-
                   {/* Fixed Header */}
                   <div className="border border-gray-200 rounded-t-lg bg-gray-50">
                     <table className="w-full">
@@ -1175,39 +1201,44 @@ const RecipesManagementPage = () => {
                   <div className="flex items-center gap-2">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="min-w-[510px] flex items-center justify-between px-4 py-2 mb-2 text-black rounded-lg hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
-                        <span className="text-sm">Add Ingredient</span>
+                        <span className="text-sm">Add New Ingredients</span>
                         <ChevronDown size={16} className="text-gray-500" />
                       </DropdownMenu.Trigger>
+
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[510px] rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 modal-scroll z-100"
+                          className="min-w-[510px] rounded-md bg-white shadow-lg border border-gray-200 p-1 outline-none overflow-visible z-[99999]"
                           sideOffset={6}
+                          avoidCollisions={true}
+                          collisionPadding={20}
                         >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                          {ingredients.map((ingredient) => (
-                            <DropdownMenu.Item
-                              key={ingredient.ID}
-                              className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                              onClick={() => {
-                                if (!formData.IngredientValue.includes(ingredient.Name)) {
-                                  const ingredientWithUnit = `${ingredient.Name} (${ingredient.Unit})`;
-                                  setFormData({
-                                    ...formData,
-                                    IngredientValue: [
-                                      ...formData.IngredientValue,
-                                      ingredientWithUnit,
-                                    ],
-                                    IngredientPrice: [
-                                      ...formData.IngredientPrice,
-                                      0,
-                                    ],
-                                  });
-                                }
-                              }}
-                            >
-                              {ingredient.Name} ({ingredient.Unit})
-                            </DropdownMenu.Item>
-                          ))}
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                          <div className="max-h-60 overflow-y-auto">
+                            {ingredients.map((ingredient) => (
+                              <DropdownMenu.Item
+                                key={ingredient.ID}
+                                className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none select-none"
+                                onSelect={() => {
+                                  if (
+                                    !formData.OptionValue.includes(
+                                      ingredient.Name
+                                    )
+                                  ) {
+                                    setFormData({
+                                      ...formData,
+                                      OptionValue: [
+                                        ...formData.OptionValue,
+                                        ingredient.Name,
+                                      ],
+                                      OptionPrice: [...formData.OptionPrice, 0],
+                                    });
+                                  }
+                                }}
+                              >
+                                {ingredient.Name}
+                              </DropdownMenu.Item>
+                            ))}
+                          </div>
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>

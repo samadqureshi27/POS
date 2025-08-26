@@ -339,7 +339,7 @@ const StaffManagementPage = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="flex gap-13 mb-8">
+      <div className="flex gap-17 mb-8 w-[95vw]">
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">{summaryData.totalStaff}</p>
@@ -354,14 +354,14 @@ const StaffManagementPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">${summaryData.totalSalaries.toLocaleString()}</p>
             <p className="text-1xl text-gray-500">Total Payroll</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm ml-1 p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px]  border border-gray-300 rounded-sm ml-1 p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">${summaryData.unpaidSalaries.toLocaleString()}</p>
             <p className="text-1xl text-gray-500">Pending Payments</p>
@@ -388,8 +388,8 @@ const StaffManagementPage = () => {
 
       {/* Table */}
      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-              <div className="max-h-[58vh] rounded-sm overflow-y-auto">
-                <table className="min-w-full divide-y divide-gray-200   table-fixed">
+              <div className=" rounded-sm ">
+                <table className="min-w-full max-w-[800px] divide-y divide-gray-200   table-fixed">
                   <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
                 <th className="relative px-6 py-6 text-left">

@@ -773,6 +773,18 @@ const MenuManagementPage = () => {
       handleCreateItem(formData);
     }
   };
+  useEffect(() => {
+      if (isModalOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "unset";
+      }
+  
+      // Cleanup function to restore scrolling when component unmounts
+      return () => {
+        document.body.style.overflow = "unset";
+      };
+    }, [isModalOpen]);
 
   const handleStatusChange = (
     field: keyof typeof formData,
@@ -861,8 +873,8 @@ const MenuManagementPage = () => {
 
       {/* Table */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm">
-        <div className="max-h-[58vh] rounded-sm overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+        <div className=" rounded-sm ">
+          <table className="min-w-full divide-y max-h-[800px] divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-6 text-left w-[2.5px]">
@@ -1672,21 +1684,21 @@ const MenuManagementPage = () => {
               )}
 
               {activeTab === "Meal" && (
-                <div className=" pr-4">
+                <div className="w-full  ">
                   {/* Add Size Button */}
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 ml-1 mb-1">
                     Menu Item Option
                   </label>
 
-                  <div className="flex items-center mb-2 gap-3">
+                  <div className="flex items-center w-full mb-2 gap-3 ml-1">
                     <DropdownMenu.Root>
-                      <DropdownMenu.Trigger className="min-w-[450px] flex items-center justify-between px-4 py-2 mt-5  text-black rounded-lg hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
+                      <DropdownMenu.Trigger className="w-[29vw] flex items-center justify-between px-4 py-2 mt-5  text-black rounded-lg hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
                         <span className="text-sm">Add New Size Option</span>
                         <ChevronDown size={16} className="text-gray-500" />
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[510px] ml-10 rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 overflow-y-auto z-100"
+                          className="w-[29vw] ml-10 rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 overflow-y-auto z-100"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
@@ -1730,7 +1742,7 @@ const MenuManagementPage = () => {
                   </div>
 
                   {/* Fixed Header */}
-                  <div className="border min-w-[515px] border-gray-200 rounded-t-lg bg-gray-50">
+                  <div className="border w-[33.5vw] border-gray-200 rounded-t-lg bg-gray-50 ml-1">
                     <table className="w-full">
                       <thead>
                         <tr>
@@ -1755,7 +1767,7 @@ const MenuManagementPage = () => {
                   </div>
 
                   {/* Scrollable Body */}
-                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-w-[515px] min-h-[197px] overflow-y-auto bg-white">
+                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg ml-1  w-[33.5vw] min-h-[197px] overflow-y-auto bg-white">
                     <DragDropContext
                       onDragEnd={(result) => {
                         const { source, destination } = result;
@@ -1821,7 +1833,7 @@ const MenuManagementPage = () => {
                                       </td>
 
                                       {/* Size Name */}
-                                      <td className="min-w-[200px] p-3">
+                                      <td className="min-w-[150px] p-3">
                                         <input
                                           type="text"
                                           value={opt}
@@ -1835,7 +1847,7 @@ const MenuManagementPage = () => {
                                               MealValue: updated,
                                             });
                                           }}
-                                          className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                                          className="max-w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                                           placeholder="Size name"
                                         />
                                       </td>
