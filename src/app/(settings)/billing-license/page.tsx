@@ -327,7 +327,7 @@ const BillingLicensePage = () => {
   if (!licenseInfo) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 w-[92.5vw] ">
       {toast && (
         <Toast
           message={toast.message}
@@ -338,7 +338,7 @@ const BillingLicensePage = () => {
       )}
 
       {/* Container with proper centering and full width utilization */}
-      <div className=" ml-10 max-w-[1500px] mx-auto px-6 lg:px-8">
+      <div className=" mt-20">
         {/* Header - Better spacing and centering */}
         <div className="flex items-center justify-between mb-12">
           <h1 className="text-3xl font-semibold text-gray-900">Billing & License</h1>
@@ -346,7 +346,7 @@ const BillingLicensePage = () => {
             <button
               onClick={handleRecheck}
               disabled={rechecking}
-              className="flex items-center gap-2 px-6 py-2 bg-[#2C2C2C] text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-2 bg-[#2C2C2C] text-white rounded-sm hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {rechecking ? (
                 <>
@@ -366,7 +366,7 @@ const BillingLicensePage = () => {
         {/* Three cards in a row with better spacing and wider layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* License Information Card - Enhanced */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[500px]">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
             <div className="flex items-center gap-2 mb-8">
               <Key className="text-black" size={24} />
               <h2 className="text-xl font-semibold">License Information</h2>
@@ -429,7 +429,7 @@ const BillingLicensePage = () => {
           </div>
 
           {/* Resources Allocation Card - Enhanced */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[500px]">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
             <div className="flex items-center gap-2 mb-8">
               <Building className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Resources Allocation</h2>
@@ -478,7 +478,7 @@ const BillingLicensePage = () => {
           </div>
 
           {/* Update License Card - Enhanced */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[500px]">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
             <div className="flex items-center gap-2 mb-8">
               <CreditCard className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Update License</h2>
@@ -498,7 +498,7 @@ const BillingLicensePage = () => {
                   value={licenseKeyInput}
                   onChange={(e) => setLicenseKeyInput(e.target.value)}
                   placeholder="Enter your license key (e.g., LIC-XXXX-XXXX-XXXX)"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   disabled={updating}
                 />
                 <p className="text-xs text-gray-500 mt-2">
@@ -509,7 +509,7 @@ const BillingLicensePage = () => {
               <button
                 type="submit"
                 disabled={updating || !licenseKeyInput.trim()}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#2C2C2C] text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#2C2C2C] text-white rounded-sm hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {updating ? (
                   <>

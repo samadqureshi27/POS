@@ -186,18 +186,46 @@ const Toast = ({
   message: string;
   type: "success" | "error";
   onClose: () => void;
-}) => (
-  <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation
+    setTimeout(() => setIsVisible(true), 10);
+  }, []);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Wait for exit animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+      } ${
+        isVisible && !isClosing
+          ? "translate-x-0 opacity-100"
+          : isClosing
+          ? "translate-x-full opacity-0"
+          : "translate-x-full opacity-0"
       }`}
-  >
-    {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-    <span>{message}</span>
-    <button onClick={onClose} className="ml-2">
-      <X size={16} />
-    </button>
-  </div>
-);
+    >
+      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      <span>{message}</span>
+      <button 
+        onClick={handleClose} 
+        className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 
 const PaymentManagementPage = () => {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -368,6 +396,18 @@ const PaymentManagementPage = () => {
       handleCreateItem(formData);
     }
   };
+  useEffect(() => {
+      if (isModalOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "unset";
+      }
+  
+      // Cleanup function to restore scrolling when component unmounts
+      return () => {
+        document.body.style.overflow = "unset";
+      };
+    }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -408,7 +448,7 @@ const PaymentManagementPage = () => {
   }
 
   return (
-    <div className="p-6 mx-6 bg-gray-50 min-h-screen overflow-y-auto">
+    <div className="  bg-gray-50 min-h-screen ">
       {toast && (
         <Toast
           message={toast.message}
@@ -417,13 +457,13 @@ const PaymentManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">
+      <h1 className="text-3xl font-semibold mb-8 mt-20">
         Payment Management
       </h1>
 
       {/* Top summary row */}
-      <div className="flex gap-4 mb-6 pl-20">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+      <div className="flex gap-4 mb-8">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-3xl font-semibold mb-1">
               {activeMethodsCount}
@@ -434,7 +474,7 @@ const PaymentManagementPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-3xl font-semibold mb-1">
               {topTaxType?.[0] || "N/A"}
@@ -447,13 +487,13 @@ const PaymentManagementPage = () => {
       </div>
 
       {/* Action bar: add, delete, search */}
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 pl-20">
+        <div className="flex gap-3 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-4 py-2 rounded-lg transition-colors ${selectedItems.length === 0
+            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -465,7 +505,7 @@ const PaymentManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSomeSelected && !actionLoading
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -477,43 +517,84 @@ const PaymentManagementPage = () => {
 
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-          <input
-            type="text"
-            placeholder="Search payment methods..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-        </div>
+                  <input
+                    type="text"
+                    placeholder="Search Payment Methods..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  />
+                  <Search
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={16}
+                  />
+                </div>
       </div>
 
       {/* Table + filters */}
-      <div className="bg-gray-50 rounded-lg ml-20 shadow-sm overflow-x-auto">
-        <div className="max-h-[500px] overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
-              <tr>
-                <th className="px-4 py-3 text-left">
-                  <Checkbox
-                    checked={isAllSelected}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    sx={{
-                      color: "#2C2C2C",
-                      "&.Mui-checked": { color: "#2C2C2C" },
-                    }}
-                  />
-                </th>
+     <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
+             <div className=" rounded-sm ">
+               <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
+                 <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+                   <tr>
+                     <th className="px-6 py-6 text-left w-[2.5px]">
+                       <Checkbox
+                         checked={isAllSelected}
+                         onChange={(e) => handleSelectAll(e.target.checked)}
+                         disableRipple
+                         sx={{
+                           transform: "scale(1.5)", // size adjustment
+                           p: 0, // remove extra padding
+                         }}
+                         icon={
+                           // unchecked grey box
+                           <svg width="20" height="20" viewBox="0 0 24 24">
+                             <rect
+                               x="3"
+                               y="3"
+                               width="18"
+                               height="18"
+                               rx="3"
+                               ry="3"
+                               fill="#e0e0e0" // grey inside
+                               stroke="#d1d1d1" // border grey
+                               strokeWidth="2"
+                             />
+                           </svg>
+                         }
+                         checkedIcon={
+                           // checked with tick
+                           <svg width="20" height="20" viewBox="0 0 24 24">
+                             <rect
+                               x="3"
+                               y="3"
+                               width="18"
+                               height="18"
+                               rx="3"
+                               ry="3"
+                               fill="#e0e0e0" // grey inside
+                               stroke="#2C2C2C" // dark border
+                               strokeWidth="2"
+                             />
+                             <path
+                               d="M9 12.5l2 2 4-4.5"
+                               fill="none"
+                               stroke="#2C2C2C"
+                               strokeWidth="2"
+                               strokeLinecap="round"
+                               strokeLinejoin="round"
+                             />
+                           </svg>
+                         }
+                       />
+                     </th>
                 <th className="relative px-4 py-3 text-left">
                   ID
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
@@ -540,19 +621,19 @@ const PaymentManagementPage = () => {
                             Payment Type
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
                             onClick={() => setStatusFilter("Cash")}
                           >
                             Cash
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-blue-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-blue-400 rounded outline-none"
                             onClick={() => setStatusFilter("Card")}
                           >
                             Card
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
                             onClick={() => setStatusFilter("Online")}
                           >
                             Online
@@ -561,7 +642,7 @@ const PaymentManagementPage = () => {
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
 
                 <th className="relative px-4 py-3 text-left">
@@ -604,51 +685,92 @@ const PaymentManagementPage = () => {
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
 
                 <th className="relative px-4 py-3 text-left">
                   Tax Percentage
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
 
                 <th className="relative px-4 py-3 text-left">
                   Status
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
 
                 <th className="relative px-4 py-3 text-left">
                   Actions
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y text-gray-500  divide-gray-300">
               {filteredItems.map((item) => (
                 <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                  <td className="px-4 py-4">
-                    <Checkbox
-                      checked={selectedItems.includes(item.ID)}
-                      onChange={(e) =>
-                        handleSelectItem(item.ID, e.target.checked)
-                      }
-                      sx={{
-                        color: "#d9d9e1",
-                        "&.Mui-checked": { color: "#d9d9e1" },
-                      }}
-                    />
-                  </td>
+                  <td className="px-6 py-8">
+                                        <Checkbox
+                                          checked={selectedItems.includes(item.ID)}
+                                          onChange={(e) =>
+                                            handleSelectItem(item.ID, e.target.checked)
+                                          }
+                                          disableRipple
+                                          sx={{
+                                            p: 0, // remove extra padding
+                                            transform: "scale(1.5)", // optional size tweak
+                                          }}
+                                          icon={
+                                            // unchecked grey box
+                                            <svg width="20" height="20" viewBox="0 0 24 24">
+                                              <rect
+                                                x="3"
+                                                y="3"
+                                                width="18"
+                                                height="18"
+                                                rx="3"
+                                                ry="3"
+                                                fill="#e0e0e0" // grey inside
+                                                stroke="#d1d1d1" // border grey
+                                                strokeWidth="2"
+                                              />
+                                            </svg>
+                                          }
+                                          checkedIcon={
+                                            // checked with tick
+                                            <svg width="20" height="20" viewBox="0 0 24 24">
+                                              <rect
+                                                x="3"
+                                                y="3"
+                                                width="18"
+                                                height="18"
+                                                rx="3"
+                                                ry="3"
+                                                fill="#e0e0e0" // grey inside
+                                                stroke="#2C2C2C" // dark border
+                                                strokeWidth="2"
+                                              />
+                                              <path
+                                                d="M9 12.5l2 2 4-4.5"
+                                                fill="none"
+                                                stroke="#2C2C2C"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              />
+                                            </svg>
+                                          }
+                                        />
+                                      </td>
 
                   <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
                   <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
-                      className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
-                  ${item.PaymentType === "Cash" ? "text-red-600 border-red-600" : ""}
-                  ${item.PaymentType === "Card" ? "text-blue-600 border-blue-600" : ""}
-                  ${item.PaymentType === "Online" ? "text-green-700 border-green-700" : ""}
+                      className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
+                  ${item.PaymentType === "Cash" ? "text-red-400 border-red-600" : ""}
+                  ${item.PaymentType === "Card" ? "text-blue-400 border-blue-600" : ""}
+                  ${item.PaymentType === "Online" ? "text-green-400 border-green-700" : ""}
                 `}
                     >
                       {item.PaymentType}
@@ -660,8 +782,8 @@ const PaymentManagementPage = () => {
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
-                      className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
-                  ${item.Status === "Active" ? "text-green-700 border-green-700" : "text-red-600 border-red-600"}
+                      className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
+                  ${item.Status === "Active" ? "text-green-400 border-green-700" : "text-red-400 border-red-600"}
                 `}
                     >
                       {item.Status}

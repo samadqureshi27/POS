@@ -5,8 +5,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React, { useState, useEffect } from "react";
 import { RadialBarChart, RadialBar, Legend, Tooltip } from "recharts";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 import {
   Plus,
@@ -197,7 +195,9 @@ class OrderAPI {
     }
 
     if (filters.status) {
-      filteredData = filteredData.filter((item) => item.Status === filters.status);
+      filteredData = filteredData.filter(
+        (item) => item.Status === filters.status
+      );
     }
 
     if (filters.type) {
@@ -205,7 +205,9 @@ class OrderAPI {
     }
 
     if (filters.customDate) {
-      filteredData = filteredData.filter((item) => item.Time_Date === filters.customDate);
+      filteredData = filteredData.filter(
+        (item) => item.Time_Date === filters.customDate
+      );
     }
 
     return {
@@ -215,6 +217,39 @@ class OrderAPI {
     };
   }
 }
+
+// Custom DatePicker Component
+const DatePicker = ({
+  selected,
+  onChange,
+  dateFormat,
+  placeholderText,
+  className,
+}: {
+  selected: Date | null;
+  onChange: (date: Date | null) => void;
+  dateFormat: string;
+  placeholderText: string;
+  className: string;
+}) => {
+  return (
+    <input
+      type="date"
+      value={selected ? selected.toISOString().split("T")[0] : ""}
+      onChange={(e) => {
+        const value = e.target.value;
+        if (value) {
+          const date = new Date(value);
+          onChange(date);
+        } else {
+          onChange(null);
+        }
+      }}
+      className={className}
+      placeholder={placeholderText}
+    />
+  );
+};
 
 const Toast = ({
   message,
@@ -226,8 +261,9 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-      }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
+      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -242,7 +278,9 @@ const OrderManagementPage = () => {
   const [filteredItems, setFilteredItems] = useState<OrderItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
+  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
+    ""
+  );
   const [unitFilter, setUnitFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -251,7 +289,7 @@ const OrderManagementPage = () => {
   const [orderStats, setOrderStats] = useState<OrderStats>({
     mostOrdered: [],
     leastOrdered: [],
-    orderTypeStats: []
+    orderTypeStats: [],
   });
 
   const [toast, setToast] = useState<{
@@ -335,8 +373,8 @@ const OrderManagementPage = () => {
   };
 
   const formatDate = (date: Date): string => {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   };
@@ -367,7 +405,7 @@ const OrderManagementPage = () => {
   }
 
   return (
-    <div className="p-6 mx-6 bg-gray-50 min-h-screen overflow-y-auto">
+    <div className="p-6  bg-gray-50 min-h-screen ">
       {toast && (
         <Toast
           message={toast.message}
@@ -376,18 +414,19 @@ const OrderManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">Order Management</h1>
+      <h1 className="text-3xl font-semibold mb-8 ">Order Management</h1>
 
-      <div className="flex gap-2 pl-20 mb-8 items-center">
+      <div className="flex gap-2 mb-8 items-center">
         {options.map((option) => (
           <button
             key={option}
             onClick={() => setActive(option)}
-            className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors
-            ${active === option
+            className={`px-4 py-2 rounded-sm text-sm font-medium border transition-colors
+            ${
+              active === option
                 ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
                 : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
-              }
+            }
           `}
           >
             {option}
@@ -408,26 +447,29 @@ const OrderManagementPage = () => {
 
       <div className="flex gap-6">
         {/* Most Ordered Table */}
-        <div className="bg-gray-50 ml-20 rounded-lg overflow-x-auto w-1/3">
+        <div className="bg-gray-50  rounded-sm overflow-x-auto w-1/3">
           <div className="max-h-[300px] overflow-y-auto">
-            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] rounded-md mb-2 p-4 bg-white shadow-sm">
+            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] border border-gray-300 rounded-sm mb-2 p-4 bg-white shadow-sm">
               <div>
                 <p className="text-2xl mb-1">Most Ordered</p>
               </div>
             </div>
 
-            <table className="min-w-full divide-y divide-gray-200 table-fixed text-sm">
-              <thead className="bg-white border-b border-gray-200 sticky top-0">
+            <table className="min-w-full divide-y divide-gray-300 border border-gray-300 rounded-sm table-fixed text-sm">
+              <thead className="bg-white border-b rounded-sm border-gray-300 sticky  top-0">
                 <tr>
                   <th className="px-2 py-2 text-left">Rank</th>
                   <th className="px-2 py-2 text-left">Name</th>
                   <th className="px-2 py-2 text-left">Total Number</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-300">
                 {statsLoading ? (
                   <tr>
-                    <td colSpan={3} className="px-2 py-4 text-center text-gray-500">
+                    <td
+                      colSpan={3}
+                      className="px-2 py-4 text-center text-gray-500"
+                    >
                       Loading statistics...
                     </td>
                   </tr>
@@ -446,25 +488,28 @@ const OrderManagementPage = () => {
         </div>
 
         {/* Least Ordered Table */}
-        <div className="bg-gray-50 rounded-lg overflow-x-auto w-1/3">
+        <div className="bg-gray-50 rounded-sm overflow-x-auto w-1/3">
           <div className="max-h-[300px] overflow-y-auto">
-            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] rounded-md mb-2 p-4 bg-white shadow-sm">
+            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] border border-gray-300 rounded-sm mb-2 p-4 bg-white shadow-sm">
               <div>
                 <p className="text-2xl mb-1">Least Ordered</p>
               </div>
             </div>
-            <table className="min-w-full divide-y divide-gray-200 table-fixed text-sm">
-              <thead className="bg-white border-b border-gray-200 sticky top-0">
+            <table className="min-w-full divide-y divide-gray-200 table-fixed border rounded-sm border-gray-300 text-sm">
+              <thead className="bg-white border-b border-gray-300 sticky  top-0">
                 <tr>
                   <th className="px-2 py-2 text-left">Rank</th>
                   <th className="px-2 py-2 text-left">Name</th>
                   <th className="px-2 py-2 text-left">Total Number</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-300">
                 {statsLoading ? (
                   <tr>
-                    <td colSpan={3} className="px-2 py-4 text-center text-gray-500">
+                    <td
+                      colSpan={3}
+                      className="px-2 py-4 text-center text-gray-500"
+                    >
                       Loading statistics...
                     </td>
                   </tr>
@@ -483,92 +528,154 @@ const OrderManagementPage = () => {
         </div>
 
         {/* Radial Chart */}
-        <div className="w-1/3 flex items-center justify-center overflow-hidden">
-          <div className="max-h-[300px]">
-            <div className="flex items-center justify-center">
-              <p className="text-2xl mb-1">Most Type of Orders</p>
-            </div>
-            <div className="flex items-center justify-center">
-              {statsLoading ? (
-                <div className="flex items-center justify-center h-[250px]">
-                  <div className="animate-spin h-8 w-8 border-b-2 border-gray-600 rounded-full"></div>
-                </div>
-              ) : (
-                <RadialBarChart
-                  width={370}
-                  height={250}
-                  cx="40%"
-                  cy="50%"
-                  innerRadius="50%"
-                  outerRadius="80%"
-                  barSize={20}
-                  data={orderStats.orderTypeStats}
-                >
-                  <RadialBar minAngle={15} clockWise dataKey="value" />
-                  <Legend
-                    iconSize={10}
-                    layout="vertical"
-                    verticalAlign="middle"
-                    align="right"
-                  />
-                  <Tooltip
-                    formatter={(value, name, props) => [
-                      `${value} Orders`,
-                      props.payload.name,
-                    ]}
-                  />
-                </RadialBarChart>
-              )}
-            </div>
-          </div>
-        </div>
+     <div className="w-1/3 flex items-center justify-center overflow-hidden outline-none border-none">              
+  <div className="max-h-[300px] outline-none border-none">                  
+    <div className="flex items-center justify-center">                      
+      <p className="text-2xl mb-1">Most Type of Orders</p>                  
+    </div>                  
+    <div className="flex items-center justify-center outline-none border-none">                      
+      {statsLoading ? (                          
+        <div className="flex items-center justify-center h-[250px]">                              
+          <div className="animate-spin h-8 w-8 border-b-2 border-gray-600 rounded-full"></div>                          
+        </div>                      
+      ) : (  
+        <div style={{
+          outline: 'none',
+          border: 'none',
+          boxShadow: 'none'
+        }}>                        
+          <RadialBarChart                              
+            width={370}                              
+            height={250}                              
+            cx="40%"                              
+            cy="50%"                              
+            innerRadius="50%"                              
+            outerRadius="80%"                              
+            barSize={20}                              
+            data={orderStats.orderTypeStats}
+            style={{
+              outline: 'none', 
+              border: 'none',
+              boxShadow: 'none'
+            }}
+          >                              
+            <RadialBar minAngle={15} clockWise dataKey="value" />                              
+            <Legend                                  
+              iconSize={10}                                  
+              layout="vertical"                                  
+              verticalAlign="middle"                                  
+              align="right"                              
+            />                              
+            <Tooltip                                  
+              formatter={(value, name, props) => [                                      
+                `${value} Orders`,                                      
+                props.payload.name,                                  
+              ]}                              
+            />                          
+          </RadialBarChart>
+        </div>                      
+      )}                  
+    </div>              
+  </div>          
+</div>
+
+{/* Add this style tag at the bottom of your component or in your CSS file */}
+<style jsx global>{`
+  .recharts-wrapper,
+  .recharts-wrapper svg,
+  .recharts-surface {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+`}</style>
       </div>
 
       {/* Search Bar */}
-       <div className="mb-6 mt-8 ml-20 flex items-center justify-end gap-4 flex-wrap">
+      <div className="mb-8 mt-8  flex items-center justify-end gap-4 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
           <input
             type="text"
-            placeholder="Search Orders..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
           />
         </div>
       </div>
 
-
       {/* Table + filters */}
-      <div className="bg-gray-50 rounded-lg ml-20 shadow-sm overflow-x-auto">
-        <div className="max-h-[500px] overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
+        <div className=" rounded-sm ">
+          <table className="min-w-full  divide-y divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-4 py-3 text-left">
+                <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
+                    disableRipple
                     sx={{
-                      color: "#2C2C2C",
-                      "&.Mui-checked": { color: "#2C2C2C" },
+                      transform: "scale(1.5)", // size adjustment
+                      p: 0, // remove extra padding
                     }}
+                    icon={
+                      // unchecked grey box
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#d1d1d1" // border grey
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    }
+                    checkedIcon={
+                      // checked with tick
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#2C2C2C" // dark border
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12.5l2 2 4-4.5"
+                          fill="none"
+                          stroke="#2C2C2C"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
                   />
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Order#
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Quantity
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
@@ -595,13 +702,13 @@ const OrderManagementPage = () => {
                             All Status
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
                             onClick={() => setStatusFilter("Active")}
                           >
                             Active
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
                             onClick={() => setStatusFilter("Inactive")}
                           >
                             Inactive
@@ -610,7 +717,7 @@ const OrderManagementPage = () => {
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
 
                 <th className="relative px-4 py-3 text-left">
@@ -653,44 +760,90 @@ const OrderManagementPage = () => {
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
 
                 <th className="relative px-4 py-3 text-left">
                   Payment
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Total
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Date
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y text-gray-500  divide-gray-300">
               {filteredItems.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
-                    {loading ? "Loading orders..." : "No orders found matching your criteria"}
+                  <td
+                    colSpan={9}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    {loading
+                      ? "Loading orders..."
+                      : "No orders found matching your criteria"}
                   </td>
                 </tr>
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item.Order} className="bg-white hover:bg-gray-50">
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-8">
                       <Checkbox
                         checked={selectedItems.includes(item.Order)}
                         onChange={(e) =>
                           handleSelectItem(item.Order, e.target.checked)
                         }
+                        disableRipple
                         sx={{
-                          color: "#d9d9e1",
-                          "&.Mui-checked": { color: "#d9d9e1" },
+                          p: 0, // remove extra padding
+                          transform: "scale(1.5)", // optional size tweak
                         }}
+                        icon={
+                          // unchecked grey box
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#d1d1d1" // border grey
+                              strokeWidth="2"
+                            />
+                          </svg>
+                        }
+                        checkedIcon={
+                          // checked with tick
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#2C2C2C" // dark border
+                              strokeWidth="2"
+                            />
+                            <path
+                              d="M9 12.5l2 2 4-4.5"
+                              fill="none"
+                              stroke="#2C2C2C"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        }
                       />
                     </td>
 
@@ -704,23 +857,26 @@ const OrderManagementPage = () => {
 
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-1 rounded-md text-xs font-medium border
-                    ${item.Status === "Inactive"
-                            ? "text-red-600 border-red-600 bg-red-50"
-                            : "text-green-700 border-green-700 bg-green-50"
-                          }
+                        className={`inline-block w-20 text-center px-2 py-1 rounded-md text-xs font-medium 
+                    ${
+                      item.Status === "Inactive"
+                        ? "text-red-400 "
+                        : "text-green-400 "
+                    }
                   `}
                       >
                         {item.Status}
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-400 rounded-md text-sm">
                         {item.Type}
                       </span>
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap">{item.Payment}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      {item.Payment}
+                    </td>
                     <td className="px-4 py-4 whitespace-nowrap font-semibold text-gray-900">
                       {item.Total}
                     </td>

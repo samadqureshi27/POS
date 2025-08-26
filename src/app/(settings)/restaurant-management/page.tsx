@@ -47,15 +47,15 @@ class RestaurantAPI {
     new Promise((resolve) => setTimeout(resolve, ms));
 
   private static mockData: Omit<RestaurantData, "logo"> = {
-    name: "Sample Restaurant",
-    type: "Both",
-    contact: "+1 (555) 123-4567",
-    email: "info@samplerestaurant.com",
-    address: "123 Main Street, City, State 12345",
-    description: "A cozy restaurant serving delicious food with exceptional service.",
-    website: "www.samplerestaurant.com",
-    openingTime: "09:00",
-    closingTime: "22:00",
+    name: "",
+    type: "",
+    contact: "",
+    email: "",
+    address: "",
+    description: "",
+    website: "",
+    openingTime: "",
+    closingTime: "",
   };
 
   static async getProfile(): Promise<ApiResponse<Omit<RestaurantData, "logo">>> {
@@ -421,7 +421,7 @@ const RestaurantProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 w-[92.5vw]">
       {toast && (
         <Toast
           message={toast.message}
@@ -431,7 +431,7 @@ const RestaurantProfilePage = () => {
         />
       )}
 
-      <div className="ml-10 max-w-[1500px] mx-auto px-6 lg:px-8">
+      <div className=" mt-20">
         {/* Header - Consistent with Billing & License page */}
         <div className="flex items-center justify-between mb-12">
           <h1 className="text-3xl font-semibold text-gray-900">Restaurant Profile</h1>
@@ -439,7 +439,7 @@ const RestaurantProfilePage = () => {
             <button
               onClick={handleSave}
               disabled={!hasChanges || saving}
-              className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
                 hasChanges && !saving
                   ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -463,7 +463,7 @@ const RestaurantProfilePage = () => {
         {/* Three cards in a row with equal height */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Basic Information Card */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
             <div className="flex items-center gap-2 mb-8">
               <Store className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Basic Information</h2>
@@ -507,13 +507,13 @@ const RestaurantProfilePage = () => {
                 name="website"
                 value={formData.website}
                 onChange={handleInputChange}
-                placeholder="www.yourrestaurant.com"
+                placeholder="Enter your website URL"
               />
             </div>
           </div>
 
           {/* Contact Information Card */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
             <div className="flex items-center gap-2 mb-8">
               <Phone className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Contact Information</h2>
@@ -527,7 +527,7 @@ const RestaurantProfilePage = () => {
                 name="contact"
                 value={formData.contact}
                 onChange={handleInputChange}
-                placeholder="+1 (555) 123-4567"
+                placeholder="Enter contact number"
               />
 
               <SimpleInput
@@ -537,7 +537,7 @@ const RestaurantProfilePage = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="info@restaurant.com"
+                placeholder="Enter email address"
               />
 
               <SimpleTextarea
@@ -546,14 +546,14 @@ const RestaurantProfilePage = () => {
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                placeholder="123 Main Street, City, State, ZIP Code"
+                placeholder="Enter your address"
                 rows={3}
               />
             </div>
           </div>
 
           {/* Logo & Hours Card */}
-          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
+          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
             <div className="flex items-center gap-2 mb-8">
               <Image className="text-black" size={24} />
               <h2 className="text-xl font-semibold">Logo & Hours</h2>
@@ -566,7 +566,7 @@ const RestaurantProfilePage = () => {
                   Restaurant Logo
                 </label>
                 <div
-                  className={`relative border-2 border-dashed rounded-lg p-6 bg-gray-50 flex flex-col justify-center items-center hover:bg-gray-100 transition-all duration-300 cursor-pointer ${
+                  className={`relative border-2 border-dashed rounded-sm p-6 bg-gray-50 flex flex-col justify-center items-center hover:bg-gray-100 transition-all duration-300 cursor-pointer ${
                     dragActive ? "border-gray-500 bg-blue-50" : "border-gray-300"
                   }`}
                   onDragEnter={handleDrag}
@@ -580,15 +580,15 @@ const RestaurantProfilePage = () => {
                       <img
                         src={previewUrl}
                         alt="Restaurant Logo"
-                        className="max-h-32 max-w-full object-contain mb-4 rounded-lg shadow-md"
+                        className="max-h-32 max-w-full object-contain mb-4 rounded-sm shadow-md"
                       />
-                      <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
+                      <div className="absolute inset-0 bg-black bg-opacity-50 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleClickUpload();
                           }}
-                          className="bg-white text-gray-900 rounded-lg p-2 hover:bg-gray-100 transition-colors"
+                          className="bg-white text-gray-900 rounded-sm p-2 hover:bg-gray-100 transition-colors"
                           title="Change logo"
                         >
                           <Camera size={16} />
@@ -598,7 +598,7 @@ const RestaurantProfilePage = () => {
                             e.stopPropagation();
                             removeLogo();
                           }}
-                          className="bg-red-500 text-white rounded-lg p-2 hover:bg-red-600 transition-colors"
+                          className="bg-red-500 text-white rounded-sm p-2 hover:bg-red-600 transition-colors"
                           title="Remove logo"
                         >
                           <Trash2 size={16} />
@@ -608,7 +608,7 @@ const RestaurantProfilePage = () => {
                     </div>
                   ) : (
                     <>
-                      <div className="p-3 bg-white rounded-full shadow-md mb-4">
+                      <div className="p-3 bg-white rounded-full shadow-sm mb-4">
                         <Upload className="w-6 h-6 text-gray-400" />
                       </div>
                       <p className="text-gray-700 text-center text-sm font-medium mb-2">
@@ -617,7 +617,7 @@ const RestaurantProfilePage = () => {
                       <p className="text-xs text-gray-500 mb-4">
                         or click to browse files
                       </p>
-                      <div className="px-4 py-2 bg-[#2C2C2C] text-white hover:bg-gray-700 text-xs font-medium rounded-lg transition-colors">
+                      <div className="px-4 py-2 bg-[#2C2C2C] text-white hover:bg-gray-700 text-xs font-medium rounded-sm transition-colors">
                         Upload Logo
                       </div>
                     </>
@@ -666,7 +666,7 @@ const RestaurantProfilePage = () => {
                   />
 
                   {formData.openingTime && formData.closingTime && (
-                    <div className="bg-gray-50 rounded-lg p-3 border">
+                    <div className="bg-gray-50 rounded-sm p-3 border">
                       <p className="text-xs font-medium text-gray-700 mb-1">Daily Hours</p>
                       <p className="text-sm font-semibold text-gray-900">
                         {formData.openingTime} - {formData.closingTime}

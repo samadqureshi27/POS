@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  ChevronDown,
-  Search,
-  AlertCircle,
-  CheckCircle,
-  X,
-} from "lucide-react";
+import { ChevronDown, Search, AlertCircle, CheckCircle, X } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 // Types
@@ -217,7 +211,7 @@ const CustomerManagementPage = () => {
   }
 
   return (
-    <div className="mx-6 p-6 bg-gray-50 min-h-screen">
+    <div className=" p-6 bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -226,18 +220,18 @@ const CustomerManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-4 pl-20">Customer Management</h1>
+      <h1 className="text-3xl font-semibold mb-8 mt-20">Customer Management</h1>
 
       {/* Summary Cards */}
-      <div className="flex gap-4 mb-6 pl-20">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+      <div className="flex gap-4 mb-8">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">{customerItems.length}</p>
             <p className="text-1xl text-gray-500">Total Customers</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-md p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">
               {customerItems.filter((item) => item.Status === "Active").length}
@@ -247,51 +241,52 @@ const CustomerManagementPage = () => {
         </div>
       </div>
 
-      <div className="mb-6 pl-20 flex items-center justify-between gap-4 flex-wrap">
+      <div className="mb-6  flex items-center justify-between gap-4 flex-wrap">
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
           <input
             type="text"
-            placeholder="Search customers..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg ml-20 shadow-sm overflow-hidden">
-        <div className="max-h-[500px] overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
+        <div className=" rounded-sm ">
+          <table className="min-w-full max-w-[800px] divide-y divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="relative px-4 py-3 text-left">
-                  Customer ID
-                </th>
+                <th className="relative px-6 py-6 text-left">Customer ID</th>
                 <th className="relative px-4 py-3 text-left">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Contact
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Email
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300]"></span>
                 </th>
-                
+
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
-                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                        <ChevronDown
+                          size={14}
+                          className="text-gray-500 ml-auto"
+                        />
                       </DropdownMenu.Trigger>
 
                       <DropdownMenu.Portal>
@@ -307,13 +302,13 @@ const CustomerManagementPage = () => {
                             Status
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
                             onClick={() => setStatusFilter("Active")}
                           >
                             Active
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
                             onClick={() => setStatusFilter("Inactive")}
                           >
                             Inactive
@@ -321,26 +316,25 @@ const CustomerManagementPage = () => {
                         </DropdownMenu.Content>
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
-                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
+                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </div>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Last Ordered Date
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Total Orders
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Total Spent
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-[#d9d9e1]"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y text-gray-500  divide-gray-300">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
@@ -354,8 +348,11 @@ const CustomerManagementPage = () => {
                 </tr>
               ) : (
                 filteredItems.map((item) => (
-                  <tr key={item.Customer_ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                  <tr
+                    key={item.Customer_ID}
+                    className="bg-white hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-8 whitespace-nowrap text-sm">
                       {`#${String(item.Customer_ID).padStart(3, "0")}`}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
@@ -367,12 +364,20 @@ const CustomerManagementPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       {item.Email}
                     </td>
-                    
+
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium border
-                          ${item.Status === "Active" ? "text-green-600 border-green-600" : ""}
-                          ${item.Status === "Inactive" ? "text-red-600 border-red-600" : ""}`}
+                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
+                          ${
+                            item.Status === "Active"
+                              ? "text-green-400 border-green-600"
+                              : ""
+                          }
+                          ${
+                            item.Status === "Inactive"
+                              ? "text-red-400 border-red-600"
+                              : ""
+                          }`}
                       >
                         {item.Status}
                       </span>
@@ -386,7 +391,6 @@ const CustomerManagementPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       PKR {item.Total_Spent.toLocaleString()}
                     </td>
-                    
                   </tr>
                 ))
               )}

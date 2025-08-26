@@ -114,19 +114,46 @@ const Toast = ({
   message: string;
   type: "success" | "error";
   onClose: () => void;
-}) => (
-  <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
-  >
-    {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-    <span>{message}</span>
-    <button onClick={onClose} className="ml-2">
-      <X size={16} />
-    </button>
-  </div>
-);
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation
+    setTimeout(() => setIsVisible(true), 10);
+  }, []);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Wait for exit animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+      } ${
+        isVisible && !isClosing
+          ? "translate-x-0 opacity-100"
+          : isClosing
+          ? "translate-x-full opacity-0"
+          : "translate-x-full opacity-0"
+      }`}
+    >
+      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      <span>{message}</span>
+      <button 
+        onClick={handleClose} 
+        className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 
 const PosListPage = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -295,6 +322,18 @@ const PosListPage = () => {
       Status: isActive ? "Active" : "Inactive",
     }));
   };
+  useEffect(() => {
+      if (isModalOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "unset";
+      }
+  
+      // Cleanup function to restore scrolling when component unmounts
+      return () => {
+        document.body.style.overflow = "unset";
+      };
+    }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -309,9 +348,7 @@ const PosListPage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto">
-            
-          </div>
+          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading POS List...</p>
         </div>
       </div>
@@ -319,7 +356,7 @@ const PosListPage = () => {
   }
 
   return (
-    <div className="mx-6 p-6 bg-gray-50 min-h-screen">
+    <div className=" p-6 bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -328,18 +365,18 @@ const PosListPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mt-14 mb-8 ">POS List</h1>
+      <h1 className="text-3xl font-semibold mt-20 mb-8 ">POS List</h1>
 
       {/* Summary Cards */}
       <div className="flex gap-4 mb-8">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">{menuItems.length}</p>
             <p className="text-1xl text-gray-500">Total POS</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl ">
               {menuItems.filter((item) => item.Status === "Active").length}
@@ -383,7 +420,7 @@ const PosListPage = () => {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search Menu Items..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
@@ -397,61 +434,61 @@ const PosListPage = () => {
 
       {/* Table */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-              <div className="max-h-[500px] rounded-sm overflow-y-auto">
-                <table className="min-w-full divide-y divide-gray-200   table-fixed">
-                  <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
-                    <tr>
-                      <th className="px-6 py-6 text-left w-[2.5px]">
-                        <Checkbox
-                          checked={isAllSelected}
-                          onChange={(e) => handleSelectAll(e.target.checked)}
-                          disableRipple
-                          sx={{
-                            transform: "scale(1.5)", // size adjustment
-                            p: 0, // remove extra padding
-                          }}
-                          icon={
-                            // unchecked grey box
-                            <svg width="20" height="20" viewBox="0 0 24 24">
-                              <rect
-                                x="3"
-                                y="3"
-                                width="18"
-                                height="18"
-                                rx="3"
-                                ry="3"
-                                fill="#e0e0e0" // grey inside
-                                stroke="#d1d1d1" // border grey
-                                strokeWidth="2"
-                              />
-                            </svg>
-                          }
-                          checkedIcon={
-                            // checked with tick
-                            <svg width="20" height="20" viewBox="0 0 24 24">
-                              <rect
-                                x="3"
-                                y="3"
-                                width="18"
-                                height="18"
-                                rx="3"
-                                ry="3"
-                                fill="#e0e0e0" // grey inside
-                                stroke="#2C2C2C" // dark border
-                                strokeWidth="2"
-                              />
-                              <path
-                                d="M9 12.5l2 2 4-4.5"
-                                fill="none"
-                                stroke="#2C2C2C"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          }
+        <div className=" rounded-sm ">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+              <tr>
+                <th className="px-6 py-6 text-left w-[2.5px]">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    disableRipple
+                    sx={{
+                      transform: "scale(1.5)", // size adjustment
+                      p: 0, // remove extra padding
+                    }}
+                    icon={
+                      // unchecked grey box
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#d1d1d1" // border grey
+                          strokeWidth="2"
                         />
-                      </th>
+                      </svg>
+                    }
+                    checkedIcon={
+                      // checked with tick
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#2C2C2C" // dark border
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12.5l2 2 4-4.5"
+                          fill="none"
+                          stroke="#2C2C2C"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
+                  />
+                </th>
                 <th className="relative px-4 py-3 text-left">
                   POS ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
@@ -524,58 +561,58 @@ const PosListPage = () => {
                 filteredItems.map((item) => (
                   <tr key={item.POS_ID} className="bg-white hover:bg-gray-50">
                     <td className="px-6 py-8">
-                                        <Checkbox
-                                          checked={selectedItems.includes(item.ID)}
-                                          onChange={(e) =>
-                                            handleSelectItem(item.ID, e.target.checked)
-                                          }
-                                          disableRipple
-                                          sx={{
-                                            p: 0, // remove extra padding
-                                            transform: "scale(1.5)", // optional size tweak
-                                          }}
-                                          icon={
-                                            // unchecked grey box
-                                            <svg width="20" height="20" viewBox="0 0 24 24">
-                                              <rect
-                                                x="3"
-                                                y="3"
-                                                width="18"
-                                                height="18"
-                                                rx="3"
-                                                ry="3"
-                                                fill="#e0e0e0" // grey inside
-                                                stroke="#d1d1d1" // border grey
-                                                strokeWidth="2"
-                                              />
-                                            </svg>
-                                          }
-                                          checkedIcon={
-                                            // checked with tick
-                                            <svg width="20" height="20" viewBox="0 0 24 24">
-                                              <rect
-                                                x="3"
-                                                y="3"
-                                                width="18"
-                                                height="18"
-                                                rx="3"
-                                                ry="3"
-                                                fill="#e0e0e0" // grey inside
-                                                stroke="#2C2C2C" // dark border
-                                                strokeWidth="2"
-                                              />
-                                              <path
-                                                d="M9 12.5l2 2 4-4.5"
-                                                fill="none"
-                                                stroke="#2C2C2C"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                              />
-                                            </svg>
-                                          }
-                                        />
-                                      </td>
+                      <Checkbox
+                        checked={selectedItems.includes(item.POS_ID)}
+                        onChange={(e) =>
+                          handleSelectItem(item.POS_ID, e.target.checked)
+                        }
+                        disableRipple
+                        sx={{
+                          p: 0, // remove extra padding
+                          transform: "scale(1.5)", // optional size tweak
+                        }}
+                        icon={
+                          // unchecked grey box
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#d1d1d1" // border grey
+                              strokeWidth="2"
+                            />
+                          </svg>
+                        }
+                        checkedIcon={
+                          // checked with tick
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#2C2C2C" // dark border
+                              strokeWidth="2"
+                            />
+                            <path
+                              d="M9 12.5l2 2 4-4.5"
+                              fill="none"
+                              stroke="#2C2C2C"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        }
+                      />
+                    </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       {`#${String(item.POS_ID).padStart(3, "0")}`}
                     </td>
@@ -585,16 +622,8 @@ const PosListPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
                         className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
-                          ${
-                            item.Status === "Active"
-                              ? "text-green-400 "
-                              : ""
-                          }
-                          ${
-                            item.Status === "Inactive"
-                              ? "text-red-400 "
-                              : ""
-                          }`}
+                          ${item.Status === "Active" ? "text-green-400 " : ""}
+                          ${item.Status === "Inactive" ? "text-red-400 " : ""}`}
                       >
                         {item.Status}
                       </span>
@@ -623,7 +652,7 @@ const PosListPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+        <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
           <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] overflow-y-auto shadow-lg relative flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">

@@ -167,19 +167,46 @@ const Toast = ({
   message: string;
   type: "success" | "error";
   onClose: () => void;
-}) => (
-  <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
-  >
-    {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-    <span>{message}</span>
-    <button onClick={onClose} className="ml-2">
-      <X size={16} />
-    </button>
-  </div>
-);
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation
+    setTimeout(() => setIsVisible(true), 10);
+  }, []);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Wait for exit animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+      } ${
+        isVisible && !isClosing
+          ? "translate-x-0 opacity-100"
+          : isClosing
+          ? "translate-x-full opacity-0"
+          : "translate-x-full opacity-0"
+      }`}
+    >
+      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      <span>{message}</span>
+      <button 
+        onClick={handleClose} 
+        className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 
 const EmployeeRecordsPage = () => {
   const [staffItems, setStaffItems] = useState<StaffItem[]>([]);
@@ -416,6 +443,18 @@ const EmployeeRecordsPage = () => {
       Status: isActive ? "Active" : "Inactive",
     }));
   };
+  useEffect(() => {
+      if (isModalOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "unset";
+      }
+  
+      // Cleanup function to restore scrolling when component unmounts
+      return () => {
+        document.body.style.overflow = "unset";
+      };
+    }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -456,7 +495,7 @@ const EmployeeRecordsPage = () => {
   }
 
   return (
-    <div className=" p-6 bg-gray-50 min-h-screen">
+    <div className=" bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -465,18 +504,18 @@ const EmployeeRecordsPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-8 mt-14">Staff Management</h1>
+      <h1 className="text-3xl font-semibold mb-8 mt-20">Staff Management</h1>
 
       {/* Summary Cards */}
       <div className="flex gap-4 mb-8">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">{staffItems.length}</p>
             <p className="text-1xl text-gray-500">Total Staff</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">
               {staffItems.filter((item) => item.Status === "Active").length}
@@ -524,7 +563,7 @@ const EmployeeRecordsPage = () => {
           />
           <input
             type="text"
-            placeholder="Search Staff..."
+            placeholder="Search..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="w-full pl-10 pr-4 py-2 h-[40px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
@@ -534,8 +573,8 @@ const EmployeeRecordsPage = () => {
 
       {/* Table */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className="max-h-[500px] rounded-sm overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200   table-fixed">
+        <div className=" rounded-sm ">
+          <table className="min-w-full max-w-[800px] divide-y divide-gray-200   table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-6 text-left w-[2.5px]">
@@ -730,9 +769,9 @@ const EmployeeRecordsPage = () => {
                   <tr key={item.Staff_ID} className="bg-white hover:bg-gray-50">
                     <td className="px-6 py-8">
                       <Checkbox
-                        checked={selectedItems.includes(item.ID)}
+                        checked={selectedItems.includes(item.Staff_ID)}
                         onChange={(e) =>
-                          handleSelectItem(item.ID, e.target.checked)
+                          handleSelectItem(item.Staff_ID, e.target.checked)
                         }
                         disableRipple
                         sx={{
@@ -868,7 +907,7 @@ const EmployeeRecordsPage = () => {
       {/* Model */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71 p-4"
+          className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 p-4"
           onClick={handleCloseModal}
         >
           <div

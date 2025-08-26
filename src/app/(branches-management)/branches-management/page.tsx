@@ -82,7 +82,7 @@ class BranchAPI {
     item: Omit<BranchItem, "Branch-ID">
   ): Promise<ApiResponse<BranchItem>> {
     await this.delay(1000);
-    const newId = Math.max(...this.mockData.map(i => i["Branch-ID"]), 0) + 1;
+    const newId = Math.max(...this.mockData.map((i) => i["Branch-ID"]), 0) + 1;
     const newItem: BranchItem = { ...item, "Branch-ID": newId };
     this.mockData.push(newItem);
     return {
@@ -112,10 +112,16 @@ class BranchAPI {
     this.mockData = this.mockData
       .filter((i) => i["Branch-ID"] !== id)
       .map((item, idx) => ({ ...item, "Branch-ID": idx + 1 }));
-    return { success: true, data: null, message: "Branch item deleted successfully" };
+    return {
+      success: true,
+      data: null,
+      message: "Branch item deleted successfully",
+    };
   }
 
-  static async bulkDeleteBranchItems(ids: number[]): Promise<ApiResponse<null>> {
+  static async bulkDeleteBranchItems(
+    ids: number[]
+  ): Promise<ApiResponse<null>> {
     await this.delay(1000);
     this.mockData = this.mockData
       .filter((i) => !ids.includes(i["Branch-ID"]))
@@ -137,18 +143,46 @@ const Toast = ({
   message: string;
   type: "success" | "error";
   onClose: () => void;
-}) => (
-  <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation
+    setTimeout(() => setIsVisible(true), 10);
+  }, []);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Wait for exit animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+      } ${
+        isVisible && !isClosing
+          ? "translate-x-0 opacity-100"
+          : isClosing
+          ? "translate-x-full opacity-0"
+          : "translate-x-full opacity-0"
       }`}
-  >
-    {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-    <span>{message}</span>
-    <button onClick={onClose} className="ml-2">
-      <X size={16} />
-    </button>
-  </div>
-);
+    >
+      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      <span>{message}</span>
+      <button 
+        onClick={handleClose} 
+        className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 
 const BranchListPage = () => {
   const [branchItems, setBranchItems] = useState<BranchItem[]>([]);
@@ -267,10 +301,15 @@ const BranchListPage = () => {
     if (!editingItem) return;
     try {
       setActionLoading(true);
-      const response = await BranchAPI.updateBranchItem(editingItem["Branch-ID"], itemData);
+      const response = await BranchAPI.updateBranchItem(
+        editingItem["Branch-ID"],
+        itemData
+      );
       if (response.success) {
         setBranchItems((prev) =>
-          prev.map((it) => (it["Branch-ID"] === editingItem["Branch-ID"] ? response.data : it))
+          prev.map((it) =>
+            it["Branch-ID"] === editingItem["Branch-ID"] ? response.data : it
+          )
         );
         setIsModalOpen(false);
         setEditingItem(null);
@@ -316,7 +355,12 @@ const BranchListPage = () => {
   }, []);
 
   const handleModalSubmit = () => {
-    if (!formData.Branch_Name.trim() || !formData["Contact-Info"].trim() || !formData.Address.trim()) return;
+    if (
+      !formData.Branch_Name.trim() ||
+      !formData["Contact-Info"].trim() ||
+      !formData.Address.trim()
+    )
+      return;
     if (editingItem) {
       handleUpdateItem(formData);
     } else {
@@ -325,8 +369,24 @@ const BranchListPage = () => {
   };
 
   const handleStatusChange = (isActive: boolean) => {
-    setFormData((prev) => ({ ...prev, Status: isActive ? "Active" : "Inactive" }));
+    setFormData((prev) => ({
+      ...prev,
+      Status: isActive ? "Active" : "Inactive",
+    }));
   };
+
+  useEffect(() => {
+      if (isModalOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "unset";
+      }
+  
+      // Cleanup function to restore scrolling when component unmounts
+      return () => {
+        document.body.style.overflow = "unset";
+      };
+    }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -341,17 +401,15 @@ const BranchListPage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto">
-          
-          </div>
-            <p className="mt-4 text-gray-600">Loading Branch Management...</p>
+          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading Branch Management...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-6 p-6 bg-gray-50 min-h-screen">
+    <div className=" p-6 bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -364,14 +422,14 @@ const BranchListPage = () => {
 
       {/* Summary Cards */}
       <div className="flex gap-4 mb-8 ">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl ">{branchItems.length}</p>
             <p className="text-1xl text-gray-500">Total Branches</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl ">
               {branchItems.filter((item) => item.Status === "Active").length}
@@ -387,10 +445,11 @@ const BranchListPage = () => {
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
+            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
+              selectedItems.length === 0
+                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
           >
             <Plus size={16} />
             Add
@@ -399,10 +458,11 @@ const BranchListPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
+              isSomeSelected && !actionLoading
+                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -410,78 +470,78 @@ const BranchListPage = () => {
         </div>
 
         {/* Search Bar */}
-       <div className="relative flex-1 min-w-[200px]">
-                 <input
-                   type="text"
-                   placeholder="Search Menu Items..."
-                   value={searchTerm}
-                   onChange={(e) => setSearchTerm(e.target.value)}
-                   className="w-full  pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                 />
-                 <Search
-                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                   size={16}
-                 />
-               </div>
+        <div className="relative flex-1 min-w-[200px]">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full  pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
+          />
+        </div>
       </div>
 
       {/* Table */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]   shadow-sm ">
-                    <div className="max-h-[500px] rounded-sm overflow-y-auto">
-                      <table className="min-w-full divide-y divide-gray-200   table-fixed">
-                        <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
-                          <tr>
-                            <th className="px-6 py-6 text-left w-[2.5px]">
-                              <Checkbox
-                                checked={isAllSelected}
-                                onChange={(e) => handleSelectAll(e.target.checked)}
-                                disableRipple
-                                sx={{
-                                  transform: "scale(1.5)", // size adjustment
-                                  p: 0, // remove extra padding
-                                }}
-                                icon={
-                                  // unchecked grey box
-                                  <svg width="20" height="20" viewBox="0 0 24 24">
-                                    <rect
-                                      x="3"
-                                      y="3"
-                                      width="18"
-                                      height="18"
-                                      rx="3"
-                                      ry="3"
-                                      fill="#e0e0e0" // grey inside
-                                      stroke="#d1d1d1" // border grey
-                                      strokeWidth="2"
-                                    />
-                                  </svg>
-                                }
-                                checkedIcon={
-                                  // checked with tick
-                                  <svg width="20" height="20" viewBox="0 0 24 24">
-                                    <rect
-                                      x="3"
-                                      y="3"
-                                      width="18"
-                                      height="18"
-                                      rx="3"
-                                      ry="3"
-                                      fill="#e0e0e0" // grey inside
-                                      stroke="#2C2C2C" // dark border
-                                      strokeWidth="2"
-                                    />
-                                    <path
-                                      d="M9 12.5l2 2 4-4.5"
-                                      fill="none"
-                                      stroke="#2C2C2C"
-                                      strokeWidth="2"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
-                                }
-                              />
-                            </th>
+        <div className=" rounded-sm ">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+              <tr>
+                <th className="px-6 py-6 text-left w-[2.5px]">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    disableRipple
+                    sx={{
+                      transform: "scale(1.5)", // size adjustment
+                      p: 0, // remove extra padding
+                    }}
+                    icon={
+                      // unchecked grey box
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#d1d1d1" // border grey
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    }
+                    checkedIcon={
+                      // checked with tick
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#2C2C2C" // dark border
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12.5l2 2 4-4.5"
+                          fill="none"
+                          stroke="#2C2C2C"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
+                  />
+                </th>
                 <th className="relative px-4 py-3 text-left">
                   Branch ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
@@ -495,7 +555,10 @@ const BranchListPage = () => {
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
-                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                        <ChevronDown
+                          size={14}
+                          className="text-gray-500 ml-auto"
+                        />
                       </DropdownMenu.Trigger>
 
                       <DropdownMenu.Portal>
@@ -562,60 +625,63 @@ const BranchListPage = () => {
                 </tr>
               ) : (
                 filteredItems.map((item) => (
-                  <tr key={item["Branch-ID"]} className="bg-white hover:bg-gray-50">
+                  <tr
+                    key={item["Branch-ID"]}
+                    className="bg-white hover:bg-gray-50"
+                  >
                     <td className="px-6 py-8">
-                                                            <Checkbox
-                                                              checked={selectedItems.includes(item.ID)}
-                                                              onChange={(e) =>
-                                                                handleSelectItem(item.ID, e.target.checked)
-                                                              }
-                                                              disableRipple
-                                                              sx={{
-                                                                p: 0, // remove extra padding
-                                                                transform: "scale(1.5)", // optional size tweak
-                                                              }}
-                                                              icon={
-                                                                // unchecked grey box
-                                                                <svg width="20" height="20" viewBox="0 0 24 24">
-                                                                  <rect
-                                                                    x="3"
-                                                                    y="3"
-                                                                    width="18"
-                                                                    height="18"
-                                                                    rx="3"
-                                                                    ry="3"
-                                                                    fill="#e0e0e0" // grey inside
-                                                                    stroke="#d1d1d1" // border grey
-                                                                    strokeWidth="2"
-                                                                  />
-                                                                </svg>
-                                                              }
-                                                              checkedIcon={
-                                                                // checked with tick
-                                                                <svg width="20" height="20" viewBox="0 0 24 24">
-                                                                  <rect
-                                                                    x="3"
-                                                                    y="3"
-                                                                    width="18"
-                                                                    height="18"
-                                                                    rx="3"
-                                                                    ry="3"
-                                                                    fill="#e0e0e0" // grey inside
-                                                                    stroke="#2C2C2C" // dark border
-                                                                    strokeWidth="2"
-                                                                  />
-                                                                  <path
-                                                                    d="M9 12.5l2 2 4-4.5"
-                                                                    fill="none"
-                                                                    stroke="#2C2C2C"
-                                                                    strokeWidth="2"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                  />
-                                                                </svg>
-                                                              }
-                                                            />
-                                                          </td>
+                      <Checkbox
+                        checked={selectedItems.includes(item["Branch-ID"])}
+                        onChange={(e) =>
+                          handleSelectItem(item["Branch-ID"], e.target.checked)
+                        }
+                        disableRipple
+                        sx={{
+                          p: 0, // remove extra padding
+                          transform: "scale(1.5)", // optional size tweak
+                        }}
+                        icon={
+                          // unchecked grey box
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#d1d1d1" // border grey
+                              strokeWidth="2"
+                            />
+                          </svg>
+                        }
+                        checkedIcon={
+                          // checked with tick
+                          <svg width="20" height="20" viewBox="0 0 24 24">
+                            <rect
+                              x="3"
+                              y="3"
+                              width="18"
+                              height="18"
+                              rx="3"
+                              ry="3"
+                              fill="#e0e0e0" // grey inside
+                              stroke="#2C2C2C" // dark border
+                              strokeWidth="2"
+                            />
+                            <path
+                              d="M9 12.5l2 2 4-4.5"
+                              fill="none"
+                              stroke="#2C2C2C"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        }
+                      />
+                    </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       {`#${String(item["Branch-ID"]).padStart(3, "0")}`}
                     </td>
@@ -625,8 +691,16 @@ const BranchListPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
                         className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
-                          ${item.Status === "Active" ? "text-green-400 border-green-600" : ""}
-                          ${item.Status === "Inactive" ? "text-red-400 border-red-600" : ""}`}
+                          ${
+                            item.Status === "Active"
+                              ? "text-green-400 border-green-600"
+                              : ""
+                          }
+                          ${
+                            item.Status === "Inactive"
+                              ? "text-red-400 border-red-600"
+                              : ""
+                          }`}
                       >
                         {item.Status}
                       </span>
@@ -667,9 +741,8 @@ const BranchListPage = () => {
         </div>
       </div>
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+        <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
           <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
-
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
@@ -795,13 +868,14 @@ const BranchListPage = () => {
                   !formData.Address.trim() ||
                   actionLoading
                 }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Branch_Name.trim() ||
-                    !formData["Contact-Info"].trim() ||
-                    !formData.Address.trim() ||
-                    actionLoading
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                  !formData.Branch_Name.trim() ||
+                  !formData["Contact-Info"].trim() ||
+                  !formData.Address.trim() ||
+                  actionLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                  }`}
+                }`}
               >
                 {actionLoading ? (
                   <>

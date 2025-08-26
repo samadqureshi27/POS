@@ -66,7 +66,7 @@ const SettingsDropdown = React.memo<DropdownProps>(({ value, options, onValueCha
       <button
         type="button"
         onClick={handleToggle}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white text-left flex items-center justify-between"
+        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white text-left flex items-center justify-between"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
@@ -75,7 +75,7 @@ const SettingsDropdown = React.memo<DropdownProps>(({ value, options, onValueCha
       </button>
       
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-sm shadow-lg max-h-60 overflow-y-auto">
           {options.map((option) => (
             <button
               key={option.value}
@@ -360,7 +360,7 @@ const Modal = ({
     >
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
         onClick={handleClose}
       />
       
@@ -450,12 +450,7 @@ const BackupRecoveryPage = () => {
     { value: "monthly", label: "Monthly" }
   ];
 
-  const locationOptions = [
-    { value: "local", label: "Local Storage Only" },
-    { value: "cloud", label: "Cloud Storage Only" },
-    { value: "both", label: "Both Local and Cloud" }
-  ];
-
+  
   useEffect(() => {
     loadData();
   }, []);
@@ -655,7 +650,7 @@ const BackupRecoveryPage = () => {
   if (!settings) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 w-[92.5vw]">
       {toast && (
         <Toast
           message={toast.message}
@@ -675,7 +670,7 @@ const BackupRecoveryPage = () => {
         confirmText={modal.isDestructive ? "Delete" : "Restore"}
       />
 
-      <div className="ml-10 max-w-[1500px] mx-auto px-6 lg:px-8">
+      <div className="mt-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-semibold text-gray-900">Backup & Recovery</h1>
@@ -683,7 +678,7 @@ const BackupRecoveryPage = () => {
             <button
               onClick={() => handleCreateBackup("full")}
               disabled={creatingBackup}
-              className="flex items-center gap-2 px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50"
             >
               {creatingBackup ? (
                 <>
@@ -700,7 +695,7 @@ const BackupRecoveryPage = () => {
             <button
               onClick={handleSave}
               disabled={!hasChanges || saving}
-              className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
                 hasChanges && !saving
                   ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -723,7 +718,7 @@ const BackupRecoveryPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Backup Settings */}
-          <div className="bg-white rounded-md p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-6">
               <Settings className="text-black" size={20} />
               <h2 className="text-lg font-semibold">Backup Settings</h2>
@@ -753,7 +748,10 @@ const BackupRecoveryPage = () => {
                       value={settings.backupFrequency}
                       options={frequencyOptions}
                       onValueChange={(value) => handleSettingChange("backupFrequency", value)}
+                      
                       placeholder="Select frequency"
+                      
+                      
                     />
                   </div>
 
@@ -765,7 +763,7 @@ const BackupRecoveryPage = () => {
                       type="time"
                       value={settings.backupTime}
                       onChange={(e) => handleSettingChange("backupTime", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                     />
                   </div>
 
@@ -779,23 +777,13 @@ const BackupRecoveryPage = () => {
                       max="365"
                       value={settings.retentionPeriod}
                       onChange={(e) => handleSettingChange("retentionPeriod", parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                     />
                   </div>
                 </>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Backup Location
-                </label>
-                <SettingsDropdown
-                  value={settings.backupLocation}
-                  options={locationOptions}
-                  onValueChange={(value) => handleSettingChange("backupLocation", value)}
-                  placeholder="Select backup location"
-                />
-              </div>
+              
 
               <div className="pt-4 border-t border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Data to Include</h3>
@@ -860,7 +848,7 @@ const BackupRecoveryPage = () => {
           </div>
 
           {/* Backup History */}
-          <div className="bg-white rounded-md p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-6">
               <History className="text-black" size={20} />
               <h2 className="text-lg font-semibold">Backup History</h2>
@@ -874,7 +862,7 @@ const BackupRecoveryPage = () => {
                 </div>
               ) : (
                 backupHistory.map((backup) => (
-                  <div key={backup.id} className="border border-gray-200 rounded-lg p-4">
+                  <div key={backup.id} className="border border-gray-200 rounded-sm p-4">
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <p className="font-medium">{backup.date}</p>
@@ -946,30 +934,7 @@ const BackupRecoveryPage = () => {
             </div>
 
             {/* Storage Information */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Storage Information</h3>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm">Local Storage</span>
-                  <span className="text-sm font-medium">4.2 GB / 10 GB</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{width: '42%'}}></div>
-                </div>
-                
-                <div className="flex justify-between items-center mt-4 mb-2">
-                  <span className="text-sm">Cloud Storage</span>
-                  <span className="text-sm font-medium">2.8 GB / 10 GB</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{width: '28%'}}></div>
-                </div>
-                
-                <button className="w-full mt-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                  Manage Storage
-                </button>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
