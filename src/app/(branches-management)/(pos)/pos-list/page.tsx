@@ -330,14 +330,14 @@ const PosListPage = () => {
 
       {/* Summary Cards */}
       <div className="flex gap-4 mb-8">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">{menuItems.length}</p>
             <p className="text-1xl text-gray-500">Total POS</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl ">
               {menuItems.filter((item) => item.Status === "Active").length}
@@ -381,7 +381,7 @@ const PosListPage = () => {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search Menu Items..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
@@ -395,7 +395,7 @@ const PosListPage = () => {
 
       {/* Table */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className="max-h-[500px] rounded-sm overflow-y-auto">
+        <div className="max-h-[58vh] rounded-sm overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200   table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
@@ -613,7 +613,7 @@ const PosListPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+        <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
           <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] overflow-y-auto shadow-lg relative flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">

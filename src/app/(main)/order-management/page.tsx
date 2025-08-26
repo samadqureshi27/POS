@@ -449,21 +449,21 @@ const OrderManagementPage = () => {
         {/* Most Ordered Table */}
         <div className="bg-gray-50  rounded-sm overflow-x-auto w-1/3">
           <div className="max-h-[300px] overflow-y-auto">
-            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] rounded-sm mb-2 p-4 bg-white shadow-sm">
+            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] border border-gray-300 rounded-sm mb-2 p-4 bg-white shadow-sm">
               <div>
                 <p className="text-2xl mb-1">Most Ordered</p>
               </div>
             </div>
 
-            <table className="min-w-full divide-y divide-gray-200 table-fixed text-sm">
-              <thead className="bg-white border-b border-gray-200 sticky top-0">
+            <table className="min-w-full divide-y divide-gray-300 border border-gray-300 rounded-sm table-fixed text-sm">
+              <thead className="bg-white border-b rounded-sm border-gray-300 sticky  top-0">
                 <tr>
                   <th className="px-2 py-2 text-left">Rank</th>
                   <th className="px-2 py-2 text-left">Name</th>
                   <th className="px-2 py-2 text-left">Total Number</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-300">
                 {statsLoading ? (
                   <tr>
                     <td
@@ -490,20 +490,20 @@ const OrderManagementPage = () => {
         {/* Least Ordered Table */}
         <div className="bg-gray-50 rounded-sm overflow-x-auto w-1/3">
           <div className="max-h-[300px] overflow-y-auto">
-            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] rounded-sm mb-2 p-4 bg-white shadow-sm">
+            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] border border-gray-300 rounded-sm mb-2 p-4 bg-white shadow-sm">
               <div>
                 <p className="text-2xl mb-1">Least Ordered</p>
               </div>
             </div>
-            <table className="min-w-full divide-y divide-gray-200 table-fixed text-sm">
-              <thead className="bg-white border-b border-gray-200 sticky top-0">
+            <table className="min-w-full divide-y divide-gray-200 table-fixed border rounded-sm border-gray-300 text-sm">
+              <thead className="bg-white border-b border-gray-300 sticky  top-0">
                 <tr>
                   <th className="px-2 py-2 text-left">Rank</th>
                   <th className="px-2 py-2 text-left">Name</th>
                   <th className="px-2 py-2 text-left">Total Number</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-300">
                 {statsLoading ? (
                   <tr>
                     <td
@@ -528,45 +528,67 @@ const OrderManagementPage = () => {
         </div>
 
         {/* Radial Chart */}
-        <div className="w-1/3 flex items-center justify-center overflow-hidden">
-          <div className="max-h-[300px]">
-            <div className="flex items-center justify-center">
-              <p className="text-2xl mb-1">Most Type of Orders</p>
-            </div>
-            <div className="flex items-center justify-center">
-              {statsLoading ? (
-                <div className="flex items-center justify-center h-[250px]">
-                  <div className="animate-spin h-8 w-8 border-b-2 border-gray-600 rounded-full"></div>
-                </div>
-              ) : (
-                <RadialBarChart
-                  width={370}
-                  height={250}
-                  cx="40%"
-                  cy="50%"
-                  innerRadius="50%"
-                  outerRadius="80%"
-                  barSize={20}
-                  data={orderStats.orderTypeStats}
-                >
-                  <RadialBar minAngle={15} clockWise dataKey="value" />
-                  <Legend
-                    iconSize={10}
-                    layout="vertical"
-                    verticalAlign="middle"
-                    align="right"
-                  />
-                  <Tooltip
-                    formatter={(value, name, props) => [
-                      `${value} Orders`,
-                      props.payload.name,
-                    ]}
-                  />
-                </RadialBarChart>
-              )}
-            </div>
-          </div>
-        </div>
+     <div className="w-1/3 flex items-center justify-center overflow-hidden outline-none border-none">              
+  <div className="max-h-[300px] outline-none border-none">                  
+    <div className="flex items-center justify-center">                      
+      <p className="text-2xl mb-1">Most Type of Orders</p>                  
+    </div>                  
+    <div className="flex items-center justify-center outline-none border-none">                      
+      {statsLoading ? (                          
+        <div className="flex items-center justify-center h-[250px]">                              
+          <div className="animate-spin h-8 w-8 border-b-2 border-gray-600 rounded-full"></div>                          
+        </div>                      
+      ) : (  
+        <div style={{
+          outline: 'none',
+          border: 'none',
+          boxShadow: 'none'
+        }}>                        
+          <RadialBarChart                              
+            width={370}                              
+            height={250}                              
+            cx="40%"                              
+            cy="50%"                              
+            innerRadius="50%"                              
+            outerRadius="80%"                              
+            barSize={20}                              
+            data={orderStats.orderTypeStats}
+            style={{
+              outline: 'none', 
+              border: 'none',
+              boxShadow: 'none'
+            }}
+          >                              
+            <RadialBar minAngle={15} clockWise dataKey="value" />                              
+            <Legend                                  
+              iconSize={10}                                  
+              layout="vertical"                                  
+              verticalAlign="middle"                                  
+              align="right"                              
+            />                              
+            <Tooltip                                  
+              formatter={(value, name, props) => [                                      
+                `${value} Orders`,                                      
+                props.payload.name,                                  
+              ]}                              
+            />                          
+          </RadialBarChart>
+        </div>                      
+      )}                  
+    </div>              
+  </div>          
+</div>
+
+{/* Add this style tag at the bottom of your component or in your CSS file */}
+<style jsx global>{`
+  .recharts-wrapper,
+  .recharts-wrapper svg,
+  .recharts-surface {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+`}</style>
       </div>
 
       {/* Search Bar */}
@@ -574,7 +596,7 @@ const OrderManagementPage = () => {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search Menu Items..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
