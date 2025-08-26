@@ -1,29 +1,36 @@
 "use client";
-import React, { useState } from 'react';
-import { ArrowLeft, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Lock, Shield } from 'lucide-react';
 import Button from '@/components/layout/UI/RoleButton';
-import Input from '@/components//layout/UI/Input';
+import Input from '@/components/layout/UI/Input';
 import ErrorMessage from '@/components/layout/UI/ErrorMessage';
 
-interface AdminLoginFormProps {
-  onBack: () => void;
-  onSubmit: (credentials: { email: string; password: string; role: 'admin' }) => void;
-  onForgotPassword: () => void;
-  isLoading: boolean;
-  error: string | null;
+interface AdminLoginOverlayProps {
+  onClose?: () => void;
+  onLogin?: (email: string, password: string) => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-const AdminLoginForm: React.FC<AdminLoginFormProps> = ({
-  onBack,
-  onSubmit,
-  onForgotPassword,
-  isLoading,
-  error
+const AdminLoginOverlay: React.FC<AdminLoginOverlayProps> = ({ 
+  onClose, 
+  onLogin,
+  isLoading = false,
+  error = null
 }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{ email?: string; password?: string }>({});
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger animation after component mounts
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 50);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const validateForm = () => {
     const errors: { email?: string; password?: string } = {};
@@ -44,121 +51,124 @@ const AdminLoginForm: React.FC<AdminLoginFormProps> = ({
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      onSubmit({ email, password, role: 'admin' });
+    if (validateForm() && onLogin) {
+      onLogin(email, password);
     }
   };
 
+  const handleForgotPassword = () => {
+    // Handle forgot password logic
+    console.log('Forgot password clicked');
+  };
+
   return (
-    <div 
-      className="relative h-screen w-full overflow-hidden flex items-center justify-center"
-      style={{ background: '#d1ab35' }}
-    >
-      {/* Background pattern */}
-      <img
-        src="/images/login-left.png"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none select-none absolute left-0 top-0 h-full w-auto object-contain opacity-20"
-        draggable={false}
-      />
+    <div className="fixed inset-0 z-50 h-screen w-screen overflow-hidden">
+      <div className="h-full w-full flex" style={{ backgroundColor: '#d1ab35' }}>
+        {/* Left Side - Admin Text */}
+        <div className="flex-[2] relative">
+          {/* Admin label positioned like in RoleSelector */}
+          <div className="absolute inset-0 z-40 flex items-center justify-center gap-16">
+            <span
+              className="pointer-events-auto cursor-pointer select-none text-black text-3xl md:text-4xl font-semibold tracking-wide"
+              style={{ textShadow: '0 0 2px rgba(0,0,0,0.25)' }}
+            >
+              ADMIN
+            </span>
+          </div>
+          
+          {/* Bottom left logo */}
+          <div className="absolute bottom-8 left-8 flex items-center text-gray-800 text-sm">
+            <Shield className="w-4 h-4 mr-2" />
+            <span>Powered by Tri Tech Technology</span>
+          </div>
+        </div>
 
-      {/* Back button */}
-      <button
-        onClick={onBack}
-        className="absolute top-8 left-8 z-10 flex items-center gap-2 text-black hover:text-gray-700 transition-colors"
-        disabled={isLoading}
-      >
-        <ArrowLeft size={24} />
-        <span className="text-lg font-medium">Back</span>
-      </button>
-
-      {/* Login form */}
-      <div className="relative z-10 w-full max-w-md mx-auto px-6">
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Login</h1>
-            <p className="text-gray-600">Enter your credentials to access the admin panel</p>
+        {/* Right Side - Login Form */}
+        <div 
+          className={`flex-[1] bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-12 py-16 shadow-lg mr-12 mt-12 transition-transform duration-1000 ease-out ${
+            isVisible 
+              ? 'transform translate-y-0' 
+              : 'transform translate-y-full'
+          }`}
+          style={{
+            willChange: 'transform'
+          }}
+        >
+          <div className="mb-12 text-center">
+            <p className="text-gray-500 text-xs mb-3 tracking-widest font-medium">WELCOME BACK</p>
+            <h2 className="text-xl font-semibold text-gray-900">Log In to your Account</h2>
           </div>
 
           {error && (
             <ErrorMessage message={error} className="mb-6" />
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-5">
             <Input
-              label="Email Address"
+              label=""
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@example.com"
-              icon={<Mail size={20} />}
+              placeholder="EMAIL-OR-NUMBER"
+              icon={<User size={18} className="text-gray-400" />}
               error={validationErrors.email}
               disabled={isLoading}
-              required
+              className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-xl py-4"
             />
 
             <Input
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
+              label=""
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              icon={<Lock size={20} />}
-              rightIcon={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              }
+              placeholder="PASSWORD"
+              icon={<Lock size={18} className="text-gray-400" />}
               error={validationErrors.password}
               disabled={isLoading}
-              required
+              className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-xl py-4"
             />
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
-              </div>
+            <div className="pt-4">
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="w-full bg-black text-white hover:bg-gray-800 font-semibold tracking-widest py-4 rounded-xl text-sm"
+                isLoading={isLoading}
+                disabled={isLoading}
+              >
+                LOGIN
+              </Button>
+            </div>
 
+            <div className="text-center pt-3">
               <button
                 type="button"
-                onClick={onForgotPassword}
-                className="text-sm text-yellow-600 hover:text-yellow-500 font-medium"
+                onClick={handleForgotPassword}
+                className="text-gray-500 text-sm hover:text-gray-700 transition-colors duration-200"
                 disabled={isLoading}
               >
                 Forgot password?
               </button>
             </div>
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full"
-              isLoading={isLoading}
-              disabled={isLoading}
-            >
-              Sign In as Admin
-            </Button>
           </form>
         </div>
       </div>
+
+      {/* Close button - optional, if you want users to be able to close the overlay */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 text-2xl font-bold z-10"
+          disabled={isLoading}
+        >
+          ×
+        </button>
+      )}
     </div>
   );
 };
 
-export default AdminLoginForm;
+export default AdminLoginOverlay;
