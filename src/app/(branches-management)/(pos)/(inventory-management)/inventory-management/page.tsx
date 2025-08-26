@@ -273,7 +273,6 @@ class MenuAPI {
     };
   }
 }
-
 const Toast = ({
   message,
   type,
@@ -282,19 +281,46 @@ const Toast = ({
   message: string;
   type: "success" | "error";
   onClose: () => void;
-}) => (
-  <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
-  >
-    {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-    <span>{message}</span>
-    <button onClick={onClose} className="ml-2">
-      <X size={16} />
-    </button>
-  </div>
-);
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation
+    setTimeout(() => setIsVisible(true), 10);
+  }, []);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Wait for exit animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+      } ${
+        isVisible && !isClosing
+          ? "translate-x-0 opacity-100"
+          : isClosing
+          ? "translate-x-full opacity-0"
+          : "translate-x-full opacity-0"
+      }`}
+    >
+      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      <span>{message}</span>
+      <button 
+        onClick={handleClose} 
+        className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 
 const InventoryManagementPage = () => {
   const [Item, setInventoryItem] = useState<InventoryItem[]>([]);

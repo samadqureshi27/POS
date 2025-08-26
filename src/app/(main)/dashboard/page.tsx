@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, BarChart,
+  Bar,
+  CartesianGrid, } from 'recharts';
 import CountUp from 'react-countup';
 import { motion } from 'framer-motion';
-import { AlertCircle, CheckCircle, X, RefreshCw } from 'lucide-react';
+import { AlertCircle, CheckCircle, X, RefreshCw, TrendingUp, TrendingDown } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -17,6 +19,57 @@ interface DashboardMetrics {
   period: string;
   lastUpdated: string;
 }
+
+interface CustomerAnalytics {
+  totalVisits: number;
+  repeatCustomers: number;
+  newCustomers: number;
+  referrals: number;
+  lastPeriod: number;
+  visitGrowth: number;
+  repeatGrowth: number;
+  newCustomerGrowth: number;
+  referralGrowth: number;
+}
+
+interface VisitData {
+  date: string;
+  visits: number;
+  repeat: number;
+}
+
+const data = [
+  { date: "Jun 24", visits: 50, repeat: 20 },
+  { date: "Jun 25", visits: 65, repeat: 22 },
+  { date: "Jun 26", visits: 58, repeat: 25 },
+  { date: "Jun 27", visits: 70, repeat: 28 },
+  { date: "Jun 28", visits: 62, repeat: 21 },
+  { date: "Jun 29", visits: 75, repeat: 26 },
+  { date: "Jun 30", visits: 68, repeat: 23 },
+  { date: "Jul 01", visits: 80, repeat: 30 },
+  { date: "Jul 02", visits: 72, repeat: 28 },
+  { date: "Jul 03", visits: 78, repeat: 25 },
+  { date: "Jul 04", visits: 66, repeat: 22 },
+  { date: "Jul 05", visits: 82, repeat: 32 },
+  { date: "Jul 06", visits: 70, repeat: 27 },
+  { date: "Jul 07", visits: 85, repeat: 35 },
+  { date: "Jul 08", visits: 73, repeat: 29 },
+  { date: "Jul 09", visits: 88, repeat: 37 },
+  { date: "Jul 10", visits: 75, repeat: 31 },
+  { date: "Jul 11", visits: 90, repeat: 40 },
+  { date: "Jul 12", visits: 77, repeat: 33 },
+  { date: "Jul 13", visits: 85, repeat: 36 },
+  { date: "Jul 14", visits: 79, repeat: 30 },
+  { date: "Jul 15", visits: 92, repeat: 41 },
+  { date: "Jul 16", visits: 81, repeat: 34 },
+  { date: "Jul 17", visits: 95, repeat: 43 },
+  { date: "Jul 18", visits: 83, repeat: 35 },
+  { date: "Jul 19", visits: 97, repeat: 45 },
+  { date: "Jul 20", visits: 85, repeat: 38 },
+  { date: "Jul 21", visits: 100, repeat: 46 },
+  { date: "Jul 22", visits: 87, repeat: 39 },
+  { date: "Jul 23", visits: 102, repeat: 48 }
+];
 
 interface RevenueData {
   day: string;
@@ -38,6 +91,8 @@ interface DashboardData {
   metrics: DashboardMetrics;
   revenueData: RevenueData[];
   bestSellingItems: BestSellingItem[];
+  customerAnalytics: CustomerAnalytics;
+  visitData: VisitData[];
   period: string;
 }
 
@@ -119,6 +174,17 @@ class DashboardAPI {
       { day: 'Week 3', date: '15-21', value: 15000, orders: 320 },
       { day: 'Week 4', date: '22-28', value: 21000, orders: 420 },
     ],
+    Quarter: [
+      { day: 'Jan', date: '01', value: 45000, orders: 850 },
+      { day: 'Feb', date: '02', value: 52000, orders: 980 },
+      { day: 'Mar', date: '03', value: 58200, orders: 1100 },
+    ],
+    Year: [
+      { day: 'Q1', date: '1-3', value: 155200, orders: 2930 },
+      { day: 'Q2', date: '4-6', value: 168400, orders: 3180 },
+      { day: 'Q3', date: '7-9', value: 185600, orders: 3520 },
+      { day: 'Q4', date: '10-12', value: 189200, orders: 3590 },
+    ],
   };
 
   private static mockBestSelling: Record<string, BestSellingItem[]> = {
@@ -141,6 +207,110 @@ class DashboardAPI {
       { rank: 4, product: 'Peach Iced Tea', revenue: '$3,560', sales: 224, category: 'Beverages', profitMargin: 78 },
       { rank: 5, product: 'Crispy Burger', revenue: '$2,920', sales: 140, category: 'Food', profitMargin: 45 },
     ],
+    Quarter: [
+      { rank: 1, product: 'Coffee', revenue: '$18,650', sales: 2340, category: 'Beverages', profitMargin: 80 },
+      { rank: 2, product: 'Grill Sandwich', revenue: '$17,400', sales: 1080, category: 'Food', profitMargin: 65 },
+      { rank: 3, product: 'Fajita Wraps', revenue: '$14,760', sales: 3960, category: 'Food', profitMargin: 55 },
+      { rank: 4, product: 'Peach Iced Tea', revenue: '$12,680', sales: 672, category: 'Beverages', profitMargin: 78 },
+      { rank: 5, product: 'Crispy Burger', revenue: '$10,440', sales: 420, category: 'Food', profitMargin: 45 },
+    ],
+    Year: [
+      { rank: 1, product: 'Coffee', revenue: '$83,520', sales: 9360, category: 'Beverages', profitMargin: 80 },
+      { rank: 2, product: 'Grill Sandwich', revenue: '$76,800', sales: 4320, category: 'Food', profitMargin: 65 },
+      { rank: 3, product: 'Fajita Wraps', revenue: '$66,240', sales: 15840, category: 'Food', profitMargin: 55 },
+      { rank: 4, product: 'Peach Iced Tea', revenue: '$56,960', sales: 2688, category: 'Beverages', profitMargin: 78 },
+      { rank: 5, product: 'Crispy Burger', revenue: '$46,800', sales: 1680, category: 'Food', profitMargin: 45 },
+    ],
+  };
+
+  private static mockCustomerAnalytics: Record<string, CustomerAnalytics> = {
+    Today: {
+      totalVisits: 1731,
+      repeatCustomers: 258,
+      newCustomers: 369,
+      referrals: 20,
+      lastPeriod: 133,
+      visitGrowth: 1023,
+      repeatGrowth: 125,
+      newCustomerGrowth: -5,
+      referralGrowth: 19,
+    },
+    Week: {
+      totalVisits: 5231,
+      repeatCustomers: 1258,
+      newCustomers: 2369,
+      referrals: 120,
+      lastPeriod: 4133,
+      visitGrowth: 2023,
+      repeatGrowth: 425,
+      newCustomerGrowth: 105,
+      referralGrowth: 49,
+    },
+    Month: {
+      totalVisits: 21731,
+      repeatCustomers: 5258,
+      newCustomers: 8369,
+      referrals: 320,
+      lastPeriod: 19133,
+      visitGrowth: 5023,
+      repeatGrowth: 1225,
+      newCustomerGrowth: 305,
+      referralGrowth: 119,
+    },
+    Quarter: {
+      totalVisits: 67240,
+      repeatCustomers: 18560,
+      newCustomers: 26480,
+      referrals: 1250,
+      lastPeriod: 58420,
+      visitGrowth: 8820,
+      repeatGrowth: 2340,
+      newCustomerGrowth: 1680,
+      referralGrowth: 280,
+    },
+    Year: {
+      totalVisits: 284600,
+      repeatCustomers: 89500,
+      newCustomers: 118200,
+      referrals: 5800,
+      lastPeriod: 241800,
+      visitGrowth: 42800,
+      repeatGrowth: 15600,
+      newCustomerGrowth: 8900,
+      referralGrowth: 1450,
+    },
+  };
+
+  private static mockVisitData: Record<string, VisitData[]> = {
+    Today: [
+      { date: "9AM", visits: 50, repeat: 20 },
+      { date: "11AM", visits: 65, repeat: 22 },
+      { date: "1PM", visits: 58, repeat: 25 },
+      { date: "3PM", visits: 70, repeat: 28 },
+      { date: "5PM", visits: 62, repeat: 21 },
+      { date: "7PM", visits: 75, repeat: 26 },
+    ],
+    Week: [
+      { date: "Mon", visits: 150, repeat: 50 },
+      { date: "Tue", visits: 165, repeat: 62 },
+      { date: "Wed", visits: 158, repeat: 55 },
+      { date: "Thu", visits: 170, repeat: 68 },
+      { date: "Fri", visits: 262, repeat: 121 },
+      { date: "Sat", visits: 375, repeat: 156 },
+      { date: "Sun", visits: 275, repeat: 126 },
+    ],
+    Month: data, // Use the full dataset for month
+    Quarter: [
+      { date: "Jan", visits: 1850, repeat: 680 },
+      { date: "Feb", visits: 2120, repeat: 780 },
+      { date: "Mar", visits: 2340, repeat: 890 },
+    ],
+    Year: [
+      { date: "Q1", visits: 6310, repeat: 2350 },
+      { date: "Q2", visits: 7120, repeat: 2640 },
+      { date: "Q3", visits: 7890, repeat: 2980 },
+      { date: "Q4", visits: 8240, repeat: 3120 },
+    ],
   };
 
   // GET /api/dashboard/overview/{period}
@@ -150,6 +320,8 @@ class DashboardAPI {
     const metrics = this.mockMetrics[period] || this.mockMetrics.Week;
     const revenueData = this.mockRevenueData[period] || this.mockRevenueData.Week;
     const bestSellingItems = this.mockBestSelling[period] || this.mockBestSelling.Week;
+    const customerAnalytics = this.mockCustomerAnalytics[period] || this.mockCustomerAnalytics.Week;
+    const visitData = this.mockVisitData[period] || this.mockVisitData.Week;
 
     return {
       success: true,
@@ -157,6 +329,8 @@ class DashboardAPI {
         metrics,
         revenueData,
         bestSellingItems,
+        customerAnalytics,
+        visitData,
         period,
       },
       message: `Dashboard data for ${period} fetched successfully`,
@@ -220,6 +394,8 @@ class DashboardAPI {
 
     const revenueData = this.mockRevenueData[period] || this.mockRevenueData.Week;
     const bestSellingItems = this.mockBestSelling[period] || this.mockBestSelling.Week;
+    const customerAnalytics = this.mockCustomerAnalytics[period] || this.mockCustomerAnalytics.Week;
+    const visitData = this.mockVisitData[period] || this.mockVisitData.Week;
 
     return {
       success: true,
@@ -227,6 +403,8 @@ class DashboardAPI {
         metrics: refreshedMetrics,
         revenueData,
         bestSellingItems,
+        customerAnalytics,
+        visitData,
         period,
       },
       message: `Dashboard refreshed successfully`,
@@ -271,12 +449,37 @@ class DashboardAPI {
       { rank: 3, product: 'Sandwich', revenue: `${Math.floor(Math.random() * 120) + 60}`, sales: Math.floor(Math.random() * 15) + 8, category: 'Food', profitMargin: 55 },
     ];
 
+    // Generate customer analytics for custom date
+    const customCustomerAnalytics: CustomerAnalytics = {
+      totalVisits: Math.floor(Math.random() * 500) + 1000,
+      repeatCustomers: Math.floor(Math.random() * 200) + 100,
+      newCustomers: Math.floor(Math.random() * 300) + 200,
+      referrals: Math.floor(Math.random() * 20) + 5,
+      lastPeriod: Math.floor(Math.random() * 100) + 50,
+      visitGrowth: Math.floor(Math.random() * 500) - 250,
+      repeatGrowth: Math.floor(Math.random() * 100) - 50,
+      newCustomerGrowth: Math.floor(Math.random() * 100) - 50,
+      referralGrowth: Math.floor(Math.random() * 10) - 5,
+    };
+
+    // Generate visit data for custom date
+    const customVisitData: VisitData[] = [
+      { date: "9AM", visits: Math.floor(Math.random() * 30) + 40, repeat: Math.floor(Math.random() * 15) + 10 },
+      { date: "11AM", visits: Math.floor(Math.random() * 40) + 50, repeat: Math.floor(Math.random() * 20) + 15 },
+      { date: "1PM", visits: Math.floor(Math.random() * 50) + 60, repeat: Math.floor(Math.random() * 25) + 20 },
+      { date: "3PM", visits: Math.floor(Math.random() * 40) + 50, repeat: Math.floor(Math.random() * 20) + 15 },
+      { date: "5PM", visits: Math.floor(Math.random() * 60) + 70, repeat: Math.floor(Math.random() * 30) + 25 },
+      { date: "7PM", visits: Math.floor(Math.random() * 50) + 60, repeat: Math.floor(Math.random() * 25) + 20 },
+    ];
+
     return {
       success: true,
       data: {
         metrics: customMetrics,
         revenueData: customRevenueData,
         bestSellingItems: customBestSelling,
+        customerAnalytics: customCustomerAnalytics,
+        visitData: customVisitData,
         period: `Custom: ${dateStr}`,
       },
       message: `Custom date data for ${dateStr} fetched successfully`,
@@ -296,7 +499,7 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
+    className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 ${
       type === "success" 
         ? "bg-green-500 text-white" 
         : type === "error"
@@ -436,7 +639,28 @@ const Dashboard = () => {
         </div>
       </div>
     );
-  }
+  }// Horizontal Line Separator Component
+const HorizontalSeparator = ({ 
+  className = "",
+  height = "1px",
+  color = "#e5e7eb",
+  margin = "1.5rem 0"
+}: {
+  className?: string;
+  height?: string;
+  color?: string;
+  margin?: string;
+}) => (
+  <div 
+    className={className}
+    style={{
+      height: height,
+      backgroundColor: color,
+      margin: margin,
+      width: '100%'
+    }}
+  />
+);
 
   if (!dashboardData) {
     return (
@@ -456,7 +680,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="w-full h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {toast && (
         <Toast
           message={toast.message}
@@ -465,13 +689,13 @@ const Dashboard = () => {
         />
       )}
 
-      <div className="w-full h-full">
+      <div className="w-full">
         {/* Header */}
-        <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900">
             Dashboard
           </h1>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {lastUpdated && (
               <p className="text-sm text-gray-500">
                 Last updated: {new Date(lastUpdated).toLocaleTimeString()}
@@ -524,30 +748,30 @@ const Dashboard = () => {
 
         {/* Metrics Cards */}
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-10"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8"
           initial="hidden"
           animate="visible"
           variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
         >
-          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-300 rounded-md shadow-sm">
+          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Gross revenue</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               <CountUp end={dashboardData.metrics.grossRevenue} prefix="$" duration={1.5} />
             </p>
           </motion.div>
-          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-300 rounded-md shadow-sm">
+          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Avg. order value</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               <CountUp end={dashboardData.metrics.avgOrderValue} prefix="$" duration={1.5} />
             </p>
           </motion.div>
-          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-300 rounded-md shadow-sm">
+          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Taxes</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               <CountUp end={dashboardData.metrics.taxes} prefix="$" decimals={1} duration={1.5} />
             </p>
           </motion.div>
-          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-300 rounded-md shadow-sm">
+          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Customers</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               <CountUp end={dashboardData.metrics.customers} duration={1.5} />
@@ -555,136 +779,242 @@ const Dashboard = () => {
           </motion.div>
         </motion.div>
 
+        {/* Customer Analytics Section - Exact match to image */}
+        <motion.div 
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          className="bg-white p-6 rounded-sm shadow-sm border border-gray-200 mb-6 sm:mb-8"
+        >
+          {/* Header */}
+          <div className="mb-4">
+            <p className="text-sm text-gray-500">Last month, 24 June - 23 July 2025</p>
+          </div>
+<HorizontalSeparator margin="1rem 0 2rem 0" />
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Left side - Main chart area */}
+            <div className="lg:col-span-3">
+              {/* Top metrics row */}
+              <div className="grid grid-cols-3 gap-6 mb-6">
+                {/* Total visits */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm text-gray-500">Total visits</p>
+                    <div className="flex items-center text-green-500">
+                      <span className="text-sm font-medium">+1,023</span>
+                      <TrendingUp size={12} className="ml-1" />
+                    </div>
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-900">1,731</h3>
+                </div>
+
+                {/* Repeat customers */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm text-gray-500">Repeat customers</p>
+                    <div className="flex items-center text-green-500">
+                      <span className="text-sm font-medium">+125</span>
+                      <TrendingUp size={12} className="ml-1" />
+                    </div>
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-900">258</h3>
+                </div>
+
+                {/* Last period */}
+                <div>
+                  <p className="text-sm text-gray-500 mb-2">Last period</p>
+                  <h3 className="text-3xl font-bold text-gray-900">133</h3>
+                </div>
+              </div>
+              
+              {/* Chart */}
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart 
+                    data={dashboardData.visitData} 
+                    margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
+                    barCategoryGap="15%"
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis 
+                      dataKey="date" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fill: '#9CA3AF' }}
+                      height={30}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fill: '#9CA3AF' }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '1px solid #e5e7eb', 
+                        borderRadius: '6px',
+                        padding: '8px',
+                        fontSize: '12px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                      formatter={(value, name) => [
+                        value, 
+                        name === 'visits' ? 'Total Visits' : 'Repeat Customers'
+                      ]}
+                    />
+                    {/* Background bars for total visits */}
+                    <Bar 
+                      dataKey="visits" 
+                      fill="#E5E7EB"
+                      radius={[2, 2, 0, 0]}
+                    />
+                    {/* Foreground bars for repeat customers */}
+                    <Bar 
+                      dataKey="repeat" 
+                      fill="#3B82F6"
+                      radius={[2, 2, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            
+            {/* Right side - Stats cards */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Repeat customers card */}
+              <div className="p-4 rounded-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                    <span className="text-sm text-gray-600">Repeat customers</span>
+                  </div>
+                  <TrendingUp size={14} className="text-green-500" />
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-gray-900">258</div>
+                  <div className="text-green-500 text-sm font-medium">+125</div>
+                </div>
+              </div>
+
+              {/* New members card */}
+              <div className="p-4 rounded-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-blue-300 rounded-full mr-2"></div>
+                    <span className="text-sm text-gray-600">New members</span>
+                  </div>
+                  <TrendingDown size={14} className="text-red-500" />
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-gray-900">369</div>
+                  <div className="text-red-500 text-sm font-medium">-5</div>
+                </div>
+              </div>
+
+              {/* Referrals card */}
+              <div className="p-4 rounded-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <span className="text-sm text-gray-600">Referrals</span>
+                  </div>
+                  <TrendingUp size={14} className="text-green-500" />
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-gray-900">20</div>
+                  <div className="text-green-500 text-sm font-medium">+19</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Charts and Tables Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Revenue Trend Chart */}
           <motion.div              
-  variants={cardVariants}             
-  initial="hidden"             
-  animate="visible"             
-  className="border border-gray-100 lg:col-span-2 bg-white p-4 sm:p-6 rounded-md shadow-sm"           
->             
-  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">               
-    <h2 className="text-lg font-semibold text-gray-900">Revenue trend</h2>               
-    <p className="text-sm text-gray-500">                 
-      {selectedPeriod} - {dashboardData.revenueData.length} data points               
-    </p>             
-  </div>              
+            variants={cardVariants}             
+            initial="hidden"             
+            animate="visible"             
+            className="border border-gray-200 lg:col-span-2 bg-white p-4 sm:p-6 rounded-sm shadow-sm"           
+          >             
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">               
+              <h2 className="text-lg font-semibold text-gray-900">Revenue trend</h2>               
+              <p className="text-sm text-gray-500">                 
+                {selectedPeriod} - {dashboardData.revenueData.length} data points               
+              </p>             
+            </div>              
 
-  <div className="h-64 sm:h-80">
-    {/* Add a wrapper div with explicit styling */}
-    <div 
-      style={{
-        width: '100%',
-        height: '100%',
-        outline: 'none',
-        border: 'none',
-        boxShadow: 'none'
-      }}
-    >               
-      <ResponsiveContainer 
-        width="100%" 
-        height="100%"
-        style={{
-          outline: 'none',
-          border: 'none'
-        }}
-      >                 
-        <LineChart 
-          data={dashboardData.revenueData} 
-          margin={{ top: 10, right: 20, left: 10, bottom: 0 }}
-          style={{
-            outline: 'none',
-            border: 'none'
-          }}
-        >                   
-          <XAxis                     
-            dataKey="day"                     
-            axisLine={false}                     
-            tickLine={false}                     
-            tick={{ fontSize: 12, fill: '#6B7280' }}                     
-            tickFormatter={(value, index) => {                       
-              const item = dashboardData.revenueData[index];                       
-              return `${value}\n${item?.date}`;                     
-            }}                   
-          />                   
-          <YAxis                     
-            axisLine={false}                     
-            tickLine={false}                     
-            tick={{ fontSize: 12, fill: '#6B7280' }}                     
-            tickFormatter={(value) =>                        
-              value >= 1000 ? `${value / 1000}K` : value.toString()                     
-            }                   
-          />                   
-          <Line                     
-            type="monotone"                     
-            dataKey="value"                     
-            stroke="#CCAB4D"                     
-            strokeWidth={2}                     
-            dot={{ fill: '#CCAB4D', strokeWidth: 2, r: 4 }}                     
-            activeDot={{ r: 6, fill: '#CCAB4D' }}
-            connectNulls={false}
-            isAnimationActive={true}
-            animationDuration={1500}
-            animationEasing="ease-in-out"
-            animationBegin={0}
-            strokeDasharray="0"
-            strokeLinecap="round"
-            strokeLinejoin="round"                   
-          />                   
-          <Tooltip                     
-            contentStyle={{                       
-              backgroundColor: '#fff',                       
-              border: '1px solid #e5e7eb',                       
-              borderRadius: '8px',                       
-              padding: '8px',                       
-              fontSize: '12px',                     
-            }}                     
-            labelFormatter={(label, payload) => {                       
-              const dataPoint = dashboardData.revenueData.find((d) => d.day === label);                       
-              return `${dataPoint?.day} (${dataPoint?.date})`;                     
-            }}                     
-            formatter={(value: number, name: string, props: any) => [                       
-              `$${value}`,                        
-              'Revenue',                       
-              `${props.payload?.orders || 0} orders`                     
-            ]}                     
-            cursor={false}                   
-          />                 
-        </LineChart>               
-      </ResponsiveContainer>
-    </div>             
-  </div>           
-</motion.div>
-
-{/* Add this global style to remove Recharts borders */}
-<style jsx global>{`
-  .recharts-wrapper,
-  .recharts-wrapper svg,
-  .recharts-surface,
-  .recharts-cartesian-grid,
-  .recharts-responsive-container {
-    outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-  
-  /* Ensure proper rendering */
-  .recharts-responsive-container {
-    position: relative !important;
-  }
-  
-  .recharts-wrapper svg {
-    overflow: visible !important;
-  }
-`}</style>
+            <div className="h-64 sm:h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart 
+                  data={dashboardData.revenueData} 
+                  margin={{ top: 10, right: 20, left: 10, bottom: 0 }}
+                >                   
+                  <XAxis                     
+                    dataKey="day"                     
+                    axisLine={false}                     
+                    tickLine={false}                     
+                    tick={{ fontSize: 12, fill: '#6B7280' }}                     
+                    tickFormatter={(value, index) => {                       
+                      const item = dashboardData.revenueData[index];                       
+                      return `${value}\n${item?.date}`;                     
+                    }}                   
+                  />                   
+                  <YAxis                     
+                    axisLine={false}                     
+                    tickLine={false}                     
+                    tick={{ fontSize: 12, fill: '#6B7280' }}                     
+                    tickFormatter={(value) =>                        
+                      value >= 1000 ? `${value / 1000}K` : value.toString()                     
+                    }                   
+                  />                   
+                  <Line                     
+                    type="monotone"                     
+                    dataKey="value"                     
+                    stroke="#CCAB4D"                     
+                    strokeWidth={2}                     
+                    dot={{ fill: '#CCAB4D', strokeWidth: 2, r: 4 }}                     
+                    activeDot={{ r: 6, fill: '#CCAB4D' }}
+                    connectNulls={false}
+                    isAnimationActive={true}
+                    animationDuration={1500}
+                    animationEasing="ease-in-out"
+                    animationBegin={0}
+                    strokeDasharray="0"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"                   
+                  />                   
+                  <Tooltip                     
+                    contentStyle={{                       
+                      backgroundColor: '#fff',                       
+                      border: '1px solid #e5e7eb',                       
+                      borderRadius: '8px',                       
+                      padding: '8px',                       
+                      fontSize: '12px',                     
+                    }}                     
+                    labelFormatter={(label, payload) => {                       
+                      const dataPoint = dashboardData.revenueData.find((d) => d.day === label);                       
+                      return `${dataPoint?.day} (${dataPoint?.date})`;                     
+                    }}                     
+                    formatter={(value: number, name: string, props: any) => [                       
+                      `$${value}`,                        
+                      'Revenue',                       
+                      `${props.payload?.orders || 0} orders`                     
+                    ]}                     
+                    cursor={false}                   
+                  />                 
+                </LineChart>               
+              </ResponsiveContainer>
+            </div>           
+          </motion.div>
 
           {/* Best Selling Items */}
           <motion.div 
             variants={cardVariants}
             initial="hidden"
             animate="visible"
-            className="bg-white p-4 sm:p-6 rounded-md shadow-sm"
+            className="bg-white p-4 sm:p-6 rounded-sm shadow-sm border border-gray-200"
           >
             <h2 className="text-lg font-semibold text-gray-900 mb-6">Best selling items</h2>
             <div className="space-y-1">
