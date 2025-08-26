@@ -160,7 +160,7 @@ export const navigationConfig: NavigationItem[] = [
     group: 'settings'
   },
   {
-    name: 'Recipies Options',
+    name: 'Recipes Options',
     href: '/recipes-options',
     group: 'recipes'
   },
