@@ -553,7 +553,53 @@ const RecipesManagementPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-w-full h-full overflow-y-auto">
+    <div className="bg-gray-50 min-w-full h-full overflow-y-auto thin-scroll">
+      <style jsx global>{`
+        .thin-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: #d1d5db #f9fafb;
+        }
+        .thin-scroll::-webkit-scrollbar {
+          width: 6px !important;
+        }
+        .thin-scroll::-webkit-scrollbar-track {
+          background: #f9fafb !important;
+          border-radius: 3px !important;
+        }
+        .thin-scroll::-webkit-scrollbar-thumb {
+          background: #d1d5db !important;
+          border-radius: 3px !important;
+        }
+        .thin-scroll::-webkit-scrollbar-thumb:hover {
+          background: #9ca3af !important;
+        }
+        .modal-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: #d1d5db #f9fafb;
+        }
+        .modal-scroll::-webkit-scrollbar {
+          width: 4px !important;
+        }
+        .modal-scroll::-webkit-scrollbar-track {
+          background: #f9fafb !important;
+          border-radius: 2px !important;
+        }
+        .modal-scroll::-webkit-scrollbar-thumb {
+          background: #d1d5db !important;
+          border-radius: 2px !important;
+        }
+        .modal-scroll::-webkit-scrollbar-thumb:hover {
+          background: #9ca3af !important;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none !important;
+        }
+      `}</style>
+      
       {toast && (
         <Toast
           message={toast.message}
@@ -599,7 +645,7 @@ const RecipesManagementPage = () => {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search Recipe Items..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
@@ -612,10 +658,10 @@ const RecipesManagementPage = () => {
       </div>
 
       {/* Table + filters */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className="max-h-[500px] rounded-sm overflow-y-auto">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm">
+        <div className="rounded-sm">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+            <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-6 text-left  w-[2.5px] ">
                   <Checkbox
@@ -828,7 +874,7 @@ const RecipesManagementPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-71">
+        <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
           <div className="bg-white rounded-lg min-w-[37vw] max-w-2xl min-h-[70vh] max-h-[70vh] overflow-hidden shadow-lg relative">
             {/* Navbar inside modal */}
             <h1 className="text-2xl pl-5 pt-2 font-medium">
@@ -936,7 +982,7 @@ const RecipesManagementPage = () => {
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[510px] rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 overflow-y-auto z-100"
+                          className="min-w-[510px] rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 modal-scroll z-100"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
@@ -984,7 +1030,7 @@ const RecipesManagementPage = () => {
                   </div>
 
                   {/* Scrollable Body */}
-                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[197px] overflow-y-auto bg-white">
+                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[197px] overflow-y-auto modal-scroll bg-white">
                     <DragDropContext
                       onDragEnd={(result: DropResult) => {
                         const { source, destination } = result;
@@ -1134,7 +1180,7 @@ const RecipesManagementPage = () => {
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[510px] rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 overflow-y-auto z-100"
+                          className="min-w-[510px] rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 modal-scroll z-100"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
@@ -1186,7 +1232,7 @@ const RecipesManagementPage = () => {
                   </div>
 
                   {/* Scrollable Body */}
-                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[197px] overflow-y-auto bg-white">
+                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[197px] overflow-y-auto modal-scroll bg-white">
                     <DragDropContext
                       onDragEnd={(result: DropResult) => {
                         const { source, destination } = result;

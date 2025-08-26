@@ -290,7 +290,7 @@ const ReportsPage = () => {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search Inventory..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
@@ -304,7 +304,7 @@ const ReportsPage = () => {
 
       {/* Table + filters */}
  <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className="max-h-[500px] rounded-sm overflow-y-auto">
+        <div className="max-h-[58vh] rounded-sm overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200   table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>

@@ -529,25 +529,25 @@ const Dashboard = () => {
           animate="visible"
           variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
         >
-          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 rounded-md shadow-sm">
+          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-300 rounded-md shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Gross revenue</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               <CountUp end={dashboardData.metrics.grossRevenue} prefix="$" duration={1.5} />
             </p>
           </motion.div>
-          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 rounded-md shadow-sm">
+          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-300 rounded-md shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Avg. order value</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               <CountUp end={dashboardData.metrics.avgOrderValue} prefix="$" duration={1.5} />
             </p>
           </motion.div>
-          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 rounded-md shadow-sm">
+          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-300 rounded-md shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Taxes</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               <CountUp end={dashboardData.metrics.taxes} prefix="$" decimals={1} duration={1.5} />
             </p>
           </motion.div>
-          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 rounded-md shadow-sm">
+          <motion.div variants={cardVariants} className="bg-white p-4 sm:p-6 border border-gray-300 rounded-md shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Customers</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               <CountUp end={dashboardData.metrics.customers} duration={1.5} />
@@ -558,71 +558,126 @@ const Dashboard = () => {
         {/* Charts and Tables Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Revenue Trend Chart */}
-          <motion.div 
-            variants={cardVariants}
-            initial="hidden"
-            animate="visible"
-            className="border border-gray-100 lg:col-span-2 bg-white p-4 sm:p-6 rounded-md shadow-sm"
-          >
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">Revenue trend</h2>
-              <p className="text-sm text-gray-500">
-                {selectedPeriod} - {dashboardData.revenueData.length} data points
-              </p>
-            </div>
+          <motion.div              
+  variants={cardVariants}             
+  initial="hidden"             
+  animate="visible"             
+  className="border border-gray-100 lg:col-span-2 bg-white p-4 sm:p-6 rounded-md shadow-sm"           
+>             
+  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">               
+    <h2 className="text-lg font-semibold text-gray-900">Revenue trend</h2>               
+    <p className="text-sm text-gray-500">                 
+      {selectedPeriod} - {dashboardData.revenueData.length} data points               
+    </p>             
+  </div>              
 
-            <div className="h-64 sm:h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={dashboardData.revenueData} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
-                  <XAxis
-                    dataKey="day"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#6B7280' }}
-                    tickFormatter={(value, index) => {
-                      const item = dashboardData.revenueData[index];
-                      return `${value}\n${item?.date}`;
-                    }}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#6B7280' }}
-                    tickFormatter={(value) => 
-                      value >= 1000 ? `${value / 1000}K` : value.toString()
-                    }
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#CCAB4D"
-                    strokeWidth={2}
-                    dot={{ fill: '#CCAB4D', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: '#CCAB4D' }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#fff',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      padding: '8px',
-                      fontSize: '12px',
-                    }}
-                    labelFormatter={(label, payload) => {
-                      const dataPoint = dashboardData.revenueData.find((d) => d.day === label);
-                      return `${dataPoint?.day} (${dataPoint?.date})`;
-                    }}
-                    formatter={(value: number, name: string, props: any) => [
-                      `$${value}`, 
-                      'Revenue',
-                      `${props.payload?.orders} orders`
-                    ]}
-                    cursor={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
+  <div className="h-64 sm:h-80">
+    {/* Add a wrapper div with explicit styling */}
+    <div 
+      style={{
+        width: '100%',
+        height: '100%',
+        outline: 'none',
+        border: 'none',
+        boxShadow: 'none'
+      }}
+    >               
+      <ResponsiveContainer 
+        width="100%" 
+        height="100%"
+        style={{
+          outline: 'none',
+          border: 'none'
+        }}
+      >                 
+        <LineChart 
+          data={dashboardData.revenueData} 
+          margin={{ top: 10, right: 20, left: 10, bottom: 0 }}
+          style={{
+            outline: 'none',
+            border: 'none'
+          }}
+        >                   
+          <XAxis                     
+            dataKey="day"                     
+            axisLine={false}                     
+            tickLine={false}                     
+            tick={{ fontSize: 12, fill: '#6B7280' }}                     
+            tickFormatter={(value, index) => {                       
+              const item = dashboardData.revenueData[index];                       
+              return `${value}\n${item?.date}`;                     
+            }}                   
+          />                   
+          <YAxis                     
+            axisLine={false}                     
+            tickLine={false}                     
+            tick={{ fontSize: 12, fill: '#6B7280' }}                     
+            tickFormatter={(value) =>                        
+              value >= 1000 ? `${value / 1000}K` : value.toString()                     
+            }                   
+          />                   
+          <Line                     
+            type="monotone"                     
+            dataKey="value"                     
+            stroke="#CCAB4D"                     
+            strokeWidth={2}                     
+            dot={{ fill: '#CCAB4D', strokeWidth: 2, r: 4 }}                     
+            activeDot={{ r: 6, fill: '#CCAB4D' }}
+            connectNulls={false}
+            isAnimationActive={true}
+            animationDuration={1500}
+            animationEasing="ease-in-out"
+            animationBegin={0}
+            strokeDasharray="0"
+            strokeLinecap="round"
+            strokeLinejoin="round"                   
+          />                   
+          <Tooltip                     
+            contentStyle={{                       
+              backgroundColor: '#fff',                       
+              border: '1px solid #e5e7eb',                       
+              borderRadius: '8px',                       
+              padding: '8px',                       
+              fontSize: '12px',                     
+            }}                     
+            labelFormatter={(label, payload) => {                       
+              const dataPoint = dashboardData.revenueData.find((d) => d.day === label);                       
+              return `${dataPoint?.day} (${dataPoint?.date})`;                     
+            }}                     
+            formatter={(value: number, name: string, props: any) => [                       
+              `$${value}`,                        
+              'Revenue',                       
+              `${props.payload?.orders || 0} orders`                     
+            ]}                     
+            cursor={false}                   
+          />                 
+        </LineChart>               
+      </ResponsiveContainer>
+    </div>             
+  </div>           
+</motion.div>
+
+{/* Add this global style to remove Recharts borders */}
+<style jsx global>{`
+  .recharts-wrapper,
+  .recharts-wrapper svg,
+  .recharts-surface,
+  .recharts-cartesian-grid,
+  .recharts-responsive-container {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Ensure proper rendering */
+  .recharts-responsive-container {
+    position: relative !important;
+  }
+  
+  .recharts-wrapper svg {
+    overflow: visible !important;
+  }
+`}</style>
 
           {/* Best Selling Items */}
           <motion.div 
