@@ -360,7 +360,7 @@ const Modal = ({
     >
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
         onClick={handleClose}
       />
       
@@ -450,12 +450,7 @@ const BackupRecoveryPage = () => {
     { value: "monthly", label: "Monthly" }
   ];
 
-  const locationOptions = [
-    { value: "local", label: "Local Storage Only" },
-    { value: "cloud", label: "Cloud Storage Only" },
-    { value: "both", label: "Both Local and Cloud" }
-  ];
-
+  
   useEffect(() => {
     loadData();
   }, []);
@@ -788,17 +783,7 @@ const BackupRecoveryPage = () => {
                 </>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Backup Location
-                </label>
-                <SettingsDropdown
-                  value={settings.backupLocation}
-                  options={locationOptions}
-                  onValueChange={(value) => handleSettingChange("backupLocation", value)}
-                  placeholder="Select backup location"
-                />
-              </div>
+              
 
               <div className="pt-4 border-t border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Data to Include</h3>
@@ -949,30 +934,7 @@ const BackupRecoveryPage = () => {
             </div>
 
             {/* Storage Information */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Storage Information</h3>
-              <div className="bg-gray-50 rounded-sm p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm">Local Storage</span>
-                  <span className="text-sm font-medium">4.2 GB / 10 GB</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{width: '42%'}}></div>
-                </div>
-                
-                <div className="flex justify-between items-center mt-4 mb-2">
-                  <span className="text-sm">Cloud Storage</span>
-                  <span className="text-sm font-medium">2.8 GB / 10 GB</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{width: '28%'}}></div>
-                </div>
-                
-                <button className="w-full mt-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-sm hover:bg-gray-200 transition-colors">
-                  Manage Storage
-                </button>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
