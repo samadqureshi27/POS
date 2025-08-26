@@ -68,17 +68,17 @@ interface ButtonPageProps {
 
 // Constants
 const DEFAULT_SETTINGS: GeneralSettings = {
-  currency: "USD",
+  currency: "",
   currencyPosition: "before",
   decimalPlaces: 2,
-  taxRate: 8.5,
-  language: "en",
-  timezone: "America/New_York",
+  taxRate: 0,
+  language: "",
+  timezone: "",
   dateFormat: "MM/DD/YYYY",
   timeFormat: "12",
   autoPrintReceipts: false,
   receiptCopies: 1,
-  receiptFooter: "Thank you for your business!",
+  receiptFooter: "",
   requireManagerForRefunds: true,
   requireManagerForDiscounts: false,
   sessionTimeout: 60,
@@ -100,6 +100,7 @@ const OPTIONS = {
     { value: "GBP", label: "British Pound (£)" },
     { value: "JPY", label: "Japanese Yen (¥)" },
     { value: "CAD", label: "Canadian Dollar (C$)" },
+    { value: "PKR", label: "Pakistani Rupee (₨)" }, // Added PKR here
   ],
   timezone: [
     { value: "America/New_York", label: "Eastern Time" },
@@ -107,6 +108,7 @@ const OPTIONS = {
     { value: "America/Denver", label: "Mountain Time" },
     { value: "America/Los_Angeles", label: "Pacific Time" },
     { value: "Europe/London", label: "GMT" },
+    { value: "Asia/Karachi", label: "Pakistan Standard Time" }, // Added Pakistan timezone
   ],
   dateFormat: [
     { value: "MM/DD/YYYY", label: "MM/DD/YYYY (12/31/2024)" },
@@ -530,6 +532,7 @@ const GeneralSettingsPage = () => {
                     handleSettingChange("taxRate", parseFloat(e.target.value))
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter tax rate"
                 />
               </div>
             </div>
@@ -673,7 +676,7 @@ const GeneralSettingsPage = () => {
                     handleSettingChange("receiptFooter", e.target.value)
                   }
                   rows={3}
-                  placeholder="Thank you message..."
+                  placeholder="Enter thank you message..."
                   className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                 />
               </div>

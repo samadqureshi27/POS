@@ -47,15 +47,15 @@ class RestaurantAPI {
     new Promise((resolve) => setTimeout(resolve, ms));
 
   private static mockData: Omit<RestaurantData, "logo"> = {
-    name: "Sample Restaurant",
-    type: "Both",
-    contact: "+1 (555) 123-4567",
-    email: "info@samplerestaurant.com",
-    address: "123 Main Street, City, State 12345",
-    description: "A cozy restaurant serving delicious food with exceptional service.",
-    website: "www.samplerestaurant.com",
-    openingTime: "09:00",
-    closingTime: "22:00",
+    name: "",
+    type: "",
+    contact: "",
+    email: "",
+    address: "",
+    description: "",
+    website: "",
+    openingTime: "",
+    closingTime: "",
   };
 
   static async getProfile(): Promise<ApiResponse<Omit<RestaurantData, "logo">>> {
@@ -507,7 +507,7 @@ const RestaurantProfilePage = () => {
                 name="website"
                 value={formData.website}
                 onChange={handleInputChange}
-                placeholder="www.yourrestaurant.com"
+                placeholder="Enter your website URL"
               />
             </div>
           </div>
@@ -527,7 +527,7 @@ const RestaurantProfilePage = () => {
                 name="contact"
                 value={formData.contact}
                 onChange={handleInputChange}
-                placeholder="+1 (555) 123-4567"
+                placeholder="Enter contact number"
               />
 
               <SimpleInput
@@ -537,7 +537,7 @@ const RestaurantProfilePage = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="info@restaurant.com"
+                placeholder="Enter email address"
               />
 
               <SimpleTextarea
@@ -546,7 +546,7 @@ const RestaurantProfilePage = () => {
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                placeholder="123 Main Street, City, State, ZIP Code"
+                placeholder="Enter your address"
                 rows={3}
               />
             </div>
