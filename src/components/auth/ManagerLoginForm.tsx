@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import Keypad from './Keypad';
+// import Keypad from '@components/auth/Keypad';
 import ErrorMessage from '@/components/layout/UI/ErrorMessage';
 
 interface ManagerLoginFormProps {
@@ -80,9 +80,9 @@ const ManagerLoginForm: React.FC<ManagerLoginFormProps> = ({
           )}
 
           {/* Keypad */}
-          <div className="mb-08">
+          {/* <div className="mb-08">
             <Keypad onKeyPress={handleKeyPress} onBackspace={handleBackspace} />
-          </div>
+          </div> */}
 
           {/* Forgot PIN Link */}
           <div className="text-center">

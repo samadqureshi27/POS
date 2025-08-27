@@ -1,6 +1,13 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useRef} from "react";
+import { DateRange } from "react-date-range";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+
+
+import "react-date-range/dist/styles.css"; // main css
+import "react-date-range/dist/theme/default.css"; // theme css
 import {
   LineChart,
   Line,
@@ -22,11 +29,6 @@ import {
   TrendingDown,
   Calendar,
 } from "lucide-react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
-
-
 
 // Data Models
 interface DashboardMetrics {
@@ -112,8 +114,6 @@ interface DashboardData {
   bestSellingItems: BestSellingItem[];
   customerAnalytics: CustomerAnalytics;
   visitData: VisitData[];
-  customerAnalytics: CustomerAnalytics;
-  visitData: VisitData[];
   period: string;
 }
 
@@ -123,9 +123,6 @@ interface ApiResponse<T> {
   success: boolean;
   lastUpdated?: string;
 }
-
-// Calendar Date Range Picker Component
-
 
 // Mock API Class
 class DashboardAPI {
@@ -579,7 +576,7 @@ class DashboardAPI {
     period: string
   ): Promise<ApiResponse<DashboardData>> {
     await this.delay(600);
-
+    
     const metrics = this.mockMetrics[period] || this.mockMetrics.Week;
     const revenueData =
       this.mockRevenueData[period] || this.mockRevenueData.Week;
@@ -595,8 +592,6 @@ class DashboardAPI {
         metrics,
         revenueData,
         bestSellingItems,
-        customerAnalytics,
-        visitData,
         customerAnalytics,
         visitData,
         period,
@@ -621,7 +616,9 @@ class DashboardAPI {
     // Add some variation based on date range
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const daysDiff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    const daysDiff = Math.ceil(
+      (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+    );
     const multiplier = Math.max(1, daysDiff / 7); // Scale based on range
 
     metrics.grossRevenue = Math.round(metrics.grossRevenue * multiplier);
@@ -647,7 +644,8 @@ class DashboardAPI {
     period: string
   ): Promise<ApiResponse<DashboardData>> {
     await this.delay(800);
-
+    
+    // Simulate data refresh with slight variations
     const baseMetrics = this.mockMetrics[period] || this.mockMetrics.Week;
     const variation = (Math.random() - 0.5) * 0.1;
 
@@ -672,8 +670,6 @@ class DashboardAPI {
         metrics: refreshedMetrics,
         revenueData,
         bestSellingItems,
-        customerAnalytics,
-        visitData,
         customerAnalytics,
         visitData,
         period,
@@ -711,6 +707,29 @@ const Toast = ({
   </div>
 );
 
+// Horizontal Line Separator Component
+const HorizontalSeparator = ({
+  className = "",
+  height = "1px",
+  color = "#e5e7eb",
+  margin = "1.5rem 0",
+}: {
+  className?: string;
+  height?: string;
+  color?: string;
+  margin?: string;
+}) => (
+  <div
+    className={className}
+    style={{
+      height: height,
+      backgroundColor: color,
+      margin: margin,
+      width: "100%",
+    }}
+  />
+);
+
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("Week");
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
@@ -724,38 +743,60 @@ const Dashboard = () => {
   } | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>("");
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [customDateRange, setCustomDateRange] = useState<{
-    start: string;
-    end: string;
-  } | null>(null);
 
-  const periods = ["Today", "Week", "Month", "Quarter", "Year"];
+  const [customDateRange, setCustomDateRange] = useState([
+  {
+    startDate: new Date(),
+    endDate: new Date(),
+    key: "selection",
+  },
+]);
 
-  const formatDisplayDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const periods = ["Today", "Week", "Month", "Quarter", "Year", "Custom"];
+
+  const formatDisplayDate = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
   };
-// Inside your Dashboard component state
 
-
-  // 🔹 State for date range
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  
+  // Date Range state
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
   const [startDate, endDate] = dateRange;
 
- 
-
-  // 🔹 Apply button logic
-  const handleApplyCustomRange = () => {
+  // Auto-fetch when range selected
+  useEffect(() => {
     if (startDate && endDate) {
       const startStr = startDate.toISOString().split("T")[0];
       const endStr = endDate.toISOString().split("T")[0];
       handleCustomDateRange(startStr, endStr);
-      setShowDatePicker(false);
     }
+  }, [startDate, endDate]);
+
+  const calendarRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+  function handleClickOutside(event: MouseEvent) {
+    if (
+      calendarRef.current &&
+      !calendarRef.current.contains(event.target as Node)
+    ) {
+      setShowDatePicker(false); // close calendar
+    }
+  }
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
   };
+}, []);
+
+
   const showToast = (message: string, type: "success" | "error" | "info") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
@@ -779,25 +820,103 @@ const Dashboard = () => {
     }
   };
 
-  const loadCustomRangeData = async (startDate: string, endDate: string) => {
-    try {
-      setLoading(true);
-      const response = await DashboardAPI.getCustomRangeData(startDate, endDate);
-      if (response.success) {
-        setDashboardData(response.data);
-        setLastUpdated(response.lastUpdated || new Date().toISOString());
-        setCustomDateRange({ start: startDate, end: endDate });
-        showToast("Custom date range data loaded successfully", "success");
-      } else {
-        throw new Error(response.message || "Failed to fetch custom range data");
-      }
-    } catch (error) {
-      console.error("Error fetching custom range data:", error);
-      showToast("Failed to load custom date range data", "error");
-    } finally {
-      setLoading(false);
+ const loadCustomRangeData = async () => {
+  if (!customDateRange[0].startDate || !customDateRange[0].endDate) return;
+
+  const startDate = customDateRange[0].startDate.toISOString().split("T")[0];
+  const endDate = customDateRange[0].endDate.toISOString().split("T")[0];
+
+  try {
+    setLoading(true);
+    const response = await DashboardAPI.getCustomRangeData(startDate, endDate);
+    if (response.success) {
+      setDashboardData(response.data);
+      setLastUpdated(response.lastUpdated || new Date().toISOString());
+      showToast("Custom date range data loaded successfully", "success");
+    } else {
+      throw new Error(response.message || "Failed to fetch custom range data");
     }
-  };
+  } catch (error) {
+    console.error("Error fetching custom range data:", error);
+    showToast("Failed to load custom date range data", "error");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const getPeriodLabel = () => {
+  const today = new Date();
+
+  switch (selectedPeriod) {
+    case "Today":
+      return `Today, ${format(today, "dd MMMM yyyy")}`;
+
+    case "Yesterday": {
+      const y = new Date();
+      y.setDate(today.getDate() - 1);
+      return `Yesterday, ${format(y, "dd MMMM yyyy")}`;
+    }
+
+    case "Week": {
+      const start = new Date(today);
+      start.setDate(today.getDate() - today.getDay());
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      return `This week, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+    }
+
+    
+
+    case "Month": {
+      const start = new Date(today.getFullYear(), today.getMonth(), 1);
+      const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      return `This month, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+    }
+
+    
+
+    case "Quarter": {
+      const currentMonth = today.getMonth();
+      const quarter = Math.floor(currentMonth / 3); // 0,1,2,3
+      const start = new Date(today.getFullYear(), quarter * 3, 1);
+      const end = new Date(today.getFullYear(), quarter * 3 + 3, 0);
+      return `This quarter (Q${quarter + 1}), ${format(start, "dd MMM")} - ${format(
+        end,
+        "dd MMM yyyy"
+      )}`;
+    }
+
+   
+
+    case "Year": {
+      const start = new Date(today.getFullYear(), 0, 1);
+      const end = new Date(today.getFullYear(), 11, 31);
+      return `This year, ${format(start, "dd MMM yyyy")} - ${format(end, "dd MMM yyyy")}`;
+    }
+
+   
+
+   case "Custom": {
+  if (
+    customDateRange &&
+    customDateRange.length > 0 &&
+    customDateRange[0].startDate &&
+    customDateRange[0].endDate
+  ) {
+    return `${format(customDateRange[0].startDate, "dd MMM yyyy")} - ${format(
+      customDateRange[0].endDate,
+      "dd MMM yyyy"
+    )}`;
+  }
+  return "Custom range";
+}
+
+    default:
+      return "";
+  }
+};
+
+
 
   const handleRefresh = async () => {
     try {
@@ -824,34 +943,12 @@ const Dashboard = () => {
 
   const handleCustomDateRange = async (startDate: string, endDate: string) => {
     setSelectedPeriod("Custom");
-    await loadCustomRangeData(startDate, endDate);
+    await loadCustomRangeData();
   };
 
   useEffect(() => {
     loadDashboardData(selectedPeriod);
   }, []);
-
-  const HorizontalSeparator = ({
-    className = "",
-    height = "1px",
-    color = "#e5e7eb",
-    margin = "1.5rem 0",
-  }: {
-    className?: string;
-    height?: string;
-    color?: string;
-    margin?: string;
-  }) => (
-    <div
-      className={className}
-      style={{
-        height: height,
-        backgroundColor: color,
-        margin: margin,
-        width: "100%",
-      }}
-    />
-  );
 
   if (loading) {
     return (
@@ -862,28 +959,7 @@ const Dashboard = () => {
         </div>
       </div>
     );
-  }// Horizontal Line Separator Component
-const HorizontalSeparator = ({ 
-  className = "",
-  height = "1px",
-  color = "#e5e7eb",
-  margin = "1.5rem 0"
-}: {
-  className?: string;
-  height?: string;
-  color?: string;
-  margin?: string;
-}) => (
-  <div 
-    className={className}
-    style={{
-      height: height,
-      backgroundColor: color,
-      margin: margin,
-      width: '100%'
-    }}
-  />
-);
+  }
 
   if (!dashboardData) {
     return (
@@ -904,7 +980,6 @@ const HorizontalSeparator = ({
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-    <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {toast && (
         <Toast
           message={toast.message}
@@ -914,14 +989,11 @@ const HorizontalSeparator = ({
       )}
 
       <div className="w-full">
-      <div className="w-full">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900">
             Dashboard
           </h1>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {lastUpdated && (
               <p className="text-sm text-gray-500">
@@ -947,67 +1019,70 @@ const HorizontalSeparator = ({
         </div>
 
         {/* Time Period Buttons */}
-        <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center">
+        <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center relative">
           {periods.map((period) => (
-            <button
-              key={period}
-              onClick={() => handlePeriodChange(period)}
-              disabled={loading}
-              className={`px-4 py-2 text-sm rounded-md transition-colors disabled:opacity-50 ${
-                selectedPeriod === period
-                  ? "bg-gray-800 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-              }`}
-            >
-              {period}
-            </button>
-          ))}
-          
-          {/* Custom Date Range Button */}
-          <button
-            onClick={() => setShowDatePicker(!showDatePicker)}
-            disabled={loading}
-            className={`flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors disabled:opacity-50 ${
-              selectedPeriod === "Custom" || showDatePicker
-                ? "bg-gray-800 text-white"
-                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-            }`}
-          >
-            <Calendar size={16} />
-            {customDateRange ? 
-              `${formatDisplayDate(customDateRange.start)} - ${formatDisplayDate(customDateRange.end)}` :
-              "Custom Range"
+            <div key={period} className="relative">
+              <button
+                onClick={() => {
+                  if (period === "Custom") {
+                    setSelectedPeriod("Custom");
+                    setShowDatePicker((prev) => !prev);
+                  } else {
+                    setSelectedPeriod(period);
+                    setShowDatePicker(false);
+                    handlePeriodChange(period);
+                  }
+                }}
+                disabled={loading}
+                className={`flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors disabled:opacity-50 ${
+                  selectedPeriod === period
+                    ? "bg-gray-800 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                }`}
+              >
+             {period === "Custom" && <Calendar size={16} />}
+{period === "Custom" &&
+ customDateRange?.[0]?.startDate &&
+ customDateRange?.[0]?.endDate
+  ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
+  : period}
+
+              </button>
+
+              {/* Calendar dropdown attached to Custom button */}
+         {period === "Custom" &&
+  selectedPeriod === "Custom" &&
+  showDatePicker && (
+    <div 
+      ref={calendarRef}
+      className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-md"
+    >
+      <DateRange
+        ranges={customDateRange?.length ? customDateRange : [{
+          startDate: new Date(),
+          endDate: new Date(),
+          key: "selection",
+        }]}
+        onChange={(ranges) => {
+          if (ranges.selection) {
+            setCustomDateRange([ranges.selection]);
+
+            if (ranges.selection.startDate && ranges.selection.endDate) {
+              loadCustomRangeData();
+              setShowDatePicker(false);
             }
-          </button>
+          }
+        }}
+        moveRangeOnFirstSelection={false}
+        className="rounded-lg"
+      />
+    </div>
+  )}
+
+
+            </div>
+          ))}
         </div>
-
-        {/* Calendar Date Range Picker */}
-     <DatePicker
-  selectsRange
-  startDate={startDate}
-  endDate={endDate}
-  onChange={(update) => {
-    const [start, end] = update as [Date | null, Date | null];
-    setDateRange([start, end]);
-
-    if (start && end) {
-      const startStr = start.toISOString().split("T")[0];
-      const endStr = end.toISOString().split("T")[0];
-      handleCustomDateRange(startStr, endStr);
-    }
-  }}
-  placeholderText="Custom Range"
-  dateFormat="dd.MM.yyyy"
-  className={`flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors cursor-pointer ${
-    selectedPeriod === "Custom"
-      ? "bg-gray-800 text-white"
-      : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-  }`}
-/>
-
-
-
-        
 
         {/* Metrics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
@@ -1041,7 +1116,7 @@ const HorizontalSeparator = ({
         <div className="bg-white p-4 rounded-sm shadow-sm border border-gray-200 mb-6 sm:mb-8">
           <div className="w-full">
             <p className="text-lg font-bold text-gray-500">
-              Last month, 24 June - 23 July 2025
+               {getPeriodLabel()}
             </p>
             <HorizontalSeparator margin="1rem 0 0 0" />
           </div>
@@ -1083,10 +1158,10 @@ const HorizontalSeparator = ({
                   <h3 className="text-3xl font-bold text-gray-900">133</h3>
                 </div>
               </div>
-
+              
               {/* Chart */}
               <div className="w-[100%] min-w-0">
-                <ResponsiveContainer width="100%" height={320} >
+                <ResponsiveContainer width="100%" height={320}>
                   <BarChart
                     data={dashboardData.visitData}
                     margin={{ top: 20, right: 0, left: 0, bottom: 20 }}
@@ -1166,7 +1241,7 @@ const HorizontalSeparator = ({
                       tick={{ fontSize: 10, fill: "#9CA3AF" }}
                       height={30}
                     />
-                    
+
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "#fff",
@@ -1199,13 +1274,15 @@ const HorizontalSeparator = ({
                 </ResponsiveContainer>
               </div>
             </div>
-
+            
             {/* Right side - Stats cards */}
             <div className="lg:w-80 flex-shrink-0 border-l border-gray-300 space-y-6">
               {/* Repeat customers card */}
-              <div className="p-4  border-b border-gray-300">
+              <div className="p-4 border-b border-gray-300">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-4xl pb-8 font-bold text-gray-900">258</div>
+                  <div className="text-4xl pb-8 font-bold text-gray-900">
+                    258
+                  </div>
                   <TrendingUp size={14} className="text-green-500" />
                 </div>
                 <div className="flex items-center justify-between">
@@ -1220,9 +1297,11 @@ const HorizontalSeparator = ({
               </div>
 
               {/* New members card */}
-              <div className="p-4  border-b border-gray-300">
+              <div className="p-4 border-b border-gray-300">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-4xl pb-8 font-bold text-gray-900">369</div>
+                  <div className="text-4xl pb-8 font-bold text-gray-900">
+                    369
+                  </div>
                   <TrendingDown size={14} className="text-red-500" />
                 </div>
                 <div className="flex items-center justify-between">
@@ -1235,9 +1314,11 @@ const HorizontalSeparator = ({
               </div>
 
               {/* Referrals card */}
-              <div className="p-4 ">
+              <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-4xl pb-8 font-bold text-gray-900">20</div>
+                  <div className="text-4xl pb-8 font-bold text-gray-900">
+                    20
+                  </div>
                   <TrendingUp size={14} className="text-green-500" />
                 </div>
                 <div className="flex items-center justify-between">
@@ -1375,4 +1456,4 @@ const HorizontalSeparator = ({
   );
 };
 
-export default Dashboard
+export default Dashboard;
