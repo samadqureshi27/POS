@@ -1,10 +1,15 @@
 "use client";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Calendar } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { RadialBarChart, RadialBar, Legend, Tooltip } from "recharts";
+import { DateRange } from "react-date-range";
+import { format } from "date-fns";
+
+import "react-date-range/dist/styles.css"; // main css
+import "react-date-range/dist/theme/default.css"; // theme css
 
 import {
   Plus,
@@ -129,6 +134,26 @@ class OrderAPI {
       Total: "$2.50",
       Time_Date: "21-08-2025",
     },
+    {
+      Order: "#009",
+      Name: "Frappuccino",
+      number_item: "31",
+      Status: "Active",
+      Type: "Dine-In",
+      Payment: "Card",
+      Total: "$6.00",
+      Time_Date: "20-08-2025",
+    },
+    {
+      Order: "#010",
+      Name: "Bagel",
+      number_item: "15",
+      Status: "Active",
+      Type: "Takeaway",
+      Payment: "Online",
+      Total: "$4.00",
+      Time_Date: "19-08-2025",
+    },
   ];
 
   // ✅ GET /api/orders/
@@ -218,39 +243,6 @@ class OrderAPI {
   }
 }
 
-// Custom DatePicker Component
-const DatePicker = ({
-  selected,
-  onChange,
-  dateFormat,
-  placeholderText,
-  className,
-}: {
-  selected: Date | null;
-  onChange: (date: Date | null) => void;
-  dateFormat: string;
-  placeholderText: string;
-  className: string;
-}) => {
-  return (
-    <input
-      type="date"
-      value={selected ? selected.toISOString().split("T")[0] : ""}
-      onChange={(e) => {
-        const value = e.target.value;
-        if (value) {
-          const date = new Date(value);
-          onChange(date);
-        } else {
-          onChange(null);
-        }
-      }}
-      className={className}
-      placeholder={placeholderText}
-    />
-  );
-};
-
 const Toast = ({
   message,
   type,
@@ -297,10 +289,151 @@ const OrderManagementPage = () => {
     type: "success" | "error";
   } | null>(null);
 
-  // Date filter states
-  const options = ["Today", "Week", "Month", "Quarter", "Year", "Custom date"];
-  const [active, setActive] = useState("Week");
+  // Period selection states - matching Dashboard
+  const periods = ["Today", "Week", "Month", "Quarter", "Year", "Custom"];
+  const [selectedPeriod, setSelectedPeriod] = useState("Week");
   const [customDate, setCustomDate] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [customDateRange, setCustomDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
+
+  const calendarRef = useRef<HTMLDivElement>(null);
+
+  // Period selection helpers
+  const formatDisplayDate = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
+
+  const getPeriodLabel = () => {
+    const today = new Date();
+
+    switch (selectedPeriod) {
+      case "Today":
+        return `Today, ${format(today, "dd MMMM yyyy")}`;
+      case "Week": {
+        const start = new Date(today);
+        start.setDate(today.getDate() - today.getDay());
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        return `This week, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+      }
+      case "Month": {
+        const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        return `This month, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+      }
+      case "Quarter": {
+        const currentMonth = today.getMonth();
+        const quarter = Math.floor(currentMonth / 3);
+        const start = new Date(today.getFullYear(), quarter * 3, 1);
+        const end = new Date(today.getFullYear(), quarter * 3 + 3, 0);
+        return `This quarter (Q${quarter + 1}), ${format(start, "dd MMM")} - ${format(
+          end,
+          "dd MMM yyyy"
+        )}`;
+      }
+      case "Year": {
+        const start = new Date(today.getFullYear(), 0, 1);
+        const end = new Date(today.getFullYear(), 11, 31);
+        return `This year, ${format(start, "dd MMM yyyy")} - ${format(end, "dd MMM yyyy")}`;
+      }
+      case "Custom": {
+        if (
+          customDateRange &&
+          customDateRange.length > 0 &&
+          customDateRange[0].startDate &&
+          customDateRange[0].endDate
+        ) {
+          return `${format(customDateRange[0].startDate, "dd MMM yyyy")} - ${format(
+            customDateRange[0].endDate,
+            "dd MMM yyyy"
+          )}`;
+        }
+        return "Custom range";
+      }
+      default:
+        return "";
+    }
+  };
+
+  const isDateInPeriod = (dateStr: string, period: string): boolean => {
+    const [day, month, year] = dateStr.split("-").map(Number);
+    const orderDate = new Date(year, month - 1, day);
+    const today = new Date();
+
+    switch (period) {
+      case "Today":
+        return (
+          orderDate.toDateString() === today.toDateString()
+        );
+      case "Week": {
+        const start = new Date(today);
+        start.setDate(today.getDate() - today.getDay());
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        return orderDate >= start && orderDate <= end;
+      }
+      case "Month": {
+        return (
+          orderDate.getMonth() === today.getMonth() &&
+          orderDate.getFullYear() === today.getFullYear()
+        );
+      }
+      case "Quarter": {
+        const currentQuarter = Math.floor(today.getMonth() / 3);
+        const orderQuarter = Math.floor(orderDate.getMonth() / 3);
+        return (
+          orderQuarter === currentQuarter &&
+          orderDate.getFullYear() === today.getFullYear()
+        );
+      }
+      case "Year": {
+        return orderDate.getFullYear() === today.getFullYear();
+      }
+      case "Custom": {
+        if (customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) {
+          return (
+            orderDate >= customDateRange[0].startDate &&
+            orderDate <= customDateRange[0].endDate
+          );
+        }
+        return true;
+      }
+      default:
+        return true;
+    }
+  };
+
+  const handlePeriodChange = (period: string) => {
+    setSelectedPeriod(period);
+    setShowDatePicker(false);
+    // applyFilters will be called via useEffect
+  };
+
+  // Close date picker when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target as Node)
+      ) {
+        setShowDatePicker(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -348,10 +481,10 @@ const OrderManagementPage = () => {
     }
   };
 
-  // Apply filters whenever filter criteria change
+  // Apply filters whenever filter criteria change - updated to include period
   useEffect(() => {
     applyFilters();
-  }, [searchTerm, statusFilter, unitFilter, customDate, items]);
+  }, [searchTerm, statusFilter, unitFilter, customDate, selectedPeriod, customDateRange, items]);
 
   const applyFilters = async () => {
     try {
@@ -364,7 +497,15 @@ const OrderManagementPage = () => {
 
       const response = await OrderAPI.getFilteredOrders(filters);
       if (response.success) {
-        setFilteredItems(response.data);
+        // Apply period filtering on top of API filters
+        let periodFilteredData = response.data;
+        
+        // Apply period filtering
+        periodFilteredData = response.data.filter(item => 
+          isDateInPeriod(item.Time_Date, selectedPeriod)
+        );
+        
+        setFilteredItems(periodFilteredData);
       }
     } catch (error) {
       console.error("Error applying filters:", error);
@@ -416,33 +557,66 @@ const OrderManagementPage = () => {
 
       <h1 className="text-3xl font-semibold mb-8 ">Order Management</h1>
 
-      <div className="flex gap-2 mb-8 items-center">
-        {options.map((option) => (
-          <button
-            key={option}
-            onClick={() => setActive(option)}
-            className={`px-4 py-2 rounded-sm text-sm font-medium border transition-colors
-            ${
-              active === option
-                ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
-                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
-            }
-          `}
-          >
-            {option}
-          </button>
-        ))}
+      {/* Time Period Buttons */}
+      <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center relative">
+        {periods.map((period) => (
+          <div key={period} className="relative">
+            <button
+              onClick={() => {
+                if (period === "Custom") {
+                  setSelectedPeriod("Custom");
+                  setShowDatePicker((prev) => !prev);
+                } else {
+                  handlePeriodChange(period);
+                }
+              }}
+              disabled={loading}
+              className={`flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors disabled:opacity-50 ${
+                selectedPeriod === period
+                  ? "bg-gray-800 text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+              }`}
+            >
+              {period === "Custom" && <Calendar size={16} />}
+              {period === "Custom" &&
+              customDateRange?.[0]?.startDate &&
+              customDateRange?.[0]?.endDate
+                ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
+                : period}
+            </button>
 
-        {/* Show calendar if "Custom date" is active */}
-        {active === "Custom date" && (
-          <DatePicker
-            selected={customDate}
-            onChange={(date: Date | null) => setCustomDate(date)}
-            dateFormat="dd/MM/yyyy"
-            placeholderText="Select date"
-            className="ml-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-        )}
+            {/* Calendar dropdown attached to Custom button */}
+            {period === "Custom" &&
+              selectedPeriod === "Custom" &&
+              showDatePicker && (
+                <div 
+                  ref={calendarRef}
+                  className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-md"
+                >
+                  <DateRange
+                    ranges={customDateRange?.length ? customDateRange : [{
+                      startDate: new Date(),
+                      endDate: new Date(),
+                      key: "selection",
+                    }]}
+                    onChange={(ranges) => {
+                      if (ranges.selection) {
+                        setCustomDateRange([ranges.selection]);
+
+                        if (ranges.selection.startDate && ranges.selection.endDate) {
+                          setSelectedPeriod("Custom");
+                          setShowDatePicker(false);
+                          setTimeout(() => applyFilters(), 100); // Apply filters after state update
+                        }
+                      }
+                    }}
+                    moveRangeOnFirstSelection={false}
+                    className="rounded-lg"
+                  />
+                </div>
+              )}
+          </div>
+        ))}
       </div>
 
       <div className="flex gap-6">
@@ -869,7 +1043,7 @@ const OrderManagementPage = () => {
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-400 rounded-md text-sm">
+                      <span className="px-2 py-1  text-blue-400 rounded-md text-sm">
                         {item.Type}
                       </span>
                     </td>
