@@ -146,7 +146,7 @@ const RestaurantDropdown = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent bg-white text-left flex items-center justify-between hover:border-gray-400 transition-all duration-200"
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent bg-white text-left flex items-center justify-between transition-all duration-200"
       >
         <span className={value ? "text-gray-900" : "text-gray-500"}>
           {options.find((opt) => opt.value === value)?.label || placeholder}
@@ -194,7 +194,7 @@ const SimpleInput = ({
     </label>
     <input
       {...props}
-      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-all duration-200 hover:border-gray-400"
+      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-all duration-200"
     />
   </div>
 );
@@ -215,7 +215,7 @@ const SimpleTextarea = ({
     </label>
     <textarea
       {...props}
-      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-all duration-200 hover:border-gray-400 resize-none"
+      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-all duration-200  resize-none"
     />
   </div>
 );
@@ -386,8 +386,9 @@ const RestaurantProfilePage = () => {
   const restaurantTypeOptions = [
     { value: "Dine In", label: "🍽️ Dine In" },
     { value: "Take Away", label: "🥡 Take Away" },
-    { value: "Both", label: "🍽️🥡 Both (Dine In & Take Away)" },
     { value: "Delivery Only", label: "🚚 Delivery Only" },
+    
+    { value: "All", label: "🍽️🥡🚚 All (Dine In , Take Away & Delivery)" },
   ];
 
   const getOperatingStatus = () => {
