@@ -112,6 +112,8 @@ interface DashboardData {
   bestSellingItems: BestSellingItem[];
   customerAnalytics: CustomerAnalytics;
   visitData: VisitData[];
+  customerAnalytics: CustomerAnalytics;
+  visitData: VisitData[];
   period: string;
 }
 
@@ -595,6 +597,8 @@ class DashboardAPI {
         bestSellingItems,
         customerAnalytics,
         visitData,
+        customerAnalytics,
+        visitData,
         period,
       },
       message: `Dashboard data for ${period} fetched successfully`,
@@ -668,6 +672,8 @@ class DashboardAPI {
         metrics: refreshedMetrics,
         revenueData,
         bestSellingItems,
+        customerAnalytics,
+        visitData,
         customerAnalytics,
         visitData,
         period,
@@ -856,7 +862,28 @@ const Dashboard = () => {
         </div>
       </div>
     );
-  }
+  }// Horizontal Line Separator Component
+const HorizontalSeparator = ({ 
+  className = "",
+  height = "1px",
+  color = "#e5e7eb",
+  margin = "1.5rem 0"
+}: {
+  className?: string;
+  height?: string;
+  color?: string;
+  margin?: string;
+}) => (
+  <div 
+    className={className}
+    style={{
+      height: height,
+      backgroundColor: color,
+      margin: margin,
+      width: '100%'
+    }}
+  />
+);
 
   if (!dashboardData) {
     return (
@@ -877,6 +904,7 @@ const Dashboard = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {toast && (
         <Toast
           message={toast.message}
@@ -886,11 +914,14 @@ const Dashboard = () => {
       )}
 
       <div className="w-full">
+      <div className="w-full">
         {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900">
             Dashboard
           </h1>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {lastUpdated && (
               <p className="text-sm text-gray-500">
