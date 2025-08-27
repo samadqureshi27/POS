@@ -56,7 +56,7 @@ const Input: React.FC<InputProps> = ({
             ${icon ? 'pl-10' : 'pl-4'}
             ${rightIcon ? 'pr-10' : 'pr-4'}
             py-3 text-gray-900 placeholder-gray-500
-            focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent
+            focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent
             ${error 
               ? 'border-red-300 bg-red-50 text-red-900' 
               : 'border-gray-300 bg-white hover:border-gray-400'
