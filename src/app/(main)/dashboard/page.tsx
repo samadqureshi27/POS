@@ -112,8 +112,6 @@ interface DashboardData {
   bestSellingItems: BestSellingItem[];
   customerAnalytics: CustomerAnalytics;
   visitData: VisitData[];
-  customerAnalytics: CustomerAnalytics;
-  visitData: VisitData[];
   period: string;
 }
 
@@ -597,8 +595,6 @@ class DashboardAPI {
         bestSellingItems,
         customerAnalytics,
         visitData,
-        customerAnalytics,
-        visitData,
         period,
       },
       message: `Dashboard data for ${period} fetched successfully`,
@@ -674,8 +670,6 @@ class DashboardAPI {
         bestSellingItems,
         customerAnalytics,
         visitData,
-        customerAnalytics,
-        visitData,
         period,
       },
       message: `Dashboard refreshed successfully`,
@@ -711,7 +705,7 @@ const Toast = ({
   </div>
 );
 
-const Dashboard = () => {
+const DashboardPage = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("Week");
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
@@ -831,38 +825,7 @@ const Dashboard = () => {
     loadDashboardData(selectedPeriod);
   }, []);
 
-  const HorizontalSeparator = ({
-    className = "",
-    height = "1px",
-    color = "#e5e7eb",
-    margin = "1.5rem 0",
-  }: {
-    className?: string;
-    height?: string;
-    color?: string;
-    margin?: string;
-  }) => (
-    <div
-      className={className}
-      style={{
-        height: height,
-        backgroundColor: color,
-        margin: margin,
-        width: "100%",
-      }}
-    />
-  );
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-blue-500 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Dashboard...</p>
-        </div>
-      </div>
-    );
-  }// Horizontal Line Separator Component
+// Horizontal Line Separator Component
 const HorizontalSeparator = ({ 
   className = "",
   height = "1px",
@@ -904,7 +867,6 @@ const HorizontalSeparator = ({
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-    <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {toast && (
         <Toast
           message={toast.message}
@@ -913,7 +875,6 @@ const HorizontalSeparator = ({
         />
       )}
 
-      <div className="w-full">
       <div className="w-full">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
@@ -1372,7 +1333,9 @@ const HorizontalSeparator = ({
         </div>
       </div>
     </div>
+    </div>
+    </div>
   );
 };
 
-export default Dashboard
+export default DashboardPage;
