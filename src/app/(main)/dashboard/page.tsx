@@ -1,10 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect , useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DateRange } from "react-date-range";
-import { motion } from "framer-motion";
 import { format } from "date-fns";
-
 
 import "react-date-range/dist/styles.css"; // main css
 import "react-date-range/dist/theme/default.css"; // theme css
@@ -19,6 +17,8 @@ import {
   Legend,
   Bar,
   CartesianGrid,
+  Area,
+  AreaChart,
 } from "recharts";
 import {
   AlertCircle,
@@ -29,6 +29,225 @@ import {
   TrendingDown,
   Calendar,
 } from "lucide-react";
+
+// Chart Components
+const ChartAreaInteractive = () => {
+  const [timeRange, setTimeRange] = useState("90d");
+
+  const chartData = [
+    { date: "2024-04-01", desktop: 222, mobile: 150 },
+    { date: "2024-04-02", desktop: 97, mobile: 180 },
+    { date: "2024-04-03", desktop: 167, mobile: 120 },
+    { date: "2024-04-04", desktop: 242, mobile: 260 },
+    { date: "2024-04-05", desktop: 373, mobile: 290 },
+    { date: "2024-04-06", desktop: 301, mobile: 340 },
+    { date: "2024-04-07", desktop: 245, mobile: 180 },
+    { date: "2024-04-08", desktop: 409, mobile: 320 },
+    { date: "2024-04-09", desktop: 59, mobile: 110 },
+    { date: "2024-04-10", desktop: 261, mobile: 190 },
+    { date: "2024-04-11", desktop: 327, mobile: 350 },
+    { date: "2024-04-12", desktop: 292, mobile: 210 },
+    { date: "2024-04-13", desktop: 342, mobile: 380 },
+    { date: "2024-04-14", desktop: 137, mobile: 220 },
+    { date: "2024-04-15", desktop: 120, mobile: 170 },
+    { date: "2024-04-16", desktop: 138, mobile: 190 },
+    { date: "2024-04-17", desktop: 446, mobile: 360 },
+    { date: "2024-04-18", desktop: 364, mobile: 410 },
+    { date: "2024-04-19", desktop: 243, mobile: 180 },
+    { date: "2024-04-20", desktop: 89, mobile: 150 },
+    { date: "2024-04-21", desktop: 137, mobile: 200 },
+    { date: "2024-04-22", desktop: 224, mobile: 170 },
+    { date: "2024-04-23", desktop: 138, mobile: 230 },
+    { date: "2024-04-24", desktop: 387, mobile: 290 },
+    { date: "2024-04-25", desktop: 215, mobile: 250 },
+    { date: "2024-04-26", desktop: 75, mobile: 130 },
+    { date: "2024-04-27", desktop: 383, mobile: 420 },
+    { date: "2024-04-28", desktop: 122, mobile: 180 },
+    { date: "2024-04-29", desktop: 315, mobile: 240 },
+    { date: "2024-04-30", desktop: 454, mobile: 380 },
+    { date: "2024-05-01", desktop: 165, mobile: 220 },
+    { date: "2024-05-02", desktop: 293, mobile: 310 },
+    { date: "2024-05-03", desktop: 247, mobile: 190 },
+    { date: "2024-05-04", desktop: 385, mobile: 420 },
+    { date: "2024-05-05", desktop: 481, mobile: 390 },
+    { date: "2024-05-06", desktop: 498, mobile: 520 },
+    { date: "2024-05-07", desktop: 388, mobile: 300 },
+    { date: "2024-05-08", desktop: 149, mobile: 210 },
+    { date: "2024-05-09", desktop: 227, mobile: 180 },
+    { date: "2024-05-10", desktop: 293, mobile: 330 },
+    { date: "2024-05-11", desktop: 335, mobile: 270 },
+    { date: "2024-05-12", desktop: 197, mobile: 240 },
+    { date: "2024-05-13", desktop: 197, mobile: 160 },
+    { date: "2024-05-14", desktop: 448, mobile: 490 },
+    { date: "2024-05-15", desktop: 473, mobile: 380 },
+    { date: "2024-05-16", desktop: 338, mobile: 400 },
+    { date: "2024-05-17", desktop: 499, mobile: 420 },
+    { date: "2024-05-18", desktop: 315, mobile: 350 },
+    { date: "2024-05-19", desktop: 235, mobile: 180 },
+    { date: "2024-05-20", desktop: 177, mobile: 230 },
+    { date: "2024-05-21", desktop: 82, mobile: 140 },
+    { date: "2024-05-22", desktop: 81, mobile: 120 },
+    { date: "2024-05-23", desktop: 252, mobile: 290 },
+    { date: "2024-05-24", desktop: 294, mobile: 220 },
+    { date: "2024-05-25", desktop: 201, mobile: 250 },
+    { date: "2024-05-26", desktop: 213, mobile: 170 },
+    { date: "2024-05-27", desktop: 420, mobile: 460 },
+    { date: "2024-05-28", desktop: 233, mobile: 190 },
+    { date: "2024-05-29", desktop: 78, mobile: 130 },
+    { date: "2024-05-30", desktop: 340, mobile: 280 },
+    { date: "2024-05-31", desktop: 178, mobile: 230 },
+    { date: "2024-06-01", desktop: 178, mobile: 200 },
+    { date: "2024-06-02", desktop: 470, mobile: 410 },
+    { date: "2024-06-03", desktop: 103, mobile: 160 },
+    { date: "2024-06-04", desktop: 439, mobile: 380 },
+    { date: "2024-06-05", desktop: 88, mobile: 140 },
+    { date: "2024-06-06", desktop: 294, mobile: 250 },
+    { date: "2024-06-07", desktop: 323, mobile: 370 },
+    { date: "2024-06-08", desktop: 385, mobile: 320 },
+    { date: "2024-06-09", desktop: 438, mobile: 480 },
+    { date: "2024-06-10", desktop: 155, mobile: 200 },
+    { date: "2024-06-11", desktop: 92, mobile: 150 },
+    { date: "2024-06-12", desktop: 492, mobile: 420 },
+    { date: "2024-06-13", desktop: 81, mobile: 130 },
+    { date: "2024-06-14", desktop: 426, mobile: 380 },
+    { date: "2024-06-15", desktop: 307, mobile: 350 },
+    { date: "2024-06-16", desktop: 371, mobile: 310 },
+    { date: "2024-06-17", desktop: 475, mobile: 520 },
+    { date: "2024-06-18", desktop: 107, mobile: 170 },
+    { date: "2024-06-19", desktop: 341, mobile: 290 },
+    { date: "2024-06-20", desktop: 408, mobile: 450 },
+    { date: "2024-06-21", desktop: 169, mobile: 210 },
+    { date: "2024-06-22", desktop: 317, mobile: 270 },
+    { date: "2024-06-23", desktop: 480, mobile: 530 },
+    { date: "2024-06-24", desktop: 132, mobile: 180 },
+    { date: "2024-06-25", desktop: 141, mobile: 190 },
+    { date: "2024-06-26", desktop: 434, mobile: 380 },
+    { date: "2024-06-27", desktop: 448, mobile: 490 },
+    { date: "2024-06-28", desktop: 149, mobile: 200 },
+    { date: "2024-06-29", desktop: 103, mobile: 160 },
+    { date: "2024-06-30", desktop: 446, mobile: 400 },
+  ];
+
+  const filteredData = chartData.filter((item) => {
+    const date = new Date(item.date)
+    const referenceDate = new Date("2024-06-30")
+    let daysToSubtract = 90
+    if (timeRange === "30d") {
+      daysToSubtract = 30
+    } else if (timeRange === "7d") {
+      daysToSubtract = 7
+    }
+    const startDate = new Date(referenceDate)
+    startDate.setDate(startDate.getDate() - daysToSubtract)
+    return date >= startDate
+  })
+
+  return (
+    <div className="bg-white rounded-sm border border-gray-200">
+      <div className="flex items-center gap-2 space-y-0 border-b py-5 px-6 sm:flex-row">
+        <div className="grid flex-1 gap-1">
+          <h2 className="text-lg font-semibold text-gray-900">Desktop vs Mobile Visitors</h2>
+          <p className="text-sm text-gray-500">
+            Showing total visitors for the last 3 months
+          </p>
+        </div>
+        <select 
+          value={timeRange} 
+          onChange={(e) => setTimeRange(e.target.value)}
+          className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex px-3 py-2 text-sm border border-gray-300 bg-white"
+          aria-label="Select a value"
+        >
+          <option value="90d">Last 3 months</option>
+          <option value="30d">Last 30 days</option>
+          <option value="7d">Last 7 days</option>
+        </select>
+      </div>
+      <div className="px-2 pt-4 sm:px-6 sm:pt-6 pb-6">
+        <div className="aspect-auto h-[250px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={filteredData}>
+              <defs>
+                <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="#3b82f6"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="#3b82f6"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="#10b981"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="#10b981"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 12, fill: "#6B7280" }}
+                tickMargin={8}
+                minTickGap={32}
+                tickFormatter={(value) => {
+                  const date = new Date(value)
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                }}
+              />
+              <Tooltip
+                cursor={false}
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                  padding: "8px",
+                  fontSize: "12px",
+                }}
+                labelFormatter={(value) => {
+                  return new Date(value).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                }}
+              />
+              <Area
+                dataKey="mobile"
+                type="natural"
+                fill="url(#fillMobile)"
+                stroke="#10b981"
+                stackId="a"
+                name="Mobile"
+              />
+              <Area
+                dataKey="desktop"
+                type="natural"
+                fill="url(#fillDesktop)"
+                stroke="#3b82f6"
+                stackId="a"
+                name="Desktop"
+              />
+              <Legend />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Data Models
 interface DashboardMetrics {
@@ -576,7 +795,7 @@ class DashboardAPI {
     period: string
   ): Promise<ApiResponse<DashboardData>> {
     await this.delay(600);
-    
+
     const metrics = this.mockMetrics[period] || this.mockMetrics.Week;
     const revenueData =
       this.mockRevenueData[period] || this.mockRevenueData.Week;
@@ -644,8 +863,7 @@ class DashboardAPI {
     period: string
   ): Promise<ApiResponse<DashboardData>> {
     await this.delay(800);
-    
-    // Simulate data refresh with slight variations
+
     const baseMetrics = this.mockMetrics[period] || this.mockMetrics.Week;
     const variation = (Math.random() - 0.5) * 0.1;
 
@@ -745,12 +963,12 @@ const Dashboard = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [customDateRange, setCustomDateRange] = useState([
-  {
-    startDate: new Date(),
-    endDate: new Date(),
-    key: "selection",
-  },
-]);
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
 
   const periods = ["Today", "Week", "Month", "Quarter", "Year", "Custom"];
 
@@ -761,7 +979,6 @@ const Dashboard = () => {
     return `${day}.${month}.${year}`;
   };
 
-  
   // Date Range state
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     null,
@@ -780,22 +997,21 @@ const Dashboard = () => {
 
   const calendarRef = useRef<HTMLDivElement>(null);
 
-useEffect(() => {
-  function handleClickOutside(event: MouseEvent) {
-    if (
-      calendarRef.current &&
-      !calendarRef.current.contains(event.target as Node)
-    ) {
-      setShowDatePicker(false); // close calendar
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target as Node)
+      ) {
+        setShowDatePicker(false); // close calendar
+      }
     }
-  }
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
-
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const showToast = (message: string, type: "success" | "error" | "info") => {
     setToast({ message, type });
@@ -820,103 +1036,93 @@ useEffect(() => {
     }
   };
 
- const loadCustomRangeData = async () => {
-  if (!customDateRange[0].startDate || !customDateRange[0].endDate) return;
+  const loadCustomRangeData = async () => {
+    if (!customDateRange[0].startDate || !customDateRange[0].endDate) return;
 
-  const startDate = customDateRange[0].startDate.toISOString().split("T")[0];
-  const endDate = customDateRange[0].endDate.toISOString().split("T")[0];
+    const startDate = customDateRange[0].startDate.toISOString().split("T")[0];
+    const endDate = customDateRange[0].endDate.toISOString().split("T")[0];
 
-  try {
-    setLoading(true);
-    const response = await DashboardAPI.getCustomRangeData(startDate, endDate);
-    if (response.success) {
-      setDashboardData(response.data);
-      setLastUpdated(response.lastUpdated || new Date().toISOString());
-      showToast("Custom date range data loaded successfully", "success");
-    } else {
-      throw new Error(response.message || "Failed to fetch custom range data");
+    try {
+      setLoading(true);
+      const response = await DashboardAPI.getCustomRangeData(startDate, endDate);
+      if (response.success) {
+        setDashboardData(response.data);
+        setLastUpdated(response.lastUpdated || new Date().toISOString());
+        showToast("Custom date range data loaded successfully", "success");
+      } else {
+        throw new Error(response.message || "Failed to fetch custom range data");
+      }
+    } catch (error) {
+      console.error("Error fetching custom range data:", error);
+      showToast("Failed to load custom date range data", "error");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Error fetching custom range data:", error);
-    showToast("Failed to load custom date range data", "error");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-const getPeriodLabel = () => {
-  const today = new Date();
+  const getPeriodLabel = () => {
+    const today = new Date();
 
-  switch (selectedPeriod) {
-    case "Today":
-      return `Today, ${format(today, "dd MMMM yyyy")}`;
+    switch (selectedPeriod) {
+      case "Today":
+        return `Today, ${format(today, "dd MMMM yyyy")}`;
 
-    case "Yesterday": {
-      const y = new Date();
-      y.setDate(today.getDate() - 1);
-      return `Yesterday, ${format(y, "dd MMMM yyyy")}`;
+      case "Yesterday": {
+        const y = new Date();
+        y.setDate(today.getDate() - 1);
+        return `Yesterday, ${format(y, "dd MMMM yyyy")}`;
+      }
+
+      case "Week": {
+        const start = new Date(today);
+        start.setDate(today.getDate() - today.getDay());
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        return `This week, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+      }
+
+      case "Month": {
+        const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        return `This month, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+      }
+
+      case "Quarter": {
+        const currentMonth = today.getMonth();
+        const quarter = Math.floor(currentMonth / 3);
+        const start = new Date(today.getFullYear(), quarter * 3, 1);
+        const end = new Date(today.getFullYear(), quarter * 3 + 3, 0);
+        return `This quarter (Q${quarter + 1}), ${format(start, "dd MMM")} - ${format(
+          end,
+          "dd MMM yyyy"
+        )}`;
+      }
+
+      case "Year": {
+        const start = new Date(today.getFullYear(), 0, 1);
+        const end = new Date(today.getFullYear(), 11, 31);
+        return `This year, ${format(start, "dd MMM yyyy")} - ${format(end, "dd MMM yyyy")}`;
+      }
+
+      case "Custom": {
+        if (
+          customDateRange &&
+          customDateRange.length > 0 &&
+          customDateRange[0].startDate &&
+          customDateRange[0].endDate
+        ) {
+          return `${format(customDateRange[0].startDate, "dd MMM yyyy")} - ${format(
+            customDateRange[0].endDate,
+            "dd MMM yyyy"
+          )}`;
+        }
+        return "Custom range";
+      }
+
+      default:
+        return "";
     }
-
-    case "Week": {
-      const start = new Date(today);
-      start.setDate(today.getDate() - today.getDay());
-      const end = new Date(start);
-      end.setDate(start.getDate() + 6);
-      return `This week, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
-    }
-
-    
-
-    case "Month": {
-      const start = new Date(today.getFullYear(), today.getMonth(), 1);
-      const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      return `This month, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
-    }
-
-    
-
-    case "Quarter": {
-      const currentMonth = today.getMonth();
-      const quarter = Math.floor(currentMonth / 3); // 0,1,2,3
-      const start = new Date(today.getFullYear(), quarter * 3, 1);
-      const end = new Date(today.getFullYear(), quarter * 3 + 3, 0);
-      return `This quarter (Q${quarter + 1}), ${format(start, "dd MMM")} - ${format(
-        end,
-        "dd MMM yyyy"
-      )}`;
-    }
-
-   
-
-    case "Year": {
-      const start = new Date(today.getFullYear(), 0, 1);
-      const end = new Date(today.getFullYear(), 11, 31);
-      return `This year, ${format(start, "dd MMM yyyy")} - ${format(end, "dd MMM yyyy")}`;
-    }
-
-   
-
-   case "Custom": {
-  if (
-    customDateRange &&
-    customDateRange.length > 0 &&
-    customDateRange[0].startDate &&
-    customDateRange[0].endDate
-  ) {
-    return `${format(customDateRange[0].startDate, "dd MMM yyyy")} - ${format(
-      customDateRange[0].endDate,
-      "dd MMM yyyy"
-    )}`;
-  }
-  return "Custom range";
-}
-
-    default:
-      return "";
-  }
-};
-
-
+  };
 
   const handleRefresh = async () => {
     try {
@@ -936,7 +1142,6 @@ const getPeriodLabel = () => {
 
   const handlePeriodChange = async (period: string) => {
     setSelectedPeriod(period);
-    setCustomDateRange(null);
     setShowDatePicker(false);
     await loadDashboardData(period);
   };
@@ -1040,46 +1245,43 @@ const getPeriodLabel = () => {
                     : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
                 }`}
               >
-             {period === "Custom" && <Calendar size={16} />}
-{period === "Custom" &&
- customDateRange?.[0]?.startDate &&
- customDateRange?.[0]?.endDate
-  ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
-  : period}
-
+                {period === "Custom" && <Calendar size={16} />}
+                {period === "Custom" &&
+                customDateRange?.[0]?.startDate &&
+                customDateRange?.[0]?.endDate
+                  ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
+                  : period}
               </button>
 
               {/* Calendar dropdown attached to Custom button */}
-         {period === "Custom" &&
-  selectedPeriod === "Custom" &&
-  showDatePicker && (
-    <div 
-      ref={calendarRef}
-      className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-md"
-    >
-      <DateRange
-        ranges={customDateRange?.length ? customDateRange : [{
-          startDate: new Date(),
-          endDate: new Date(),
-          key: "selection",
-        }]}
-        onChange={(ranges) => {
-          if (ranges.selection) {
-            setCustomDateRange([ranges.selection]);
+              {period === "Custom" &&
+                selectedPeriod === "Custom" &&
+                showDatePicker && (
+                  <div 
+                    ref={calendarRef}
+                    className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-md"
+                  >
+                    <DateRange
+                      ranges={customDateRange?.length ? customDateRange : [{
+                        startDate: new Date(),
+                        endDate: new Date(),
+                        key: "selection",
+                      }]}
+                      onChange={(ranges) => {
+                        if (ranges.selection) {
+                          setCustomDateRange([ranges.selection]);
 
-            if (ranges.selection.startDate && ranges.selection.endDate) {
-              loadCustomRangeData();
-              setShowDatePicker(false);
-            }
-          }
-        }}
-        moveRangeOnFirstSelection={false}
-        className="rounded-lg"
-      />
-    </div>
-  )}
-
-
+                          if (ranges.selection.startDate && ranges.selection.endDate) {
+                            loadCustomRangeData();
+                            setShowDatePicker(false);
+                          }
+                        }
+                      }}
+                      moveRangeOnFirstSelection={false}
+                      className="rounded-lg"
+                    />
+                  </div>
+                )}
             </div>
           ))}
         </div>
@@ -1112,11 +1314,16 @@ const getPeriodLabel = () => {
           </div>
         </div>
 
+        {/* Interactive Area Chart */}
+        <div className="bg-white p-4 sm:p-6 rounded-sm shadow-sm border border-gray-200 mb-6 sm:mb-8">
+          <ChartAreaInteractive />
+        </div>
+
         {/* Customer Analytics Section */}
         <div className="bg-white p-4 rounded-sm shadow-sm border border-gray-200 mb-6 sm:mb-8">
           <div className="w-full">
             <p className="text-lg font-bold text-gray-500">
-               {getPeriodLabel()}
+              {getPeriodLabel()}
             </p>
             <HorizontalSeparator margin="1rem 0 0 0" />
           </div>
@@ -1158,7 +1365,7 @@ const getPeriodLabel = () => {
                   <h3 className="text-3xl font-bold text-gray-900">133</h3>
                 </div>
               </div>
-              
+
               {/* Chart */}
               <div className="w-[100%] min-w-0">
                 <ResponsiveContainer width="100%" height={320}>
@@ -1274,7 +1481,7 @@ const getPeriodLabel = () => {
                 </ResponsiveContainer>
               </div>
             </div>
-            
+
             {/* Right side - Stats cards */}
             <div className="lg:w-80 flex-shrink-0 border-l border-gray-300 space-y-6">
               {/* Repeat customers card */}
@@ -1347,7 +1554,7 @@ const getPeriodLabel = () => {
               </p>
             </div>
 
-            <div className="h-64  sm:h-80">
+            <div className="h-64 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={dashboardData.revenueData}
