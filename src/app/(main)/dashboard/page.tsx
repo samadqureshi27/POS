@@ -1053,7 +1053,7 @@ const getPeriodLabel = () => {
   showDatePicker && (
     <div 
       ref={calendarRef}
-      className="absolute z-50 mt-2 bg-white h-[100px] shadow-lg border border-gray-200 rounded-md"
+      className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-md"
     >
       <DateRange
         ranges={customDateRange?.length ? customDateRange : [{
