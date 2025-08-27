@@ -163,24 +163,21 @@ class SettingsAPI {
 const Toast = React.memo<ToastProps>(
   ({ message, type, onClose, isVisible }) => (
     <div
-      className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${
-        isVisible
+      className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[450px] transition-all duration-500 ease-in-out transform ${isVisible
           ? "translate-x-0 opacity-100 scale-100"
           : "translate-x-full opacity-0 scale-95"
-      } ${
-        type === "success"
+        } ${type === "success"
           ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200"
           : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
-      }`}
+        }`}
       style={{
         backdropFilter: "blur(10px)",
         border: "1px solid rgba(255, 255, 255, 0.2)",
       }}
     >
       <div
-        className={`flex-shrink-0 p-1 rounded-full ${
-          type === "success" ? "bg-green-400/20" : "bg-red-400/20"
-        }`}
+        className={`flex-shrink-0 p-1 rounded-full ${type === "success" ? "bg-green-400/20" : "bg-red-400/20"
+          }`}
       >
         {type === "success" ? (
           <CheckCircle size={20} className="text-white" />
@@ -390,7 +387,7 @@ const GeneralSettingsPage = () => {
   if (!settings) return null;
 
   return (
-    <div className="min-h-screen w-[92.5vw] bg-gray-50  ">
+    <div className=" min-h-screen w-full bg-gray-50  ">
       {toast && (
         <Toast
           message={toast.message}
@@ -399,395 +396,395 @@ const GeneralSettingsPage = () => {
           isVisible={toastVisible}
         />
       )}
-
-      <div className="mt-20    ">
-        <div className="flex items-center justify-between mb-12">
-          <h1 className="text-3xl font-semibold text-gray-900">
-            General Settings
-          </h1>
-          <div className="flex gap-3 ">
-            <button
-              onClick={handleResetToDefaults}
-              disabled={resetting}
-              className="flex items-center gap-2 px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {resetting ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-b-2 border-gray-600 rounded-full"></div>
-                  Resetting...
-                </>
-              ) : (
-                "Reset to Defaults"
-              )}
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={!hasChanges || saving}
-              className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
-                hasChanges && !saving
-                  ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              {saving ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save size={16} />
-                  Save Changes
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 ">
-          {/* Currency & Pricing Card */}
-          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
-            <div className="flex items-center gap-2 mb-8">
-              <DollarSign className="text-black" size={24} />
-              <h2 className="text-xl font-semibold">Currency & Pricing</h2>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Currency
-                </label>
-                <SettingsDropdown
-                  value={settings.currency}
-                  options={OPTIONS.currency}
-                  onValueChange={(value) =>
-                    handleSettingChange("currency", value)
-                  }
-                  placeholder="Select Currency"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Currency Position
-                </label>
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="before"
-                      checked={settings.currencyPosition === "before"}
-                      onChange={(e) =>
-                        handleSettingChange("currencyPosition", e.target.value)
-                      }
-                      className="mr-2 text-blue-600"
-                    />
-                    Before amount ($100.00)
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="after"
-                      checked={settings.currencyPosition === "after"}
-                      onChange={(e) =>
-                        handleSettingChange("currencyPosition", e.target.value)
-                      }
-                      className="mr-2 text-blue-600"
-                    />
-                    After amount (100.00$)
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Decimal Places
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="4"
-                  onChange={(e) =>
-                    handleSettingChange(
-                      "decimalPlaces",
-                      parseInt(e.target.value)
-                    )
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="Enter number of decimal places"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Default Tax Rate (%)
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  onChange={(e) =>
-                    handleSettingChange("taxRate", parseFloat(e.target.value))
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="Enter tax rate"
-                />
-              </div>
+      <div className="flex-1 justify-center  items-center w-full px-6">
+        <div className="mt-20     ">
+          <div className="flex items-center justify-between mb-12">
+            <h1 className="text-3xl font-semibold text-gray-900">
+              General Settings
+            </h1>
+            <div className="flex gap-3 ">
+              <button
+                onClick={handleResetToDefaults}
+                disabled={resetting}
+                className="flex items-center gap-2 px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {resetting ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-gray-600 rounded-full"></div>
+                    Resetting...
+                  </>
+                ) : (
+                  "Reset to Defaults"
+                )}
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={!hasChanges || saving}
+                className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${hasChanges && !saving
+                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
+              >
+                {saving ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    Save Changes
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Regional Settings Card */}
-          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
-            <div className="flex items-center gap-2 mb-8">
-              <Globe className="text-black" size={24} />
-              <h2 className="text-xl font-semibold">Regional Settings</h2>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Language
-                </label>
-                <SettingsDropdown
-                  value={settings.language}
-                  options={OPTIONS.language}
-                  onValueChange={(value) =>
-                    handleSettingChange("language", value)
-                  }
-                  placeholder="Select Language"
-                />
+          <div className="grid w-full grid-cols-1 lg:grid-cols-3 gap-8 ">
+            {/* Currency & Pricing Card */}
+            <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 max-h-[450px]">
+              <div className="flex items-center gap-2 mb-8">
+                <DollarSign className="text-black" size={24} />
+                <h2 className="text-xl font-semibold">Currency & Pricing</h2>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Timezone
-                </label>
-                <SettingsDropdown
-                  value={settings.timezone}
-                  options={OPTIONS.timezone}
-                  onValueChange={(value) =>
-                    handleSettingChange("timezone", value)
-                  }
-                  placeholder="Select Timezone"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Date Format
-                </label>
-                <SettingsDropdown
-                  value={settings.dateFormat}
-                  options={OPTIONS.dateFormat}
-                  onValueChange={(value) =>
-                    handleSettingChange("dateFormat", value)
-                  }
-                  placeholder="Select Date Format"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Time Format
-                </label>
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="12"
-                      checked={settings.timeFormat === "12"}
-                      onChange={(e) =>
-                        handleSettingChange("timeFormat", e.target.value)
-                      }
-                      className="mr-2 text-blue-600"
-                    />
-                    12-hour (3:30 PM)
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Currency
                   </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="24"
-                      checked={settings.timeFormat === "24"}
-                      onChange={(e) =>
-                        handleSettingChange("timeFormat", e.target.value)
-                      }
-                      className="mr-2 text-blue-600"
-                    />
-                    24-hour (15:30)
+                  <SettingsDropdown
+                    value={settings.currency}
+                    options={OPTIONS.currency}
+                    onValueChange={(value) =>
+                      handleSettingChange("currency", value)
+                    }
+                    placeholder="Select Currency"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Currency Position
                   </label>
+                  <div className="flex flex-col gap-2">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        value="before"
+                        checked={settings.currencyPosition === "before"}
+                        onChange={(e) =>
+                          handleSettingChange("currencyPosition", e.target.value)
+                        }
+                        className="mr-2 text-blue-600"
+                      />
+                      Before amount ($100.00)
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        value="after"
+                        checked={settings.currencyPosition === "after"}
+                        onChange={(e) =>
+                          handleSettingChange("currencyPosition", e.target.value)
+                        }
+                        className="mr-2 text-blue-600"
+                      />
+                      After amount (100.00$)
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Decimal Places
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="4"
+                    onChange={(e) =>
+                      handleSettingChange(
+                        "decimalPlaces",
+                        parseInt(e.target.value)
+                      )
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                    placeholder="Enter number of decimal places"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Default Tax Rate (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    onChange={(e) =>
+                      handleSettingChange("taxRate", parseFloat(e.target.value))
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                    placeholder="Enter tax rate"
+                  />
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Receipt Settings Card */}
-          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
-            <div className="flex items-center gap-2 mb-8">
-              <Printer className="text-black" size={24} />
-              <h2 className="text-xl font-semibold">Receipt Settings</h2>
+            {/* Regional Settings Card */}
+            <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[450px]">
+              <div className="flex items-center gap-2 mb-8">
+                <Globe className="text-black" size={24} />
+                <h2 className="text-xl font-semibold">Regional Settings</h2>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Language
+                  </label>
+                  <SettingsDropdown
+                    value={settings.language}
+                    options={OPTIONS.language}
+                    onValueChange={(value) =>
+                      handleSettingChange("language", value)
+                    }
+                    placeholder="Select Language"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Timezone
+                  </label>
+                  <SettingsDropdown
+                    value={settings.timezone}
+                    options={OPTIONS.timezone}
+                    onValueChange={(value) =>
+                      handleSettingChange("timezone", value)
+                    }
+                    placeholder="Select Timezone"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Date Format
+                  </label>
+                  <SettingsDropdown
+                    value={settings.dateFormat}
+                    options={OPTIONS.dateFormat}
+                    onValueChange={(value) =>
+                      handleSettingChange("dateFormat", value)
+                    }
+                    placeholder="Select Date Format"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Time Format
+                  </label>
+                  <div className="flex flex-col gap-2">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        value="12"
+                        checked={settings.timeFormat === "12"}
+                        onChange={(e) =>
+                          handleSettingChange("timeFormat", e.target.value)
+                        }
+                        className="mr-2 text-blue-600"
+                      />
+                      12-hour (3:30 PM)
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        value="24"
+                        checked={settings.timeFormat === "24"}
+                        onChange={(e) =>
+                          handleSettingChange("timeFormat", e.target.value)
+                        }
+                        className="mr-2 text-blue-600"
+                      />
+                      24-hour (15:30)
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
+            {/* Receipt Settings Card */}
+            <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[450px]">
+              <div className="flex items-center gap-2 mb-8">
+                <Printer className="text-black" size={24} />
+                <h2 className="text-xl font-semibold">Receipt Settings</h2>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">
+                      Auto Print Receipts
+                    </label>
+                    <p className="text-xs text-gray-500">
+                      Print receipt after each sale
+                    </p>
+                  </div>
+                  <ButtonPage
+                    checked={settings.autoPrintReceipts}
+                    onChange={(isActive) =>
+                      handleSettingChange("autoPrintReceipts", isActive)
+                    }
+                  />
+                </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-500">
-                    Auto Print Receipts
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Receipt Copies
                   </label>
-                  <p className="text-xs text-gray-500">
-                    Print receipt after each sale
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    onChange={(e) =>
+                      handleSettingChange(
+                        "receiptCopies",
+                        parseInt(e.target.value)
+                      )
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                    placeholder="Enter number of copies"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Receipt Footer Message
+                  </label>
+                  <textarea
+                    value={settings.receiptFooter}
+                    onChange={(e) =>
+                      handleSettingChange("receiptFooter", e.target.value)
+                    }
+                    rows={3}
+                    placeholder="Enter thank you message..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Security & Access Card */}
+            <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[450px]">
+              <div className="flex items-center gap-2 mb-8">
+                <Shield className="text-black" size={24} />
+                <h2 className="text-xl font-semibold">Security & Access</h2>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">
+                      Manager Approval for Refunds
+                    </label>
+                    <p className="text-xs text-gray-500">
+                      Require manager password for refunds
+                    </p>
+                  </div>
+                  <ButtonPage
+                    checked={settings.requireManagerForRefunds}
+                    onChange={(isActive) =>
+                      handleSettingChange("requireManagerForRefunds", isActive)
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">
+                      Manager Approval for Discounts
+                    </label>
+                    <p className="text-xs text-gray-500">
+                      Require manager password for discounts
+                    </p>
+                  </div>
+                  <ButtonPage
+                    checked={settings.requireManagerForDiscounts}
+                    onChange={(isActive) =>
+                      handleSettingChange("requireManagerForDiscounts", isActive)
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">
+                    Session Timeout (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    min="5"
+                    max="240"
+                    onChange={(e) =>
+                      handleSettingChange(
+                        "sessionTimeout",
+                        parseInt(e.target.value)
+                      )
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                    placeholder="Enter timeout in minutes"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Auto logout after inactivity
                   </p>
                 </div>
-                <ButtonPage
-                  checked={settings.autoPrintReceipts}
-                  onChange={(isActive) =>
-                    handleSettingChange("autoPrintReceipts", isActive)
-                  }
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Receipt Copies
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  onChange={(e) =>
-                    handleSettingChange(
-                      "receiptCopies",
-                      parseInt(e.target.value)
-                    )
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="Enter number of copies"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Receipt Footer Message
-                </label>
-                <textarea
-                  value={settings.receiptFooter}
-                  onChange={(e) =>
-                    handleSettingChange("receiptFooter", e.target.value)
-                  }
-                  rows={3}
-                  placeholder="Enter thank you message..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                />
               </div>
             </div>
-          </div>
 
-          {/* Security & Access Card */}
-          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
-            <div className="flex items-center gap-2 mb-8">
-              <Shield className="text-black" size={24} />
-              <h2 className="text-xl font-semibold">Security & Access</h2>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-500">
-                    Manager Approval for Refunds
-                  </label>
-                  <p className="text-xs text-gray-500">
-                    Require manager password for refunds
-                  </p>
-                </div>
-                <ButtonPage
-                  checked={settings.requireManagerForRefunds}
-                  onChange={(isActive) =>
-                    handleSettingChange("requireManagerForRefunds", isActive)
-                  }
-                />
+            {/* Notifications & Alerts Card */}
+            <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[450px]">
+              <div className="flex items-center gap-2 mb-8">
+                <Bell className="text-black" size={24} />
+                <h2 className="text-xl font-semibold">Notifications & Alerts</h2>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-500">
-                    Manager Approval for Discounts
-                  </label>
-                  <p className="text-xs text-gray-500">
-                    Require manager password for discounts
-                  </p>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">
+                      Enable Notifications
+                    </label>
+                    <p className="text-xs text-gray-500">
+                      Show system alerts and updates
+                    </p>
+                  </div>
+                  <ButtonPage
+                    checked={settings.enableNotifications}
+                    onChange={(isActive) =>
+                      handleSettingChange("enableNotifications", isActive)
+                    }
+                  />
                 </div>
-                <ButtonPage
-                  checked={settings.requireManagerForDiscounts}
-                  onChange={(isActive) =>
-                    handleSettingChange("requireManagerForDiscounts", isActive)
-                  }
-                />
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">
-                  Session Timeout (minutes)
-                </label>
-                <input
-                  type="number"
-                  min="5"
-                  max="240"
-                  onChange={(e) =>
-                    handleSettingChange(
-                      "sessionTimeout",
-                      parseInt(e.target.value)
-                    )
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="Enter timeout in minutes"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Auto logout after inactivity
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Notifications & Alerts Card */}
-          <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
-            <div className="flex items-center gap-2 mb-8">
-              <Bell className="text-black" size={24} />
-              <h2 className="text-xl font-semibold">Notifications & Alerts</h2>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-500">
-                    Enable Notifications
-                  </label>
-                  <p className="text-xs text-gray-500">
-                    Show system alerts and updates
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">
+                      Enable Sound Effects
+                    </label>
+                    <p className="text-xs text-gray-500">
+                      Play sounds for transactions and alerts
+                    </p>
+                  </div>
+                  <ButtonPage
+                    checked={settings.enableSounds}
+                    onChange={(isActive) =>
+                      handleSettingChange("enableSounds", isActive)
+                    }
+                  />
                 </div>
-                <ButtonPage
-                  checked={settings.enableNotifications}
-                  onChange={(isActive) =>
-                    handleSettingChange("enableNotifications", isActive)
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-500">
-                    Enable Sound Effects
-                  </label>
-                  <p className="text-xs text-gray-500">
-                    Play sounds for transactions and alerts
-                  </p>
-                </div>
-                <ButtonPage
-                  checked={settings.enableSounds}
-                  onChange={(isActive) =>
-                    handleSettingChange("enableSounds", isActive)
-                  }
-                />
               </div>
             </div>
           </div>

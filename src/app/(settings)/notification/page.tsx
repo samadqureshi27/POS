@@ -26,26 +26,26 @@ interface NotificationSettings {
   orderSound: boolean;
   orderPushNotifications: boolean;
   orderModificationAlerts: boolean;
-  
+
   // Table & Reservations
   newReservationAlerts: boolean;
   tableReadyNotifications: boolean;
   reservationReminders: boolean;
-  
+
   // Kitchen Notifications
   kitchenOrderAlerts: boolean;
   priorityOrderAlerts: boolean;
   inventoryLowAlerts: boolean;
-  
+
   // Payment Notifications
   paymentAlerts: boolean;
   refundAlerts: boolean;
   highValueTransactionAlerts: boolean;
-  
+
   // Customer Service
   customerFeedbackAlerts: boolean;
   specialRequestAlerts: boolean;
-  
+
   // Notification Preferences
   emailNotifications: boolean;
   quietHoursEnabled: boolean;
@@ -118,15 +118,13 @@ interface ToastProps {
 // Enhanced Toast Component with advanced animations (matching backup page)
 const Toast = React.memo<ToastProps>(({ message, type, onClose, isVisible }) => (
   <div
-    className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${
-      isVisible 
-        ? 'translate-x-0 opacity-100 scale-100' 
+    className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${isVisible
+        ? 'translate-x-0 opacity-100 scale-100'
         : 'translate-x-full opacity-0 scale-95'
-    } ${
-      type === "success" 
-        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200" 
+      } ${type === "success"
+        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200"
         : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
-    }`}
+      }`}
     style={{
       backdropFilter: 'blur(10px)',
       border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -139,14 +137,14 @@ const Toast = React.memo<ToastProps>(({ message, type, onClose, isVisible }) => 
         <AlertCircle size={20} className="text-white" />
       )}
     </div>
-    
+
     <div className="flex-1">
       <p className="font-medium text-sm">{message}</p>
     </div>
-    
-    <button 
-      onClick={onClose} 
-      className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200" 
+
+    <button
+      onClick={onClose}
+      className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200"
       aria-label="Close"
     >
       <X size={16} className="text-white" />
@@ -159,7 +157,7 @@ const NotificationSettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  
+
   // Advanced toast state management (matching backup page)
   const [toast, setToast] = useState<{ message: string; type: "success" | "error"; id: number } | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
@@ -241,7 +239,7 @@ const NotificationSettingsPage = () => {
   if (!settings) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 w-[92.5vw]">
+    <div className="min-h-screen bg-gray-50 w-full">
       {toast && (
         <Toast
           message={toast.message}
@@ -250,328 +248,328 @@ const NotificationSettingsPage = () => {
           isVisible={toastVisible}
         />
       )}
-
-      <div className="mt-20">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900">Notification Settings</h1>
-          <div className="flex gap-3">
-            <button
-              onClick={handleSave}
-              disabled={!hasChanges || saving}
-              className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
-                hasChanges && !saving
-                  ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              {saving ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save size={16} />
-                  Save Changes
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Order Management Notifications */}
-          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-              <ShoppingCart className="text-black" size={20} />
-              <h2 className="text-lg font-semibold">Order Management</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    New Order Alerts
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.newOrderAlerts}
-                  onChange={(isActive) => handleSettingChange("newOrderAlerts", isActive)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Order Sounds
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.orderSound}
-                  onChange={(isActive) => handleSettingChange("orderSound", isActive)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Push Notifications
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.orderPushNotifications}
-                  onChange={(isActive) => handleSettingChange("orderPushNotifications", isActive)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Modification Alerts
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.orderModificationAlerts}
-                  onChange={(isActive) => handleSettingChange("orderModificationAlerts", isActive)}
-                />
-              </div>
+      <div className="flex-1 justify-center  items-center w-full px-6">
+        <div className="mt-20">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-semibold text-gray-900">Notification Settings</h1>
+            <div className="flex gap-3">
+              <button
+                onClick={handleSave}
+                disabled={!hasChanges || saving}
+                className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${hasChanges && !saving
+                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
+              >
+                {saving ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    Save Changes
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Table & Reservation Notifications */}
-          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-              <Calendar className="text-black" size={20} />
-              <h2 className="text-lg font-semibold">Table & Reservations</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    New Reservations
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.newReservationAlerts}
-                  onChange={(isActive) => handleSettingChange("newReservationAlerts", isActive)}
-                />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Order Management Notifications */}
+            <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-6">
+                <ShoppingCart className="text-black" size={20} />
+                <h2 className="text-lg font-semibold">Order Management</h2>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Table Ready
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.tableReadyNotifications}
-                  onChange={(isActive) => handleSettingChange("tableReadyNotifications", isActive)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Reservation Reminders
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.reservationReminders}
-                  onChange={(isActive) => handleSettingChange("reservationReminders", isActive)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Kitchen & Inventory Notifications */}
-          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-              <Utensils className="text-black" size={20} />
-              <h2 className="text-lg font-semibold">Kitchen & Inventory</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Kitchen Orders
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.kitchenOrderAlerts}
-                  onChange={(isActive) => handleSettingChange("kitchenOrderAlerts", isActive)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Priority Orders
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.priorityOrderAlerts}
-                  onChange={(isActive) => handleSettingChange("priorityOrderAlerts", isActive)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Low Inventory
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.inventoryLowAlerts}
-                  onChange={(isActive) => handleSettingChange("inventoryLowAlerts", isActive)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Notifications */}
-          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-              <CreditCard className="text-black" size={20} />
-              <h2 className="text-lg font-semibold">Payment Alerts</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Payment Alerts
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.paymentAlerts}
-                  onChange={(isActive) => handleSettingChange("paymentAlerts", isActive)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Refund Alerts
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.refundAlerts}
-                  onChange={(isActive) => handleSettingChange("refundAlerts", isActive)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    High-Value Transactions
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.highValueTransactionAlerts}
-                  onChange={(isActive) => handleSettingChange("highValueTransactionAlerts", isActive)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Customer Service Notifications */}
-          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-              <MessageSquare className="text-black" size={20} />
-              <h2 className="text-lg font-semibold">Customer Service</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Feedback Alerts
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.customerFeedbackAlerts}
-                  onChange={(isActive) => handleSettingChange("customerFeedbackAlerts", isActive)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Special Requests
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.specialRequestAlerts}
-                  onChange={(isActive) => handleSettingChange("specialRequestAlerts", isActive)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Notification Preferences */}
-          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-              <Settings className="text-black" size={20} />
-              <h2 className="text-lg font-semibold">Preferences</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Email Notifications
-                  </label>
-                </div>
-                <ButtonPage
-                  checked={settings.emailNotifications}
-                  onChange={(isActive) => handleSettingChange("emailNotifications", isActive)}
-                />
-              </div>
-
-              
-
-              <div className="pt-3 border-t border-gray-200">
-                <div className="flex items-center justify-between mb-3">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Quiet Hours
+                      New Order Alerts
                     </label>
                   </div>
                   <ButtonPage
-                    checked={settings.quietHoursEnabled}
-                    onChange={(isActive) => handleSettingChange("quietHoursEnabled", isActive)}
+                    checked={settings.newOrderAlerts}
+                    onChange={(isActive) => handleSettingChange("newOrderAlerts", isActive)}
                   />
                 </div>
-                
-                {settings.quietHoursEnabled && (
-                  <div className="grid grid-cols-2 gap-3 mt-3">
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">
-                        Start
-                      </label>
-                      <input
-                        type="time"
-                        value={settings.quietHoursStart}
-                        onChange={(e) => handleSettingChange("quietHoursStart", e.target.value)}
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">
-                        End
-                      </label>
-                      <input
-                        type="time"
-                        value={settings.quietHoursEnd}
-                        onChange={(e) => handleSettingChange("quietHoursEnd", e.target.value)}
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                      />
-                    </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Order Sounds
+                    </label>
                   </div>
-                )}
+                  <ButtonPage
+                    checked={settings.orderSound}
+                    onChange={(isActive) => handleSettingChange("orderSound", isActive)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Push Notifications
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.orderPushNotifications}
+                    onChange={(isActive) => handleSettingChange("orderPushNotifications", isActive)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Modification Alerts
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.orderModificationAlerts}
+                    onChange={(isActive) => handleSettingChange("orderModificationAlerts", isActive)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Table & Reservation Notifications */}
+            <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-6">
+                <Calendar className="text-black" size={20} />
+                <h2 className="text-lg font-semibold">Table & Reservations</h2>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      New Reservations
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.newReservationAlerts}
+                    onChange={(isActive) => handleSettingChange("newReservationAlerts", isActive)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Table Ready
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.tableReadyNotifications}
+                    onChange={(isActive) => handleSettingChange("tableReadyNotifications", isActive)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Reservation Reminders
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.reservationReminders}
+                    onChange={(isActive) => handleSettingChange("reservationReminders", isActive)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Kitchen & Inventory Notifications */}
+            <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-6">
+                <Utensils className="text-black" size={20} />
+                <h2 className="text-lg font-semibold">Kitchen & Inventory</h2>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Kitchen Orders
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.kitchenOrderAlerts}
+                    onChange={(isActive) => handleSettingChange("kitchenOrderAlerts", isActive)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Priority Orders
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.priorityOrderAlerts}
+                    onChange={(isActive) => handleSettingChange("priorityOrderAlerts", isActive)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Low Inventory
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.inventoryLowAlerts}
+                    onChange={(isActive) => handleSettingChange("inventoryLowAlerts", isActive)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Notifications */}
+            <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-6">
+                <CreditCard className="text-black" size={20} />
+                <h2 className="text-lg font-semibold">Payment Alerts</h2>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Payment Alerts
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.paymentAlerts}
+                    onChange={(isActive) => handleSettingChange("paymentAlerts", isActive)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Refund Alerts
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.refundAlerts}
+                    onChange={(isActive) => handleSettingChange("refundAlerts", isActive)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      High-Value Transactions
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.highValueTransactionAlerts}
+                    onChange={(isActive) => handleSettingChange("highValueTransactionAlerts", isActive)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Customer Service Notifications */}
+            <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-6">
+                <MessageSquare className="text-black" size={20} />
+                <h2 className="text-lg font-semibold">Customer Service</h2>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Feedback Alerts
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.customerFeedbackAlerts}
+                    onChange={(isActive) => handleSettingChange("customerFeedbackAlerts", isActive)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Special Requests
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.specialRequestAlerts}
+                    onChange={(isActive) => handleSettingChange("specialRequestAlerts", isActive)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Notification Preferences */}
+            <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-6">
+                <Settings className="text-black" size={20} />
+                <h2 className="text-lg font-semibold">Preferences</h2>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Email Notifications
+                    </label>
+                  </div>
+                  <ButtonPage
+                    checked={settings.emailNotifications}
+                    onChange={(isActive) => handleSettingChange("emailNotifications", isActive)}
+                  />
+                </div>
+
+
+
+                <div className="pt-3 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Quiet Hours
+                      </label>
+                    </div>
+                    <ButtonPage
+                      checked={settings.quietHoursEnabled}
+                      onChange={(isActive) => handleSettingChange("quietHoursEnabled", isActive)}
+                    />
+                  </div>
+
+                  {settings.quietHoursEnabled && (
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">
+                          Start
+                        </label>
+                        <input
+                          type="time"
+                          value={settings.quietHoursStart}
+                          onChange={(e) => handleSettingChange("quietHoursStart", e.target.value)}
+                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">
+                          End
+                        </label>
+                        <input
+                          type="time"
+                          value={settings.quietHoursEnd}
+                          onChange={(e) => handleSettingChange("quietHoursEnd", e.target.value)}
+                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
