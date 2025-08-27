@@ -1,5 +1,4 @@
 import React from 'react';
-import CustomerMgmtSubmenu from '@/components/layout/submenus/CustomerMgmtSubmenu';
 
 
 export default function CustomerMgmtLayout({
@@ -9,7 +8,6 @@ export default function CustomerMgmtLayout({
 }) {
   return (
     <>
-      <CustomerMgmtSubmenu />
       <main className="p-6">
         {children}
       </main>
