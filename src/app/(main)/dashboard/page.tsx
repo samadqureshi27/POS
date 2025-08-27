@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect , useRef} from "react";
 import { DateRange } from "react-date-range";
+import { motion } from "framer-motion";
 import { format } from "date-fns";
 
 
@@ -1448,7 +1449,7 @@ const getPeriodLabel = () => {
                 No data available for {selectedPeriod}
               </div>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>
