@@ -1,4 +1,5 @@
 "use client";
+"use client";
 
 import React, { useState, useEffect , useRef} from "react";
 import { DateRange } from "react-date-range";
@@ -56,9 +57,40 @@ interface VisitData {
   visits: number;
   repeat: number;
   referrals: number;
+  referrals: number;
 }
 
 const data = [
+  { date: "Jun 24", visits: 50, repeat: 20, referrals: 8 },
+  { date: "Jun 25", visits: 65, repeat: 22, referrals: 10 },
+  { date: "Jun 26", visits: 58, repeat: 25, referrals: 9 },
+  { date: "Jun 27", visits: 70, repeat: 28, referrals: 12 },
+  { date: "Jun 28", visits: 62, repeat: 21, referrals: 8 },
+  { date: "Jun 29", visits: 75, repeat: 26, referrals: 11 },
+  { date: "Jun 30", visits: 68, repeat: 23, referrals: 9 },
+  { date: "Jul 01", visits: 80, repeat: 30, referrals: 13 },
+  { date: "Jul 02", visits: 72, repeat: 28, referrals: 12 },
+  { date: "Jul 03", visits: 78, repeat: 25, referrals: 10 },
+  { date: "Jul 04", visits: 66, repeat: 22, referrals: 9 },
+  { date: "Jul 05", visits: 82, repeat: 32, referrals: 14 },
+  { date: "Jul 06", visits: 70, repeat: 27, referrals: 11 },
+  { date: "Jul 07", visits: 85, repeat: 35, referrals: 15 },
+  { date: "Jul 08", visits: 73, repeat: 29, referrals: 12 },
+  { date: "Jul 09", visits: 88, repeat: 37, referrals: 16 },
+  { date: "Jul 10", visits: 75, repeat: 31, referrals: 13 },
+  { date: "Jul 11", visits: 90, repeat: 40, referrals: 17 },
+  { date: "Jul 12", visits: 77, repeat: 33, referrals: 14 },
+  { date: "Jul 13", visits: 85, repeat: 36, referrals: 15 },
+  { date: "Jul 14", visits: 79, repeat: 30, referrals: 13 },
+  { date: "Jul 15", visits: 92, repeat: 41, referrals: 18 },
+  { date: "Jul 16", visits: 81, repeat: 34, referrals: 14 },
+  { date: "Jul 17", visits: 95, repeat: 43, referrals: 19 },
+  { date: "Jul 18", visits: 83, repeat: 35, referrals: 15 },
+  { date: "Jul 19", visits: 97, repeat: 45, referrals: 20 },
+  { date: "Jul 20", visits: 85, repeat: 38, referrals: 16 },
+  { date: "Jul 21", visits: 100, repeat: 46, referrals: 21 },
+  { date: "Jul 22", visits: 87, repeat: 39, referrals: 17 },
+  { date: "Jul 23", visits: 102, repeat: 48, referrals: 22 },
   { date: "Jun 24", visits: 50, repeat: 20, referrals: 8 },
   { date: "Jun 25", visits: 65, repeat: 22, referrals: 10 },
   { date: "Jun 26", visits: 58, repeat: 25, referrals: 9 },
@@ -123,6 +155,9 @@ interface ApiResponse<T> {
   lastUpdated?: string;
 }
 
+// Calendar Date Range Picker Component
+
+
 // Mock API Class
 class DashboardAPI {
   private static delay = (ms: number) =>
@@ -135,6 +170,7 @@ class DashboardAPI {
       taxes: 245.0,
       customers: 29,
       period: "Today",
+      period: "Today",
       lastUpdated: new Date().toISOString(),
     },
     Week: {
@@ -142,6 +178,7 @@ class DashboardAPI {
       avgOrderValue: 204,
       taxes: 1210.5,
       customers: 306,
+      period: "Week",
       period: "Week",
       lastUpdated: new Date().toISOString(),
     },
@@ -151,6 +188,7 @@ class DashboardAPI {
       taxes: 4856.7,
       customers: 1245,
       period: "Month",
+      period: "Month",
       lastUpdated: new Date().toISOString(),
     },
     Quarter: {
@@ -159,6 +197,7 @@ class DashboardAPI {
       taxes: 14550.0,
       customers: 3680,
       period: "Quarter",
+      period: "Quarter",
       lastUpdated: new Date().toISOString(),
     },
     Year: {
@@ -166,6 +205,15 @@ class DashboardAPI {
       avgOrderValue: 198,
       taxes: 58200.0,
       customers: 14720,
+      period: "Year",
+      lastUpdated: new Date().toISOString(),
+    },
+    Custom: {
+      grossRevenue: 35600,
+      avgOrderValue: 178,
+      taxes: 2968.0,
+      customers: 680,
+      period: "Custom",
       period: "Year",
       lastUpdated: new Date().toISOString(),
     },
@@ -186,8 +234,20 @@ class DashboardAPI {
       { day: "1PM", date: "13", value: 850, orders: 15 },
       { day: "3PM", date: "15", value: 650, orders: 12 },
       { day: "5PM", date: "17", value: 500, orders: 9 },
+      { day: "9AM", date: "09", value: 150, orders: 3 },
+      { day: "11AM", date: "11", value: 300, orders: 8 },
+      { day: "1PM", date: "13", value: 850, orders: 15 },
+      { day: "3PM", date: "15", value: 650, orders: 12 },
+      { day: "5PM", date: "17", value: 500, orders: 9 },
     ],
     Week: [
+      { day: "Mon", date: "15", value: 2000, orders: 45 },
+      { day: "Tue", date: "16", value: 3000, orders: 62 },
+      { day: "Wed", date: "17", value: 2500, orders: 55 },
+      { day: "Thu", date: "18", value: 4000, orders: 78 },
+      { day: "Fri", date: "19", value: 6000, orders: 95 },
+      { day: "Sat", date: "20", value: 8000, orders: 110 },
+      { day: "Sun", date: "21", value: 7500, orders: 98 },
       { day: "Mon", date: "15", value: 2000, orders: 45 },
       { day: "Tue", date: "16", value: 3000, orders: 62 },
       { day: "Wed", date: "17", value: 2500, orders: 55 },
@@ -201,13 +261,32 @@ class DashboardAPI {
       { day: "Week 2", date: "8-14", value: 18000, orders: 380 },
       { day: "Week 3", date: "15-21", value: 15000, orders: 320 },
       { day: "Week 4", date: "22-28", value: 21000, orders: 420 },
+      { day: "Week 1", date: "1-7", value: 12000, orders: 250 },
+      { day: "Week 2", date: "8-14", value: 18000, orders: 380 },
+      { day: "Week 3", date: "15-21", value: 15000, orders: 320 },
+      { day: "Week 4", date: "22-28", value: 21000, orders: 420 },
     ],
     Quarter: [
       { day: "Jan", date: "01", value: 45000, orders: 850 },
       { day: "Feb", date: "02", value: 52000, orders: 980 },
       { day: "Mar", date: "03", value: 58200, orders: 1100 },
+      { day: "Jan", date: "01", value: 45000, orders: 850 },
+      { day: "Feb", date: "02", value: 52000, orders: 980 },
+      { day: "Mar", date: "03", value: 58200, orders: 1100 },
     ],
     Year: [
+      { day: "Q1", date: "1-3", value: 155200, orders: 2930 },
+      { day: "Q2", date: "4-6", value: 168400, orders: 3180 },
+      { day: "Q3", date: "7-9", value: 185600, orders: 3520 },
+      { day: "Q4", date: "10-12", value: 189200, orders: 3590 },
+    ],
+    Custom: [
+      { day: "Day 1", date: "01", value: 5200, orders: 95 },
+      { day: "Day 2", date: "02", value: 6800, orders: 120 },
+      { day: "Day 3", date: "03", value: 4500, orders: 80 },
+      { day: "Day 4", date: "04", value: 7200, orders: 135 },
+      { day: "Day 5", date: "05", value: 8100, orders: 150 },
+      { day: "Day 6", date: "06", value: 3800, orders: 70 },
       { day: "Q1", date: "1-3", value: 155200, orders: 2930 },
       { day: "Q2", date: "4-6", value: 168400, orders: 3180 },
       { day: "Q3", date: "7-9", value: 185600, orders: 3520 },
@@ -249,8 +328,72 @@ class DashboardAPI {
         category: "Pastry",
         profitMargin: 70,
       },
+      {
+        rank: 1,
+        product: "Iced Coffee",
+        revenue: "$125",
+        sales: 15,
+        category: "Beverages",
+        profitMargin: 75,
+      },
+      {
+        rank: 2,
+        product: "Breakfast Sandwich",
+        revenue: "$98",
+        sales: 8,
+        category: "Food",
+        profitMargin: 60,
+      },
+      {
+        rank: 3,
+        product: "Croissant",
+        revenue: "$87",
+        sales: 12,
+        category: "Pastry",
+        profitMargin: 70,
+      },
     ],
     Week: [
+      {
+        rank: 1,
+        product: "Coffee",
+        revenue: "$1,304",
+        sales: 195,
+        category: "Beverages",
+        profitMargin: 80,
+      },
+      {
+        rank: 2,
+        product: "Grill Sandwich",
+        revenue: "$1,250",
+        sales: 90,
+        category: "Food",
+        profitMargin: 65,
+      },
+      {
+        rank: 3,
+        product: "Fajita Wraps",
+        revenue: "$1,030",
+        sales: 330,
+        category: "Food",
+        profitMargin: 55,
+      },
+      {
+        rank: 4,
+        product: "Peach Iced Tea",
+        revenue: "$890",
+        sales: 56,
+        category: "Beverages",
+        profitMargin: 78,
+      },
+      {
+        rank: 5,
+        product: "Crispy Burger",
+        revenue: "$730",
+        sales: 35,
+        category: "Food",
+        profitMargin: 45,
+      },
       {
         rank: 1,
         product: "Coffee",
@@ -333,6 +476,46 @@ class DashboardAPI {
         category: "Food",
         profitMargin: 45,
       },
+      {
+        rank: 1,
+        product: "Coffee",
+        revenue: "$5,216",
+        sales: 780,
+        category: "Beverages",
+        profitMargin: 80,
+      },
+      {
+        rank: 2,
+        product: "Grill Sandwich",
+        revenue: "$5,000",
+        sales: 360,
+        category: "Food",
+        profitMargin: 65,
+      },
+      {
+        rank: 3,
+        product: "Fajita Wraps",
+        revenue: "$4,120",
+        sales: 1320,
+        category: "Food",
+        profitMargin: 55,
+      },
+      {
+        rank: 4,
+        product: "Peach Iced Tea",
+        revenue: "$3,560",
+        sales: 224,
+        category: "Beverages",
+        profitMargin: 78,
+      },
+      {
+        rank: 5,
+        product: "Crispy Burger",
+        revenue: "$2,920",
+        sales: 140,
+        category: "Food",
+        profitMargin: 45,
+      },
     ],
     Quarter: [
       {
@@ -375,8 +558,130 @@ class DashboardAPI {
         category: "Food",
         profitMargin: 45,
       },
+      {
+        rank: 1,
+        product: "Coffee",
+        revenue: "$18,650",
+        sales: 2340,
+        category: "Beverages",
+        profitMargin: 80,
+      },
+      {
+        rank: 2,
+        product: "Grill Sandwich",
+        revenue: "$17,400",
+        sales: 1080,
+        category: "Food",
+        profitMargin: 65,
+      },
+      {
+        rank: 3,
+        product: "Fajita Wraps",
+        revenue: "$14,760",
+        sales: 3960,
+        category: "Food",
+        profitMargin: 55,
+      },
+      {
+        rank: 4,
+        product: "Peach Iced Tea",
+        revenue: "$12,680",
+        sales: 672,
+        category: "Beverages",
+        profitMargin: 78,
+      },
+      {
+        rank: 5,
+        product: "Crispy Burger",
+        revenue: "$10,440",
+        sales: 420,
+        category: "Food",
+        profitMargin: 45,
+      },
     ],
     Year: [
+      {
+        rank: 1,
+        product: "Coffee",
+        revenue: "$83,520",
+        sales: 9360,
+        category: "Beverages",
+        profitMargin: 80,
+      },
+      {
+        rank: 2,
+        product: "Grill Sandwich",
+        revenue: "$76,800",
+        sales: 4320,
+        category: "Food",
+        profitMargin: 65,
+      },
+      {
+        rank: 3,
+        product: "Fajita Wraps",
+        revenue: "$66,240",
+        sales: 15840,
+        category: "Food",
+        profitMargin: 55,
+      },
+      {
+        rank: 4,
+        product: "Peach Iced Tea",
+        revenue: "$56,960",
+        sales: 2688,
+        category: "Beverages",
+        profitMargin: 78,
+      },
+      {
+        rank: 5,
+        product: "Crispy Burger",
+        revenue: "$46,800",
+        sales: 1680,
+        category: "Food",
+        profitMargin: 45,
+      },
+    ],
+    Custom: [
+      {
+        rank: 1,
+        product: "Coffee",
+        revenue: "$2,840",
+        sales: 320,
+        category: "Beverages",
+        profitMargin: 80,
+      },
+      {
+        rank: 2,
+        product: "Grill Sandwich",
+        revenue: "$2,600",
+        sales: 150,
+        category: "Food",
+        profitMargin: 65,
+      },
+      {
+        rank: 3,
+        product: "Fajita Wraps",
+        revenue: "$2,200",
+        sales: 580,
+        category: "Food",
+        profitMargin: 55,
+      },
+      {
+        rank: 4,
+        product: "Peach Iced Tea",
+        revenue: "$1,890",
+        sales: 95,
+        category: "Beverages",
+        profitMargin: 78,
+      },
+      {
+        rank: 5,
+        product: "Crispy Burger",
+        revenue: "$1,520",
+        sales: 65,
+        category: "Food",
+        profitMargin: 45,
+      },
       {
         rank: 1,
         product: "Coffee",
@@ -529,10 +834,27 @@ class DashboardAPI {
       newCustomerGrowth: 450,
       referralGrowth: 65,
     },
+    Custom: {
+      totalVisits: 8450,
+      repeatCustomers: 2150,
+      newCustomers: 3200,
+      referrals: 180,
+      lastPeriod: 7200,
+      visitGrowth: 1250,
+      repeatGrowth: 320,
+      newCustomerGrowth: 450,
+      referralGrowth: 65,
+    },
   };
 
   private static mockVisitData: Record<string, VisitData[]> = {
     Today: [
+      { date: "9AM", visits: 50, repeat: 20, referrals: 19 },
+      { date: "11AM", visits: 65, repeat: 22, referrals: 21 },
+      { date: "1PM", visits: 58, repeat: 25, referrals: 24 },
+      { date: "3PM", visits: 70, repeat: 28, referrals: 30 },
+      { date: "5PM", visits: 62, repeat: 21, referrals: 7 },
+      { date: "7PM", visits: 75, repeat: 26, referrals: 13 },
       { date: "9AM", visits: 50, repeat: 20, referrals: 19 },
       { date: "11AM", visits: 65, repeat: 22, referrals: 21 },
       { date: "1PM", visits: 58, repeat: 25, referrals: 24 },
@@ -548,14 +870,29 @@ class DashboardAPI {
       { date: "Fri", visits: 262, repeat: 121, referrals: 14 },
       { date: "Sat", visits: 375, repeat: 156, referrals: 70 },
       { date: "Sun", visits: 275, repeat: 126, referrals: 30 },
+      { date: "Mon", visits: 150, repeat: 50, referrals: 50 },
+      { date: "Tue", visits: 165, repeat: 62, referrals: 50 },
+      { date: "Wed", visits: 158, repeat: 55, referrals: 96 },
+      { date: "Thu", visits: 170, repeat: 68, referrals: 35 },
+      { date: "Fri", visits: 262, repeat: 121, referrals: 14 },
+      { date: "Sat", visits: 375, repeat: 156, referrals: 70 },
+      { date: "Sun", visits: 275, repeat: 126, referrals: 30 },
     ],
+    Month: data,
     Month: data,
     Quarter: [
       { date: "Jan", visits: 1850, repeat: 680, referrals: 190 },
       { date: "Feb", visits: 2120, repeat: 780, referrals: 240 },
       { date: "Mar", visits: 2340, repeat: 890, referrals: 500 },
+      { date: "Jan", visits: 1850, repeat: 680, referrals: 190 },
+      { date: "Feb", visits: 2120, repeat: 780, referrals: 240 },
+      { date: "Mar", visits: 2340, repeat: 890, referrals: 500 },
     ],
     Year: [
+      { date: "Q1", visits: 6310, repeat: 2350, referrals: 1900 },
+      { date: "Q2", visits: 7120, repeat: 2640, referrals: 500 },
+      { date: "Q3", visits: 7890, repeat: 2980, referrals: 600 },
+      { date: "Q4", visits: 8240, repeat: 3120, referrals: 2500 },
       { date: "Q1", visits: 6310, repeat: 2350, referrals: 1900 },
       { date: "Q2", visits: 7120, repeat: 2640, referrals: 500 },
       { date: "Q3", visits: 7890, repeat: 2980, referrals: 600 },
@@ -574,9 +911,29 @@ class DashboardAPI {
   static async getDashboardData(
     period: string
   ): Promise<ApiResponse<DashboardData>> {
+    Custom: [
+      { date: "Day 1", visits: 420, repeat: 180, referrals: 35 },
+      { date: "Day 2", visits: 380, repeat: 160, referrals: 28 },
+      { date: "Day 3", visits: 450, repeat: 195, referrals: 42 },
+      { date: "Day 4", visits: 520, repeat: 220, referrals: 38 },
+      { date: "Day 5", visits: 480, repeat: 205, referrals: 45 },
+      { date: "Day 6", visits: 360, repeat: 150, referrals: 25 },
+    ],
+  };
+
+  static async getDashboardData(
+    period: string
+  ): Promise<ApiResponse<DashboardData>> {
     await this.delay(600);
 
+
     const metrics = this.mockMetrics[period] || this.mockMetrics.Week;
+    const revenueData =
+      this.mockRevenueData[period] || this.mockRevenueData.Week;
+    const bestSellingItems =
+      this.mockBestSelling[period] || this.mockBestSelling.Week;
+    const customerAnalytics =
+      this.mockCustomerAnalytics[period] || this.mockCustomerAnalytics.Week;
     const revenueData =
       this.mockRevenueData[period] || this.mockRevenueData.Week;
     const bestSellingItems =
@@ -642,9 +999,28 @@ class DashboardAPI {
   static async refreshDashboard(
     period: string
   ): Promise<ApiResponse<DashboardData>> {
+      data: {
+        metrics,
+        revenueData,
+        bestSellingItems,
+        customerAnalytics,
+        visitData,
+        period: `Custom (${startDate} to ${endDate})`,
+      },
+      message: `Dashboard data for custom range fetched successfully`,
+      lastUpdated: new Date().toISOString(),
+    };
+  }
+
+  static async refreshDashboard(
+    period: string
+  ): Promise<ApiResponse<DashboardData>> {
     await this.delay(800);
 
+
     const baseMetrics = this.mockMetrics[period] || this.mockMetrics.Week;
+    const variation = (Math.random() - 0.5) * 0.1;
+
     const variation = (Math.random() - 0.5) * 0.1;
 
     const refreshedMetrics: DashboardMetrics = {
@@ -654,6 +1030,12 @@ class DashboardAPI {
       lastUpdated: new Date().toISOString(),
     };
 
+    const revenueData =
+      this.mockRevenueData[period] || this.mockRevenueData.Week;
+    const bestSellingItems =
+      this.mockBestSelling[period] || this.mockBestSelling.Week;
+    const customerAnalytics =
+      this.mockCustomerAnalytics[period] || this.mockCustomerAnalytics.Week;
     const revenueData =
       this.mockRevenueData[period] || this.mockRevenueData.Week;
     const bestSellingItems =
@@ -690,6 +1072,8 @@ const Toast = ({
 }) => (
   <div
     className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 ${
+      type === "success"
+        ? "bg-green-500 text-white"
       type === "success"
         ? "bg-green-500 text-white"
         : type === "error"
@@ -968,6 +1352,7 @@ const getPeriodLabel = () => {
           <button
             onClick={() => loadDashboardData(selectedPeriod)}
             className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
+            className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
           >
             Retry
           </button>
@@ -989,9 +1374,11 @@ const getPeriodLabel = () => {
       <div className="w-full">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900">
             Dashboard
           </h1>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {lastUpdated && (
               <p className="text-sm text-gray-500">
@@ -1005,8 +1392,13 @@ const getPeriodLabel = () => {
                 refreshing
                   ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                   : "bg-gray-800 text-white hover:bg-gray-700"
+                  : "bg-gray-800 text-white hover:bg-gray-700"
               }`}
             >
+              <RefreshCw
+                size={16}
+                className={refreshing ? "animate-spin" : ""}
+              />
               <RefreshCw
                 size={16}
                 className={refreshing ? "animate-spin" : ""}
@@ -1085,28 +1477,42 @@ const getPeriodLabel = () => {
         {/* Metrics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Gross revenue</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               ${dashboardData.metrics.grossRevenue.toLocaleString()}
+              ${dashboardData.metrics.grossRevenue.toLocaleString()}
             </p>
+          </div>
+          <div className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
           </div>
           <div className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Avg. order value</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               ${dashboardData.metrics.avgOrderValue}
+              ${dashboardData.metrics.avgOrderValue}
             </p>
+          </div>
+          <div className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
           </div>
           <div className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Taxes</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               ${dashboardData.metrics.taxes.toFixed(1)}
+              ${dashboardData.metrics.taxes.toFixed(1)}
             </p>
+          </div>
+          <div className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
           </div>
           <div className="bg-white p-4 sm:p-6 border border-gray-200 rounded-sm shadow-sm">
             <p className="text-sm text-gray-500 mb-2">Customers</p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               {dashboardData.metrics.customers.toLocaleString()}
+              {dashboardData.metrics.customers.toLocaleString()}
             </p>
+          </div>
+        </div>
           </div>
         </div>
 
@@ -1120,11 +1526,15 @@ const getPeriodLabel = () => {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-6">
+
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* Left side - Main chart area */}
+            <div className="flex-1 min-w-0 w-[100%]">
             <div className="flex-1 min-w-0 w-[100%]">
               {/* Top metrics row */}
               <div className="grid grid-cols-3 gap-6 mb-6">
                 {/* Total visits */}
+                <div className="border-r pt-4 pr-4 border-gray-300">
                 <div className="border-r pt-4 pr-4 border-gray-300">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm text-gray-500">Total visits</p>
@@ -1137,6 +1547,7 @@ const getPeriodLabel = () => {
                 </div>
 
                 {/* Repeat customers */}
+                <div className="border-r pt-4 pr-4 border-gray-300">
                 <div className="border-r pt-4 pr-4 border-gray-300">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm text-gray-500">Repeat customers</p>
@@ -1153,9 +1564,13 @@ const getPeriodLabel = () => {
                   <p className="text-sm pt-4 pr-4 text-gray-500 mb-2">
                     Last period
                   </p>
+                  <p className="text-sm pt-4 pr-4 text-gray-500 mb-2">
+                    Last period
+                  </p>
                   <h3 className="text-3xl font-bold text-gray-900">133</h3>
                 </div>
               </div>
+
 
               {/* Chart */}
               <div className="w-[100%] min-w-0">
@@ -1237,6 +1652,7 @@ const getPeriodLabel = () => {
                       axisLine={false}
                       tickLine={false}
                       tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                      tick={{ fontSize: 10, fill: "#9CA3AF" }}
                       height={30}
                     />
 
@@ -1268,12 +1684,32 @@ const getPeriodLabel = () => {
                       fill="url(#referralsGradient)"
                       name="Referrals"
                     />
+                    <Bar
+                      dataKey="repeat"
+                      stackId="a"
+                      fill="#1d50cd"
+                      name="Repeat Customers"
+                    />
+                    <Bar
+                      dataKey="visits"
+                      stackId="a"
+                      fill="url(#newMembersGradient)"
+                      name="New Members"
+                    />
+                    <Bar
+                      dataKey="referrals"
+                      stackId="a"
+                      fill="url(#referralsGradient)"
+                      name="Referrals"
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
+
             {/* Right side - Stats cards */}
+            <div className="lg:w-80 flex-shrink-0 border-l border-gray-300 space-y-6">
             <div className="lg:w-80 flex-shrink-0 border-l border-gray-300 space-y-6">
               {/* Repeat customers card */}
               <div className="p-4 border-b border-gray-300">
@@ -1330,6 +1766,7 @@ const getPeriodLabel = () => {
             </div>
           </div>
         </div>
+        </div>
 
         {/* Charts and Tables Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -1344,12 +1781,50 @@ const getPeriodLabel = () => {
                 points
               </p>
             </div>
+          <div className="border border-gray-200 lg:col-span-2 bg-white p-4 sm:p-6 rounded-sm shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Revenue trend
+              </h2>
+              <p className="text-sm text-gray-500">
+                {selectedPeriod} - {dashboardData.revenueData.length} data
+                points
+              </p>
+            </div>
 
-            <div className="h-64 sm:h-80">
+            <div className="h-64  sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={dashboardData.revenueData}
+                <LineChart
+                  data={dashboardData.revenueData}
                   margin={{ top: 10, right: 20, left: 10, bottom: 0 }}
+                >
+                  <XAxis
+                    dataKey="day"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: "#6B7280" }}
+                    tickFormatter={(value, index) => {
+                      const item = dashboardData.revenueData[index];
+                      return `${value}\n${item?.date}`;
+                    }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: "#6B7280" }}
+                    tickFormatter={(value) =>
+                      value >= 1000 ? `${value / 1000}K` : value.toString()
+                    }
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#CCAB4D"
+                    strokeWidth={2}
+                    dot={{ fill: "#CCAB4D", strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, fill: "#CCAB4D" }}
                 >
                   <XAxis
                     dataKey="day"
@@ -1407,6 +1882,30 @@ const getPeriodLabel = () => {
                     cursor={false}
                   />
                 </LineChart>
+                    strokeLinejoin="round"
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#fff",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "8px",
+                      padding: "8px",
+                      fontSize: "12px",
+                    }}
+                    labelFormatter={(label, payload) => {
+                      const dataPoint = dashboardData.revenueData.find(
+                        (d) => d.day === label
+                      );
+                      return `${dataPoint?.day} (${dataPoint?.date})`;
+                    }}
+                    formatter={(value: number, name: string, props: any) => [
+                      `${value}`,
+                      "Revenue",
+                      `${props.payload?.orders || 0} orders`,
+                    ]}
+                    cursor={false}
+                  />
+                </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -1423,8 +1922,8 @@ const getPeriodLabel = () => {
                 <div className="col-span-3 text-right">Revenue</div>
                 <div className="col-span-3 text-right">Sales</div>
               </div>
-              {dashboardData.bestSellingItems.map((item) => (
-                <div
+              {dashboardData.bestSellingItems.map((item, index) => (
+                <motion.div
                   key={item.rank}
                   className="grid grid-cols-12 gap-2 py-3 text-sm border-b border-gray-50 last:border-b-0 hover:bg-gray-50 rounded-md transition-colors"
                   title={`Category: ${item.category} | Profit Margin: ${item.profitMargin}%`}
@@ -1447,7 +1946,7 @@ const getPeriodLabel = () => {
                 No data available for {selectedPeriod}
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
