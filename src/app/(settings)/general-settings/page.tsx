@@ -507,7 +507,6 @@ const GeneralSettingsPage = () => {
                   type="number"
                   min="0"
                   max="4"
-                  value={settings.decimalPlaces}
                   onChange={(e) =>
                     handleSettingChange(
                       "decimalPlaces",
@@ -515,6 +514,7 @@ const GeneralSettingsPage = () => {
                     )
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter number of decimal places"
                 />
               </div>
 
@@ -527,7 +527,6 @@ const GeneralSettingsPage = () => {
                   step="0.1"
                   min="0"
                   max="100"
-                  value={settings.taxRate}
                   onChange={(e) =>
                     handleSettingChange("taxRate", parseFloat(e.target.value))
                   }
@@ -655,7 +654,6 @@ const GeneralSettingsPage = () => {
                   type="number"
                   min="1"
                   max="5"
-                  value={settings.receiptCopies}
                   onChange={(e) =>
                     handleSettingChange(
                       "receiptCopies",
@@ -663,6 +661,7 @@ const GeneralSettingsPage = () => {
                     )
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter number of copies"
                 />
               </div>
 
@@ -733,7 +732,6 @@ const GeneralSettingsPage = () => {
                   type="number"
                   min="5"
                   max="240"
-                  value={settings.sessionTimeout}
                   onChange={(e) =>
                     handleSettingChange(
                       "sessionTimeout",
@@ -741,6 +739,7 @@ const GeneralSettingsPage = () => {
                     )
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  placeholder="Enter timeout in minutes"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Auto logout after inactivity
