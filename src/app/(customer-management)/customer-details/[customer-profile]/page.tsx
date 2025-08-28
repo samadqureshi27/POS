@@ -3,8 +3,17 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Search, ArrowLeft, Star, ChevronDown } from "lucide-react";
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 
 // Types (same as before)
 interface CustomerItem {
@@ -18,6 +27,7 @@ interface CustomerItem {
   Birthdate: string;
   Registration_Date: string;
   Profile_Creation_Date: string;
+  Card_Status: "Active" | "Inactive";
 }
 
 interface OrderItem {
@@ -53,6 +63,7 @@ class CustomerAPI {
       Birthdate: "09/13/1995",
       Registration_Date: "2024-01-15",
       Profile_Creation_Date: "01/15/2024 09:30",
+      Card_Status: "Active",
     },
     {
       Customer_ID: 2,
@@ -65,6 +76,7 @@ class CustomerAPI {
       Birthdate: "05/22/1988",
       Registration_Date: "2024-02-20",
       Profile_Creation_Date: "02/20/2024 14:45",
+      Card_Status: "Active",
     },
     {
       Customer_ID: 3,
@@ -77,6 +89,7 @@ class CustomerAPI {
       Birthdate: "12/08/1992",
       Registration_Date: "2023-12-10",
       Profile_Creation_Date: "12/10/2023 11:20",
+      Card_Status: "Active",
     },
     {
       Customer_ID: 12,
@@ -89,7 +102,8 @@ class CustomerAPI {
       Birthdate: "03/15/1990",
       Registration_Date: "2022-01-15",
       Profile_Creation_Date: "01/15/2022 10:30",
-    }
+      Card_Status: "Inactive",
+    },
   ];
 
   private static mockOrders: { [customerId: number]: OrderItem[] } = {
@@ -190,14 +204,14 @@ class CustomerAPI {
         Total: 900,
         Status: "Cancelled",
       },
-    ]
+    ],
   };
 
   static async getCustomerById(id: number): Promise<ApiResponse<CustomerItem>> {
     await this.delay(500);
     console.log(`Looking for customer with ID: ${id}`); // Debug log
-    const customer = this.mockCustomers.find(c => c.Customer_ID === id);
-    
+    const customer = this.mockCustomers.find((c) => c.Customer_ID === id);
+
     if (!customer) {
       console.log(`Customer with ID ${id} not found`); // Debug log
       return {
@@ -215,7 +229,9 @@ class CustomerAPI {
     };
   }
 
-  static async getCustomerOrders(customerId: number): Promise<ApiResponse<OrderItem[]>> {
+  static async getCustomerOrders(
+    customerId: number
+  ): Promise<ApiResponse<OrderItem[]>> {
     await this.delay(600);
     const orders = this.mockOrders[customerId] || [];
     console.log(`Orders for customer ${customerId}:`, orders); // Debug log
@@ -228,19 +244,28 @@ class CustomerAPI {
 }
 
 // Profile Picture Component
-const ProfilePicture = ({ name, size = "large" }: { name: string; size?: "small" | "large" }) => {
+const ProfilePicture = ({
+  name,
+  size = "large",
+}: {
+  name: string;
+  size?: "small" | "large";
+}) => {
   const getInitials = (fullName: string) => {
-    const names = fullName.split(' ');
+    const names = fullName.split(" ");
     if (names.length >= 2) {
       return names[0][0] + names[1][0];
     }
-    return names[0][0] + (names[0][1] || '');
+    return names[0][0] + (names[0][1] || "");
   };
 
-  const sizeClasses = size === "large" ? "w-12 h-12 text-lg" : "w-10 h-10 text-base font-light";
+  const sizeClasses =
+    size === "large" ? "w-12 h-12 text-lg" : "w-10 h-10 text-base font-light";
 
   return (
-    <div className={`${sizeClasses} bg-[#2c2c2c] rounded-full flex items-center justify-center text-white`}>
+    <div
+      className={`${sizeClasses} bg-[#2c2c2c] rounded-full flex items-center justify-center text-white`}
+    >
       {getInitials(name).toUpperCase()}
     </div>
   );
@@ -255,9 +280,7 @@ const StarRating = ({ rating }: { rating: number }) => {
           key={star}
           size={14}
           className={
-            star <= rating
-              ? "text-yellow-400 fill-yellow-400"
-              : "text-gray-300"
+            star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
           }
         />
       ))}
@@ -274,9 +297,7 @@ const LargeStarRating = ({ rating }: { rating: number }) => {
           key={star}
           size={32}
           className={
-            star <= rating
-              ? "text-yellow-400 fill-yellow-400"
-              : "text-gray-300"
+            star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
           }
         />
       ))}
@@ -287,7 +308,7 @@ const LargeStarRating = ({ rating }: { rating: number }) => {
 const CustomerProfilePage = () => {
   const params = useParams();
   const router = useRouter();
-  
+
   const [customer, setCustomer] = useState<CustomerItem | null>(null);
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -298,22 +319,22 @@ const CustomerProfilePage = () => {
 
   // FIXED: Access the parameter using the folder name 'customer-profile'
   const customerId = React.useMemo(() => {
-    const param = params['customer-profile'];
-    console.log('Raw param:', param, 'Type:', typeof param); // Debug log
-    
+    const param = params["customer-profile"];
+    console.log("Raw param:", param, "Type:", typeof param); // Debug log
+
     if (!param) {
-      console.log('No customer-profile param found');
+      console.log("No customer-profile param found");
       return null;
     }
-    
+
     const id = parseInt(param as string);
-    console.log('Parsed customer ID:', id); // Debug log
+    console.log("Parsed customer ID:", id); // Debug log
     return isNaN(id) ? null : id;
   }, [params]);
 
   useEffect(() => {
-    console.log('Effect triggered, customerId:', customerId); // Debug log
-    
+    console.log("Effect triggered, customerId:", customerId); // Debug log
+
     if (customerId !== null) {
       loadCustomerData(customerId);
     } else {
@@ -327,21 +348,21 @@ const CustomerProfilePage = () => {
       console.log(`Loading data for customer ID: ${id}`); // Debug log
       setLoading(true);
       setError(null);
-      
+
       const [customerResponse, ordersResponse] = await Promise.all([
         CustomerAPI.getCustomerById(id),
-        CustomerAPI.getCustomerOrders(id)
+        CustomerAPI.getCustomerOrders(id),
       ]);
-      
-      console.log('Customer response:', customerResponse); // Debug log
-      console.log('Orders response:', ordersResponse); // Debug log
-      
+
+      console.log("Customer response:", customerResponse); // Debug log
+      console.log("Orders response:", ordersResponse); // Debug log
+
       if (customerResponse.success) {
         setCustomer(customerResponse.data);
       } else {
         setError(customerResponse.message || "Customer not found");
       }
-      
+
       if (ordersResponse.success) {
         setOrders(ordersResponse.data);
       }
@@ -354,7 +375,7 @@ const CustomerProfilePage = () => {
   };
 
   const handleBackClick = () => {
-    router.push('/customer-details');
+    router.push("/customer-details");
   };
 
   // Calculate metrics
@@ -372,26 +393,27 @@ const CustomerProfilePage = () => {
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(order =>
-        order.Order_ID.toLowerCase().includes(term) ||
-        order.Order_Number.toLowerCase().includes(term) ||
-        order.Type.toLowerCase().includes(term)
+      filtered = filtered.filter(
+        (order) =>
+          order.Order_ID.toLowerCase().includes(term) ||
+          order.Order_Number.toLowerCase().includes(term) ||
+          order.Type.toLowerCase().includes(term)
       );
     }
 
     if (typeFilter) {
-      filtered = filtered.filter(order => order.Type === typeFilter);
+      filtered = filtered.filter((order) => order.Type === typeFilter);
     }
 
     if (statusFilter) {
-      filtered = filtered.filter(order => order.Status === statusFilter);
+      filtered = filtered.filter((order) => order.Status === statusFilter);
     }
 
     return filtered;
   }, [orders, searchTerm, typeFilter, statusFilter]);
 
   // Debug render
-  console.log('Render state:', { customerId, loading, error, customer }); // Debug log
+  console.log("Render state:", { customerId, loading, error, customer }); // Debug log
 
   if (loading) {
     return (
@@ -399,7 +421,9 @@ const CustomerProfilePage = () => {
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading Customer Profile...</p>
-          <p className="text-sm text-gray-400 mt-2">Customer ID: {customerId}</p>
+          <p className="text-sm text-gray-400 mt-2">
+            Customer ID: {customerId}
+          </p>
         </div>
       </div>
     );
@@ -409,8 +433,12 @@ const CustomerProfilePage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <p className="text-gray-600 text-lg mb-4">{error || "Customer not found"}</p>
-          <p className="text-sm text-gray-400 mb-4">Customer ID: {customerId}</p>
+          <p className="text-gray-600 text-lg mb-4">
+            {error || "Customer not found"}
+          </p>
+          <p className="text-sm text-gray-400 mb-4">
+            Customer ID: {customerId}
+          </p>
           <button
             onClick={handleBackClick}
             className="px-4 py-2 bg-[#2C2C2C] text-white rounded-md hover:bg-gray-700 transition-colors"
@@ -426,7 +454,10 @@ const CustomerProfilePage = () => {
     <div className=" bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8 mt-2">
-        <button onClick={handleBackClick} className="p-2 hover:bg-gray-100 rounded-sm">
+        <button
+          onClick={handleBackClick}
+          className="p-2 hover:bg-gray-100 rounded-sm"
+        >
           <ArrowLeft size={20} className="text-gray-600" />
         </button>
         <h1 className="text-3xl font-semibold">Customer Profile</h1>
@@ -452,11 +483,13 @@ const CustomerProfilePage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4 text-base">
                   <div className="flex justify-between">
                     <span className="text-gray-500">ID:</span>
-                    <span>#{String(customer.Customer_ID).padStart(3, "0")}</span>
+                    <span>
+                      #{String(customer.Customer_ID).padStart(3, "0")}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Contact:</span>
@@ -469,6 +502,17 @@ const CustomerProfilePage = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-500">Since:</span>
                     <span>{customer.Registration_Date}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500">Card Status:</span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium
+      ${
+        customer.Card_Status === "Active" ? " text-green-400" : " text-red-400"
+      }`}
+                    >
+                      {customer.Card_Status}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -489,7 +533,9 @@ const CustomerProfilePage = () => {
               {/* Total Orders */}
               <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-start h-[140px]">
                 <div className="text-start">
-                  <p className="text-5xl font-bold mb-2">{customer.Total_Orders}</p>
+                  <p className="text-5xl font-bold mb-2">
+                    {customer.Total_Orders}
+                  </p>
                   <p className="text-base text-gray-500">Total Orders</p>
                 </div>
               </div>
@@ -497,7 +543,9 @@ const CustomerProfilePage = () => {
               {/* Total Spent */}
               <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-start h-[140px]">
                 <div className="text-start">
-                  <p className="text-5xl font-bold mb-2">{totalSpent.toLocaleString()}</p>
+                  <p className="text-5xl font-bold mb-2">
+                    {totalSpent.toLocaleString()}
+                  </p>
                   <p className="text-base text-gray-500">Total Spent (PKR)</p>
                 </div>
               </div>
@@ -506,7 +554,9 @@ const CustomerProfilePage = () => {
               <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-start h-[140px]">
                 <div className="text-start">
                   <p className="text-5xl font-bold mb-2">{averageOrderValue}</p>
-                  <p className="text-base text-gray-500">Avg Order Value (PKR)</p>
+                  <p className="text-base text-gray-500">
+                    Avg Order Value (PKR)
+                  </p>
                 </div>
               </div>
             </div>
@@ -516,15 +566,22 @@ const CustomerProfilePage = () => {
         {/* Right Column - Chart */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm h-[448px]">
-            <h3 className="text-xl font-semibold mb-6">Order Trends</h3>
-            <div className="h-[378px] bg-gray-100 rounded-sm flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
-                </div>
-                <p className="text-gray-500 text-lg">Chart will be displayed here</p>
-                <p className="text-gray-400 text-sm mt-2">Order trends and analytics</p>
-              </div>
+            <h3 className="text-xl font-semibold mb-6">Order Spent</h3>
+            <div className="h-[378px] bg-white rounded-sm p-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={orders}
+                  margin={{ top: 20, right: 20, left: 0, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="Date" />
+                  <YAxis />
+                  <Tooltip
+                    formatter={(value: number) => value.toLocaleString()}
+                  />
+                  <Bar dataKey="Total" fill="#3b82f6" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
@@ -560,7 +617,9 @@ const CustomerProfilePage = () => {
             <table className="min-w-full divide-y divide-gray-200 table-fixed">
               <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
                 <tr>
-                  <th className="relative px-6 py-6 text-left w-24">Order ID</th>
+                  <th className="relative px-6 py-6 text-left w-24">
+                    Order ID
+                  </th>
                   <th className="relative px-4 py-3 text-left w-40">
                     Order Number
                     <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
@@ -570,16 +629,31 @@ const CustomerProfilePage = () => {
                       <DropdownMenu.Root>
                         <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                           {typeFilter || "Type"}
-                          <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                          <ChevronDown
+                            size={14}
+                            className="text-gray-500 ml-auto"
+                          />
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
-                          <DropdownMenu.Content className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none" sideOffset={6}>
+                          <DropdownMenu.Content
+                            className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                            sideOffset={6}
+                          >
                             <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-                            <DropdownMenu.Item className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none" onClick={() => setTypeFilter("")}>
+                            <DropdownMenu.Item
+                              className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                              onClick={() => setTypeFilter("")}
+                            >
                               Type
                             </DropdownMenu.Item>
-                            {Array.from(new Set(orders.map((order) => order.Type))).map((type) => (
-                              <DropdownMenu.Item key={type} className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none" onClick={() => setTypeFilter(type)}>
+                            {Array.from(
+                              new Set(orders.map((order) => order.Type))
+                            ).map((type) => (
+                              <DropdownMenu.Item
+                                key={type}
+                                className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
+                                onClick={() => setTypeFilter(type)}
+                              >
                                 {type}
                               </DropdownMenu.Item>
                             ))}
@@ -602,18 +676,37 @@ const CustomerProfilePage = () => {
                       <DropdownMenu.Root>
                         <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                           {statusFilter || "Status"}
-                          <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                          <ChevronDown
+                            size={14}
+                            className="text-gray-500 ml-auto"
+                          />
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
-                          <DropdownMenu.Content className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none" sideOffset={6}>
+                          <DropdownMenu.Content
+                            className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                            sideOffset={6}
+                          >
                             <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-                            <DropdownMenu.Item className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none" onClick={() => setStatusFilter("")}>
+                            <DropdownMenu.Item
+                              className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                              onClick={() => setStatusFilter("")}
+                            >
                               Status
                             </DropdownMenu.Item>
-                            {Array.from(new Set(orders.map((order) => order.Status))).map((status) => (
-                              <DropdownMenu.Item key={status} className={`px-3 py-1 text-sm cursor-pointer rounded outline-none ${
-                                status === "Completed" ? "hover:bg-green-100 text-green-400" : status === "Pending" ? "hover:bg-blue-100 text-blue-400" : "hover:bg-red-100 text-red-400"
-                              }`} onClick={() => setStatusFilter(status)}>
+                            {Array.from(
+                              new Set(orders.map((order) => order.Status))
+                            ).map((status) => (
+                              <DropdownMenu.Item
+                                key={status}
+                                className={`px-3 py-1 text-sm cursor-pointer rounded outline-none ${
+                                  status === "Completed"
+                                    ? "hover:bg-green-100 text-green-400"
+                                    : status === "Pending"
+                                    ? "hover:bg-blue-100 text-blue-400"
+                                    : "hover:bg-red-100 text-red-400"
+                                }`}
+                                onClick={() => setStatusFilter(status)}
+                              >
                                 {status}
                               </DropdownMenu.Item>
                             ))}
@@ -629,19 +722,37 @@ const CustomerProfilePage = () => {
               <tbody className="divide-y text-gray-500 divide-gray-300">
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                      {searchTerm || typeFilter || statusFilter ? "No orders match your search criteria." : "No orders found."}
+                    <td
+                      colSpan={6}
+                      className="px-4 py-8 text-center text-gray-500"
+                    >
+                      {searchTerm || typeFilter || statusFilter
+                        ? "No orders match your search criteria."
+                        : "No orders found."}
                     </td>
                   </tr>
                 ) : (
                   filteredOrders.map((order) => (
-                    <tr key={order.Order_ID} className="bg-white hover:bg-gray-50">
-                      <td className="px-6 py-8 whitespace-nowrap text-sm">{order.Order_ID}</td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm">{order.Order_Number}</td>
+                    <tr
+                      key={order.Order_ID}
+                      className="bg-white hover:bg-gray-50"
+                    >
+                      <td className="px-6 py-8 whitespace-nowrap text-sm">
+                        {order.Order_ID}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+                        {order.Order_Number}
+                      </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                          order.Type === "Dine in" ? " text-yellow-400" : order.Type === "Takeaway" ? " text-green-400" : " text-blue-400"
-                        }`}>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                            order.Type === "Dine in"
+                              ? " text-yellow-400"
+                              : order.Type === "Takeaway"
+                              ? " text-green-400"
+                              : " text-blue-400"
+                          }`}
+                        >
                           {order.Type}
                         </span>
                       </td>
@@ -652,9 +763,15 @@ const CustomerProfilePage = () => {
                         PKR {order.Total.toLocaleString()}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                          order.Status === "Completed" ? " text-green-400" : order.Status === "Pending" ? " text-blue-400" : " text-red-400"
-                        }`}>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                            order.Status === "Completed"
+                              ? " text-green-400"
+                              : order.Status === "Pending"
+                              ? " text-blue-400"
+                              : " text-red-400"
+                          }`}
+                        >
                           {order.Status}
                         </span>
                       </td>
