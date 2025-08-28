@@ -461,14 +461,14 @@ const CustomerProfilePage = () => {
           <ArrowLeft size={20} className="text-gray-600" />
         </button>
         <h1 className="text-3xl font-semibold">Customer Profile</h1>
-        <span className="text-sm text-gray-400">ID: {customerId}</span>
+        
       </div>
 
       {/* Main Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-1  lg:grid-cols-7 gap-6 mb-8 ">
         {/* Left Column - Customer Profile Card and Customer Feedback */}
         <div className="lg:col-span-4">
-          <div className="grid grid-cols-2 gap-6 h-[450px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:h-[450px]">
             {/* Left side - Customer Profile Card and Customer Feedback */}
             <div className="flex flex-col gap-4 h-full">
               {/* Customer Profile Card */}
@@ -529,7 +529,7 @@ const CustomerProfilePage = () => {
             </div>
 
             {/* Right side - Metrics */}
-            <div className="flex flex-col gap-4 h-full">
+            <div className="flex  flex-col gap-4 h-full">
               {/* Total Orders */}
               <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-start h-[140px]">
                 <div className="text-start">
@@ -590,12 +590,12 @@ const CustomerProfilePage = () => {
       {/* Order History Section */}
       <div className="space-y-6">
         {/* Order History Title */}
-        <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm">
+        <div className="bg-white rounded-sm border border-gray-300 p-6 mb-8 shadow-sm">
           <h3 className="text-2xl font-semibold">Order History</h3>
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <input
               type="text"
@@ -612,8 +612,8 @@ const CustomerProfilePage = () => {
         </div>
 
         {/* Orders Table */}
-        <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto">
-          <div className="rounded-sm">
+        <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm overflow-x-auto responsive-customer-table">
+          <div className="rounded-sm table-container">
             <table className="min-w-full divide-y divide-gray-200 table-fixed">
               <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
                 <tr>
@@ -737,13 +737,13 @@ const CustomerProfilePage = () => {
                       key={order.Order_ID}
                       className="bg-white hover:bg-gray-50"
                     >
-                      <td className="px-6 py-8 whitespace-nowrap text-sm">
+                      <td className="px-6 py-8 whitespace-nowrap text-sm" data-label="ID">
                         {order.Order_ID}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Order Number">
                         {order.Order_Number}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-4 py-4 whitespace-nowrap"data-label="Type" >
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                             order.Type === "Dine in"
@@ -756,13 +756,13 @@ const CustomerProfilePage = () => {
                           {order.Type}
                         </span>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Date">
                         {new Date(order.Date).toLocaleDateString()}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Total">
                         PKR {order.Total.toLocaleString()}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                             order.Status === "Completed"
