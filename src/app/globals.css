@@ -25,6 +25,129 @@ body,
   --foreground: #171717;
 }
 
+/* Global CSS - Add this to your globals.css or styles.css */
+
+/* Desktop table view - default styling */
+.responsive-customer-table {
+  /* Your existing table styles remain unchanged */
+
+    border:none;
+}
+
+/* Responsive breakpoint at 1045px */
+@media (max-width: 1045px) {
+  .responsive-customer-table .table-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 0;
+    border: none;
+  }
+  
+  .responsive-customer-table table,
+  .responsive-customer-table thead,
+  .responsive-customer-table tbody {
+    display: contents;
+  }
+  
+  .responsive-customer-table thead {
+    display: none;
+  }
+  
+  .responsive-customer-table tr {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0;
+  }
+  
+  .responsive-customer-table tr:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+  
+  .responsive-customer-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border: none !important;
+    min-height: 32px;
+    width: 100%;
+  }
+  
+  .responsive-customer-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #374151;
+    flex-basis: 45%;
+    text-align: left;
+    font-size: 0.875rem;
+  }
+  
+  .responsive-customer-table .card-customer-id {
+    margin: -1rem -1rem 0.5rem -1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .responsive-customer-table .card-name-cell {
+    padding: 12px 0;
+  }
+  
+  .responsive-customer-table .card-name-cell .name-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+  
+  .responsive-customer-table .card-rating-cell .rating-content {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+/* Tablet breakpoint - single column */
+@media (max-width: 600px) {
+  .responsive-customer-table .table-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .responsive-customer-table td::before {
+    flex-basis: 40%;
+  }
+}
+
+/* Mobile breakpoint - adjusted spacing */
+@media (max-width: 640px) {
+  .responsive-customer-table tr {
+    padding: 0.75rem;
+  }
+  
+  .responsive-customer-table .card-customer-id {
+    margin: -0.75rem -0.75rem 0.5rem -0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .responsive-customer-table td::before {
+    flex-basis: 42%;
+    font-size: 0.8rem;
+  }
+  
+  .responsive-customer-table .card-name-cell .name-content {
+    gap: 0.5rem;
+  }
+}
 
 
 

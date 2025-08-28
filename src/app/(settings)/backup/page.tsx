@@ -33,34 +33,34 @@ interface DropdownProps {
 // Custom Dropdown Component
 const SettingsDropdown = React.memo<DropdownProps>(({ value, options, onValueChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const handleToggle = useCallback(() => setIsOpen(prev => !prev), []);
-  
+
   const handleSelect = useCallback((optionValue: string) => {
     onValueChange(optionValue);
     setIsOpen(false);
   }, [onValueChange]);
-  
+
   const selectedLabel = useMemo(
     () => options.find(opt => opt.value === value)?.label || placeholder,
     [options, value, placeholder]
   );
-  
+
   // Close dropdown on outside click
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
       if (!target.closest('.dropdown-container')) {
         setIsOpen(false);
       }
     };
-    
+
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isOpen]);
-  
+
   return (
     <div className="relative dropdown-container">
       <button
@@ -73,7 +73,7 @@ const SettingsDropdown = React.memo<DropdownProps>(({ value, options, onValueCha
         {selectedLabel}
         <ChevronDown size={16} className="text-gray-400" />
       </button>
-      
+
       {isOpen && (
         <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-sm shadow-lg max-h-60 overflow-y-auto">
           {options.map((option) => (
@@ -100,7 +100,7 @@ interface BackupSettings {
   backupTime: string;
   retentionPeriod: number; // in days
   backupLocation: "local" | "cloud" | "both";
-  
+
   // Data Selection
   includeMenuData: boolean;
   includeOrderHistory: boolean;
@@ -108,7 +108,7 @@ interface BackupSettings {
   includeEmployeeData: boolean;
   includeSettings: boolean;
   includeFinancialData: boolean;
-  
+
   // Cloud Storage
   cloudStorageEnabled: boolean;
   maxStorageSize: number; // in GB
@@ -212,13 +212,13 @@ class BackupAPI {
   static async createBackup(
     backupType: "full" | "partial",
     selectedData?: string[]
-  ): Promise<ApiResponse<{id: string}>> {
+  ): Promise<ApiResponse<{ id: string }>> {
     await this.delay(2000);
-    
+
     // Determine what data to include based on selections
     const defaultIncludes = ["Menu", "Orders", "Customers", "Employees", "Settings", "Financial"];
     const includes = selectedData && selectedData.length > 0 ? selectedData : defaultIncludes;
-    
+
     const newBackup: BackupHistoryItem = {
       id: Date.now().toString(),
       date: new Date().toLocaleString(),
@@ -266,15 +266,13 @@ interface ToastProps {
 // Enhanced Toast Component with animation
 const Toast = React.memo<ToastProps>(({ message, type, onClose, isVisible }) => (
   <div
-    className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${
-      isVisible 
-        ? 'translate-x-0 opacity-100 scale-100' 
+    className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${isVisible
+        ? 'translate-x-0 opacity-100 scale-100'
         : 'translate-x-full opacity-0 scale-95'
-    } ${
-      type === "success" 
-        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200" 
+      } ${type === "success"
+        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200"
         : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
-    }`}
+      }`}
     style={{
       backdropFilter: 'blur(10px)',
       border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -287,14 +285,14 @@ const Toast = React.memo<ToastProps>(({ message, type, onClose, isVisible }) => 
         <AlertCircle size={20} className="text-white" />
       )}
     </div>
-    
+
     <div className="flex-1">
       <p className="font-medium text-sm">{message}</p>
     </div>
-    
-    <button 
-      onClick={onClose} 
-      className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200" 
+
+    <button
+      onClick={onClose}
+      className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200"
       aria-label="Close"
     >
       <X size={16} className="text-white" />
@@ -353,28 +351,25 @@ const Modal = ({
   if (!isOpen) return null;
 
   return (
-    <div 
-      className={`fixed inset-0 z-[9998] flex items-center justify-center transition-all duration-200 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
-      }`}
+    <div
+      className={`fixed inset-0 z-[9998] flex items-center justify-center transition-all duration-200 ${isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
     >
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-black/30 backdrop-blur-sm"
         onClick={handleClose}
       />
-      
+
       {/* Modal */}
-      <div 
-        className={`relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-200 ${
-          isVisible ? 'scale-100' : 'scale-95'
-        }`}
+      <div
+        className={`relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-200 ${isVisible ? 'scale-100' : 'scale-95'
+          }`}
       >
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
-              isDestructive ? 'bg-red-100' : 'bg-blue-100'
-            }`}>
+            <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${isDestructive ? 'bg-red-100' : 'bg-blue-100'
+              }`}>
               {isDestructive ? (
                 <AlertCircle className="w-6 h-6 text-red-600" />
               ) : (
@@ -390,7 +385,7 @@ const Modal = ({
               </p>
             </div>
           </div>
-          
+
           <div className="flex gap-3 mt-6 justify-end">
             <button
               onClick={handleClose}
@@ -400,11 +395,10 @@ const Modal = ({
             </button>
             <button
               onClick={handleConfirm}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                isDestructive
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDestructive
                   ? 'bg-red-600 text-white hover:bg-red-700'
                   : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
+                }`}
             >
               {confirmText}
             </button>
@@ -424,11 +418,11 @@ const BackupRecoveryPage = () => {
   const [restoring, setRestoring] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
-  
+
   // Fixed toast state management
   const [toast, setToast] = useState<{ message: string; type: "success" | "error"; id: number } | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
-  
+
   const [modal, setModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -440,7 +434,7 @@ const BackupRecoveryPage = () => {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   // Dropdown options
@@ -450,7 +444,7 @@ const BackupRecoveryPage = () => {
     { value: "monthly", label: "Monthly" }
   ];
 
-  
+
   useEffect(() => {
     loadData();
   }, []);
@@ -500,10 +494,10 @@ const BackupRecoveryPage = () => {
         BackupAPI.getSettings(),
         BackupAPI.getBackupHistory()
       ]);
-      
+
       if (!settingsResponse.success) throw new Error(settingsResponse.message);
       if (!historyResponse.success) throw new Error(historyResponse.message);
-      
+
       setSettings(settingsResponse.data);
       setBackupHistory(historyResponse.data);
     } catch {
@@ -537,9 +531,9 @@ const BackupRecoveryPage = () => {
 
   const handleCreateBackup = async (type: "full" | "partial" = "full") => {
     if (!settings) return;
-    
+
     setCreatingBackup(true);
-    
+
     try {
       // Get selected data types based on checkbox settings
       const selectedData: string[] = [];
@@ -549,13 +543,13 @@ const BackupRecoveryPage = () => {
       if (settings.includeEmployeeData) selectedData.push("Employees");
       if (settings.includeSettings) selectedData.push("Settings");
       if (settings.includeFinancialData) selectedData.push("Financial");
-      
+
       // Check if at least one data type is selected
       if (selectedData.length === 0) {
         showToast("Please select at least one data type to backup", "error");
         return;
       }
-      
+
       const response = await BackupAPI.createBackup(type, selectedData);
       if (response.success) {
         // Refresh the backup history
@@ -650,7 +644,7 @@ const BackupRecoveryPage = () => {
   if (!settings) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 w-[92.5vw]">
+    <div className="min-h-screen bg-gray-50 w-full">
       {toast && (
         <Toast
           message={toast.message}
@@ -670,271 +664,270 @@ const BackupRecoveryPage = () => {
         confirmText={modal.isDestructive ? "Delete" : "Restore"}
       />
 
-      <div className="mt-20">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900">Backup & Recovery</h1>
-          <div className="flex gap-3">
-            <button
-              onClick={() => handleCreateBackup("full")}
-              disabled={creatingBackup}
-              className="flex items-center gap-2 px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50"
-            >
-              {creatingBackup ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-b-2 border-gray-600 rounded-full"></div>
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Database size={16} />
-                  Create Backup
-                </>
-              )}
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={!hasChanges || saving}
-              className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
-                hasChanges && !saving
-                  ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              {saving ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save size={16} />
-                  Save Settings
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Backup Settings */}
-          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-              <Settings className="text-black" size={20} />
-              <h2 className="text-lg font-semibold">Backup Settings</h2>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Automatic Backups
-                  </label>
-                  <p className="text-xs text-gray-500">Enable scheduled backups</p>
-                </div>
-                <ButtonPage
-                  checked={settings.autoBackupEnabled}
-                  onChange={(isActive) => handleSettingChange("autoBackupEnabled", isActive)}
-                />
-              </div>
-
-              {settings.autoBackupEnabled && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Backup Frequency
-                    </label>
-                    <SettingsDropdown
-                      value={settings.backupFrequency}
-                      options={frequencyOptions}
-                      onValueChange={(value) => handleSettingChange("backupFrequency", value)}
-                      
-                      placeholder="Select frequency"
-                      
-                      
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Backup Time
-                    </label>
-                    <input
-                      type="time"
-                      value={settings.backupTime}
-                      onChange={(e) => handleSettingChange("backupTime", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Retention Period (days)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="365"
-                      value={settings.retentionPeriod}
-                      onChange={(e) => handleSettingChange("retentionPeriod", parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                    />
-                  </div>
-                </>
-              )}
-
-              
-
-              <div className="pt-4 border-t border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Data to Include</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={settings.includeMenuData}
-                      onChange={(e) => handleSettingChange("includeMenuData", e.target.checked)}
-                      className="mr-2 text-black"
-                    />
-                    <label className="text-sm">Menu Data</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={settings.includeOrderHistory}
-                      onChange={(e) => handleSettingChange("includeOrderHistory", e.target.checked)}
-                      className="mr-2 text-black"
-                    />
-                    <label className="text-sm">Order History</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={settings.includeCustomerData}
-                      onChange={(e) => handleSettingChange("includeCustomerData", e.target.checked)}
-                      className="mr-2 text-black"
-                    />
-                    <label className="text-sm">Customer Data</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={settings.includeEmployeeData}
-                      onChange={(e) => handleSettingChange("includeEmployeeData", e.target.checked)}
-                      className="mr-2 text-black"
-                    />
-                    <label className="text-sm">Employee Data</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={settings.includeSettings}
-                      onChange={(e) => handleSettingChange("includeSettings", e.target.checked)}
-                      className="mr-2 text-black"
-                    />
-                    <label className="text-sm">System Settings</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={settings.includeFinancialData}
-                      onChange={(e) => handleSettingChange("includeFinancialData", e.target.checked)}
-                      className="mr-2 text-black"
-                    />
-                    <label className="text-sm">Financial Data</label>
-                  </div>
-                </div>
-              </div>
+      <div className="flex-1 justify-center  items-center w-full px-6">
+        <div className="mt-20">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-semibold text-gray-900">Backup & Recovery</h1>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleCreateBackup("full")}
+                disabled={creatingBackup}
+                className="flex items-center gap-2 px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50"
+              >
+                {creatingBackup ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-gray-600 rounded-full"></div>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Database size={16} />
+                    Create Backup
+                  </>
+                )}
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={!hasChanges || saving}
+                className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${hasChanges && !saving
+                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
+              >
+                {saving ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    Save Settings
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Backup History */}
-          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-              <History className="text-black" size={20} />
-              <h2 className="text-lg font-semibold">Backup History</h2>
-            </div>
-            
-            <div className="space-y-4">
-              {backupHistory.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Database size={32} className="mx-auto mb-2 opacity-50" />
-                  <p>No backups found</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Backup Settings */}
+            <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-6">
+                <Settings className="text-black" size={20} />
+                <h2 className="text-lg font-semibold">Backup Settings</h2>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Automatic Backups
+                    </label>
+                    <p className="text-xs text-gray-500">Enable scheduled backups</p>
+                  </div>
+                  <ButtonPage
+                    checked={settings.autoBackupEnabled}
+                    onChange={(isActive) => handleSettingChange("autoBackupEnabled", isActive)}
+                  />
                 </div>
-              ) : (
-                backupHistory.map((backup) => (
-                  <div key={backup.id} className="border border-gray-200 rounded-sm p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <p className="font-medium">{backup.date}</p>
-                        <p className="text-sm text-gray-500">{backup.size} • {backup.type}</p>
-                      </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(backup.status)}`}>
-                        {backup.status}
-                      </span>
+
+                {settings.autoBackupEnabled && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Backup Frequency
+                      </label>
+                      <SettingsDropdown
+                        value={settings.backupFrequency}
+                        options={frequencyOptions}
+                        onValueChange={(value) => handleSettingChange("backupFrequency", value)}
+
+                        placeholder="Select frequency"
+
+
+                      />
                     </div>
-                    
-                    <div className="mb-3">
-                      <p className="text-xs text-gray-500 mb-1">Includes:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {backup.includes.map((item, index) => (
-                          <span key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Backup Time
+                      </label>
+                      <input
+                        type="time"
+                        value={settings.backupTime}
+                        onChange={(e) => handleSettingChange("backupTime", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      />
                     </div>
-                    
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleRestoreBackup(backup.id)}
-                        disabled={restoring === backup.id}
-                        className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50"
-                      >
-                        {restoring === backup.id ? (
-                          <>
-                            <div className="animate-spin h-3 w-3 border-b-2 border-blue-700 rounded-full"></div>
-                            Restoring...
-                          </>
-                        ) : (
-                          <>
-                            <RefreshCw size={14} />
-                            Restore
-                          </>
-                        )}
-                      </button>
-                      <button className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors">
-                        <Download size={14} />
-                        Download
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteBackup(backup.id)}
-                        disabled={deleting === backup.id}
-                        className={`flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors ml-auto ${
-                          deleting === backup.id 
-                            ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
-                            : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                        }`}
-                      >
-                        {deleting === backup.id ? (
-                          <>
-                            <div className="animate-spin h-3 w-3 border-b-2 border-gray-400 rounded-full"></div>
-                            Deleting...
-                          </>
-                        ) : (
-                          <>
-                            <Trash2 size={12} />
-                            Delete
-                          </>
-                        )}
-                      </button>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Retention Period (days)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="365"
+                        value={settings.retentionPeriod}
+                        onChange={(e) => handleSettingChange("retentionPeriod", parseInt(e.target.value))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      />
+                    </div>
+                  </>
+                )}
+
+
+
+                <div className="pt-4 border-t border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">Data to Include</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.includeMenuData}
+                        onChange={(e) => handleSettingChange("includeMenuData", e.target.checked)}
+                        className="mr-2 text-black"
+                      />
+                      <label className="text-sm">Menu Data</label>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.includeOrderHistory}
+                        onChange={(e) => handleSettingChange("includeOrderHistory", e.target.checked)}
+                        className="mr-2 text-black"
+                      />
+                      <label className="text-sm">Order History</label>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.includeCustomerData}
+                        onChange={(e) => handleSettingChange("includeCustomerData", e.target.checked)}
+                        className="mr-2 text-black"
+                      />
+                      <label className="text-sm">Customer Data</label>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.includeEmployeeData}
+                        onChange={(e) => handleSettingChange("includeEmployeeData", e.target.checked)}
+                        className="mr-2 text-black"
+                      />
+                      <label className="text-sm">Employee Data</label>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.includeSettings}
+                        onChange={(e) => handleSettingChange("includeSettings", e.target.checked)}
+                        className="mr-2 text-black"
+                      />
+                      <label className="text-sm">System Settings</label>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.includeFinancialData}
+                        onChange={(e) => handleSettingChange("includeFinancialData", e.target.checked)}
+                        className="mr-2 text-black"
+                      />
+                      <label className="text-sm">Financial Data</label>
                     </div>
                   </div>
-                ))
-              )}
+                </div>
+              </div>
             </div>
 
-            {/* Storage Information */}
-            
+            {/* Backup History */}
+            <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-6">
+                <History className="text-black" size={20} />
+                <h2 className="text-lg font-semibold">Backup History</h2>
+              </div>
+
+              <div className="space-y-4">
+                {backupHistory.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Database size={32} className="mx-auto mb-2 opacity-50" />
+                    <p>No backups found</p>
+                  </div>
+                ) : (
+                  backupHistory.map((backup) => (
+                    <div key={backup.id} className="border border-gray-200 rounded-sm p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="font-medium">{backup.date}</p>
+                          <p className="text-sm text-gray-500">{backup.size} • {backup.type}</p>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(backup.status)}`}>
+                          {backup.status}
+                        </span>
+                      </div>
+
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 mb-1">Includes:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {backup.includes.map((item, index) => (
+                            <span key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleRestoreBackup(backup.id)}
+                          disabled={restoring === backup.id}
+                          className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50"
+                        >
+                          {restoring === backup.id ? (
+                            <>
+                              <div className="animate-spin h-3 w-3 border-b-2 border-blue-700 rounded-full"></div>
+                              Restoring...
+                            </>
+                          ) : (
+                            <>
+                              <RefreshCw size={14} />
+                              Restore
+                            </>
+                          )}
+                        </button>
+                        <button className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors">
+                          <Download size={14} />
+                          Download
+                        </button>
+                        <button
+                          onClick={() => handleDeleteBackup(backup.id)}
+                          disabled={deleting === backup.id}
+                          className={`flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors ml-auto ${deleting === backup.id
+                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                              : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                            }`}
+                        >
+                          {deleting === backup.id ? (
+                            <>
+                              <div className="animate-spin h-3 w-3 border-b-2 border-gray-400 rounded-full"></div>
+                              Deleting...
+                            </>
+                          ) : (
+                            <>
+                              <Trash2 size={12} />
+                              Delete
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+
+            </div>
           </div>
         </div>
       </div>
