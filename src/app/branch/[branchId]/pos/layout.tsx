@@ -7,9 +7,9 @@ export default function PosLayout({ children }: { children: React.ReactNode }) {
   const { branchId } = useParams(); // ✅ get branchId dynamically
 
   const items = [
-    { label: "POS Dashboard", href: `/branch/${branchId}/pos` },
-    { label: "Transactions", href: `/branch/${branchId}/pos/transactions` },
-    { label: "Reports", href: `/branch/${branchId}/pos/reports` },
+    { label: "POS", href: `/branch/${branchId}/pos` },
+    { label: "Inventory", href: `/branch/${branchId}/inventory` },
+    { label: "Staff Management", href: `/branch/${branchId}/staff` },
   ];
 
   return (
