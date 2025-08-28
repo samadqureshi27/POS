@@ -135,7 +135,7 @@ class BranchAPI {
   }
 }
 
-// Toast
+// Toast Component
 const Toast = ({
   message,
   type,
@@ -149,13 +149,11 @@ const Toast = ({
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    // Trigger entrance animation
     setTimeout(() => setIsVisible(true), 10);
   }, []);
 
   const handleClose = () => {
     setIsClosing(true);
-    // Wait for exit animation to complete before calling onClose
     setTimeout(() => {
       onClose();
     }, 300);
@@ -190,11 +188,7 @@ const BranchListPage = () => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-
-  // Debounced search
-  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
   const [editingItem, setEditingItem] = useState<BranchItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<{
@@ -215,19 +209,10 @@ const BranchListPage = () => {
     postalCode: "",
   });
 
-  // Debounce search input
-  useEffect(() => {
-    const handler = setTimeout(() => setSearchTerm(searchInput), 300);
-    return () => clearTimeout(handler);
-  }, [searchInput]);
-
-  // Auto-close toast
-  useEffect(() => {
-    if (toast) {
-      const t = setTimeout(() => setToast(null), 3000);
-      return () => clearTimeout(t);
-    }
-  }, [toast]);
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     loadBranchItems();
@@ -255,9 +240,6 @@ const BranchListPage = () => {
       });
     }
   }, [editingItem, isModalOpen]);
-
-  const showToast = (message: string, type: "success" | "error") =>
-    setToast({ message, type });
 
   const loadBranchItems = async () => {
     try {
@@ -360,8 +342,10 @@ const BranchListPage = () => {
       !formData.Branch_Name.trim() ||
       !formData["Contact-Info"].trim() ||
       !formData.Address.trim()
-    )
+    ) {
+      showToast("Please fill all required fields", "error");
       return;
+    }
     if (editingItem) {
       handleUpdateItem(formData);
     } else {
@@ -376,29 +360,28 @@ const BranchListPage = () => {
     }));
   };
 
-  useEffect(() => {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "unset";
-      }
-  
-      // Cleanup function to restore scrolling when component unmounts
-      return () => {
-        document.body.style.overflow = "unset";
-      };
-    }, [isModalOpen]);
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
   };
-  const router = useRouter();
-const handleCustomerClick = (branchId: number) => {
-  console.log('Navigating to branch:', branchId); // Debug log
-  router.push(`/branch/${branchId}/pos`);
-};
 
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
+
+  const router = useRouter();
+  const handleCustomerClick = (branchId: number) => {
+    console.log('Navigating to branch:', branchId);
+    router.push(`/branch/${branchId}/pos`);
+  };
 
   const isAllSelected =
     selectedItems.length === filteredItems.length && filteredItems.length > 0;
@@ -416,7 +399,7 @@ const handleCustomerClick = (branchId: number) => {
   }
 
   return (
-    <div className=" p-6 bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen mt-6 w-full px-4">
       {toast && (
         <Toast
           message={toast.message}
@@ -425,34 +408,37 @@ const handleCustomerClick = (branchId: number) => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mt-2 mb-8 ">Branch List</h1>
+      <div className="mb-8 mt-2">
+        <h1 className="text-3xl font-semibold">Branch Management</h1>
+      </div>
 
-      {/* Summary Cards */}
-      <div className="flex gap-4 mb-8 ">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+      {/* Summary Cards - Same layout as POS page */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl ">{branchItems.length}</p>
+            <p className="text-6xl mb-1">{branchItems.length}</p>
             <p className="text-1xl text-gray-500">Total Branches</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl ">
+            <p className="text-6xl mb-1">
               {branchItems.filter((item) => item.Status === "Active").length}
             </p>
             <p className="text-1xl text-gray-500">Active Branches</p>
           </div>
         </div>
+
       </div>
 
-      {/* Action bar */}
-      <div className="mb-8 flex items-center justify-between gap-4  flex-wrap">
+      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        {/* Action Buttons */}
         <div className="flex gap-3 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
+            className={`flex items-center text-center gap-2 px-4 py-2 rounded-sm transition-colors ${
               selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -475,7 +461,7 @@ const handleCustomerClick = (branchId: number) => {
             {actionLoading ? "Deleting..." : "Delete Selected"}
           </button>
         </div>
-
+        
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
           <input
@@ -483,7 +469,7 @@ const handleCustomerClick = (branchId: number) => {
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full  pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -492,23 +478,22 @@ const handleCustomerClick = (branchId: number) => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]   shadow-sm ">
-        <div className=" rounded-sm ">
-          <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+      {/* Responsive Table with Global CSS Classes */}
+      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
+        <div className="table-container">
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-6 text-left w-[2.5px]">
+                <th className="px-6 py-6 text-left w-24">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     disableRipple
                     sx={{
-                      transform: "scale(1.5)", // size adjustment
-                      p: 0, // remove extra padding
+                      transform: "scale(1.5)",
+                      p: 0,
                     }}
                     icon={
-                      // unchecked grey box
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -517,14 +502,13 @@ const handleCustomerClick = (branchId: number) => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#d1d1d1" // border grey
+                          fill="#e0e0e0"
+                          stroke="#d1d1d1"
                           strokeWidth="2"
                         />
                       </svg>
                     }
                     checkedIcon={
-                      // checked with tick
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -533,8 +517,8 @@ const handleCustomerClick = (branchId: number) => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#2C2C2C" // dark border
+                          fill="#e0e0e0"
+                          stroke="#2C2C2C"
                           strokeWidth="2"
                         />
                         <path
@@ -549,17 +533,17 @@ const handleCustomerClick = (branchId: number) => {
                     }
                   />
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-24">
                   Branch ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-52">
                   Branch Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-36">
                   <div className="flex flex-col gap-1">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
                         <ChevronDown
@@ -568,57 +552,57 @@ const handleCustomerClick = (branchId: number) => {
                         />
                       </DropdownMenu.Trigger>
 
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                          className="min-w-[160px] rounded-md bg-white shadow-md border border-gray-200 p-1 z-50"
-                          sideOffset={5}
-                          align="start"
+                      <DropdownMenu.Content
+                        className="min-w-[120px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
+                        sideOffset={6}
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        onCloseAutoFocus={(e) => e.preventDefault()}
+                        style={{ zIndex: 1000 }}
+                      >
+                        <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                        <DropdownMenu.Item
+                          className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                          onClick={() => setStatusFilter("")}
                         >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                            onClick={() => setStatusFilter("")}
-                          >
-                            Status
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
-                            onClick={() => setStatusFilter("Active")}
-                          >
-                            Active
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
-                            onClick={() => setStatusFilter("Inactive")}
-                          >
-                            Inactive
-                          </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
+                          Status
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
+                          onClick={() => setStatusFilter("Active")}
+                        >
+                          Active
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
+                          onClick={() => setStatusFilter("Inactive")}
+                        >
+                          Inactive
+                        </DropdownMenu.Item>
+                      </DropdownMenu.Content>
                     </DropdownMenu.Root>
-                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </div>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-32">
                   Contact Info
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-40">
                   Address
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-20">
                   Details
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-28">
                   Actions
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y text-gray-500  divide-gray-300">
+            <tbody className="divide-y text-gray-500 divide-gray-300">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
@@ -634,9 +618,9 @@ const handleCustomerClick = (branchId: number) => {
                 filteredItems.map((item) => (
                   <tr
                     key={item["Branch-ID"]}
-                    className="bg-white hover:bg-gray-50"
+                    className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-8">
+                    <td className="px-6 py-8 whitespace-nowrap text-sm card-customer-id" data-label="Select">
                       <Checkbox
                         checked={selectedItems.includes(item["Branch-ID"])}
                         onChange={(e) =>
@@ -644,11 +628,10 @@ const handleCustomerClick = (branchId: number) => {
                         }
                         disableRipple
                         sx={{
-                          p: 0, // remove extra padding
-                          transform: "scale(1.5)", // optional size tweak
+                          p: 0,
+                          transform: "scale(1.5)",
                         }}
                         icon={
-                          // unchecked grey box
                           <svg width="20" height="20" viewBox="0 0 24 24">
                             <rect
                               x="3"
@@ -657,14 +640,13 @@ const handleCustomerClick = (branchId: number) => {
                               height="18"
                               rx="3"
                               ry="3"
-                              fill="#e0e0e0" // grey inside
-                              stroke="#d1d1d1" // border grey
+                              fill="#e0e0e0"
+                              stroke="#d1d1d1"
                               strokeWidth="2"
                             />
                           </svg>
                         }
                         checkedIcon={
-                          // checked with tick
                           <svg width="20" height="20" viewBox="0 0 24 24">
                             <rect
                               x="3"
@@ -673,8 +655,8 @@ const handleCustomerClick = (branchId: number) => {
                               height="18"
                               rx="3"
                               ry="3"
-                              fill="#e0e0e0" // grey inside
-                              stroke="#2C2C2C" // dark border
+                              fill="#e0e0e0"
+                              stroke="#2C2C2C"
                               strokeWidth="2"
                             />
                             <path
@@ -689,44 +671,43 @@ const handleCustomerClick = (branchId: number) => {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Branch ID">
                       {`#${String(item["Branch-ID"]).padStart(3, "0")}`}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                      {item.Branch_Name}
+                    
+                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="Branch Name">
+                      <div className="name-content">
+                        <span className="font-medium">{item.Branch_Name}</span>
+                      </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
-                          ${
-                            item.Status === "Active"
-                              ? "text-green-400 border-green-600"
-                              : ""
-                          }
-                          ${
-                            item.Status === "Inactive"
-                              ? "text-red-400 border-red-600"
-                              : ""
-                          }`}
+                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-sm text-xs font-medium 
+                          ${item.Status === "Active" ? "text-green-400 " : ""}
+                          ${item.Status === "Inactive" ? "text-red-400 " : ""}`}
                       >
                         {item.Status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact Info">
                       {item["Contact-Info"]}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      {item.Address}
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Address">
+                      <div className="truncate max-w-[150px]" title={item.Address}>
+                        {item.Address}
+                      </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <a
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Details">
+                      <button
                         onClick={() => handleCustomerClick(item["Branch-ID"])}
-                        className="text-black-600 hover:text-black-800 transition-colors"
+                        className="text-gray-600 hover:text-gray-800 p-1 transition-colors"
+                        title="View Details"
                       >
                         <Info size={16} />
-                      </a>
+                      </button>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => {
@@ -747,8 +728,10 @@ const handleCustomerClick = (branchId: number) => {
           </table>
         </div>
       </div>
+
+      {/* Modal for Add/Edit */}
       {isModalOpen && (
-        <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
           <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
@@ -758,9 +741,9 @@ const handleCustomerClick = (branchId: number) => {
             </div>
 
             {/* Scrollable Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 py-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 p-2">
               {/* Branch Name */}
-              <div className="md:col-span-2 mt-2">
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Branch Name <span className="text-red-500">*</span>
                 </label>
@@ -843,7 +826,7 @@ const handleCustomerClick = (branchId: number) => {
                 />
               </div>
 
-              {/* Status */}
+              {/* Status Toggle */}
               <div className="flex items-center justify-between">
                 <label className="block text-sm font-medium text-gray-700">
                   Status
@@ -892,7 +875,7 @@ const handleCustomerClick = (branchId: number) => {
                 ) : (
                   <>
                     <Save size={16} />
-                    {editingItem ? "Update Branch" : "Save & Close"}
+                    {editingItem ? "Update Branch" : "Add Branch"}
                   </>
                 )}
               </button>

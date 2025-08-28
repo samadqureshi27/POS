@@ -15,7 +15,6 @@ import {
   Info,
   Calendar,
 } from "lucide-react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 // Types
 interface StaffItem {
@@ -26,6 +25,7 @@ interface StaffItem {
   Role: string;
   Salary: number;
   JoinDate: string;
+  Branch_ID_fk: string;
 }
 
 interface ApiResponse<T> {
@@ -34,7 +34,7 @@ interface ApiResponse<T> {
   success: boolean;
 }
 
-// Mock API - Only GET method for read-only display
+// Mock API - Updated to filter by branch
 class StaffAPI {
   private static delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -47,7 +47,8 @@ class StaffAPI {
       Status: "Paid",
       Role: "Manager",
       Salary: 5000,
-      JoinDate: "2025-08-28", // Today
+      JoinDate: "2025-08-28",
+      Branch_ID_fk: "1",
     },
     {
       STAFF_ID: "2",
@@ -56,7 +57,8 @@ class StaffAPI {
       Status: "Unpaid",
       Role: "Waiter",
       Salary: 2500,
-      JoinDate: "2025-08-26", // This week
+      JoinDate: "2025-08-26",
+      Branch_ID_fk: "1",
     },
     {
       STAFF_ID: "3",
@@ -65,7 +67,8 @@ class StaffAPI {
       Status: "Paid",
       Role: "Cashier",
       Salary: 3000,
-      JoinDate: "2025-08-15", // This month
+      JoinDate: "2025-08-15",
+      Branch_ID_fk: "1",
     },
     {
       STAFF_ID: "4",
@@ -74,7 +77,8 @@ class StaffAPI {
       Status: "Unpaid",
       Role: "Chef",
       Salary: 4000,
-      JoinDate: "2025-08-05", // This month
+      JoinDate: "2025-08-05",
+      Branch_ID_fk: "2",
     },
     {
       STAFF_ID: "5",
@@ -83,7 +87,8 @@ class StaffAPI {
       Status: "Paid",
       Role: "Cleaner",
       Salary: 2000,
-      JoinDate: "2025-07-12", // This quarter
+      JoinDate: "2025-07-12",
+      Branch_ID_fk: "2",
     },
     {
       STAFF_ID: "6",
@@ -92,7 +97,8 @@ class StaffAPI {
       Status: "Unpaid",
       Role: "Waiter",
       Salary: 2500,
-      JoinDate: "2025-06-18", // This quarter
+      JoinDate: "2025-06-18",
+      Branch_ID_fk: "2",
     },
     {
       STAFF_ID: "7",
@@ -101,7 +107,8 @@ class StaffAPI {
       Status: "Paid",
       Role: "Security",
       Salary: 2800,
-      JoinDate: "2025-01-25", // This year
+      JoinDate: "2025-01-25",
+      Branch_ID_fk: "3",
     },
     {
       STAFF_ID: "8",
@@ -110,33 +117,84 @@ class StaffAPI {
       Status: "Unpaid",
       Role: "Hostess",
       Salary: 2200,
-      JoinDate: "2024-08-10", // Last year
+      JoinDate: "2024-08-10",
+      Branch_ID_fk: "3",
     },
   ];
 
-  static async getStaffItems(): Promise<ApiResponse<StaffItem[]>> {
+  static async getStaffItemsByBranch(branchId: string): Promise<ApiResponse<StaffItem[]>> {
     await this.delay(800);
+    
+    // Filter staff items by branch ID
+    const filteredData = this.mockData.filter(item => item.Branch_ID_fk === branchId);
+    
     return {
       success: true,
-      data: [...this.mockData],
-      message: "Staff items fetched successfully",
+      data: filteredData,
+      message: `Staff items for branch ${branchId} fetched successfully`,
     };
   }
 }
+
+// Simple Dropdown Component (replacing Radix UI)
+const Dropdown = ({ trigger, children, isOpen, onOpenChange }) => {
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+      });
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
+          triggerRef.current && !triggerRef.current.contains(event.target)) {
+        onOpenChange(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onOpenChange]);
+
+  return (
+    <>
+      <div ref={triggerRef} onClick={() => onOpenChange(!isOpen)}>
+        {trigger}
+      </div>
+      {isOpen && (
+        <div
+          ref={dropdownRef}
+          className="fixed z-50 min-w-[120px] rounded-sm bg-white shadow-lg border border-gray-200 p-1"
+          style={{ top: position.top + 5, left: position.left }}
+        >
+          {children}
+        </div>
+      )}
+    </>
+  );
+};
 
 // Toast Component
 const Toast = ({
   message,
   type,
   onClose,
-}: {
-  message: string;
-  type: "success" | "error";
-  onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-      }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -147,25 +205,38 @@ const Toast = ({
 );
 
 const StaffManagementPage = () => {
-  const [staffItems, setStaffItems] = useState<StaffItem[]>([]);
+  // Get branch ID from URL - simulating useParams with URL parsing
+  const [branchId, setBranchId] = useState(null);
+  
+  useEffect(() => {
+    // Extract branch ID from current URL path
+    const path = window.location.pathname;
+    const branchMatch = path.match(/\/branch\/(\d+)/);
+    if (branchMatch) {
+      setBranchId(branchMatch[1]);
+    }
+  }, []);
+
+  const [staffItems, setStaffItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Debounced search
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [toast, setToast] = useState(null);
 
-  const [statusFilter, setStatusFilter] = useState<"" | "Paid" | "Unpaid">("");
-  const [roleFilter, setRoleFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
 
   // Time period filter  
   const periods = ["Today", "Week", "Month", "Quarter", "Year", "Custom"];
   const [activeTimePeriod, setActiveTimePeriod] = useState("Week");
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Dropdown states
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
 
   const [customDateRange, setCustomDateRange] = useState([
     {
@@ -175,9 +246,9 @@ const StaffManagementPage = () => {
     },
   ]);
 
-  const calendarRef = useRef<HTMLDivElement>(null);
+  const calendarRef = useRef(null);
 
-  const formatDisplayDate = (date: Date) => {
+  const formatDisplayDate = (date) => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
@@ -192,12 +263,12 @@ const StaffManagementPage = () => {
 
   // Handle click outside calendar
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event) {
       if (
         calendarRef.current &&
-        !calendarRef.current.contains(event.target as Node)
+        !calendarRef.current.contains(event.target)
       ) {
-        setShowDatePicker(false); // close calendar
+        setShowDatePicker(false);
       }
     }
 
@@ -216,16 +287,24 @@ const StaffManagementPage = () => {
   }, [toast]);
 
   useEffect(() => {
-    loadStaffItems();
-  }, []);
+    if (branchId) {
+      loadStaffItems();
+    }
+  }, [branchId]);
 
-  const showToast = (message: string, type: "success" | "error") =>
+  const showToast = (message, type) =>
     setToast({ message, type });
 
   const loadStaffItems = async () => {
+    if (!branchId) {
+      showToast("Branch ID not found", "error");
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await StaffAPI.getStaffItems();
+      const response = await StaffAPI.getStaffItemsByBranch(branchId);
       if (!response.success) throw new Error(response.message);
       setStaffItems(response.data);
     } catch {
@@ -236,10 +315,9 @@ const StaffManagementPage = () => {
   };
 
   // Helper function to get date ranges with proper boundary handling
-  const getDateRange = (period: string) => {
+  const getDateRange = (period) => {
     const today = new Date();
     
-    // Set time to start and end of day for proper comparison
     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
     const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
@@ -248,12 +326,10 @@ const StaffManagementPage = () => {
         return { start: startOfToday, end: endOfToday };
       
       case "Week": {
-        // Get start of current week (Sunday)
         const startOfWeek = new Date(today);
         startOfWeek.setDate(today.getDate() - today.getDay());
         startOfWeek.setHours(0, 0, 0, 0);
         
-        // Get end of current week (Saturday)
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
         endOfWeek.setHours(23, 59, 59, 999);
@@ -321,7 +397,7 @@ const StaffManagementPage = () => {
     });
   }, [staffItems, searchTerm, statusFilter, roleFilter, activeTimePeriod, customDateRange]);
 
-  // Calculate summary data
+  // Calculate summary data - using filtered staff items for branch-specific data
   const summaryData = useMemo(() => {
     const totalStaff = staffItems.length;
     const paidStaff = staffItems.filter(item => item.Status === "Paid").length;
@@ -349,14 +425,25 @@ const StaffManagementPage = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Staff Management...</p>
+          <p className="mt-4 text-gray-600">Loading Payroll...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!branchId) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-gray-600">Branch ID not found in URL parameters</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen mt-17 w-full px-2">
       {toast && (
         <Toast
           message={toast.message}
@@ -365,7 +452,9 @@ const StaffManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mt-20 mb-8">Staff Management</h1>
+      <div className="mb-8 mt-2">
+        <h1 className="text-3xl font-semibold">Payroll - Branch #{branchId}</h1>
+      </div>
 
       {/* Time Period Filter */}
       <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center relative">
@@ -401,7 +490,7 @@ const StaffManagementPage = () => {
               showDatePicker && (
                 <div 
                   ref={calendarRef}
-                  className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-md"
+                  className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-sm"
                 >
                   <DateRange
                     ranges={customDateRange?.length ? customDateRange : [{
@@ -427,32 +516,32 @@ const StaffManagementPage = () => {
         ))}
       </div>
 
-      {/* Summary Cards */}
-      <div className="flex gap-17 mb-8 w-[95vw]">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+      {/* Summary Cards - Same layout as other pages */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-4xl mb-1">{summaryData.totalStaff}</p>
+            <p className="text-6xl mb-1">{summaryData.totalStaff}</p>
             <p className="text-1xl text-gray-500">Total Staff</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-4xl mb-1">{summaryData.paidStaff}</p>
+            <p className="text-6xl mb-1">{summaryData.paidStaff}</p>
             <p className="text-1xl text-gray-500">Paid Staff</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-4xl mb-1">${summaryData.totalSalaries.toLocaleString()}</p>
+            <p className="text-6xl mb-1">${summaryData.totalSalaries.toLocaleString()}</p>
             <p className="text-1xl text-gray-500">Total Payroll</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm ml-1 p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-4xl mb-1">${summaryData.unpaidSalaries.toLocaleString()}</p>
+            <p className="text-6xl mb-1">${summaryData.unpaidSalaries.toLocaleString()}</p>
             <p className="text-1xl text-gray-500">Pending Payments</p>
           </div>
         </div>
@@ -464,8 +553,8 @@ const StaffManagementPage = () => {
           <input
             type="text"
             placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
@@ -475,10 +564,10 @@ const StaffManagementPage = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm">
-        <div className="rounded-sm">
-          <table className="min-w-full max-w-[800px] divide-y divide-gray-200 table-fixed">
+      {/* Responsive Table with Global CSS Classes */}
+      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
+        <div className="table-container">
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
                 <th className="relative px-6 py-6 text-left">
@@ -494,76 +583,83 @@ const StaffManagementPage = () => {
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
-                    <DropdownMenu.Root>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
-                        {roleFilter || "Role"}
-                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
-                      </DropdownMenu.Trigger>
-
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                          className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
-                          sideOffset={6}
-                        >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                            onClick={() => setRoleFilter("")}
+                    <Dropdown
+                      isOpen={roleDropdownOpen}
+                      onOpenChange={setRoleDropdownOpen}
+                      trigger={
+                        <button className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
+                          {roleFilter || "Role"}
+                          <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                        </button>
+                      }
+                    >
+                      <button
+                        className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none text-left"
+                        onClick={() => {
+                          setRoleFilter("");
+                          setRoleDropdownOpen(false);
+                        }}
+                      >
+                        Role
+                      </button>
+                      {Array.from(new Set(staffItems.map((item) => item.Role))).map(
+                        (role) => (
+                          <button
+                            key={role}
+                            className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 text-black-700 rounded outline-none text-left"
+                            onClick={() => {
+                              setRoleFilter(role);
+                              setRoleDropdownOpen(false);
+                            }}
                           >
-                            Role
-                          </DropdownMenu.Item>
-                          {Array.from(new Set(staffItems.map((item) => item.Role))).map(
-                            (role) => (
-                              <DropdownMenu.Item
-                                key={role}
-                                className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 text-black-700 rounded outline-none"
-                                onClick={() => setRoleFilter(role)}
-                              >
-                                {role}
-                              </DropdownMenu.Item>
-                            )
-                          )}
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
-                    </DropdownMenu.Root>
+                            {role}
+                          </button>
+                        )
+                      )}
+                    </Dropdown>
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
-                    <DropdownMenu.Root>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
-                        {statusFilter || "Status"}
-                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
-                      </DropdownMenu.Trigger>
-
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                          className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
-                          sideOffset={6}
-                        >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                            onClick={() => setStatusFilter("")}
-                          >
-                            Status
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
-                            onClick={() => setStatusFilter("Paid")}
-                          >
-                            Paid
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
-                            onClick={() => setStatusFilter("Unpaid")}
-                          >
-                            Unpaid
-                          </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
-                    </DropdownMenu.Root>
+                    <Dropdown
+                      isOpen={statusDropdownOpen}
+                      onOpenChange={setStatusDropdownOpen}
+                      trigger={
+                        <button className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
+                          {statusFilter || "Status"}
+                          <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                        </button>
+                      }
+                    >
+                      <button
+                        className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none text-left"
+                        onClick={() => {
+                          setStatusFilter("");
+                          setStatusDropdownOpen(false);
+                        }}
+                      >
+                        Status
+                      </button>
+                      <button
+                        className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none text-left"
+                        onClick={() => {
+                          setStatusFilter("Paid");
+                          setStatusDropdownOpen(false);
+                        }}
+                      >
+                        Paid
+                      </button>
+                      <button
+                        className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none text-left"
+                        onClick={() => {
+                          setStatusFilter("Unpaid");
+                          setStatusDropdownOpen(false);
+                        }}
+                      >
+                        Unpaid
+                      </button>
+                    </Dropdown>
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
@@ -592,45 +688,47 @@ const StaffManagementPage = () => {
                     {searchTerm || statusFilter || roleFilter || 
                      (activeTimePeriod === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) ||
                      (activeTimePeriod !== "Week" && activeTimePeriod !== "Custom")
-                      ? "No staff members match your search criteria."
-                      : "No staff members found."}
+                      ? `No staff members match your search criteria for Branch #${branchId}.`
+                      : `No staff members found for Branch #${branchId}.`}
                   </td>
                 </tr>
               ) : (
                 filteredItems.map((item) => (
-                  <tr key={item.STAFF_ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-6 py-8 whitespace-nowrap text-sm">
+                  <tr key={item.STAFF_ID} className="bg-white hover:bg-gray-50 cursor-pointer transition-colors">
+                    <td className="px-6 py-8 whitespace-nowrap text-sm" data-label="Staff ID">
                       {`#${String(item.STAFF_ID).padStart(3, "0")}`}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                      {item.Name}
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium card-name-cell" data-label="Name">
+                      <div className="name-content">
+                        <span>{item.Name}</span>
+                      </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact">
                       {item.Contact}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Role">
                       {item.Role}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Status">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium  ${item.Status === "Paid"
-                            ? "text-green-400 border-green-600"
-                            : ""
-                          } ${item.Status === "Unpaid"
-                            ? "text-red-400 border-red-600"
-                            : ""
-                          }`}
+                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-sm text-xs font-medium  ${item.Status === "Paid"
+                          ? "text-green-400 border-green-600"
+                          : ""
+                        } ${item.Status === "Unpaid"
+                          ? "text-red-400 border-red-600"
+                          : ""
+                        }`}
                       >
                         {item.Status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      ${item.Salary.toLocaleString()}
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Salary">
+                      {item.Salary.toLocaleString()}Rs
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Join Date">
                       {new Date(item.JoinDate).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Details">
                       <div className="flex items-center gap-2">
                         <button
                           className="text-gray-600 hover:text-gray-800 p-1 transition-colors"

@@ -7,7 +7,7 @@ export default function InventoryLayout({ children }: { children: React.ReactNod
   const { branchId } = useParams();
 
   const items = [
-    { label: "Overview", href: `/branch/${branchId}/inventory` },
+    { label: "Inventory", href: `/branch/${branchId}/inventory` },
     { label: "Vendors", href: `/branch/${branchId}/inventory/vendors` },
     { label: "Reports", href: `/branch/${branchId}/inventory/reports` },
   ];
