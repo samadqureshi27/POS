@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useParams } from "next/navigation";
 import {
   Plus,
   Trash2,
@@ -23,6 +23,7 @@ interface VendorItem {
   Contact: string;
   Address: string;
   Email: string;
+  Branch_ID: number; // Added branch association
 }
 
 interface ApiResponse<T> {
@@ -43,6 +44,7 @@ class VendorAPI {
       Contact: "03001234567",
       Address: "#777, Block G1, Johartown",
       Email: "abd@gmail.com",
+      Branch_ID: 1,
     },
     {
       ID: 2,
@@ -51,6 +53,7 @@ class VendorAPI {
       Contact: "03001231234",
       Address: "#777, Block G1, Johartown",
       Email: "csd@gmail.com",
+      Branch_ID: 1,
     },
     {
       ID: 3,
@@ -59,6 +62,7 @@ class VendorAPI {
       Contact: "03007897891",
       Address: "#777, Block G1, Johartown",
       Email: "yul@gmail.com",
+      Branch_ID: 2,
     },
     {
       ID: 4,
@@ -67,6 +71,7 @@ class VendorAPI {
       Contact: "03009876543",
       Address: "#123, Block A2, DHA Phase 1",
       Email: "mkhan@foodsupplies.com",
+      Branch_ID: 2,
     },
     {
       ID: 5,
@@ -75,28 +80,41 @@ class VendorAPI {
       Contact: "03005432109",
       Address: "#456, Gulberg III",
       Email: "ali@freshmart.com",
+      Branch_ID: 3,
+    },
+    {
+      ID: 6,
+      Company_Name: "Tech Solutions",
+      Name: "Usman Ali",
+      Contact: "03001122334",
+      Address: "#89, Model Town",
+      Email: "usman@techsol.com",
+      Branch_ID: 1,
     },
   ];
 
-  // GET /api/vendors/
-  static async getVendorItems(): Promise<ApiResponse<VendorItem[]>> {
+  // GET /api/vendors/branch/{branchId}
+  static async getVendorItemsByBranch(branchId: number): Promise<ApiResponse<VendorItem[]>> {
     await this.delay(800);
+    const filteredData = this.mockData.filter(vendor => vendor.Branch_ID === branchId);
     return {
       success: true,
-      data: [...this.mockData],
-      message: "Vendor items fetched successfully",
+      data: filteredData,
+      message: `Vendor items for branch ${branchId} fetched successfully`,
     };
   }
 
-  // POST /api/vendors/
+  // POST /api/vendors/branch/{branchId}
   static async createVendorItem(
-    item: Omit<VendorItem, "ID">
+    item: Omit<VendorItem, "ID">,
+    branchId: number
   ): Promise<ApiResponse<VendorItem>> {
     await this.delay(1000);
-    const newId = this.mockData.length + 1;
+    const newId = Math.max(...this.mockData.map(i => i.ID), 0) + 1;
     const newItem: VendorItem = {
       ...item,
       ID: newId,
+      Branch_ID: branchId,
     };
     this.mockData.push(newItem);
     return {
@@ -124,18 +142,19 @@ class VendorAPI {
   }
 
   // DELETE /api/vendors/{id}/
-  static async deleteVendorItem(id: number): Promise<ApiResponse<null>> {
+  static async deleteVendorItem(id: number, branchId: number): Promise<ApiResponse<null>> {
     await this.delay(600);
     const index = this.mockData.findIndex((i) => i.ID === id);
     if (index === -1) throw new Error("Item not found");
 
     this.mockData.splice(index, 1);
 
-    // Reassign IDs sequentially
-    this.mockData = this.mockData.map((item, idx) => ({
-      ...item,
-      ID: idx + 1,
-    }));
+    // Reassign IDs sequentially for the specific branch
+    const branchVendors = this.mockData.filter(item => item.Branch_ID === branchId);
+    branchVendors.forEach((item, idx) => {
+      const originalIndex = this.mockData.findIndex(vendor => vendor.ID === item.ID);
+      this.mockData[originalIndex].ID = idx + 1;
+    });
 
     return {
       success: true,
@@ -144,18 +163,20 @@ class VendorAPI {
     };
   }
 
-  // DELETE /api/vendors/bulk-delete/
+  // DELETE /api/vendors/branch/{branchId}/bulk-delete/
   static async bulkDeleteVendorItems(
-    ids: number[]
+    ids: number[],
+    branchId: number
   ): Promise<ApiResponse<null>> {
     await this.delay(1000);
     this.mockData = this.mockData.filter((item) => !ids.includes(item.ID));
 
-    // Reassign IDs sequentially
-    this.mockData = this.mockData.map((item, idx) => ({
-      ...item,
-      ID: idx + 1,
-    }));
+    // Reassign IDs sequentially for the specific branch
+    const branchVendors = this.mockData.filter(item => item.Branch_ID === branchId);
+    branchVendors.forEach((item, idx) => {
+      const originalIndex = this.mockData.findIndex(vendor => vendor.ID === item.ID);
+      this.mockData[originalIndex].ID = idx + 1;
+    });
 
     return {
       success: true,
@@ -164,6 +185,7 @@ class VendorAPI {
     };
   }
 }
+
 const Toast = ({
   message,
   type,
@@ -177,13 +199,11 @@ const Toast = ({
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    // Trigger entrance animation
     setTimeout(() => setIsVisible(true), 10);
   }, []);
 
   const handleClose = () => {
     setIsClosing(true);
-    // Wait for exit animation to complete before calling onClose
     setTimeout(() => {
       onClose();
     }, 300);
@@ -191,20 +211,18 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
-        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
-      } ${
-        isVisible && !isClosing
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+        } ${isVisible && !isClosing
           ? "translate-x-0 opacity-100"
           : isClosing
-          ? "translate-x-full opacity-0"
-          : "translate-x-full opacity-0"
-      }`}
+            ? "translate-x-full opacity-0"
+            : "translate-x-full opacity-0"
+        }`}
     >
       {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
       <span>{message}</span>
-      <button 
-        onClick={handleClose} 
+      <button
+        onClick={handleClose}
         className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
       >
         <X size={16} />
@@ -212,7 +230,11 @@ const Toast = ({
     </div>
   );
 };
+
 const VendorsPage = () => {
+  const params = useParams();
+  const branchId = parseInt(params?.branchId as string) || 1;
+
   const [vendorItems, setVendorItems] = useState<VendorItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -225,8 +247,8 @@ const VendorsPage = () => {
     type: "success" | "error";
   } | null>(null);
 
-  // Modal form state
-  const [formData, setFormData] = useState<Omit<VendorItem, "ID">>({
+  // Modal form state (removed Branch_ID from form as it's determined by route)
+  const [formData, setFormData] = useState<Omit<VendorItem, "ID" | "Branch_ID">>({
     Company_Name: "",
     Name: "",
     Contact: "",
@@ -241,7 +263,7 @@ const VendorsPage = () => {
 
   useEffect(() => {
     loadVendorItems();
-  }, []);
+  }, [branchId]);
 
   // Modal form effect
   useEffect(() => {
@@ -267,7 +289,7 @@ const VendorsPage = () => {
   const loadVendorItems = async () => {
     try {
       setLoading(true);
-      const response = await VendorAPI.getVendorItems();
+      const response = await VendorAPI.getVendorItemsByBranch(branchId);
       if (response.success) {
         setVendorItems(response.data);
       } else {
@@ -299,7 +321,6 @@ const VendorsPage = () => {
   // Generate consistent usage data using item ID as seed
   const itemsWithUsage = useMemo(() => {
     return vendorItems.map((item) => {
-      // Use item ID as seed for consistent random numbers
       const seed = item.ID;
       const usageCount = Math.floor((seed * 17 + 23) % 100);
       return {
@@ -325,10 +346,10 @@ const VendorsPage = () => {
     );
   }, [itemsWithUsage]);
 
-  const handleCreateItem = async (itemData: Omit<VendorItem, "ID">) => {
+  const handleCreateItem = async (itemData: Omit<VendorItem, "ID" | "Branch_ID">) => {
     try {
       setActionLoading(true);
-      const response = await VendorAPI.createVendorItem(itemData);
+      const response = await VendorAPI.createVendorItem(itemData, branchId);
       if (response.success) {
         setVendorItems((prevItems) => [...prevItems, response.data]);
         setIsModalOpen(false);
@@ -342,7 +363,7 @@ const VendorsPage = () => {
     }
   };
 
-  const handleUpdateItem = async (itemData: Omit<VendorItem, "ID">) => {
+  const handleUpdateItem = async (itemData: Omit<VendorItem, "ID" | "Branch_ID">) => {
     if (!editingItem) return;
     try {
       setActionLoading(true);
@@ -371,7 +392,7 @@ const VendorsPage = () => {
     if (selectedItems.length === 0) return;
     try {
       setActionLoading(true);
-      const response = await VendorAPI.bulkDeleteVendorItems(selectedItems);
+      const response = await VendorAPI.bulkDeleteVendorItems(selectedItems, branchId);
       if (response.success) {
         setVendorItems((prev) => {
           const remaining = prev.filter((i) => !selectedItems.includes(i.ID));
@@ -432,18 +453,18 @@ const VendorsPage = () => {
     setIsModalOpen(false);
     setEditingItem(null);
   };
+
   useEffect(() => {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "unset";
-      }
-  
-      // Cleanup function to restore scrolling when component unmounts
-      return () => {
-        document.body.style.overflow = "unset";
-      };
-    }, [isModalOpen]);
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
 
   const isAllSelected =
     selectedItems.length === filteredItems.length && filteredItems.length > 0;
@@ -461,7 +482,7 @@ const VendorsPage = () => {
   }
 
   return (
-    <div className="  bg-gray-50 min-h-screen ">
+    <div className="bg-gray-50 min-h-screen mt-17">
       {toast && (
         <Toast
           message={toast.message}
@@ -470,45 +491,48 @@ const VendorsPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-8 mt-20">Vendors & Suppliers</h1>
-
-      {/* Top summary row */}
-      <div className="flex gap-4 mb-8 ">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
-          <div>
-            <p className="text-3xl font-semibold mb-1">
-              {mostOrderedVendor?.Company_Name || "N/A"}
-            </p>
-            <p className="text-gray-500">
-              Most Ordered ({mostOrderedVendor?.usageCount || 0} times)
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
-          <div>
-            <p className="text-3xl font-semibold mb-1">
-              {leastOrderedVendor?.Company_Name || "N/A"}
-            </p>
-            <p className="text-gray-500">
-              Least Ordered ({leastOrderedVendor?.usageCount || 0} times)
-            </p>
-          </div>
-        </div>
+      <div className="mb-8 mt-2">
+        <h1 className="text-3xl font-semibold">
+           Vendors & Suppliers - Branch #{branchId} 
+        </h1>
       </div>
 
-      {/* Action bar */}
-      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+          <div>
+            <p className="text-6xl mb-1">{vendorItems.length}</p>
+            <p className="text-1xl text-gray-500">Total Vendors</p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+          <div>
+            <p className="text-6xl mb-1">
+              {itemsWithUsage.reduce((total, item) => total + item.usageCount, 0)}
+            </p>
+            <p className="text-1xl text-gray-500">Total Orders</p>
+          </div>
+        </div>
+
+
+
+
+
+      </div>
+
+      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+
+
         {/* Action Buttons */}
-        <div className="flex gap-3  h-[40px]">
+        <div className="flex gap-3 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center text-center gap-2 px-4 py-2 rounded-sm transition-colors ${selectedItems.length === 0
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Plus size={16} />
             Add
@@ -517,17 +541,15 @@ const VendorsPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
           </button>
         </div>
-
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
           <input
@@ -542,25 +564,25 @@ const VendorsPage = () => {
             size={16}
           />
         </div>
+
       </div>
 
-      {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className=" rounded-sm ">
-          <table className="min-w-full max-w-[800px] divide-y divide-gray-200   table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+      {/* Responsive Table with Global CSS Classes */}
+      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
+        <div className="table-container">
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-6 text-left w-[2.5px]">
+                <th className="px-6 py-6 text-left w-24">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     disableRipple
                     sx={{
-                      transform: "scale(1.5)", // size adjustment
-                      p: 0, // remove extra padding
+                      transform: "scale(1.5)",
+                      p: 0,
                     }}
                     icon={
-                      // unchecked grey box
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -569,14 +591,13 @@ const VendorsPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#d1d1d1" // border grey
+                          fill="#e0e0e0"
+                          stroke="#d1d1d1"
                           strokeWidth="2"
                         />
                       </svg>
                     }
                     checkedIcon={
-                      // checked with tick
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -585,8 +606,8 @@ const VendorsPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#2C2C2C" // dark border
+                          fill="#e0e0e0"
+                          stroke="#2C2C2C"
                           strokeWidth="2"
                         />
                         <path
@@ -601,54 +622,56 @@ const VendorsPage = () => {
                     }
                   />
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-24">
                   ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-40">
                   Company Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
-                  Name
+                <th className="relative px-4 py-3 text-left w-36">
+                  Contact Person
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-36">
                   Contact
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
-                  Address
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
-                </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-52">
                   Email
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-44">
+                  Address
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+                </th>
+                <th className="relative px-4 py-3 text-left w-28">
                   Actions
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y text-gray-500  divide-gray-300">
+            <tbody className="divide-y text-gray-500 divide-gray-300">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={9}
+                    colSpan={8}
                     className="px-4 py-8 text-center text-gray-500"
                   >
                     {searchTerm
-                      ? "No vendors match your search criteria."
-                      : "No vendors found."}
+                      ? `No vendors match your search criteria for Branch #${branchId}.`
+                      : `No vendors found for Branch #${branchId}.`}
                   </td>
                 </tr>
               ) : (
                 filteredItems.map((item) => (
-                  <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-6 py-8">
+                  <tr
+                    key={item.ID}
+                    className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
+                    <td className="px-6 py-8 whitespace-nowrap text-sm card-customer-id" data-label="Select">
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -656,11 +679,10 @@ const VendorsPage = () => {
                         }
                         disableRipple
                         sx={{
-                          p: 0, // remove extra padding
-                          transform: "scale(1.5)", // optional size tweak
+                          p: 0,
+                          transform: "scale(1.5)",
                         }}
                         icon={
-                          // unchecked grey box
                           <svg width="20" height="20" viewBox="0 0 24 24">
                             <rect
                               x="3"
@@ -669,14 +691,13 @@ const VendorsPage = () => {
                               height="18"
                               rx="3"
                               ry="3"
-                              fill="#e0e0e0" // grey inside
-                              stroke="#d1d1d1" // border grey
+                              fill="#e0e0e0"
+                              stroke="#d1d1d1"
                               strokeWidth="2"
                             />
                           </svg>
                         }
                         checkedIcon={
-                          // checked with tick
                           <svg width="20" height="20" viewBox="0 0 24 24">
                             <rect
                               x="3"
@@ -685,8 +706,8 @@ const VendorsPage = () => {
                               height="18"
                               rx="3"
                               ry="3"
-                              fill="#e0e0e0" // grey inside
-                              stroke="#2C2C2C" // dark border
+                              fill="#e0e0e0"
+                              stroke="#2C2C2C"
                               strokeWidth="2"
                             />
                             <path
@@ -701,29 +722,32 @@ const VendorsPage = () => {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Vendor ID">
                       {item.ID}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                      {item.Company_Name}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      {item.Name}
+
+                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="Company Name">
+                      <div className="name-content">
+                        <span className="font-medium">{item.Company_Name}</span>
+                      </div>
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact Person">
+                      {item.Name}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact">
                       {item.Contact}
                     </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Email">
+                      {item.Email}
+                    </td>
                     <td
-                      className="px-4 py-4 text-sm text-gray-600 max-w-xs truncate"
-                      title={item.Address}
+                      className="px-4 py-4 whitespace-nowrap text-sm "
+                      data-label="Address"
                     >
                       {item.Address}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {item.Email}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => {
@@ -752,7 +776,7 @@ const VendorsPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
-                {editingItem ? "Edit Vendor" : "Add New Vendor"}
+                {editingItem ? "Edit Vendor" : `Add New Vendor - Branch #${branchId}`}
               </h2>
             </div>
 
@@ -848,27 +872,6 @@ const VendorsPage = () => {
                   rows="3"
                 />
               </div>
-
-              {/* Vendor Status Display */}
-              {formData.Company_Name.trim() && formData.Name.trim() && (
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vendor Status
-                    <span className="text-xs text-gray-500 ml-1">
-                      (Auto-generated)
-                    </span>
-                  </label>
-                  <div className="flex items-center gap-3 p-3 rounded-lg border bg-green-50">
-                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                    <span className="text-sm font-semibold text-green-600">
-                      ACTIVE VENDOR
-                    </span>
-                    <span className="text-xs text-gray-500 ml-auto">
-                      Ready for transactions
-                    </span>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Fixed Action Buttons */}
@@ -890,13 +893,12 @@ const VendorsPage = () => {
                   !formData.Company_Name.trim() ||
                   actionLoading
                 }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                  !formData.Name.trim() ||
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
                   !formData.Company_Name.trim() ||
                   actionLoading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                }`}
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
               >
                 {actionLoading ? (
                   <>
@@ -917,4 +919,5 @@ const VendorsPage = () => {
     </div>
   );
 };
+
 export default VendorsPage;

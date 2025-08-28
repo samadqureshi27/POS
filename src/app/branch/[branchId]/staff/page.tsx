@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useParams } from "next/navigation";
 import {
   ChevronDown,
   Plus,
@@ -18,7 +19,7 @@ import ButtonPage from "@/components/layout/UI/button";
 
 // Types
 interface StaffItem {
-  Staff_ID: number;
+  Staff_ID: string; // Changed to string to match POS page pattern
   Name: string;
   Contact: string;
   Address: string;
@@ -28,7 +29,16 @@ interface StaffItem {
   Salary: string;
   Shift_Start_Time: string;
   Shift_End_Time: string;
-  Access_Code?: string; // Optional 4-digit code for cashiers and managers
+  Branch_ID_fk: string; // Changed to match POS page naming convention
+  Access_Code?: string;
+}
+
+interface BranchInfo {
+  "Branch-ID": number;
+  Branch_Name: string;
+  Status: "Active" | "Inactive";
+  "Contact-Info": string;
+  Address: string;
 }
 
 interface ApiResponse<T> {
@@ -37,14 +47,14 @@ interface ApiResponse<T> {
   success: boolean;
 }
 
-// Mock API
+// Mock API with Branch Integration
 class StaffAPI {
   private static delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
   private static mockData: StaffItem[] = [
     {
-      Staff_ID: 1,
+      Staff_ID: "1",
       Name: "efe",
       Contact: "03001231234",
       Address: "123 Main Street, Lahore",
@@ -54,9 +64,10 @@ class StaffAPI {
       Salary: "30000",
       Shift_Start_Time: "9:00",
       Shift_End_Time: "6:00",
+      Branch_ID_fk: "1",
     },
     {
-      Staff_ID: 2,
+      Staff_ID: "2",
       Name: "andd",
       Contact: "03001234567",
       Address: "456 Park Avenue, Karachi",
@@ -66,10 +77,11 @@ class StaffAPI {
       Salary: "50000",
       Shift_Start_Time: "9:00",
       Shift_End_Time: "6:00",
+      Branch_ID_fk: "1",
       Access_Code: "1234",
     },
     {
-      Staff_ID: 3,
+      Staff_ID: "3",
       Name: "ghie",
       Contact: "03001231238",
       Address: "789 Garden Road, Islamabad",
@@ -79,9 +91,10 @@ class StaffAPI {
       Salary: "15000",
       Shift_Start_Time: "9:00",
       Shift_End_Time: "6:00",
+      Branch_ID_fk: "2",
     },
     {
-      Staff_ID: 4,
+      Staff_ID: "4",
       Name: "Ahmed Khan",
       Contact: "03009876543",
       Address: "321 Business District, Lahore",
@@ -91,16 +104,57 @@ class StaffAPI {
       Salary: "80000",
       Shift_Start_Time: "8:00",
       Shift_End_Time: "8:00",
+      Branch_ID_fk: "1",
       Access_Code: "5678",
+    },
+    {
+      Staff_ID: "5",
+      Name: "Sara Ali",
+      Contact: "03007777777",
+      Address: "555 North Street, Karachi",
+      CNIC: "42101-7777777-7",
+      Status: "Active",
+      Role: "Waiter",
+      Salary: "25000",
+      Shift_Start_Time: "10:00",
+      Shift_End_Time: "7:00",
+      Branch_ID_fk: "2",
+    },
+    {
+      Staff_ID: "6",
+      Name: "Usman Sheikh",
+      Contact: "03008888888",
+      Address: "666 South Avenue, Islamabad",
+      CNIC: "61101-8888888-8",
+      Status: "Active",
+      Role: "Chef",
+      Salary: "45000",
+      Shift_Start_Time: "11:00",
+      Shift_End_Time: "9:00",
+      Branch_ID_fk: "3",
     },
   ];
 
-  static async getStaffItems(): Promise<ApiResponse<StaffItem[]>> {
+  // Get staff items filtered by branch ID
+  static async getStaffItemsByBranch(branchId: string): Promise<ApiResponse<StaffItem[]>> {
     await this.delay(800);
+    const branchStaff = this.mockData.filter(staff => staff.Branch_ID_fk === branchId);
     return {
       success: true,
-      data: [...this.mockData],
-      message: "Staff items fetched successfully",
+      data: branchStaff,
+      message: `Staff items for branch ${branchId} fetched successfully`,
+    };
+  }
+
+  // Get branch info by ID
+  static async getBranchInfo(branchId: string): Promise<ApiResponse<BranchInfo>> {
+    await this.delay(500);
+    const filteredData = this.mockData.filter(item => item.Branch_ID_fk === branchId);
+
+    return {
+      success: true,
+      data: filteredData,
+      message: "Branch info fetched successfully",
     };
   }
 
@@ -109,7 +163,7 @@ class StaffAPI {
   ): Promise<ApiResponse<StaffItem>> {
     await this.delay(1000);
     const newId = (this.mockData.length + 1).toString();
-    const newItem: StaffItem = { ...item, Staff_ID: this.mockData.length + 1 };
+    const newItem: StaffItem = { ...item, Staff_ID: newId };
     this.mockData.push(newItem);
     return {
       success: true,
@@ -119,7 +173,7 @@ class StaffAPI {
   }
 
   static async updateStaffItem(
-    id: number,
+    id: string,
     item: Partial<StaffItem>
   ): Promise<ApiResponse<StaffItem>> {
     await this.delay(800);
@@ -133,11 +187,15 @@ class StaffAPI {
     };
   }
 
-  static async deleteStaffItem(id: number): Promise<ApiResponse<null>> {
+  static async deleteStaffItem(id: string): Promise<ApiResponse<null>> {
     await this.delay(600);
-    this.mockData = this.mockData
-      .filter((i) => i.Staff_ID !== id)
-      .map((item, idx) => ({ ...item, Staff_ID: idx + 1 }));
+    const initialLength = this.mockData.length;
+    this.mockData = this.mockData.filter((i) => i.Staff_ID !== id);
+
+    if (this.mockData.length === initialLength) {
+      throw new Error("Staff item not found");
+    }
+
     return {
       success: true,
       data: null,
@@ -145,11 +203,9 @@ class StaffAPI {
     };
   }
 
-  static async bulkDeleteStaffItems(ids: number[]): Promise<ApiResponse<null>> {
+  static async bulkDeleteStaffItems(ids: string[]): Promise<ApiResponse<null>> {
     await this.delay(1000);
-    this.mockData = this.mockData
-      .filter((i) => !ids.includes(i.Staff_ID))
-      .map((item, idx) => ({ ...item, Staff_ID: idx + 1 }));
+    this.mockData = this.mockData.filter((i) => !ids.includes(i.Staff_ID));
     return {
       success: true,
       data: null,
@@ -158,7 +214,7 @@ class StaffAPI {
   }
 }
 
-// Toast
+// Toast Component
 const Toast = ({
   message,
   type,
@@ -172,13 +228,11 @@ const Toast = ({
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    // Trigger entrance animation
     setTimeout(() => setIsVisible(true), 10);
   }, []);
 
   const handleClose = () => {
     setIsClosing(true);
-    // Wait for exit animation to complete before calling onClose
     setTimeout(() => {
       onClose();
     }, 300);
@@ -186,20 +240,18 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
-        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
-      } ${
-        isVisible && !isClosing
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+        } ${isVisible && !isClosing
           ? "translate-x-0 opacity-100"
           : isClosing
-          ? "translate-x-full opacity-0"
-          : "translate-x-full opacity-0"
-      }`}
+            ? "translate-x-full opacity-0"
+            : "translate-x-full opacity-0"
+        }`}
     >
       {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
       <span>{message}</span>
-      <button 
-        onClick={handleClose} 
+      <button
+        onClick={handleClose}
         className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
       >
         <X size={16} />
@@ -209,23 +261,23 @@ const Toast = ({
 };
 
 const EmployeeRecordsPage = () => {
+  const params = useParams();
+  const branchId = params?.branchId as string;
+
   const [staffItems, setStaffItems] = useState<StaffItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [branchInfo, setBranchInfo] = useState<BranchInfo | null>(null);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  // Debounced search
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
   const [editingItem, setEditingItem] = useState<StaffItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
-  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">(
-    ""
-  );
+  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
   const [roleFilter, setRoleFilter] = useState("");
 
   // Modal form state
@@ -239,6 +291,7 @@ const EmployeeRecordsPage = () => {
     Salary: "",
     Shift_Start_Time: "",
     Shift_End_Time: "",
+    Branch_ID_fk: branchId || "",
     Access_Code: "",
   });
 
@@ -257,8 +310,10 @@ const EmployeeRecordsPage = () => {
   }, [toast]);
 
   useEffect(() => {
-    loadStaffItems();
-  }, []);
+    if (branchId) {
+      loadBranchData();
+    }
+  }, [branchId]);
 
   // Modal form sync
   useEffect(() => {
@@ -273,6 +328,7 @@ const EmployeeRecordsPage = () => {
         Salary: editingItem.Salary,
         Shift_Start_Time: editingItem.Shift_Start_Time,
         Shift_End_Time: editingItem.Shift_End_Time,
+        Branch_ID_fk: editingItem.Branch_ID_fk,
         Access_Code: editingItem.Access_Code || "",
       });
     } else {
@@ -286,10 +342,11 @@ const EmployeeRecordsPage = () => {
         Salary: "",
         Shift_Start_Time: "",
         Shift_End_Time: "",
+        Branch_ID_fk: branchId || "",
         Access_Code: "",
       });
     }
-  }, [editingItem, isModalOpen]);
+  }, [editingItem, isModalOpen, branchId]);
 
   // Clear access code when role is not Cashier or Manager
   useEffect(() => {
@@ -301,14 +358,34 @@ const EmployeeRecordsPage = () => {
   const showToast = (message: string, type: "success" | "error") =>
     setToast({ message, type });
 
-  const loadStaffItems = async () => {
+  const loadBranchData = async () => {
+    if (!branchId) {
+      showToast("Branch ID not found", "error");
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await StaffAPI.getStaffItems();
-      if (!response.success) throw new Error(response.message);
-      setStaffItems(response.data);
-    } catch {
-      showToast("Failed to load staff items", "error");
+
+      // Load both branch info and staff data
+      const [branchResponse, staffResponse] = await Promise.all([
+        StaffAPI.getBranchInfo(branchId),
+        StaffAPI.getStaffItemsByBranch(branchId)
+      ]);
+
+      if (!branchResponse.success) {
+        throw new Error(branchResponse.message || "Branch not found");
+      }
+
+      if (!staffResponse.success) {
+        throw new Error(staffResponse.message || "Failed to load staff");
+      }
+
+      setBranchInfo(branchResponse.data);
+      setStaffItems(staffResponse.data);
+    } catch (error) {
+      showToast(error.message || "Failed to load branch data", "error");
     } finally {
       setLoading(false);
     }
@@ -333,15 +410,18 @@ const EmployeeRecordsPage = () => {
   const handleCreateItem = async (itemData: Omit<StaffItem, "Staff_ID">) => {
     try {
       setActionLoading(true);
-      // Remove Access_Code if role is not Cashier or Manager
-      const cleanData = { ...itemData };
+      const cleanData = { 
+        ...itemData, 
+        Branch_ID_fk: branchId // Ensure branch ID is set
+      };
       if (cleanData.Role !== "Cashier" && cleanData.Role !== "Manager") {
         delete cleanData.Access_Code;
       }
 
       const response = await StaffAPI.createStaffItem(cleanData);
       if (response.success) {
-        setStaffItems((prev) => [...prev, response.data]);
+        // Reload staff data for this branch
+        await loadBranchData();
         setIsModalOpen(false);
         showToast(response.message || "Staff created successfully", "success");
       }
@@ -356,22 +436,15 @@ const EmployeeRecordsPage = () => {
     if (!editingItem) return;
     try {
       setActionLoading(true);
-      // Remove Access_Code if role is not Cashier or Manager
       const cleanData = { ...itemData };
       if (cleanData.Role !== "Cashier" && cleanData.Role !== "Manager") {
         delete cleanData.Access_Code;
       }
 
-      const response = await StaffAPI.updateStaffItem(
-        editingItem.Staff_ID,
-        cleanData
-      );
+      const response = await StaffAPI.updateStaffItem(editingItem.Staff_ID, cleanData);
       if (response.success) {
-        setStaffItems((prev) =>
-          prev.map((it) =>
-            it.Staff_ID === editingItem.Staff_ID ? response.data : it
-          )
-        );
+        // Reload staff data for this branch
+        await loadBranchData();
         setIsModalOpen(false);
         setEditingItem(null);
         showToast(response.message || "Staff updated successfully", "success");
@@ -389,9 +462,8 @@ const EmployeeRecordsPage = () => {
       setActionLoading(true);
       const response = await StaffAPI.bulkDeleteStaffItems(selectedItems);
       if (response.success) {
-        // Refresh from API (IDs already re-assigned there)
-        const updated = await StaffAPI.getStaffItems();
-        setStaffItems(updated.data);
+        // Reload staff data for this branch
+        await loadBranchData();
         setSelectedItems([]);
         showToast(response.message || "Staff deleted successfully", "success");
       }
@@ -409,7 +481,7 @@ const EmployeeRecordsPage = () => {
     [filteredItems]
   );
 
-  const handleSelectItem = useCallback((staffId: number, checked: boolean) => {
+  const handleSelectItem = useCallback((staffId: string, checked: boolean) => {
     setSelectedItems((prev) =>
       checked ? [...prev, staffId] : prev.filter((id) => id !== staffId)
     );
@@ -418,7 +490,6 @@ const EmployeeRecordsPage = () => {
   const handleModalSubmit = () => {
     if (!formData.Name.trim() || !formData.CNIC.trim()) return;
 
-    // Validate access code if role is Cashier or Manager
     if (
       (formData.Role === "Cashier" || formData.Role === "Manager") &&
       (!formData.Access_Code || formData.Access_Code.length !== 4)
@@ -443,18 +514,18 @@ const EmployeeRecordsPage = () => {
       Status: isActive ? "Active" : "Inactive",
     }));
   };
+
   useEffect(() => {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "unset";
-      }
-  
-      // Cleanup function to restore scrolling when component unmounts
-      return () => {
-        document.body.style.overflow = "unset";
-      };
-    }, [isModalOpen]);
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -463,19 +534,14 @@ const EmployeeRecordsPage = () => {
 
   // CNIC formatting function
   const formatCNIC = (value: string) => {
-    // Remove all non-digits
     const digits = value.replace(/\D/g, "");
 
-    // Apply CNIC format: 35202-1234567-8
     if (digits.length <= 5) {
       return digits;
     } else if (digits.length <= 12) {
       return `${digits.slice(0, 5)}-${digits.slice(5)}`;
     } else {
-      return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(
-        12,
-        13
-      )}`;
+      return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12, 13)}`;
     }
   };
 
@@ -494,8 +560,19 @@ const EmployeeRecordsPage = () => {
     );
   }
 
+  if (!branchId) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-gray-600">Branch ID not found in URL parameters</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className=" bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen w-full mt-17">
       {toast && (
         <Toast
           message={toast.message}
@@ -504,18 +581,22 @@ const EmployeeRecordsPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-8 mt-20">Staff Management</h1>
+      <div className="mb-8 mt-2">
+        <h1 className="text-3xl font-semibold">
+          Staff Management - Branch #{branchId}
+        </h1>
+      </div>
 
-      {/* Summary Cards */}
-      <div className="flex gap-4 mb-8">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+      {/* Summary Cards - Same layout as Branch page */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">{staffItems.length}</p>
             <p className="text-1xl text-gray-500">Total Staff</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">
               {staffItems.filter((item) => item.Status === "Active").length}
@@ -523,19 +604,20 @@ const EmployeeRecordsPage = () => {
             <p className="text-1xl text-gray-500">Active Staff</p>
           </div>
         </div>
+
+       
       </div>
 
       {/* Action bar */}
-      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex gap-3 h-[40px] ">
+      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex gap-3 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Plus size={16} />
             Add
@@ -544,11 +626,10 @@ const EmployeeRecordsPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -557,37 +638,36 @@ const EmployeeRecordsPage = () => {
 
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
           <input
             type="text"
             placeholder="Search..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 h-[40px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
           />
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className=" rounded-sm ">
-          <table className="min-w-full max-w-[800px] divide-y divide-gray-200   table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+      {/* Table - Using responsive classes from branch page */}
+      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
+        <div className="table-container">
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-6 text-left w-[2.5px]">
+                <th className="px-6 py-6 text-left w-24">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     disableRipple
                     sx={{
-                      transform: "scale(1.5)", // size adjustment
-                      p: 0, // remove extra padding
+                      transform: "scale(1.5)",
+                      p: 0,
                     }}
                     icon={
-                      // unchecked grey box
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -596,14 +676,13 @@ const EmployeeRecordsPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#d1d1d1" // border grey
+                          fill="#e0e0e0"
+                          stroke="#d1d1d1"
                           strokeWidth="2"
                         />
                       </svg>
                     }
                     checkedIcon={
-                      // checked with tick
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -612,8 +691,8 @@ const EmployeeRecordsPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#2C2C2C" // dark border
+                          fill="#e0e0e0"
+                          stroke="#2C2C2C"
                           strokeWidth="2"
                         />
                         <path
@@ -628,29 +707,29 @@ const EmployeeRecordsPage = () => {
                     }
                   />
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-24">
                   Staff ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-52">
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-32">
                   Contact
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-40">
                   Address
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-32">
                   CNIC
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-36">
                   <div className="flex flex-col gap-1">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
                         <ChevronDown
@@ -659,39 +738,40 @@ const EmployeeRecordsPage = () => {
                         />
                       </DropdownMenu.Trigger>
 
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                          className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none "
-                          sideOffset={6}
+                      <DropdownMenu.Content
+                        className="min-w-[120px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
+                        sideOffset={6}
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        onCloseAutoFocus={(e) => e.preventDefault()}
+                        style={{ zIndex: 1000 }}
+                      >
+                        <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                        <DropdownMenu.Item
+                          className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                          onClick={() => setStatusFilter("")}
                         >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                            onClick={() => setStatusFilter("")}
-                          >
-                            Status
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
-                            onClick={() => setStatusFilter("Active")}
-                          >
-                            Active
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
-                            onClick={() => setStatusFilter("Inactive")}
-                          >
-                            Inactive
-                          </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
+                          Status
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
+                          onClick={() => setStatusFilter("Active")}
+                        >
+                          Active
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
+                          onClick={() => setStatusFilter("Inactive")}
+                        >
+                          Inactive
+                        </DropdownMenu.Item>
+                      </DropdownMenu.Content>
                     </DropdownMenu.Root>
-                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </div>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-36">
                   <div className="flex flex-col gap-1">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {roleFilter || "Role"}
                         <ChevronDown
@@ -700,59 +780,60 @@ const EmployeeRecordsPage = () => {
                         />
                       </DropdownMenu.Trigger>
 
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                          className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
-                          sideOffset={6}
+                      <DropdownMenu.Content
+                        className="min-w-[120px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
+                        sideOffset={6}
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        onCloseAutoFocus={(e) => e.preventDefault()}
+                        style={{ zIndex: 1000 }}
+                      >
+                        <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                        <DropdownMenu.Item
+                          className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                          onClick={() => setRoleFilter("")}
                         >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                          Role
+                        </DropdownMenu.Item>
+                        {Array.from(
+                          new Set(staffItems.map((i) => i.Role))
+                        ).map((role) => (
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                            onClick={() => setRoleFilter("")}
+                            key={role}
+                            className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
+                            onClick={() => setRoleFilter(role)}
                           >
-                            Role
+                            {role}
                           </DropdownMenu.Item>
-                          {Array.from(
-                            new Set(staffItems.map((i) => i.Role))
-                          ).map((role) => (
-                            <DropdownMenu.Item
-                              key={role}
-                              className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                              onClick={() => setRoleFilter(role)}
-                            >
-                              {role}
-                            </DropdownMenu.Item>
-                          ))}
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
+                        ))}
+                      </DropdownMenu.Content>
                     </DropdownMenu.Root>
-                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </div>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-24">
                   Salary
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-32">
                   Shift Start Time
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-32">
                   Shift End Time
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-28">
                   Access Code
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+                <th className="relative px-4 py-3 text-left w-28">
                   Actions
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y text-gray-500  divide-gray-300">
+            <tbody className="divide-y text-gray-500 divide-gray-300">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
@@ -761,13 +842,16 @@ const EmployeeRecordsPage = () => {
                   >
                     {searchTerm || statusFilter || roleFilter
                       ? "No staff match your search criteria."
-                      : "No staff found."}
+                      : `No staff found for ${branchInfo?.Branch_Name || 'this branch'}.`}
                   </td>
                 </tr>
               ) : (
                 filteredItems.map((item) => (
-                  <tr key={item.Staff_ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-6 py-8">
+                  <tr
+                    key={item.Staff_ID}
+                    className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
+                    <td className="px-6 py-8 whitespace-nowrap text-sm" data-label="Select">
                       <Checkbox
                         checked={selectedItems.includes(item.Staff_ID)}
                         onChange={(e) =>
@@ -775,11 +859,10 @@ const EmployeeRecordsPage = () => {
                         }
                         disableRipple
                         sx={{
-                          p: 0, // remove extra padding
-                          transform: "scale(1.5)", // optional size tweak
+                          p: 0,
+                          transform: "scale(1.5)",
                         }}
                         icon={
-                          // unchecked grey box
                           <svg width="20" height="20" viewBox="0 0 24 24">
                             <rect
                               x="3"
@@ -788,14 +871,13 @@ const EmployeeRecordsPage = () => {
                               height="18"
                               rx="3"
                               ry="3"
-                              fill="#e0e0e0" // grey inside
-                              stroke="#d1d1d1" // border grey
+                              fill="#e0e0e0"
+                              stroke="#d1d1d1"
                               strokeWidth="2"
                             />
                           </svg>
                         }
                         checkedIcon={
-                          // checked with tick
                           <svg width="20" height="20" viewBox="0 0 24 24">
                             <rect
                               x="3"
@@ -804,8 +886,8 @@ const EmployeeRecordsPage = () => {
                               height="18"
                               rx="3"
                               ry="3"
-                              fill="#e0e0e0" // grey inside
-                              stroke="#2C2C2C" // dark border
+                              fill="#e0e0e0"
+                              stroke="#2C2C2C"
                               strokeWidth="2"
                             />
                             <path
@@ -820,62 +902,54 @@ const EmployeeRecordsPage = () => {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Staff ID">
                       {`#${String(item.Staff_ID).padStart(3, "0")}`}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                      {item.Name}
+
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium card-name-cell" data-label="Name">
+                      <div className="name-content">
+                        <span className="font-medium">{item.Name}</span>
+                      </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact">
                       {item.Contact}
                     </td>
-                    <td
-                      className="px-4 py-4 text-sm max-w-[200px] truncate"
-                      title={item.Address}
-                    >
+                    <td className="px-4 py-4 text-sm max-w-[200px] truncate" data-label="Address" title={item.Address}>
                       {item.Address}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="CNIC">
                       {item.CNIC}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
-                          ${
-                            item.Status === "Active"
-                              ? "text-green-400 border-green-600"
-                              : ""
-                          }
-                          ${
-                            item.Status === "Inactive"
-                              ? "text-red-400 border-red-600"
-                              : ""
-                          }`}
+                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-sm text-xs font-medium 
+                    ${item.Status === "Active" ? "text-green-400 border-green-600" : ""}
+                    ${item.Status === "Inactive" ? "text-red-400 border-red-600" : ""}`}
                       >
                         {item.Status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Role">
                       {item.Role}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Salary">
                       {item.Salary}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600" data-label="Shift Start Time">
                       {item.Shift_Start_Time}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600" data-label="Shift End Time">
                       {item.Shift_End_Time}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Access Code">
                       {(item.Role === "Cashier" || item.Role === "Manager") &&
-                      item.Access_Code ? (
+                        item.Access_Code ? (
                         <span
-                          className={`px-2 py-1 rounded text-xs font-mono ${
-                            item.Role === "Cashier"
-                              ? "bg-blue-100 text-blue-400"
-                              : "bg-purple-100 text-purple-400"
-                          }`}
+                          className={`px-2 py-1 rounded text-xs font-mono ${item.Role === "Cashier"
+                            ? "bg-blue-100 text-blue-400"
+                            : "bg-purple-100 text-purple-400"
+                            }`}
                         >
                           {item.Access_Code}
                         </span>
@@ -883,7 +957,7 @@ const EmployeeRecordsPage = () => {
                         <span className="text-gray-400">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => {
@@ -904,10 +978,11 @@ const EmployeeRecordsPage = () => {
           </table>
         </div>
       </div>
-      {/* Model */}
+
+      {/* Modal for Add/Edit */}
       {isModalOpen && (
         <div
-          className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 p-4"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 p-4"
           onClick={handleCloseModal}
         >
           <div
@@ -1025,12 +1100,11 @@ const EmployeeRecordsPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[200px] rounded-md bg-white shadow-lg border border-gray-200 p-1 relative outline-none z-[100] max-h-60 overflow-y-auto"
+                          className="min-w-[200px] rounded-sm bg-white shadow-lg border border-gray-200 p-1 relative outline-none z-[100] max-h-60 overflow-y-auto"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
 
-                          {/* Default Option */}
                           <DropdownMenu.Item
                             className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none text-gray-500"
                             onClick={() =>
@@ -1040,7 +1114,6 @@ const EmployeeRecordsPage = () => {
                             Select Role
                           </DropdownMenu.Item>
 
-                          {/* Role Options */}
                           {[
                             "Manager",
                             "Cashier",
@@ -1120,35 +1193,37 @@ const EmployeeRecordsPage = () => {
                   {/* Access Code - Only for Cashier and Manager */}
                   {(formData.Role === "Cashier" ||
                     formData.Role === "Manager") && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Access Code <span className="text-red-500">*</span>
-                        <span className="text-xs text-gray-500 ml-1">
-                          (4 digits)
-                        </span>
-                      </label>
-                      <input
-                        type="password"
-                        value={formData.Access_Code}
-                        onChange={(e) => {
-                          const value = e.target.value
-                            .replace(/\D/g, "")
-                            .slice(0, 4);
-                          setFormData({ ...formData, Access_Code: value });
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent font-mono tracking-widest transition-colors"
-                        placeholder="••••"
-                        maxLength={4}
-                        required
-                      />
-                      {formData.Access_Code &&
-                        formData.Access_Code.length < 4 && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Access code must be exactly 4 digits
-                          </p>
-                        )}
-                    </div>
-                  )}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Access Code <span className="text-red-500">*</span>
+                          <span className="text-xs text-gray-500 ml-1">
+                            (4 digits)
+                          </span>
+                        </label>
+                        <input
+                          type="password"
+                          value={formData.Access_Code}
+                          onChange={(e) => {
+                            const value = e.target.value
+                              .replace(/\D/g, "")
+                              .slice(0, 4);
+                            setFormData({ ...formData, Access_Code: value });
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent font-mono tracking-widest transition-colors"
+                          placeholder="••••"
+                          maxLength={4}
+                          required
+                        />
+                        {formData.Access_Code &&
+                          formData.Access_Code.length < 4 && (
+                            <p className="text-red-500 text-xs mt-1">
+                              Access code must be exactly 4 digits
+                            </p>
+                          )}
+                      </div>
+                    )}
+
+
 
                   {/* Status Toggle */}
                   <div className="flex items-center justify-between py-2">
@@ -1157,11 +1232,10 @@ const EmployeeRecordsPage = () => {
                     </label>
                     <div className="flex items-center gap-3">
                       <span
-                        className={`text-sm font-medium ${
-                          formData.Status === "Active"
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`text-sm font-medium ${formData.Status === "Active"
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         {formData.Status}
                       </span>
@@ -1197,17 +1271,16 @@ const EmployeeRecordsPage = () => {
                     (!formData.Access_Code ||
                       formData.Access_Code.length !== 4))
                 }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 font-medium ${
-                  !formData.Name.trim() ||
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 font-medium ${!formData.Name.trim() ||
                   !formData.CNIC.trim() ||
                   actionLoading ||
                   ((formData.Role === "Cashier" ||
                     formData.Role === "Manager") &&
                     (!formData.Access_Code ||
                       formData.Access_Code.length !== 4))
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                }`}
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
               >
                 {actionLoading ? (
                   <>
