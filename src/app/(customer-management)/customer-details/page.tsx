@@ -332,7 +332,7 @@ const CustomerManagementPage = () => {
         />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8 mt-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 items-center max-w-[100vw] mb-8 mt-2">
         <h1 className="text-3xl font-semibold">Loyal Customers</h1>
 
         {/* Import/Export Buttons */}
@@ -359,7 +359,7 @@ const CustomerManagementPage = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
+      <div className="grid grid-cols-1   md:grid-cols-2 lg:grid-cols-4  gap-4 mb-8 max-w-[100vw]">
         <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl mb-1">{customerItems.length}</p>
@@ -402,16 +402,17 @@ const CustomerManagementPage = () => {
           <div>
             <div className="flex items-center justify-start mb-2">
               <LargeStarRating rating={Math.round(averageRating)} />
-              <span className="text-xl  text-gray-500">({averageRating} )</span>
+              
             </div>
-            <p className="text-1xl text-gray-500">Avg. Feedback Rating</p>
+            <p className="text-1xl text-gray-500">Avg. Feedback Rating <span className="text-xl  text-gray-500">({averageRating})</span></p>
+            
           </div>
         </div>
       </div>
 
       <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
         {/* Search Bar */}
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative flex-1 min-w-[150px] max-w-[100vw]">
           <input
             type="text"
             placeholder="Search..."
@@ -427,15 +428,15 @@ const CustomerManagementPage = () => {
       </div>
 
       {/* Responsive Table with Global CSS Classes */}
-      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
+      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm overflow-x-auto responsive-customer-table">
         <div className="table-container">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
-                <th className="relative px-6 py-6 text-left w-24">ID</th>
-                <th className="relative px-4 py-3 text-left w-40">
+                
+                <th className="relative px-4 py-3 py-6 text-left w-40">
                   Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+                  
                 </th>
                 <th className="relative px-4 py-3 text-left w-36">
                   Contact
@@ -487,11 +488,9 @@ const CustomerManagementPage = () => {
                     onClick={() => handleCustomerClick(item.Customer_ID)}
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm card-customer-id" data-label="Customer ID">
-                      {item.Customer_ID}
-                    </td>
                     
-                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="Name">
+                    
+                    <td className="px-4 py-8 whitespace-nowrap text-sm card-name-cell" data-label="Name">
                       <div className="name-content flex items-center gap-2">
                         <ProfilePicture name={item.Name} />
                         <span className="font-medium">{item.Name}</span>
