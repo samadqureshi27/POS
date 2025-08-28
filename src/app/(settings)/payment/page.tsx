@@ -448,7 +448,7 @@ const PaymentManagementPage = () => {
   }
 
   return (
-    <div className="  bg-gray-50 min-h-screen ">
+    <div className=" px-4  bg-gray-50 min-h-screen ">
       {toast && (
         <Toast
           message={toast.message}
@@ -462,8 +462,9 @@ const PaymentManagementPage = () => {
       </h1>
 
       {/* Top summary row */}
-      <div className="flex gap-4 mb-8">
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+      <div className="grid grid-cols-1 max-w-[100vw]  lg:grid-cols-2   gap-4 mb-8 lg:max-w-[50vw]">
+        
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-3xl font-semibold mb-1">
               {activeMethodsCount}
@@ -474,7 +475,7 @@ const PaymentManagementPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-3xl font-semibold mb-1">
               {topTaxType?.[0] || "N/A"}
@@ -489,11 +490,11 @@ const PaymentManagementPage = () => {
       {/* Action bar: add, delete, search */}
       <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 h-[40px]">
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -505,7 +506,7 @@ const PaymentManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -522,7 +523,7 @@ const PaymentManagementPage = () => {
                     placeholder="Search Payment Methods..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                    className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   />
                   <Search
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -532,8 +533,8 @@ const PaymentManagementPage = () => {
       </div>
 
       {/* Table + filters */}
-     <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-             <div className=" rounded-sm ">
+     <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table  ">
+             <div className=" rounded-sm table-container ">
                <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
                  <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
                    <tr>
@@ -762,12 +763,12 @@ const PaymentManagementPage = () => {
                                         />
                                       </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="ID">{item.ID}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Name">{item.Name}</td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap"data-label="Payment Type">
                     <span
-                      className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
+                      className={`inline-block w-20  text-right px-2 py-[2px] rounded-md text-xs font-medium 
                   ${item.PaymentType === "Cash" ? "text-red-400 border-red-600" : ""}
                   ${item.PaymentType === "Card" ? "text-blue-400 border-blue-600" : ""}
                   ${item.PaymentType === "Online" ? "text-green-400 border-green-700" : ""}
@@ -777,12 +778,12 @@ const PaymentManagementPage = () => {
                     </span>
                   </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">{item.TaxType}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.TaxPercentage}%</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Tax Type">{item.TaxType}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Tax Percentage">{item.TaxPercentage}%</td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap"data-label="Status">
                     <span
-                      className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
+                      className={`inline-block w-20 text-right px-2 py-[2px] rounded-md text-xs font-medium 
                   ${item.Status === "Active" ? "text-green-400 border-green-700" : "text-red-400 border-red-600"}
                 `}
                     >
@@ -790,7 +791,7 @@ const PaymentManagementPage = () => {
                     </span>
                   </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Action">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => {
