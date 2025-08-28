@@ -1,7 +1,9 @@
+// app/customers-details/page.tsx
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { ChevronDown, Search, AlertCircle, CheckCircle, X, Star, Download, Upload } from "lucide-react";
+import { ChevronDown, Search, AlertCircle, CheckCircle, X, Star, Download, Upload, Trophy } from "lucide-react";
+import { useRouter } from 'next/navigation'; // Next.js 13+ App Router
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 // Types
@@ -14,26 +16,17 @@ interface CustomerItem {
   Feedback_Rating: number;
   Total_Orders: number;
   Birthdate: string;
+  Device :"Google Pay" | "Apple Pay"
   Registration_Date: string;
   Profile_Creation_Date: string;
 }
-
-interface OrderItem {
-  Order_ID: string;
-  Order_Number: string;
-  Type: "Dine in" | "Takeaway" | "Delivery";
-  Date: string;
-  Total: number;
-  Status: "Completed" | "Pending" | "Cancelled";
-}
-
 interface ApiResponse<T> {
   data: T;
   message?: string;
   success: boolean;
 }
 
-// Mock API
+// Mock API (same as before)
 class CustomerAPI {
   private static delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -50,6 +43,7 @@ class CustomerAPI {
       Birthdate: "09/13/1995",
       Registration_Date: "2024-01-15",
       Profile_Creation_Date: "01/15/2024 09:30",
+      Device:"Apple Pay"
     },
     {
       Customer_ID: 2,
@@ -62,6 +56,7 @@ class CustomerAPI {
       Birthdate: "05/22/1988",
       Registration_Date: "2024-02-20",
       Profile_Creation_Date: "02/20/2024 14:45",
+      Device:"Apple Pay"
     },
     {
       Customer_ID: 3,
@@ -74,102 +69,7 @@ class CustomerAPI {
       Birthdate: "12/08/1992",
       Registration_Date: "2023-12-10",
       Profile_Creation_Date: "12/10/2023 11:20",
-    },
-    {
-      Customer_ID: 4,
-      Name: "Ayesha Malik",
-      Contact: "03002222222",
-      Email: "ayesha.malik@gmail.com",
-      Address: "321 Business District, Lahore",
-      Feedback_Rating: 2,
-      Total_Orders: 3,
-      Birthdate: "03/17/2000",
-      Registration_Date: "2024-05-08",
-      Profile_Creation_Date: "05/08/2024 16:12",
-    },
-    {
-      Customer_ID: 5,
-      Name: "Omar Farooq",
-      Contact: "03003333333",
-      Email: "omar.farooq@gmail.com",
-      Address: "555 University Road, Lahore",
-      Feedback_Rating: 5,
-      Total_Orders: 20,
-      Birthdate: "09/13/2002",
-      Registration_Date: "2023-11-22",
-      Profile_Creation_Date: "11/22/2023 08:15",
-    },
-    {
-      Customer_ID: 6,
-      Name: "Zara Sheikh",
-      Contact: "03004444444",
-      Email: "zara.sheikh@gmail.com",
-      Address: "777 Mall Road, Rawalpindi",
-      Feedback_Rating: 1,
-      Total_Orders: 5,
-      Birthdate: "07/30/1985",
-      Registration_Date: "2024-03-12",
-      Profile_Creation_Date: "08/26/2025 13:34",
-    },
-    {
-      Customer_ID: 7,
-      Name: "Ali Raza",
-      Contact: "03005555555",
-      Email: "ali.raza@yahoo.com",
-      Address: "101 Canal Bank, Faisalabad",
-      Feedback_Rating: 4,
-      Total_Orders: 9,
-      Birthdate: "11/25/1990",
-      Registration_Date: "2024-04-18",
-      Profile_Creation_Date: "04/18/2024 10:22",
-    },
-    {
-      Customer_ID: 8,
-      Name: "Sana Tariq",
-      Contact: "03006666666",
-      Email: "sana.tariq@hotmail.com",
-      Address: "88 Liberty Market, Lahore",
-      Feedback_Rating: 5,
-      Total_Orders: 14,
-      Birthdate: "02/14/1996",
-      Registration_Date: "2023-09-05",
-      Profile_Creation_Date: "09/05/2023 15:18",
-    },
-    {
-      Customer_ID: 9,
-      Name: "Bilal Ahmed",
-      Contact: "03007777777",
-      Email: "bilal.ahmed@gmail.com",
-      Address: "67 Model Town, Multan",
-      Feedback_Rating: 3,
-      Total_Orders: 6,
-      Birthdate: "08/03/1987",
-      Registration_Date: "2024-06-12",
-      Profile_Creation_Date: "06/12/2024 12:45",
-    },
-    {
-      Customer_ID: 10,
-      Name: "Rabia Noor",
-      Contact: "03008888888",
-      Email: "rabia.noor@outlook.com",
-      Address: "234 Satellite Town, Gujranwala",
-      Feedback_Rating: 2,
-      Total_Orders: 4,
-      Birthdate: "06/18/1993",
-      Registration_Date: "2024-07-20",
-      Profile_Creation_Date: "07/20/2024 09:33",
-    },
-    {
-      Customer_ID: 11,
-      Name: "Hamza Shah",
-      Contact: "03009999999",
-      Email: "hamza.shah@gmail.com",
-      Address: "445 DHA Phase 2, Karachi",
-      Feedback_Rating: 4,
-      Total_Orders: 11,
-      Birthdate: "10/12/1994",
-      Registration_Date: "2023-08-14",
-      Profile_Creation_Date: "08/14/2023 16:28",
+      Device:"Apple Pay"
     },
     {
       Customer_ID: 12,
@@ -182,93 +82,7 @@ class CustomerAPI {
       Birthdate: "04/07/1989",
       Registration_Date: "2023-10-30",
       Profile_Creation_Date: "10/30/2023 11:55",
-    },
-    {
-      Customer_ID: 13,
-      Name: "Usman Malik",
-      Contact: "03002020202",
-      Email: "usman.malik@hotmail.com",
-      Address: "67 Johar Town, Lahore",
-      Feedback_Rating: 3,
-      Total_Orders: 7,
-      Birthdate: "01/22/1991",
-      Registration_Date: "2024-03-25",
-      Profile_Creation_Date: "03/25/2024 14:12",
-    },
-    {
-      Customer_ID: 14,
-      Name: "Khadija Riaz",
-      Contact: "03003030303",
-      Email: "khadija.riaz@gmail.com",
-      Address: "299 Gulshan Colony, Sialkot",
-      Feedback_Rating: 1,
-      Total_Orders: 2,
-      Birthdate: "12/01/1998",
-      Registration_Date: "2024-08-05",
-      Profile_Creation_Date: "08/05/2024 17:40",
-    },
-    {
-      Customer_ID: 15,
-      Name: "Faisal Javed",
-      Contact: "03004040404",
-      Email: "faisal.javed@outlook.com",
-      Address: "156 Cavalry Ground, Lahore",
-      Feedback_Rating: 4,
-      Total_Orders: 13,
-      Birthdate: "09/15/1986",
-      Registration_Date: "2023-12-22",
-      Profile_Creation_Date: "12/22/2023 08:25",
-    }
-  ];
-
-  private static mockOrders: OrderItem[] = [
-    {
-      Order_ID: "ORD001",
-      Order_Number: "12345",
-      Type: "Dine in",
-      Date: "2024-08-25",
-      Total: 850,
-      Status: "Completed",
-    },
-    {
-      Order_ID: "ORD002",
-      Order_Number: "12346",
-      Type: "Takeaway",
-      Date: "2024-08-20",
-      Total: 1200,
-      Status: "Completed",
-    },
-    {
-      Order_ID: "ORD003",
-      Order_Number: "12347",
-      Type: "Delivery",
-      Date: "2024-08-15",
-      Total: 750,
-      Status: "Completed",
-    },
-    {
-      Order_ID: "ORD004",
-      Order_Number: "12348",
-      Type: "Dine in",
-      Date: "2024-08-10",
-      Total: 950,
-      Status: "Completed",
-    },
-    {
-      Order_ID: "ORD005",
-      Order_Number: "12349",
-      Type: "Takeaway",
-      Date: "2024-08-05",
-      Total: 650,
-      Status: "Pending",
-    },
-    {
-      Order_ID: "ORD006",
-      Order_Number: "12350",
-      Type: "Delivery",
-      Date: "2024-08-01",
-      Total: 900,
-      Status: "Cancelled",
+      Device: "Google Pay"
     },
   ];
 
@@ -280,35 +94,9 @@ class CustomerAPI {
       message: "Customer items fetched successfully",
     };
   }
-
-  static async getCustomerById(id: number): Promise<ApiResponse<CustomerItem>> {
-    await this.delay(500);
-    const customer = this.mockData.find(c => c.Customer_ID === id);
-    if (!customer) {
-      return {
-        success: false,
-        data: {} as CustomerItem,
-        message: "Customer not found",
-      };
-    }
-    return {
-      success: true,
-      data: customer,
-      message: "Customer details fetched successfully",
-    };
-  }
-
-  static async getCustomerOrders(customerId: number): Promise<ApiResponse<OrderItem[]>> {
-    await this.delay(600);
-    return {
-      success: true,
-      data: [...this.mockOrders],
-      message: "Customer orders fetched successfully",
-    };
-  }
 }
 
-// Toast
+// Toast Component
 const Toast = ({
   message,
   type,
@@ -349,7 +137,7 @@ const ProfilePicture = ({ name, size = "small" }: { name: string; size?: "small"
   );
 };
 
-// Star Rating Component for table
+// Star Rating Component
 const StarRating = ({ rating }: { rating: number }) => {
   return (
     <div className="flex items-center">
@@ -368,7 +156,7 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
-// Large Star Rating Component for summary tile
+// Large Star Rating Component
 const LargeStarRating = ({ rating }: { rating: number }) => {
   return (
     <div className="flex items-center justify-center">
@@ -387,46 +175,10 @@ const LargeStarRating = ({ rating }: { rating: number }) => {
   );
 };
 
-// Navigation functions for different routing approaches
-const NavigationHelpers = {
-  // Option 1: Using Next.js router (most common)
-  navigateWithNextRouter: (customerId: number) => {
-    // Uncomment this if you're using Next.js
-    // const router = useRouter();
-    // router.push(`/customer/${customerId}`);
-    console.log(`Navigate to /customer/${customerId} using Next.js router`);
-    alert(`This would navigate to /customer/${customerId} using Next.js router`);
-  },
-
-  // Option 2: Using React Router
-  navigateWithReactRouter: (customerId: number) => {
-    // Uncomment this if you're using React Router
-    // const navigate = useNavigate();
-    // navigate(`/customer/${customerId}`);
-    console.log(`Navigate to /customer/${customerId} using React Router`);
-    alert(`This would navigate to /customer/${customerId} using React Router`);
-  },
-
-  // Option 3: Using window.location (vanilla approach)
-  navigateWithWindowLocation: (customerId: number) => {
-    window.location.href = `/customer/${customerId}`;
-  },
-
-  // Option 4: Opening in new tab/window
-  openInNewTab: (customerId: number) => {
-    window.open(`/customer/${customerId}`, '_blank');
-  },
-
-  // Option 5: Using History API
-  navigateWithHistoryAPI: (customerId: number) => {
-    window.history.pushState({}, '', `/customer/${customerId}`);
-    // You would also need to trigger a page reload or component re-render
-    window.location.reload();
-  }
-};
-
 // Main Customer Management Page Component
 const CustomerManagementPage = () => {
+  const router = useRouter(); // Next.js App Router hook
+
   const [customerItems, setCustomerItems] = useState<CustomerItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState("");
@@ -470,24 +222,10 @@ const CustomerManagementPage = () => {
     }
   };
 
-  // Handle customer row click - Updated to use different navigation methods
+  // FIXED: Handle customer row click - Navigate to dynamic route
   const handleCustomerClick = (customerId: number) => {
-    // Choose one of these navigation methods based on your routing setup:
-    
-    // Option 1: Next.js Router (recommended for Next.js apps)
-    NavigationHelpers.navigateWithNextRouter(customerId);
-    
-    // Option 2: React Router (recommended for React Router apps)
-    // NavigationHelpers.navigateWithReactRouter(customerId);
-    
-    // Option 3: Window location (works anywhere)
-    // NavigationHelpers.navigateWithWindowLocation(customerId);
-    
-    // Option 4: Open in new tab
-    // NavigationHelpers.openInNewTab(customerId);
-    
-    // Option 5: History API
-    // NavigationHelpers.navigateWithHistoryAPI(customerId);
+    console.log('Navigating to customer ID:', customerId); // Debug log
+    router.push(`/customer-details/${customerId}`);
   };
 
   // Memoized filtering
@@ -495,6 +233,7 @@ const CustomerManagementPage = () => {
     const s = searchTerm.toLowerCase();
     return customerItems.filter((item) => {
       const matchesSearch =
+      item.Device.toLowerCase().includes(s) ||
         item.Name.toLowerCase().includes(s) ||
         item.Contact.toLowerCase().includes(s) ||
         item.Email.toLowerCase().includes(s) ||
@@ -512,12 +251,27 @@ const CustomerManagementPage = () => {
     return total / customerItems.length;
   }, [customerItems]);
 
+  // Find best customer (highest rating, then highest orders as tiebreaker)
+  const bestCustomer = useMemo(() => {
+    if (customerItems.length === 0) return null;
+
+    return customerItems.reduce((best, current) => {
+      if (current.Feedback_Rating > best.Feedback_Rating) {
+        return current;
+      }
+      if (current.Feedback_Rating === best.Feedback_Rating && current.Total_Orders > best.Total_Orders) {
+        return current;
+      }
+      return best;
+    });
+  }, [customerItems]);
+
   // Export functionality
   const handleExport = () => {
     const csvContent = "data:text/csv;charset=utf-8,"
       + "Customer ID,Name,Contact,Email,Address,Feedback Rating,Total Orders,Birthdate,Registration Date,Profile Creation Date\n"
       + customerItems.map(item =>
-        `${item.Customer_ID},"${item.Name}","${item.Contact}","${item.Email}","${item.Address}",${item.Feedback_Rating},${item.Total_Orders},"${item.Birthdate}","${item.Registration_Date}","${item.Profile_Creation_Date}"`
+        `${item.Customer_ID},"${item.Name}","${item.Contact}","${item.Email}","${item.Address}",${item.Feedback_Rating},${item.Total_Orders},${item.Device},"${item.Birthdate}","${item.Registration_Date}","${item.Profile_Creation_Date}"`
       ).join("\n");
 
     const encodedUri = encodeURI(csvContent);
@@ -569,7 +323,7 @@ const CustomerManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -578,10 +332,10 @@ const CustomerManagementPage = () => {
         />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8 mt-20">
+      <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8 mt-2">
         <h1 className="text-3xl font-semibold">Loyal Customers</h1>
 
-        {/* Import/Export Buttons - Right side on larger screens */}
+        {/* Import/Export Buttons */}
         <div className="flex gap-4 justify-start md:justify-end mt-4 md:mt-0">
           <label className="flex items-center gap-2 px-4 py-2 bg-[#2C2C2C] text-white rounded-md cursor-pointer hover:bg-gray-700 transition-colors">
             <Upload size={16} />
@@ -615,8 +369,32 @@ const CustomerManagementPage = () => {
 
         <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">{customerItems.length}</p>
-            <p className="text-1xl text-gray-500">Active Customers</p>
+            <p className="text-6xl mb-1">
+              {customerItems.reduce((total, item) => total + item.Total_Orders, 0)}
+            </p>
+            <p className="text-1xl text-gray-500">Total Orders</p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+          <div className="w-full">
+            {bestCustomer ? (
+              <div className="flex items-center gap-3 mb-2">
+                <ProfilePicture name={bestCustomer.Name} size="large" />
+                <div className="flex-1">
+                  <p className="text-lg font-semibold text-gray-800 truncate" title={bestCustomer.Name}>
+                    {bestCustomer.Name}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <StarRating rating={bestCustomer.Feedback_Rating} />
+                    <span className="text-sm text-gray-500">({bestCustomer.Total_Orders} orders)</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-2xl mb-1">-</p>
+            )}
+            <p className="text-1xl text-gray-500">Best Customer</p>
           </div>
         </div>
 
@@ -624,17 +402,9 @@ const CustomerManagementPage = () => {
           <div>
             <div className="flex items-center justify-start mb-2">
               <LargeStarRating rating={Math.round(averageRating)} />
+              <span className="text-xl  text-gray-500">({averageRating} )</span>
             </div>
             <p className="text-1xl text-gray-500">Avg. Feedback Rating</p>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
-          <div>
-            <p className="text-6xl mb-1">
-              {customerItems.reduce((total, item) => total + item.Total_Orders, 0)}
-            </p>
-            <p className="text-1xl text-gray-500">Total Orders</p>
           </div>
         </div>
       </div>
@@ -656,13 +426,13 @@ const CustomerManagementPage = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto">
-        <div className="rounded-sm">
+      {/* Responsive Table with Global CSS Classes */}
+      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
+        <div className="table-container">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
-                <th className="relative px-6 py-6 text-left w-24">Customer ID</th>
+                <th className="relative px-6 py-6 text-left w-24">ID</th>
                 <th className="relative px-4 py-3 text-left w-40">
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
@@ -691,6 +461,10 @@ const CustomerManagementPage = () => {
                   Profile Created
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
+                <th className="relative px-4 py-3 text-left w-44">
+                  Device
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+                </th>
               </tr>
             </thead>
 
@@ -713,53 +487,45 @@ const CustomerManagementPage = () => {
                     onClick={() => handleCustomerClick(item.Customer_ID)}
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm">
-                      {`#${String(item.Customer_ID).padStart(3, "0")}`}
+                    <td className="px-6 py-8 whitespace-nowrap text-sm card-customer-id" data-label="Customer ID">
+                      {item.Customer_ID}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      <div className="flex items-center gap-3">
+                    
+                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="Name">
+                      <div className="name-content flex items-center gap-2">
                         <ProfilePicture name={item.Name} />
                         <span className="font-medium">{item.Name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact">
                       {item.Contact}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Email">
                       {item.Email}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <StarRating rating={item.Feedback_Rating} />
+                    <td className="px-4 py-4 whitespace-nowrap card-rating-cell" data-label="Feedback Rating">
+                      <div className="rating-content">
+                        <StarRating rating={item.Feedback_Rating} />
+                      </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Total Orders">
                       {item.Total_Orders}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Birthdate">
                       {item.Birthdate}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Profile Created">
                       {item.Profile_Creation_Date}
+                    </td>
+                    <td className="px-4 text-black py-4 whitespace-nowrap text-sm" data-label="Device">
+                      {item.Device}
                     </td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      {/* Navigation Instructions */}
-      <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-sm">
-        <h3 className="text-lg font-semibold mb-2">Navigation Setup Instructions:</h3>
-        <div className="space-y-2 text-sm">
-          <p><strong>Current:</strong> Using demo alerts. Choose one of the following methods:</p>
-          
-          <div className="ml-4 space-y-1">
-            <p><strong>1. Next.js:</strong> Uncomment useRouter import and router.push() in NavigationHelpers.navigateWithNextRouter</p>
-            <p><strong>2. React Router:</strong> Uncomment useNavigate import and navigate() in NavigationHelpers.navigateWithReactRouter</p>
-            <p><strong>3. Window Location:</strong> Use NavigationHelpers.navigateWithWindowLocation (works anywhere)</p>
-            <p><strong>4. New Tab:</strong> Use NavigationHelpers.openInNewTab to open profile in new tab</p>
-          </div>
         </div>
       </div>
     </div>

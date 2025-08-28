@@ -795,7 +795,7 @@ class DashboardAPI {
     period: string
   ): Promise<ApiResponse<DashboardData>> {
     await this.delay(600);
-
+    
     const metrics = this.mockMetrics[period] || this.mockMetrics.Week;
     const revenueData =
       this.mockRevenueData[period] || this.mockRevenueData.Week;
@@ -863,7 +863,8 @@ class DashboardAPI {
     period: string
   ): Promise<ApiResponse<DashboardData>> {
     await this.delay(800);
-
+    
+    // Simulate data refresh with slight variations
     const baseMetrics = this.mockMetrics[period] || this.mockMetrics.Week;
     const variation = (Math.random() - 0.5) * 0.1;
 
@@ -979,6 +980,7 @@ const Dashboard = () => {
     return `${day}.${month}.${year}`;
   };
 
+  
   // Date Range state
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     null,
@@ -1159,7 +1161,7 @@ const Dashboard = () => {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-blue-500 rounded-full mx-auto"></div>
+          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading Dashboard...</p>
         </div>
       </div>
@@ -1314,10 +1316,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Interactive Area Chart */}
-        <div className="bg-white p-4 sm:p-6 rounded-sm shadow-sm border border-gray-200 mb-6 sm:mb-8">
-          <ChartAreaInteractive />
-        </div>
+       
 
         {/* Customer Analytics Section */}
         <div className="bg-white p-4 rounded-sm shadow-sm border border-gray-200 mb-6 sm:mb-8">
@@ -1336,7 +1335,7 @@ const Dashboard = () => {
                 {/* Total visits */}
                 <div className="border-r pt-4 pr-4 border-gray-300">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm text-gray-500">Total visits</p>
+                    <p className="text-sm text-gray-500">Total Revenue</p>
                     <div className="flex items-center text-green-500">
                       <span className="text-sm font-medium">+1,023</span>
                       <TrendingUp size={12} className="ml-1" />
@@ -1348,7 +1347,7 @@ const Dashboard = () => {
                 {/* Repeat customers */}
                 <div className="border-r pt-4 pr-4 border-gray-300">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm text-gray-500">Repeat customers</p>
+                    <p className="text-sm text-gray-500">Total Expense</p>
                     <div className="flex items-center text-green-500">
                       <span className="text-sm font-medium">+125</span>
                       <TrendingUp size={12} className="ml-1" />
@@ -1360,127 +1359,130 @@ const Dashboard = () => {
                 {/* Last period */}
                 <div>
                   <p className="text-sm pt-4 pr-4 text-gray-500 mb-2">
-                    Last period
+                    Total Orders
                   </p>
                   <h3 className="text-3xl font-bold text-gray-900">133</h3>
                 </div>
               </div>
-
+              
               {/* Chart */}
-              <div className="w-[100%] min-w-0">
-                <ResponsiveContainer width="100%" height={320}>
-                  <BarChart
-                    data={dashboardData.visitData}
-                    margin={{ top: 20, right: 0, left: 0, bottom: 20 }}
-                    barCategoryGap="2%"
-                  >
-                    <defs>
-                      {/* Green gradient for referrals */}
-                      <linearGradient
-                        id="referralsGradient"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#22c55e"
-                          stopOpacity={0.9}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#92fc7e"
-                          stopOpacity={1}
-                        />
-                      </linearGradient>
+<div className="w-[100%] min-w-0">
+  <ResponsiveContainer width="100%" height={320}>
+    <AreaChart
+      data={dashboardData.visitData}
+      margin={{ top: 20, right: 0, left: 0, bottom: 20 }}
+    >
+      <defs>
+        {/* Green gradient for referrals */}
+        <linearGradient
+          id="referralsGradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop
+            offset="0%"
+            stopColor="#22c55e"
+            stopOpacity={0.8}
+          />
+          <stop
+            offset="100%"
+            stopColor="#22c55e"
+            stopOpacity={0.1}
+          />
+        </linearGradient>
 
-                      {/* Blue gradient for repeat customers */}
-                      <linearGradient
-                        id="repeatGradient"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#93C5FD"
-                          stopOpacity={0.9}
-                        />
-                        <stop
-                          offset="50%"
-                          stopColor="#60A5FA"
-                          stopOpacity={0.8}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#1D4ED8"
-                          stopOpacity={1}
-                        />
-                      </linearGradient>
+        {/* Blue gradient for repeat customers */}
+        <linearGradient
+          id="repeatGradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop
+            offset="0%"
+            stopColor="#1D4ED8"
+            stopOpacity={0.8}
+          />
+          <stop
+            offset="100%"
+            stopColor="#1D4ED8"
+            stopOpacity={0.1}
+          />
+        </linearGradient>
 
-                      {/* Purple gradient for new members */}
-                      <linearGradient
-                        id="newMembersGradient"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#aab5df"
-                          stopOpacity={0.9}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#e4e8f5"
-                          stopOpacity={1}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                    <XAxis
-                      dataKey="date"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 10, fill: "#9CA3AF" }}
-                      height={30}
-                    />
-
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "6px",
-                        padding: "8px",
-                        fontSize: "12px",
-                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                      }}
-                    />
-                    <Bar
-                      dataKey="repeat"
-                      stackId="a"
-                      fill="#1d50cd"
-                      name="Repeat Customers"
-                    />
-                    <Bar
-                      dataKey="visits"
-                      stackId="a"
-                      fill="url(#newMembersGradient)"
-                      name="New Members"
-                    />
-                    <Bar
-                      dataKey="referrals"
-                      stackId="a"
-                      fill="url(#referralsGradient)"
-                      name="Referrals"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+        {/* Gray gradient for new members */}
+        <linearGradient
+          id="newMembersGradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop
+            offset="0%"
+            stopColor="#6B7280"
+            stopOpacity={0.8}
+          />
+          <stop
+            offset="100%"
+            stopColor="#6B7280"
+            stopOpacity={0.1}
+          />
+        </linearGradient>
+      </defs>
+      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+      <XAxis
+        dataKey="date"
+        axisLine={false}
+        tickLine={false}
+        tick={{ fontSize: 10, fill: "#9CA3AF" }}
+        height={30}
+      />
+      <Tooltip
+        contentStyle={{
+          backgroundColor: "#fff",
+          border: "1px solid #e5e7eb",
+          borderRadius: "6px",
+          padding: "8px",
+          fontSize: "12px",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        }}
+      />
+      <Area
+        type="monotone"
+        dataKey="repeat"
+        stackId="a"
+        fill="url(#repeatGradient)"
+        stroke="#1D4ED8"
+        strokeWidth={1}
+        name="Repeat Customers"
+      />
+      <Area
+        type="monotone"
+        dataKey="visits"
+        stackId="a"
+        fill="url(#newMembersGradient)"
+        stroke="#6B7280"
+        strokeWidth={1}
+        name="New Members"
+      />
+      <Area
+        type="monotone"
+        dataKey="referrals"
+        stackId="a"
+        fill="url(#referralsGradient)"
+        stroke="#22c55e"
+        strokeWidth={1}
+        name="Referrals"
+      />
+      <Legend />
+    </AreaChart>
+  </ResponsiveContainer>
+</div>
+</div>
 
             {/* Right side - Stats cards */}
             <div className="lg:w-80 flex-shrink-0 border-l border-gray-300 space-y-6">
@@ -1496,7 +1498,7 @@ const Dashboard = () => {
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
                     <span className="text-sm text-gray-600">
-                      Repeat customers
+                      Total Revenue
                     </span>
                   </div>
                   <div className="text-green-500 text-sm font-medium">+125</div>
@@ -1514,7 +1516,7 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
-                    <span className="text-sm text-gray-600">New members</span>
+                    <span className="text-sm text-gray-600">Total Expense</span>
                   </div>
                   <div className="text-red-500 text-sm font-medium">-5</div>
                 </div>
@@ -1531,7 +1533,7 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    <span className="text-sm text-gray-600">Referrals</span>
+                    <span className="text-sm text-gray-600">Total Orders</span>
                   </div>
                   <div className="text-green-500 text-sm font-medium">+19</div>
                 </div>
@@ -1548,10 +1550,7 @@ const Dashboard = () => {
               <h2 className="text-lg font-semibold text-gray-900">
                 Revenue trend
               </h2>
-              <p className="text-sm text-gray-500">
-                {selectedPeriod} - {dashboardData.revenueData.length} data
-                points
-              </p>
+              
             </div>
 
             <div className="h-64 sm:h-80">
@@ -1581,10 +1580,10 @@ const Dashboard = () => {
                   <Line
                     type="monotone"
                     dataKey="value"
-                    stroke="#CCAB4D"
+                    stroke="#301bcbff"
                     strokeWidth={2}
-                    dot={{ fill: "#CCAB4D", strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: "#CCAB4D" }}
+                    dot={{ fill: "#3c1ae4ff", strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, fill: "#8783dfff" }}
                     connectNulls={false}
                     isAnimationActive={true}
                     animationDuration={1500}
@@ -1597,7 +1596,7 @@ const Dashboard = () => {
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#fff",
-                      border: "1px solid #e5e7eb",
+                      border: "1px solid #175be2ff",
                       borderRadius: "8px",
                       padding: "8px",
                       fontSize: "12px",
@@ -1620,43 +1619,76 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Best Selling Items */}
-          <div className="bg-white p-4 sm:p-6 rounded-sm shadow-sm border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">
-              Best selling items
-            </h2>
-            <div className="space-y-1">
-              <div className="grid grid-cols-12 gap-2 text-xs text-gray-500 font-medium pb-3 border-b border-gray-100">
-                <div className="col-span-1">#</div>
-                <div className="col-span-5">Products</div>
-                <div className="col-span-3 text-right">Revenue</div>
-                <div className="col-span-3 text-right">Sales</div>
-              </div>
-              {dashboardData.bestSellingItems.map((item, index) => (
-                <div
-                  key={item.rank}
-                  className="grid grid-cols-12 gap-2 py-3 text-sm border-b border-gray-50 last:border-b-0 hover:bg-gray-50 rounded-md transition-colors"
-                  title={`Category: ${item.category} | Profit Margin: ${item.profitMargin}%`}
-                >
-                  <div className="col-span-1 text-gray-600 font-medium">
-                    {item.rank}
-                  </div>
-                  <div className="col-span-5 text-gray-900">{item.product}</div>
-                  <div className="col-span-3 text-right font-medium text-gray-900">
-                    {item.revenue}
-                  </div>
-                  <div className="col-span-3 text-right text-gray-600">
-                    {item.sales}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {dashboardData.bestSellingItems.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                No data available for {selectedPeriod}
-              </div>
-            )}
-          </div>
+          
+          {/* Best Selling Items Bar Chart */}
+<div className="bg-white p-4 sm:p-6 rounded-sm shadow-sm border border-gray-200">
+  <h2 className="text-lg font-semibold text-gray-900 mb-6">
+    Best selling items
+  </h2>
+  
+  {dashboardData.bestSellingItems.length === 0 ? (
+    <div className="text-center py-8 text-gray-500">
+      No data available for {selectedPeriod}
+    </div>
+  ) : (
+    <div className="h-80 w-full ">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={dashboardData.bestSellingItems.map((item, index) => {
+            const blueShades = ['#dbeafe', '#93c5fd', '#60a5fa', '#3b82f6', '#2563eb', '#1d4ed8'];
+            return {
+              product: item.product,
+              revenue: parseFloat(item.revenue.replace(/[$,]/g, '')),
+              sales: parseInt(item.sales.toString().replace(/[,]/g, '')),
+              fill: blueShades[index % blueShades.length]
+            };
+          })}
+          layout="vertical"
+          margin={{
+            left: 0,
+            right: 20,
+            top: 20,
+            bottom: 20,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+          <XAxis 
+            type="number" 
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: "#6B7280" }}
+            tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+          />
+          <YAxis
+            dataKey="product"
+            type="category"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: "#374151" }}
+            width={100}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#fff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              padding: "8px",
+              fontSize: "12px",
+            }}
+            formatter={(value, name) => [
+              name === 'Ordered' ? `${value.toLocaleString()}` : value.toLocaleString(),
+              name === 'revenue' ? 'Ordered' : 'Sales'
+            ]}
+          />
+          <Bar 
+            dataKey="revenue" 
+            radius={[0, 4, 4, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  )}
+</div>
         </div>
       </div>
     </div>

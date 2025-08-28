@@ -11,21 +11,16 @@ import {
   X,
   Edit,
   Save,
-  Info,
 } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ButtonPage from "@/components/layout/UI/button";
 
 // Types
-interface BranchItem {
-  "Branch-ID": number;
-  Branch_Name: string;
+interface MenuItem {
+  POS_ID: string;
+  POS_Name: string;
   Status: "Active" | "Inactive";
-  "Contact-Info": string;
-  Address: string;
-  email: string;
-  postalCode: string;
 }
 
 interface ApiResponse<T> {
@@ -35,101 +30,77 @@ interface ApiResponse<T> {
 }
 
 // Mock API
-class BranchAPI {
+class PosAPI {
   private static delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
-  private static mockData: BranchItem[] = [
-    {
-      "Branch-ID": 1,
-      Branch_Name: "Main Branch",
-      Status: "Active",
-      "Contact-Info": "03001234567",
-      Address: "123 Main St.",
-      email: "main@gmail.com",
-      postalCode: "35346",
-    },
-    {
-      "Branch-ID": 2,
-      Branch_Name: "North Branch",
-      Status: "Inactive",
-      "Contact-Info": "03007654321",
-      Address: "456 North Ave.",
-      email: "north@gmail.com",
-      postalCode: "2335346",
-    },
-    {
-      "Branch-ID": 3,
-      Branch_Name: "South Branch",
-      Status: "Active",
-      "Contact-Info": "03009876543",
-      Address: "789 South Blvd.",
-      email: "south@gmail.com",
-      postalCode: "12345",
-    },
+  private static mockData: MenuItem[] = [
+    { POS_ID: "1", POS_Name: "Main Branch", Status: "Active" },
+    { POS_ID: "2", POS_Name: "North Branch", Status: "Inactive" },
+    { POS_ID: "3", POS_Name: "South Branch", Status: "Active" },
+    { POS_ID: "4", POS_Name: "East Branch", Status: "Active" },
+    { POS_ID: "5", POS_Name: "West Branch", Status: "Inactive" },
   ];
 
-  static async getBranchItems(): Promise<ApiResponse<BranchItem[]>> {
+  static async getPosItems(): Promise<ApiResponse<MenuItem[]>> {
     await this.delay(800);
     return {
       success: true,
       data: [...this.mockData],
-      message: "Branch items fetched successfully",
+      message: "POS items fetched successfully",
     };
   }
 
-  static async createBranchItem(
-    item: Omit<BranchItem, "Branch-ID">
-  ): Promise<ApiResponse<BranchItem>> {
+  static async createPosItem(
+    item: Omit<MenuItem, "POS_ID">
+  ): Promise<ApiResponse<MenuItem>> {
     await this.delay(1000);
-    const newId = Math.max(...this.mockData.map((i) => i["Branch-ID"]), 0) + 1;
-    const newItem: BranchItem = { ...item, "Branch-ID": newId };
+    const newId = (this.mockData.length + 1).toString();
+    const newItem: MenuItem = { ...item, POS_ID: newId };
     this.mockData.push(newItem);
     return {
       success: true,
       data: newItem,
-      message: "Branch item created successfully",
+      message: "POS item created successfully",
     };
   }
 
-  static async updateBranchItem(
-    id: number,
-    item: Partial<BranchItem>
-  ): Promise<ApiResponse<BranchItem>> {
+  static async updatePosItem(
+    id: string,
+    item: Partial<MenuItem>
+  ): Promise<ApiResponse<MenuItem>> {
     await this.delay(800);
-    const index = this.mockData.findIndex((i) => i["Branch-ID"] === id);
+    const index = this.mockData.findIndex((i) => i.POS_ID === id);
     if (index === -1) throw new Error("Item not found");
     this.mockData[index] = { ...this.mockData[index], ...item };
     return {
       success: true,
       data: this.mockData[index],
-      message: "Branch item updated successfully",
+      message: "POS item updated successfully",
     };
   }
 
-  static async deleteBranchItem(id: number): Promise<ApiResponse<null>> {
+  static async deletePosItem(id: string): Promise<ApiResponse<null>> {
     await this.delay(600);
     this.mockData = this.mockData
-      .filter((i) => i["Branch-ID"] !== id)
-      .map((item, idx) => ({ ...item, "Branch-ID": idx + 1 }));
+      .filter((i) => i.POS_ID !== id)
+      .map((item, idx) => ({ ...item, POS_ID: (idx + 1).toString() }));
     return {
       success: true,
       data: null,
-      message: "Branch item deleted successfully",
+      message: "POS item deleted successfully",
     };
   }
 
-  static async bulkDeleteBranchItems(
-    ids: number[]
-  ): Promise<ApiResponse<null>> {
+  static async bulkDeletePosItems(ids: string[]): Promise<ApiResponse<null>> {
     await this.delay(1000);
     this.mockData = this.mockData
-      .filter((i) => !ids.includes(i["Branch-ID"]))
-      .map((item, idx) => ({ ...item, "Branch-ID": idx + 1 }));
+      .filter((i) => !ids.includes(i.POS_ID))
+      .map((item, idx) => ({ ...item, POS_ID: (idx + 1).toString() }));
     return {
       success: true,
       data: null,
-      message: `${ids.length} Branch items deleted successfully`,
+      message: `${ids.length} POS items deleted successfully`,
     };
   }
 }
@@ -184,9 +155,9 @@ const Toast = ({
   );
 };
 
-const BranchListPage = () => {
-  const [branchItems, setBranchItems] = useState<BranchItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+const PosListPage = () => {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -194,7 +165,7 @@ const BranchListPage = () => {
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [editingItem, setEditingItem] = useState<BranchItem | null>(null);
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
@@ -205,13 +176,9 @@ const BranchListPage = () => {
   );
 
   // Modal form state
-  const [formData, setFormData] = useState<Omit<BranchItem, "Branch-ID">>({
-    Branch_Name: "",
+  const [formData, setFormData] = useState<Omit<MenuItem, "POS_ID">>({
+    POS_Name: "",
     Status: "Active",
-    "Contact-Info": "",
-    Address: "",
-    email: "",
-    postalCode: "",
   });
 
   // Debounce search input
@@ -229,43 +196,32 @@ const BranchListPage = () => {
   }, [toast]);
 
   useEffect(() => {
-    loadBranchItems();
+    loadPosItems();
   }, []);
 
   // Modal form sync
   useEffect(() => {
     if (editingItem) {
       setFormData({
-        Branch_Name: editingItem.Branch_Name,
+        POS_Name: editingItem.POS_Name,
         Status: editingItem.Status,
-        "Contact-Info": editingItem["Contact-Info"],
-        Address: editingItem.Address,
-        email: editingItem.email,
-        postalCode: editingItem.postalCode,
       });
     } else {
-      setFormData({
-        Branch_Name: "",
-        Status: "Active",
-        "Contact-Info": "",
-        Address: "",
-        email: "",
-        postalCode: "",
-      });
+      setFormData({ POS_Name: "", Status: "Active" });
     }
   }, [editingItem, isModalOpen]);
 
   const showToast = (message: string, type: "success" | "error") =>
     setToast({ message, type });
 
-  const loadBranchItems = async () => {
+  const loadPosItems = async () => {
     try {
       setLoading(true);
-      const response = await BranchAPI.getBranchItems();
+      const response = await PosAPI.getPosItems();
       if (!response.success) throw new Error(response.message);
-      setBranchItems(response.data);
+      setMenuItems(response.data);
     } catch {
-      showToast("Failed to load Branch items", "error");
+      showToast("Failed to load POS items", "error");
     } finally {
       setLoading(false);
     }
@@ -274,49 +230,46 @@ const BranchListPage = () => {
   // Memoized filtering
   const filteredItems = useMemo(() => {
     const s = searchTerm.toLowerCase();
-    return branchItems.filter((item) => {
-      const matchesSearch = item.Branch_Name.toLowerCase().includes(s);
+    return menuItems.filter((item) => {
+      const matchesSearch = item.POS_Name.toLowerCase().includes(s);
       const matchesStatus = statusFilter ? item.Status === statusFilter : true;
       return matchesSearch && matchesStatus;
     });
-  }, [branchItems, searchTerm, statusFilter]);
+  }, [menuItems, searchTerm, statusFilter]);
 
-  const handleCreateItem = async (itemData: Omit<BranchItem, "Branch-ID">) => {
+  const handleCreateItem = async (itemData: Omit<MenuItem, "POS_ID">) => {
     try {
       setActionLoading(true);
-      const response = await BranchAPI.createBranchItem(itemData);
+      const response = await PosAPI.createPosItem(itemData);
       if (response.success) {
-        setBranchItems((prev) => [...prev, response.data]);
+        setMenuItems((prev) => [...prev, response.data]);
         setIsModalOpen(false);
-        showToast(response.message || "Branch created successfully", "success");
+        showToast(response.message || "POS created successfully", "success");
       }
     } catch {
-      showToast("Failed to create Branch", "error");
+      showToast("Failed to create POS", "error");
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleUpdateItem = async (itemData: Omit<BranchItem, "Branch-ID">) => {
+  const handleUpdateItem = async (itemData: Omit<MenuItem, "POS_ID">) => {
     if (!editingItem) return;
     try {
       setActionLoading(true);
-      const response = await BranchAPI.updateBranchItem(
-        editingItem["Branch-ID"],
-        itemData
-      );
+      const response = await PosAPI.updatePosItem(editingItem.POS_ID, itemData);
       if (response.success) {
-        setBranchItems((prev) =>
+        setMenuItems((prev) =>
           prev.map((it) =>
-            it["Branch-ID"] === editingItem["Branch-ID"] ? response.data : it
+            it.POS_ID === editingItem.POS_ID ? response.data : it
           )
         );
         setIsModalOpen(false);
         setEditingItem(null);
-        showToast(response.message || "Branch updated successfully", "success");
+        showToast(response.message || "POS updated successfully", "success");
       }
     } catch {
-      showToast("Failed to update Branch", "error");
+      showToast("Failed to update POS", "error");
     } finally {
       setActionLoading(false);
     }
@@ -326,16 +279,16 @@ const BranchListPage = () => {
     if (selectedItems.length === 0) return;
     try {
       setActionLoading(true);
-      const response = await BranchAPI.bulkDeleteBranchItems(selectedItems);
+      const response = await PosAPI.bulkDeletePosItems(selectedItems);
       if (response.success) {
         // Refresh from API (IDs already re-assigned there)
-        const updated = await BranchAPI.getBranchItems();
-        setBranchItems(updated.data);
+        const updated = await PosAPI.getPosItems();
+        setMenuItems(updated.data);
         setSelectedItems([]);
-        showToast(response.message || "Branch deleted successfully", "success");
+        showToast(response.message || "POS deleted successfully", "success");
       }
     } catch {
-      showToast("Failed to delete Branch", "error");
+      showToast("Failed to delete POS", "error");
     } finally {
       setActionLoading(false);
     }
@@ -343,24 +296,19 @@ const BranchListPage = () => {
 
   const handleSelectAll = useCallback(
     (checked: boolean) => {
-      setSelectedItems(checked ? filteredItems.map((i) => i["Branch-ID"]) : []);
+      setSelectedItems(checked ? filteredItems.map((i) => i.POS_ID) : []);
     },
     [filteredItems]
   );
 
-  const handleSelectItem = useCallback((branchId: number, checked: boolean) => {
+  const handleSelectItem = useCallback((posId: string, checked: boolean) => {
     setSelectedItems((prev) =>
-      checked ? [...prev, branchId] : prev.filter((id) => id !== branchId)
+      checked ? [...prev, posId] : prev.filter((id) => id !== posId)
     );
   }, []);
 
   const handleModalSubmit = () => {
-    if (
-      !formData.Branch_Name.trim() ||
-      !formData["Contact-Info"].trim() ||
-      !formData.Address.trim()
-    )
-      return;
+    if (!formData.POS_Name.trim()) return;
     if (editingItem) {
       handleUpdateItem(formData);
     } else {
@@ -375,18 +323,48 @@ const BranchListPage = () => {
     }));
   };
 
+  // Aggressive scrollbar protection
   useEffect(() => {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "unset";
+    let intervalId: NodeJS.Timeout;
+
+    const ensureScrollbar = () => {
+      if (!isModalOpen) {
+        // Force scrollbar to be visible when modal is not open
+        if (document.body.style.overflow === 'hidden') {
+          document.body.style.overflow = 'auto';
+          document.body.style.paddingRight = '0px';
+        }
       }
-  
-      // Cleanup function to restore scrolling when component unmounts
+    };
+
+    if (!isModalOpen) {
+      // Start monitoring when modal is not open
+      intervalId = setInterval(ensureScrollbar, 100);
+      ensureScrollbar(); // Run immediately
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isModalOpen]);
+
+  // Only hide scrollbar for modal using class-based approach
+  useEffect(() => {
+    if (isModalOpen) {
+      // Add class to body to hide scrollbar
+      document.body.classList.add('modal-open');
+      
       return () => {
-        document.body.style.overflow = "unset";
+        // Remove class when modal closes
+        document.body.classList.remove('modal-open');
+        // Ensure scrollbar is restored
+        document.body.style.overflow = 'auto';
+        document.body.style.paddingRight = '0px';
       };
-    }, [isModalOpen]);
+    }
+  }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -402,7 +380,7 @@ const BranchListPage = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Branch Management...</p>
+          <p className="mt-4 text-gray-600">Loading POS List...</p>
         </div>
       </div>
     );
@@ -410,6 +388,20 @@ const BranchListPage = () => {
 
   return (
     <div className=" p-6 bg-gray-50 min-h-screen">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          /* Force scrollbar to always be visible except when modal is open */
+          body:not(.modal-open) {
+            overflow: auto !important;
+            padding-right: 0 !important;
+          }
+          
+          /* Only hide scrollbar when modal is explicitly open */
+          body.modal-open {
+            overflow: hidden !important;
+          }
+        `
+      }} />
       {toast && (
         <Toast
           message={toast.message}
@@ -418,29 +410,29 @@ const BranchListPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mt-2 mb-8 ">Branch List</h1>
+      <h1 className="text-3xl font-semibold mt-20 mb-8 ">POS List</h1>
 
       {/* Summary Cards */}
-      <div className="flex gap-4 mb-8 ">
+      <div className="flex gap-4 mb-8">
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl ">{branchItems.length}</p>
-            <p className="text-1xl text-gray-500">Total Branches</p>
+            <p className="text-6xl mb-1">{menuItems.length}</p>
+            <p className="text-1xl text-gray-500">Total POS</p>
           </div>
         </div>
 
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] border border-gray-300 min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-6xl ">
-              {branchItems.filter((item) => item.Status === "Active").length}
+              {menuItems.filter((item) => item.Status === "Active").length}
             </p>
-            <p className="text-1xl text-gray-500">Active Branches</p>
+            <p className="text-1xl text-gray-500">Active POS</p>
           </div>
         </div>
       </div>
 
       {/* Action bar */}
-      <div className="mb-8 flex items-center justify-between gap-4  flex-wrap">
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex gap-3 h-[40px]">
           <button
             onClick={() => setIsModalOpen(true)}
@@ -476,7 +468,7 @@ const BranchListPage = () => {
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full  pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -486,7 +478,7 @@ const BranchListPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]   shadow-sm ">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
         <div className=" rounded-sm ">
           <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
@@ -543,16 +535,16 @@ const BranchListPage = () => {
                   />
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  Branch ID
+                  POS ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  Branch Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+                  POS Name
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
                         <ChevronDown
@@ -561,12 +553,13 @@ const BranchListPage = () => {
                         />
                       </DropdownMenu.Trigger>
 
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                          className="min-w-[160px] rounded-md bg-white shadow-md border border-gray-200 p-1 z-50"
-                          sideOffset={5}
-                          align="start"
-                        >
+                      <DropdownMenu.Content
+                        className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none ml-80"
+                        sideOffset={6}
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        onCloseAutoFocus={(e) => e.preventDefault()}
+                        style={{ zIndex: 1000 }}
+                      >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
                           <DropdownMenu.Item
                             className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
@@ -587,22 +580,9 @@ const BranchListPage = () => {
                             Inactive
                           </DropdownMenu.Item>
                         </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                     <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </div>
-                </th>
-                <th className="relative px-4 py-3 text-left">
-                  Contact Info
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
-                </th>
-                <th className="relative px-4 py-3 text-left">
-                  Address
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
-                </th>
-                <th className="relative px-4 py-3 text-left">
-                  Details
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   Actions
@@ -615,25 +595,22 @@ const BranchListPage = () => {
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={5}
                     className="px-4 py-8 text-center text-gray-500"
                   >
                     {searchTerm || statusFilter
-                      ? "No branches match your search criteria."
-                      : "No branches found."}
+                      ? "No POS match your search criteria."
+                      : "No POS found."}
                   </td>
                 </tr>
               ) : (
                 filteredItems.map((item) => (
-                  <tr
-                    key={item["Branch-ID"]}
-                    className="bg-white hover:bg-gray-50"
-                  >
+                  <tr key={item.POS_ID} className="bg-white hover:bg-gray-50">
                     <td className="px-6 py-8">
                       <Checkbox
-                        checked={selectedItems.includes(item["Branch-ID"])}
+                        checked={selectedItems.includes(item.POS_ID)}
                         onChange={(e) =>
-                          handleSelectItem(item["Branch-ID"], e.target.checked)
+                          handleSelectItem(item.POS_ID, e.target.checked)
                         }
                         disableRipple
                         sx={{
@@ -683,41 +660,19 @@ const BranchListPage = () => {
                       />
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      {`#${String(item["Branch-ID"]).padStart(3, "0")}`}
+                      {`#${String(item.POS_ID).padStart(3, "0")}`}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                      {item.Branch_Name}
+                      {item.POS_Name}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
                         className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium 
-                          ${
-                            item.Status === "Active"
-                              ? "text-green-400 border-green-600"
-                              : ""
-                          }
-                          ${
-                            item.Status === "Inactive"
-                              ? "text-red-400 border-red-600"
-                              : ""
-                          }`}
+                          ${item.Status === "Active" ? "text-green-400 " : ""}
+                          ${item.Status === "Inactive" ? "text-red-400 " : ""}`}
                       >
                         {item.Status}
                       </span>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      {item["Contact-Info"]}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      {item.Address}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <a
-                        href="/pos-list"
-                        className="text-black-600 hover:text-black-800 transition-colors"
-                      >
-                        <Info size={16} />
-                      </a>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -740,105 +695,39 @@ const BranchListPage = () => {
           </table>
         </div>
       </div>
+
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
+          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] overflow-y-auto shadow-lg relative flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                {editingItem ? "Edit Branch" : "Add New Branch"}
+              <h2 className="text-xl font-semibold">
+                {editingItem ? "Edit POS" : "Add New POS"}
               </h2>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 py-2">
-              {/* Branch Name */}
-              <div className="md:col-span-2 mt-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Branch Name <span className="text-red-500">*</span>
+            {/* Content */}
+            <div className="space-y-3 flex-1 overflow-y-auto">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  POS Name
                 </label>
                 <input
                   type="text"
-                  value={formData.Branch_Name}
+                  value={formData.POS_Name}
                   onChange={(e) =>
-                    setFormData({ ...formData, Branch_Name: e.target.value })
+                    setFormData({ ...formData, POS_Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="Enter branch name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   required
-                />
-              </div>
-
-              {/* Contact Info */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact Info <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData["Contact-Info"]}
-                  onChange={(e) =>
-                    setFormData({ ...formData, "Contact-Info": e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="Enter phone number"
-                  required
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
-                  <span className="text-xs text-gray-500 ml-1">(Optional)</span>
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="Enter email address"
-                />
-              </div>
-
-              {/* Address */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Address <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={formData.Address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, Address: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent h-32 resize-none"
-                  placeholder="Enter branch address"
-                  required
-                />
-              </div>
-
-              {/* Postal Code */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Postal Code
-                  <span className="text-xs text-gray-500 ml-1">(Optional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.postalCode}
-                  onChange={(e) =>
-                    setFormData({ ...formData, postalCode: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
-                  placeholder="Enter postal code"
                 />
               </div>
 
               {/* Status */}
-              <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-gray-700">
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
                 </label>
                 <ButtonPage
@@ -848,7 +737,7 @@ const BranchListPage = () => {
               </div>
             </div>
 
-            {/* Fixed Action Buttons */}
+            {/* Action Buttons pinned bottom-right */}
             <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
               <button
                 type="button"
@@ -862,17 +751,9 @@ const BranchListPage = () => {
               <button
                 type="button"
                 onClick={handleModalSubmit}
-                disabled={
-                  !formData.Branch_Name.trim() ||
-                  !formData["Contact-Info"].trim() ||
-                  !formData.Address.trim() ||
-                  actionLoading
-                }
+                disabled={!formData.POS_Name.trim() || actionLoading}
                 className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                  !formData.Branch_Name.trim() ||
-                  !formData["Contact-Info"].trim() ||
-                  !formData.Address.trim() ||
-                  actionLoading
+                  !formData.POS_Name.trim() || actionLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 }`}
@@ -885,7 +766,7 @@ const BranchListPage = () => {
                 ) : (
                   <>
                     <Save size={16} />
-                    {editingItem ? "Update Branch" : "Save & Close"}
+                    {editingItem ? "Update Staff" : "Add Staff"}
                   </>
                 )}
               </button>
@@ -897,4 +778,4 @@ const BranchListPage = () => {
   );
 };
 
-export default BranchListPage;
+export default PosListPage;
