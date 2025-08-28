@@ -16,6 +16,7 @@ import {
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ButtonPage from "@/components/layout/UI/button";
+import { useRouter } from "next/navigation";
 
 // Types
 interface BranchItem {
@@ -392,6 +393,12 @@ const BranchListPage = () => {
     setIsModalOpen(false);
     setEditingItem(null);
   };
+  const router = useRouter();
+const handleCustomerClick = (branchId: number) => {
+  console.log('Navigating to branch:', branchId); // Debug log
+  router.push(`/branch/${branchId}/pos`);
+};
+
 
   const isAllSelected =
     selectedItems.length === filteredItems.length && filteredItems.length > 0;
@@ -713,7 +720,7 @@ const BranchListPage = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <a
-                        href="/pos-list"
+                        onClick={() => handleCustomerClick(item["Branch-ID"])}
                         className="text-black-600 hover:text-black-800 transition-colors"
                       >
                         <Info size={16} />
