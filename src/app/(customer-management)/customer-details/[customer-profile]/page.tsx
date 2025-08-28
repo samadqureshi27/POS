@@ -1,14 +1,12 @@
+// app/customers-details/[customer-profile]/page.tsx
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Search, ArrowLeft, Star, ChevronDown } from "lucide-react";
+import { useParams, useRouter } from 'next/navigation';
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-// Import your router hook based on your setup:
-// import { useParams, useRouter } from 'next/navigation'; // Next.js 13+
-// import { useParams } from 'react-router-dom'; // React Router
-// import { useRouter } from 'next/router'; // Next.js 12 and below
 
-// Types
+// Types (same as before)
 interface CustomerItem {
   Customer_ID: number;
   Name: string;
@@ -23,6 +21,7 @@ interface CustomerItem {
 }
 
 interface OrderItem {
+  Customer_fk_ID: number;
   Order_ID: string;
   Order_Number: string;
   Type: "Dine in" | "Takeaway" | "Delivery";
@@ -37,12 +36,11 @@ interface ApiResponse<T> {
   success: boolean;
 }
 
-// Mock APIs - Updated to handle dynamic customer IDs
+// Mock API - same as before but with debugging
 class CustomerAPI {
   private static delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
-  // Mock data for multiple customers
   private static mockCustomers: CustomerItem[] = [
     {
       Customer_ID: 1,
@@ -69,76 +67,139 @@ class CustomerAPI {
       Profile_Creation_Date: "02/20/2024 14:45",
     },
     {
+      Customer_ID: 3,
+      Name: "Muhammad Hassan",
+      Contact: "03001111111",
+      Email: "hassan@gmail.com",
+      Address: "789 Garden Road, Islamabad",
+      Feedback_Rating: 3,
+      Total_Orders: 15,
+      Birthdate: "12/08/1992",
+      Registration_Date: "2023-12-10",
+      Profile_Creation_Date: "12/10/2023 11:20",
+    },
+    {
       Customer_ID: 12,
-      Name: "Sophia Bennett",
-      Contact: "03001234567",
-      Email: "sophia.bennett@email.com",
-      Address: "123 Business District, Lahore",
+      Name: "Mariam Qureshi",
+      Contact: "03001010101",
+      Email: "mariam.qureshi@yahoo.com",
+      Address: "112 F-6 Sector, Islamabad",
       Feedback_Rating: 5,
       Total_Orders: 25,
       Birthdate: "03/15/1990",
       Registration_Date: "2022-01-15",
       Profile_Creation_Date: "01/15/2022 10:30",
     }
-    // Add more mock customers as needed
   ];
 
-  private static mockOrders: OrderItem[] = [
-    {
-      Order_ID: "ORD001",
-      Order_Number: "12345",
-      Type: "Dine in",
-      Date: "2024-08-25",
-      Total: 850,
-      Status: "Completed",
-    },
-    {
-      Order_ID: "ORD002",
-      Order_Number: "12346",
-      Type: "Takeaway",
-      Date: "2024-08-20",
-      Total: 1200,
-      Status: "Completed",
-    },
-    {
-      Order_ID: "ORD003",
-      Order_Number: "12347",
-      Type: "Delivery",
-      Date: "2024-08-15",
-      Total: 750,
-      Status: "Completed",
-    },
-    {
-      Order_ID: "ORD004",
-      Order_Number: "12348",
-      Type: "Dine in",
-      Date: "2024-08-10",
-      Total: 950,
-      Status: "Completed",
-    },
-    {
-      Order_ID: "ORD005",
-      Order_Number: "12349",
-      Type: "Takeaway",
-      Date: "2024-08-05",
-      Total: 650,
-      Status: "Pending",
-    },
-    {
-      Order_ID: "ORD006",
-      Order_Number: "12350",
-      Type: "Delivery",
-      Date: "2024-08-01",
-      Total: 900,
-      Status: "Cancelled",
-    },
-  ];
+  private static mockOrders: { [customerId: number]: OrderItem[] } = {
+    1: [
+      {
+        Customer_fk_ID: 1,
+        Order_ID: "ORD001",
+        Order_Number: "12345",
+        Type: "Dine in",
+        Date: "2024-08-25",
+        Total: 850,
+        Status: "Completed",
+      },
+      {
+        Customer_fk_ID: 1,
+        Order_ID: "ORD002",
+        Order_Number: "12346",
+        Type: "Takeaway",
+        Date: "2024-08-20",
+        Total: 1200,
+        Status: "Completed",
+      },
+    ],
+    2: [
+      {
+        Customer_fk_ID: 2,
+        Order_ID: "ORD007",
+        Order_Number: "12351",
+        Type: "Delivery",
+        Date: "2024-08-22",
+        Total: 650,
+        Status: "Pending",
+      },
+    ],
+    3: [
+      {
+        Customer_fk_ID: 3,
+        Order_ID: "ORD008",
+        Order_Number: "12352",
+        Type: "Dine in",
+        Date: "2024-08-18",
+        Total: 1100,
+        Status: "Completed",
+      },
+    ],
+    12: [
+      {
+        Customer_fk_ID: 12,
+        Order_ID: "ORD001",
+        Order_Number: "12345",
+        Type: "Dine in",
+        Date: "2024-08-25",
+        Total: 850,
+        Status: "Completed",
+      },
+      {
+        Customer_fk_ID: 12,
+        Order_ID: "ORD002",
+        Order_Number: "12346",
+        Type: "Takeaway",
+        Date: "2024-08-20",
+        Total: 1200,
+        Status: "Completed",
+      },
+      {
+        Customer_fk_ID: 12,
+        Order_ID: "ORD003",
+        Order_Number: "12347",
+        Type: "Delivery",
+        Date: "2024-08-15",
+        Total: 750,
+        Status: "Completed",
+      },
+      {
+        Customer_fk_ID: 12,
+        Order_ID: "ORD004",
+        Order_Number: "12348",
+        Type: "Dine in",
+        Date: "2024-08-10",
+        Total: 950,
+        Status: "Completed",
+      },
+      {
+        Customer_fk_ID: 12,
+        Order_ID: "ORD005",
+        Order_Number: "12349",
+        Type: "Takeaway",
+        Date: "2024-08-05",
+        Total: 650,
+        Status: "Pending",
+      },
+      {
+        Customer_fk_ID: 12,
+        Order_ID: "ORD006",
+        Order_Number: "12350",
+        Type: "Delivery",
+        Date: "2024-08-01",
+        Total: 900,
+        Status: "Cancelled",
+      },
+    ]
+  };
 
   static async getCustomerById(id: number): Promise<ApiResponse<CustomerItem>> {
     await this.delay(500);
+    console.log(`Looking for customer with ID: ${id}`); // Debug log
     const customer = this.mockCustomers.find(c => c.Customer_ID === id);
     
     if (!customer) {
+      console.log(`Customer with ID ${id} not found`); // Debug log
       return {
         success: false,
         data: {} as CustomerItem,
@@ -146,6 +207,7 @@ class CustomerAPI {
       };
     }
 
+    console.log(`Found customer:`, customer); // Debug log
     return {
       success: true,
       data: customer,
@@ -155,10 +217,11 @@ class CustomerAPI {
 
   static async getCustomerOrders(customerId: number): Promise<ApiResponse<OrderItem[]>> {
     await this.delay(600);
-    // In a real app, you'd filter orders by customer ID
+    const orders = this.mockOrders[customerId] || [];
+    console.log(`Orders for customer ${customerId}:`, orders); // Debug log
     return {
       success: true,
-      data: [...this.mockOrders],
+      data: orders,
       message: "Customer orders fetched successfully",
     };
   }
@@ -202,7 +265,29 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
+// Large Star Rating Component
+const LargeStarRating = ({ rating }: { rating: number }) => {
+  return (
+    <div className="flex items-center justify-center">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          size={32}
+          className={
+            star <= rating
+              ? "text-yellow-400 fill-yellow-400"
+              : "text-gray-300"
+          }
+        />
+      ))}
+    </div>
+  );
+};
+
 const CustomerProfilePage = () => {
+  const params = useParams();
+  const router = useRouter();
+  
   const [customer, setCustomer] = useState<CustomerItem | null>(null);
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -211,26 +296,25 @@ const CustomerProfilePage = () => {
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  // Get customer ID from URL parameters
-  // Uncomment the appropriate line based on your routing setup:
-  
-  // For Next.js 13+ (App Router):
-  // const params = useParams();
-  // const customerId = parseInt(params.id as string);
-  
-  // For Next.js 12 and below (Pages Router):
-  // const router = useRouter();
-  // const customerId = parseInt(router.query.id as string);
-  
-  // For React Router:
-  // const { id } = useParams();
-  // const customerId = parseInt(id as string);
-  
-  // Demo: Using hardcoded ID for now - replace with above
-  const customerId = 12;
+  // FIXED: Access the parameter using the folder name 'customer-profile'
+  const customerId = React.useMemo(() => {
+    const param = params['customer-profile'];
+    console.log('Raw param:', param, 'Type:', typeof param); // Debug log
+    
+    if (!param) {
+      console.log('No customer-profile param found');
+      return null;
+    }
+    
+    const id = parseInt(param as string);
+    console.log('Parsed customer ID:', id); // Debug log
+    return isNaN(id) ? null : id;
+  }, [params]);
 
   useEffect(() => {
-    if (customerId && !isNaN(customerId)) {
+    console.log('Effect triggered, customerId:', customerId); // Debug log
+    
+    if (customerId !== null) {
       loadCustomerData(customerId);
     } else {
       setError("Invalid customer ID");
@@ -240,6 +324,7 @@ const CustomerProfilePage = () => {
 
   const loadCustomerData = async (id: number) => {
     try {
+      console.log(`Loading data for customer ID: ${id}`); // Debug log
       setLoading(true);
       setError(null);
       
@@ -247,6 +332,9 @@ const CustomerProfilePage = () => {
         CustomerAPI.getCustomerById(id),
         CustomerAPI.getCustomerOrders(id)
       ]);
+      
+      console.log('Customer response:', customerResponse); // Debug log
+      console.log('Orders response:', ordersResponse); // Debug log
       
       if (customerResponse.success) {
         setCustomer(customerResponse.data);
@@ -265,21 +353,8 @@ const CustomerProfilePage = () => {
     }
   };
 
-  // Navigation functions for different routing setups
   const handleBackClick = () => {
-    // Choose one based on your routing setup:
-    
-    // For Next.js:
-    // window.history.back(); // Simple back navigation
-    // router.push('/customers'); // Navigate to customers list
-    
-    // For React Router:
-    // navigate('/customers'); // Navigate to customers list
-    // navigate(-1); // Go back one page
-    
-    // For demo purposes:
-    console.log("Navigate back to customers list");
-    alert("This would navigate back to the customers list");
+    router.push('/customer-details');
   };
 
   // Calculate metrics
@@ -315,12 +390,16 @@ const CustomerProfilePage = () => {
     return filtered;
   }, [orders, searchTerm, typeFilter, statusFilter]);
 
+  // Debug render
+  console.log('Render state:', { customerId, loading, error, customer }); // Debug log
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading Customer Profile...</p>
+          <p className="text-sm text-gray-400 mt-2">Customer ID: {customerId}</p>
         </div>
       </div>
     );
@@ -331,6 +410,7 @@ const CustomerProfilePage = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
           <p className="text-gray-600 text-lg mb-4">{error || "Customer not found"}</p>
+          <p className="text-sm text-gray-400 mb-4">Customer ID: {customerId}</p>
           <button
             onClick={handleBackClick}
             className="px-4 py-2 bg-[#2C2C2C] text-white rounded-md hover:bg-gray-700 transition-colors"
@@ -343,24 +423,25 @@ const CustomerProfilePage = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className=" bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8 mt-2">
         <button onClick={handleBackClick} className="p-2 hover:bg-gray-100 rounded-sm">
           <ArrowLeft size={20} className="text-gray-600" />
         </button>
         <h1 className="text-3xl font-semibold">Customer Profile</h1>
+        <span className="text-sm text-gray-400">ID: {customerId}</span>
       </div>
 
       {/* Main Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-6 mb-6">
-        {/* Left Column - Customer Profile Card and Metrics */}
+        {/* Left Column - Customer Profile Card and Customer Feedback */}
         <div className="lg:col-span-4">
           <div className="grid grid-cols-2 gap-6 h-[450px]">
-            {/* Customer Profile Card with Average Order Value below */}
-            <div className="flex flex-col gap-6 h-full">
+            {/* Left side - Customer Profile Card and Customer Feedback */}
+            <div className="flex flex-col gap-4 h-full">
               {/* Customer Profile Card */}
-              <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm h-[282px]">
+              <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm h-[294px]">
                 <div className="flex items-center gap-4 mb-6">
                   <ProfilePicture name={customer.Name} size="large" />
                   <div>
@@ -392,30 +473,40 @@ const CustomerProfilePage = () => {
                 </div>
               </div>
 
-              {/* Average Order Value */}
-              <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-center h-[144px]">
-                <div className="text-center">
-                  <p className="text-5xl font-bold mb-2">{averageOrderValue}</p>
-                  <p className="text-base text-gray-500">Avg Order Value (PKR)</p>
+              {/* Customer Feedback Card */}
+              <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-start h-[140px]">
+                <div className="text-start">
+                  <div className="mb-3">
+                    <LargeStarRating rating={customer.Feedback_Rating} />
+                  </div>
+                  <p className="text-base text-gray-500">Customer Feedback</p>
                 </div>
               </div>
             </div>
 
-            {/* Right column with metrics */}
-            <div className="flex flex-col gap-6 h-full">
+            {/* Right side - Metrics */}
+            <div className="flex flex-col gap-4 h-full">
               {/* Total Orders */}
-              <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-center h-[282px]">
-                <div className="text-center">
-                  <p className="text-8xl font-bold mb-2">{customer.Total_Orders}</p>
+              <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-start h-[140px]">
+                <div className="text-start">
+                  <p className="text-5xl font-bold mb-2">{customer.Total_Orders}</p>
                   <p className="text-base text-gray-500">Total Orders</p>
                 </div>
               </div>
 
               {/* Total Spent */}
-              <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-center h-[144px]">
-                <div className="text-center">
+              <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-start h-[140px]">
+                <div className="text-start">
                   <p className="text-5xl font-bold mb-2">{totalSpent.toLocaleString()}</p>
                   <p className="text-base text-gray-500">Total Spent (PKR)</p>
+                </div>
+              </div>
+
+              {/* Average Order Value */}
+              <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm flex items-center justify-start h-[140px]">
+                <div className="text-start">
+                  <p className="text-5xl font-bold mb-2">{averageOrderValue}</p>
+                  <p className="text-base text-gray-500">Avg Order Value (PKR)</p>
                 </div>
               </div>
             </div>
@@ -424,9 +515,9 @@ const CustomerProfilePage = () => {
 
         {/* Right Column - Chart */}
         <div className="lg:col-span-3">
-          <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm h-[450px]">
+          <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm h-[448px]">
             <h3 className="text-xl font-semibold mb-6">Order Trends</h3>
-            <div className="h-[360px] bg-gray-100 rounded-sm flex items-center justify-center">
+            <div className="h-[378px] bg-gray-100 rounded-sm flex items-center justify-center">
               <div className="text-center">
                 <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
@@ -572,19 +663,6 @@ const CustomerProfilePage = () => {
                 )}
               </tbody>
             </table>
-          </div>
-        </div>
-      </div>
-
-      {/* Setup Instructions */}
-      <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-sm">
-        <h3 className="text-lg font-semibold mb-2">Dynamic Routing Setup:</h3>
-        <div className="space-y-2 text-sm">
-          <p><strong>Current:</strong> Using hardcoded customer ID (12). To make it dynamic:</p>
-          <div className="ml-4 space-y-1">
-            <p><strong>1. Next.js App Router:</strong> Uncomment useParams() and set up /customer/[id]/page.js</p>
-            <p><strong>2. Next.js Pages Router:</strong> Uncomment useRouter() and set up /pages/customer/[id].js</p>
-            <p><strong>3. React Router:</strong> Uncomment useParams() and set up route pattern /customer/:id</p>
           </div>
         </div>
       </div>
