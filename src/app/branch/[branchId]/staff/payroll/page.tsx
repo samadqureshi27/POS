@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { DateRange } from "react-date-range";
+import { format } from "date-fns";
+
+import "react-date-range/dist/styles.css"; // main css
+import "react-date-range/dist/theme/default.css"; // theme css
 import {
   ChevronDown,
   Search,
@@ -8,6 +13,7 @@ import {
   CheckCircle,
   X,
   Info,
+  Calendar,
 } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
@@ -41,7 +47,7 @@ class StaffAPI {
       Status: "Paid",
       Role: "Manager",
       Salary: 5000,
-      JoinDate: "2023-01-15",
+      JoinDate: "2025-08-28", // Today
     },
     {
       STAFF_ID: "2",
@@ -50,7 +56,7 @@ class StaffAPI {
       Status: "Unpaid",
       Role: "Waiter",
       Salary: 2500,
-      JoinDate: "2023-03-20",
+      JoinDate: "2025-08-26", // This week
     },
     {
       STAFF_ID: "3",
@@ -59,7 +65,7 @@ class StaffAPI {
       Status: "Paid",
       Role: "Cashier",
       Salary: 3000,
-      JoinDate: "2023-02-10",
+      JoinDate: "2025-08-15", // This month
     },
     {
       STAFF_ID: "4",
@@ -68,7 +74,7 @@ class StaffAPI {
       Status: "Unpaid",
       Role: "Chef",
       Salary: 4000,
-      JoinDate: "2023-04-05",
+      JoinDate: "2025-08-05", // This month
     },
     {
       STAFF_ID: "5",
@@ -77,7 +83,7 @@ class StaffAPI {
       Status: "Paid",
       Role: "Cleaner",
       Salary: 2000,
-      JoinDate: "2023-05-12",
+      JoinDate: "2025-07-12", // This quarter
     },
     {
       STAFF_ID: "6",
@@ -86,7 +92,7 @@ class StaffAPI {
       Status: "Unpaid",
       Role: "Waiter",
       Salary: 2500,
-      JoinDate: "2023-06-18",
+      JoinDate: "2025-06-18", // This quarter
     },
     {
       STAFF_ID: "7",
@@ -95,7 +101,7 @@ class StaffAPI {
       Status: "Paid",
       Role: "Security",
       Salary: 2800,
-      JoinDate: "2023-07-25",
+      JoinDate: "2025-01-25", // This year
     },
     {
       STAFF_ID: "8",
@@ -104,7 +110,7 @@ class StaffAPI {
       Status: "Unpaid",
       Role: "Hostess",
       Salary: 2200,
-      JoinDate: "2023-08-10",
+      JoinDate: "2024-08-10", // Last year
     },
   ];
 
@@ -117,53 +123,6 @@ class StaffAPI {
     };
   }
 }
-
-// Custom DatePicker Component
-const DatePicker = ({ selected, onChange, dateFormat, placeholderText, className }: {
-  selected: Date | null;
-  onChange: (date: Date | null) => void;
-  dateFormat: string;
-  placeholderText: string;
-  className: string;
-}) => {
-  const formatDate = (date: Date): string => {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  const parseDate = (dateString: string): Date | null => {
-    const parts = dateString.split('/');
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
-      if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-        return new Date(year, month, day);
-      }
-    }
-    return null;
-  };
-
-  return (
-    <input
-      type="date"
-      value={selected ? selected.toISOString().split('T')[0] : ''}
-      onChange={(e) => {
-        const value = e.target.value;
-        if (value) {
-          const date = new Date(value);
-          onChange(date);
-        } else {
-          onChange(null);
-        }
-      }}
-      className={className}
-      placeholder={placeholderText}
-    />
-  );
-};
 
 // Toast Component
 const Toast = ({
@@ -203,16 +162,50 @@ const StaffManagementPage = () => {
   const [statusFilter, setStatusFilter] = useState<"" | "Paid" | "Unpaid">("");
   const [roleFilter, setRoleFilter] = useState<string>("");
 
-  // Time period filter
-  const timePeriodOptions = ["Today", "Week", "Month", "Quarter", "Year", "Custom date"];
+  // Time period filter  
+  const periods = ["Today", "Week", "Month", "Quarter", "Year", "Custom"];
   const [activeTimePeriod, setActiveTimePeriod] = useState("Week");
-  const [customDate, setCustomDate] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const [customDateRange, setCustomDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
+
+  const calendarRef = useRef<HTMLDivElement>(null);
+
+  const formatDisplayDate = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
 
   // Debounce search input
   useEffect(() => {
     const handler = setTimeout(() => setSearchTerm(searchInput), 300);
     return () => clearTimeout(handler);
   }, [searchInput]);
+
+  // Handle click outside calendar
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target as Node)
+      ) {
+        setShowDatePicker(false); // close calendar
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Auto-close toast
   useEffect(() => {
@@ -242,6 +235,67 @@ const StaffManagementPage = () => {
     }
   };
 
+  // Helper function to get date ranges with proper boundary handling
+  const getDateRange = (period: string) => {
+    const today = new Date();
+    
+    // Set time to start and end of day for proper comparison
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+    const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+
+    switch (period) {
+      case "Today":
+        return { start: startOfToday, end: endOfToday };
+      
+      case "Week": {
+        // Get start of current week (Sunday)
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        
+        // Get end of current week (Saturday)
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+        
+        return { start: startOfWeek, end: endOfWeek };
+      }
+      
+      case "Month": {
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0, 0);
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+        return { start: startOfMonth, end: endOfMonth };
+      }
+      
+      case "Quarter": {
+        const currentMonth = today.getMonth();
+        const quarter = Math.floor(currentMonth / 3);
+        const startOfQuarter = new Date(today.getFullYear(), quarter * 3, 1, 0, 0, 0, 0);
+        const endOfQuarter = new Date(today.getFullYear(), quarter * 3 + 3, 0, 23, 59, 59, 999);
+        return { start: startOfQuarter, end: endOfQuarter };
+      }
+      
+      case "Year": {
+        const startOfYear = new Date(today.getFullYear(), 0, 1, 0, 0, 0, 0);
+        const endOfYear = new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999);
+        return { start: startOfYear, end: endOfYear };
+      }
+      
+      case "Custom":
+        if (customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) {
+          const rangeStart = new Date(customDateRange[0].startDate);
+          rangeStart.setHours(0, 0, 0, 0);
+          const rangeEnd = new Date(customDateRange[0].endDate);
+          rangeEnd.setHours(23, 59, 59, 999);
+          return { start: rangeStart, end: rangeEnd };
+        }
+        return null;
+      
+      default:
+        return null;
+    }
+  };
+
   // Memoized filtering
   const filteredItems = useMemo(() => {
     const s = searchTerm.toLowerCase();
@@ -254,17 +308,18 @@ const StaffManagementPage = () => {
       const matchesStatus = statusFilter ? item.Status === statusFilter : true;
       const matchesRole = roleFilter ? item.Role === roleFilter : true;
       
-      // Custom date filtering
+      // Date filtering based on time period
       let matchesDate = true;
-      if (activeTimePeriod === "Custom date" && customDate) {
+      const dateRange = getDateRange(activeTimePeriod);
+      
+      if (dateRange) {
         const itemDate = new Date(item.JoinDate);
-        const selectedDate = new Date(customDate);
-        matchesDate = itemDate.toDateString() === selectedDate.toDateString();
+        matchesDate = itemDate >= dateRange.start && itemDate <= dateRange.end;
       }
       
       return matchesSearch && matchesStatus && matchesRole && matchesDate;
     });
-  }, [staffItems, searchTerm, statusFilter, roleFilter, activeTimePeriod, customDate]);
+  }, [staffItems, searchTerm, statusFilter, roleFilter, activeTimePeriod, customDateRange]);
 
   // Calculate summary data
   const summaryData = useMemo(() => {
@@ -301,7 +356,7 @@ const StaffManagementPage = () => {
   }
 
   return (
-    <div className="  bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       {toast && (
         <Toast
           message={toast.message}
@@ -310,32 +365,66 @@ const StaffManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mt-20 mb-8 ">Staff Management</h1>
+      <h1 className="text-3xl font-semibold mt-20 mb-8">Staff Management</h1>
 
       {/* Time Period Filter */}
-      <div className="flex gap-2  mb-5">
-        {timePeriodOptions.map((option) => (
-          <button
-            key={option}
-            onClick={() => setActiveTimePeriod(option)}
-            className={`px-4 py-2 rounded-sm text-sm font-medium border transition-colors ${activeTimePeriod === option
-                ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
-                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
+      <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center relative">
+        {periods.map((period) => (
+          <div key={period} className="relative">
+            <button
+              onClick={() => {
+                if (period === "Custom") {
+                  setActiveTimePeriod("Custom");
+                  setShowDatePicker((prev) => !prev);
+                } else {
+                  setActiveTimePeriod(period);
+                  setShowDatePicker(false);
+                }
+              }}
+              className={`flex items-center gap-2 px-4 py-2 text-sm rounded-sm transition-colors border ${
+                activeTimePeriod === period
+                  ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
+                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
               }`}
-          >
-            {option}
-          </button>
-        ))}
-         {/* Show calendar if "Custom date" is active */}
-                {activeTimePeriod === "Custom date" && (
-                  <DatePicker
-                    selected={customDate}
-                    onChange={(date: Date | null) => setCustomDate(date)}
-                    dateFormat="dd/MM/yyyy"
-                    placeholderText="Select date"
-                    className="ml-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            >
+              {period === "Custom" && <Calendar size={16} />}
+              {period === "Custom" &&
+              customDateRange?.[0]?.startDate &&
+              customDateRange?.[0]?.endDate
+                ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
+                : period}
+            </button>
+
+            {/* Calendar dropdown attached to Custom button */}
+            {period === "Custom" &&
+              activeTimePeriod === "Custom" &&
+              showDatePicker && (
+                <div 
+                  ref={calendarRef}
+                  className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-md"
+                >
+                  <DateRange
+                    ranges={customDateRange?.length ? customDateRange : [{
+                      startDate: new Date(),
+                      endDate: new Date(),
+                      key: "selection",
+                    }]}
+                    onChange={(ranges) => {
+                      if (ranges.selection) {
+                        setCustomDateRange([ranges.selection]);
+
+                        if (ranges.selection.startDate && ranges.selection.endDate) {
+                          setShowDatePicker(false);
+                        }
+                      }
+                    }}
+                    moveRangeOnFirstSelection={false}
+                    className="rounded-lg"
                   />
-                )}
+                </div>
+              )}
+          </div>
+        ))}
       </div>
 
       {/* Summary Cards */}
@@ -361,7 +450,7 @@ const StaffManagementPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px]  border border-gray-300 rounded-sm ml-1 p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[300px] min-h-[100px] border border-gray-300 rounded-sm ml-1 p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">${summaryData.unpaidSalaries.toLocaleString()}</p>
             <p className="text-1xl text-gray-500">Pending Payments</p>
@@ -370,27 +459,27 @@ const StaffManagementPage = () => {
       </div>
 
       {/* Search Bar */}
-     <div className="mb-8 ">
+      <div className="mb-8">
         <div className="relative flex-1 min-w-[200px]">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  />
-                  <Search
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={16}
-                  />
-                </div>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
+          />
+        </div>
       </div>
 
       {/* Table */}
-     <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-              <div className=" rounded-sm ">
-                <table className="min-w-full max-w-[800px] divide-y divide-gray-200   table-fixed">
-                  <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm">
+        <div className="rounded-sm">
+          <table className="min-w-full max-w-[800px] divide-y divide-gray-200 table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
                 <th className="relative px-6 py-6 text-left">
                   Staff ID
@@ -493,14 +582,16 @@ const StaffManagementPage = () => {
               </tr>
             </thead>
 
-            <tbody className="divide-y text-gray-500  divide-gray-300">
+            <tbody className="divide-y text-gray-500 divide-gray-300">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
                     colSpan={8}
                     className="px-4 py-8 text-center text-gray-500"
                   >
-                    {searchTerm || statusFilter || roleFilter || (activeTimePeriod === "Custom date" && customDate)
+                    {searchTerm || statusFilter || roleFilter || 
+                     (activeTimePeriod === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) ||
+                     (activeTimePeriod !== "Week" && activeTimePeriod !== "Custom")
                       ? "No staff members match your search criteria."
                       : "No staff members found."}
                   </td>
@@ -556,7 +647,6 @@ const StaffManagementPage = () => {
           </table>
         </div>
       </div>
-
     </div>
   );
 };

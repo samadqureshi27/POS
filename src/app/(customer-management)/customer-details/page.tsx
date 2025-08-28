@@ -16,6 +16,7 @@ interface CustomerItem {
   Feedback_Rating: number;
   Total_Orders: number;
   Birthdate: string;
+  Device :"Google Pay" | "Apple Pay"
   Registration_Date: string;
   Profile_Creation_Date: string;
 }
@@ -42,6 +43,7 @@ class CustomerAPI {
       Birthdate: "09/13/1995",
       Registration_Date: "2024-01-15",
       Profile_Creation_Date: "01/15/2024 09:30",
+      Device:"Apple Pay"
     },
     {
       Customer_ID: 2,
@@ -54,6 +56,7 @@ class CustomerAPI {
       Birthdate: "05/22/1988",
       Registration_Date: "2024-02-20",
       Profile_Creation_Date: "02/20/2024 14:45",
+      Device:"Apple Pay"
     },
     {
       Customer_ID: 3,
@@ -66,6 +69,7 @@ class CustomerAPI {
       Birthdate: "12/08/1992",
       Registration_Date: "2023-12-10",
       Profile_Creation_Date: "12/10/2023 11:20",
+      Device:"Apple Pay"
     },
     {
       Customer_ID: 12,
@@ -78,6 +82,7 @@ class CustomerAPI {
       Birthdate: "04/07/1989",
       Registration_Date: "2023-10-30",
       Profile_Creation_Date: "10/30/2023 11:55",
+      Device: "Google Pay"
     },
   ];
 
@@ -228,6 +233,7 @@ const CustomerManagementPage = () => {
     const s = searchTerm.toLowerCase();
     return customerItems.filter((item) => {
       const matchesSearch =
+      item.Device.toLowerCase().includes(s) ||
         item.Name.toLowerCase().includes(s) ||
         item.Contact.toLowerCase().includes(s) ||
         item.Email.toLowerCase().includes(s) ||
@@ -265,7 +271,7 @@ const CustomerManagementPage = () => {
     const csvContent = "data:text/csv;charset=utf-8,"
       + "Customer ID,Name,Contact,Email,Address,Feedback Rating,Total Orders,Birthdate,Registration Date,Profile Creation Date\n"
       + customerItems.map(item =>
-        `${item.Customer_ID},"${item.Name}","${item.Contact}","${item.Email}","${item.Address}",${item.Feedback_Rating},${item.Total_Orders},"${item.Birthdate}","${item.Registration_Date}","${item.Profile_Creation_Date}"`
+        `${item.Customer_ID},"${item.Name}","${item.Contact}","${item.Email}","${item.Address}",${item.Feedback_Rating},${item.Total_Orders},${item.Device},"${item.Birthdate}","${item.Registration_Date}","${item.Profile_Creation_Date}"`
       ).join("\n");
 
     const encodedUri = encodeURI(csvContent);
@@ -396,6 +402,7 @@ const CustomerManagementPage = () => {
           <div>
             <div className="flex items-center justify-start mb-2">
               <LargeStarRating rating={Math.round(averageRating)} />
+              <span className="text-xl  text-gray-500">({averageRating} )</span>
             </div>
             <p className="text-1xl text-gray-500">Avg. Feedback Rating</p>
           </div>
@@ -420,12 +427,12 @@ const CustomerManagementPage = () => {
       </div>
 
       {/* Responsive Table with Global CSS Classes */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
+      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
         <div className="table-container">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
-                <th className="relative px-6 py-6 text-left w-24">Customer ID</th>
+                <th className="relative px-6 py-6 text-left w-24">ID</th>
                 <th className="relative px-4 py-3 text-left w-40">
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
@@ -452,6 +459,10 @@ const CustomerManagementPage = () => {
                 </th>
                 <th className="relative px-4 py-3 text-left w-44">
                   Profile Created
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+                </th>
+                <th className="relative px-4 py-3 text-left w-44">
+                  Device
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
@@ -506,6 +517,9 @@ const CustomerManagementPage = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Profile Created">
                       {item.Profile_Creation_Date}
+                    </td>
+                    <td className="px-4 text-black py-4 whitespace-nowrap text-sm" data-label="Device">
+                      {item.Device}
                     </td>
                   </tr>
                 ))
