@@ -82,7 +82,9 @@ class LicenseAPI {
 
     // Validate key format (simple mock validation)
     if (key.length < 10 || !key.includes("-")) {
-      throw new Error("Invalid license key format. Please check your key and try again.");
+      throw new Error(
+        "Invalid license key format. Please check your key and try again."
+      );
     }
 
     // Simulate different plans based on key
@@ -92,7 +94,9 @@ class LicenseAPI {
         plan: "Trial",
         status: "Active",
         licenseKey: key,
-        expiryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        expiryDate: new Date(
+          Date.now() + 14 * 24 * 60 * 60 * 1000
+        ).toISOString(),
         totalPOS: 1,
         totalKDS: 1,
         totalBranches: 1,
@@ -149,41 +153,49 @@ interface ToastProps {
 }
 
 // Enhanced Toast Component with animation (same as backup page)
-const Toast = React.memo<ToastProps>(({ message, type, onClose, isVisible }) => (
-  <div
-    className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${isVisible
-        ? 'translate-x-0 opacity-100 scale-100'
-        : 'translate-x-full opacity-0 scale-95'
-      } ${type === "success"
-        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200"
-        : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
+const Toast = React.memo<ToastProps>(
+  ({ message, type, onClose, isVisible }) => (
+    <div
+      className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${
+        isVisible
+          ? "translate-x-0 opacity-100 scale-100"
+          : "translate-x-full opacity-0 scale-95"
+      } ${
+        type === "success"
+          ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200"
+          : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
       }`}
-    style={{
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.2)'
-    }}
-  >
-    <div className={`flex-shrink-0 p-1 rounded-full ${type === "success" ? "bg-green-400/20" : "bg-red-400/20"}`}>
-      {type === "success" ? (
-        <CheckCircle size={20} className="text-white" />
-      ) : (
-        <AlertCircle size={20} className="text-white" />
-      )}
-    </div>
-
-    <div className="flex-1">
-      <p className="font-medium text-sm">{message}</p>
-    </div>
-
-    <button
-      onClick={onClose}
-      className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200"
-      aria-label="Close"
+      style={{
+        backdropFilter: "blur(10px)",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
+      }}
     >
-      <X size={16} className="text-white" />
-    </button>
-  </div>
-));
+      <div
+        className={`flex-shrink-0 p-1 rounded-full ${
+          type === "success" ? "bg-green-400/20" : "bg-red-400/20"
+        }`}
+      >
+        {type === "success" ? (
+          <CheckCircle size={20} className="text-white" />
+        ) : (
+          <AlertCircle size={20} className="text-white" />
+        )}
+      </div>
+
+      <div className="flex-1">
+        <p className="font-medium text-sm">{message}</p>
+      </div>
+
+      <button
+        onClick={onClose}
+        className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200"
+        aria-label="Close"
+      >
+        <X size={16} className="text-white" />
+      </button>
+    </div>
+  )
+);
 
 // Plan Icon Component
 const PlanIcon = ({ plan }: { plan: string }) => {
@@ -213,8 +225,10 @@ const StatusBadge = ({ status }: { status: string }) => {
 
   return (
     <span
-      className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status as keyof typeof statusColors] || statusColors.Inactive
-        }`}
+      className={`px-2 py-1 rounded-full text-xs font-medium ${
+        statusColors[status as keyof typeof statusColors] ||
+        statusColors.Inactive
+      }`}
     >
       {status}
     </span>
@@ -229,7 +243,11 @@ const BillingLicensePage = () => {
   const [licenseKeyInput, setLicenseKeyInput] = useState("");
 
   // Enhanced toast state management (same as backup page)
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error"; id: number } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+    id: number;
+  } | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
 
   useEffect(() => {
@@ -237,21 +255,24 @@ const BillingLicensePage = () => {
   }, []);
 
   // Enhanced toast management with animations (same as backup page)
-  const showToast = useCallback((message: string, type: "success" | "error") => {
-    const id = Date.now();
-    setToast({ message, type, id });
-    setToastVisible(true);
+  const showToast = useCallback(
+    (message: string, type: "success" | "error") => {
+      const id = Date.now();
+      setToast({ message, type, id });
+      setToastVisible(true);
 
-    // Auto hide after 4 seconds
-    setTimeout(() => {
-      setToastVisible(false);
-    }, 4000);
+      // Auto hide after 4 seconds
+      setTimeout(() => {
+        setToastVisible(false);
+      }, 4000);
 
-    // Remove from DOM after animation completes
-    setTimeout(() => {
-      setToast(null);
-    }, 4500);
-  }, []);
+      // Remove from DOM after animation completes
+      setTimeout(() => {
+        setToast(null);
+      }, 4500);
+    },
+    []
+  );
 
   const hideToast = useCallback(() => {
     setToastVisible(false);
@@ -279,7 +300,10 @@ const BillingLicensePage = () => {
       const response = await LicenseAPI.recheckLicense();
       if (response.success) {
         setLicenseInfo(response.data);
-        showToast(response.message || "License rechecked successfully! ✨", "success");
+        showToast(
+          response.message || "License rechecked successfully! ✨",
+          "success"
+        );
       }
     } catch {
       showToast("Failed to recheck license. Please try again.", "error");
@@ -301,10 +325,17 @@ const BillingLicensePage = () => {
       if (response.success) {
         setLicenseInfo(response.data);
         setLicenseKeyInput("");
-        showToast(response.message || "License updated successfully! 🎉", "success");
+        showToast(
+          response.message || "License updated successfully! 🎉",
+          "success"
+        );
       }
     } catch (error: any) {
-      showToast(error.message || "Failed to update license. Please check your key and try again.", "error");
+      showToast(
+        error.message ||
+          "Failed to update license. Please check your key and try again.",
+        "error"
+      );
     } finally {
       setUpdating(false);
     }
@@ -338,26 +369,30 @@ const BillingLicensePage = () => {
         {/* Container with proper centering and full width utilization */}
         <div className=" mt-20">
           {/* Header - Better spacing and centering */}
-          <div className="flex items-center justify-between mb-12">
-            <h1 className="text-3xl font-semibold text-gray-900">Billing & License</h1>
-            <div className="flex gap-3">
-              <button
-                onClick={handleRecheck}
-                disabled={rechecking}
-                className="flex items-center gap-2 px-6 py-2 bg-[#2C2C2C] text-white rounded-sm hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {rechecking ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
-                    Rechecking...
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw size={16} />
-                    Recheck License
-                  </>
-                )}
-              </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
+            <h1 className="text-3xl font-semibold text-gray-900 mb-5">
+              Billing & License
+            </h1>
+            <div className="flex justify-center items-center w-full  md:justify-end">
+              <div className="flex gap-3 w-full md:w-[40%] lg:w-[30%]">
+                <button
+                  onClick={handleRecheck}
+                  disabled={rechecking}
+                  className="flex w-[100%] items-center justify-center gap-2 px-6 py-2 bg-[#2C2C2C] text-white rounded-sm hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {rechecking ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                      Rechecking...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw size={16} />
+                      Recheck License
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -375,7 +410,9 @@ const BillingLicensePage = () => {
                   <label className="block text-sm font-medium text-gray-500 mb-2">
                     Licensed To
                   </label>
-                  <p className="text-base font-medium text-gray-900">{licenseInfo.licensedTo}</p>
+                  <p className="text-base font-medium text-gray-900">
+                    {licenseInfo.licensedTo}
+                  </p>
                 </div>
 
                 <div>
@@ -384,10 +421,17 @@ const BillingLicensePage = () => {
                   </label>
                   <div className="flex items-center gap-3">
                     <PlanIcon plan={licenseInfo.plan} />
-                    <span className="text-base font-medium text-gray-900">{licenseInfo.plan}</span>
+                    <span className="text-base font-medium text-gray-900">
+                      {licenseInfo.plan}
+                    </span>
                     {licenseInfo.plan === "Trial" && (
                       <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                        {Math.ceil((new Date(licenseInfo.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days left
+                        {Math.ceil(
+                          (new Date(licenseInfo.expiryDate).getTime() -
+                            Date.now()) /
+                            (1000 * 60 * 60 * 24)
+                        )}{" "}
+                        days left
                       </span>
                     )}
                   </div>
@@ -440,7 +484,9 @@ const BillingLicensePage = () => {
                   </label>
                   <div className="flex items-center gap-3">
                     <Monitor size={20} className="text-gray-400" />
-                    <span className="text-base font-medium text-gray-900">{licenseInfo.totalPOS}</span>
+                    <span className="text-base font-medium text-gray-900">
+                      {licenseInfo.totalPOS}
+                    </span>
                   </div>
                 </div>
 
@@ -450,7 +496,9 @@ const BillingLicensePage = () => {
                   </label>
                   <div className="flex items-center gap-3">
                     <Smartphone size={20} className="text-gray-400" />
-                    <span className="text-base font-medium text-gray-900">{licenseInfo.totalKDS}</span>
+                    <span className="text-base font-medium text-gray-900">
+                      {licenseInfo.totalKDS}
+                    </span>
                   </div>
                 </div>
 
@@ -460,17 +508,21 @@ const BillingLicensePage = () => {
                   </label>
                   <div className="flex items-center gap-3">
                     <Building size={20} className="text-gray-400" />
-                    <span className="text-base font-medium text-gray-900">{licenseInfo.totalBranches}</span>
+                    <span className="text-base font-medium text-gray-900">
+                      {licenseInfo.totalBranches}
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className="mt-12 pt-6 border-t border-gray-200">
-                <h3 className="text-sm font-medium text-gray-500 mb-3">About Recheck</h3>
+                <h3 className="text-sm font-medium text-gray-500 mb-3">
+                  About Recheck
+                </h3>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  You can refresh the License Details by clicking on the "Recheck" button.
-                  License is usually checked timely, but if you want to fetch the latest information,
-                  click on "Recheck".
+                  You can refresh the License Details by clicking on the
+                  "Recheck" button. License is usually checked timely, but if
+                  you want to fetch the latest information, click on "Recheck".
                 </p>
               </div>
             </div>
