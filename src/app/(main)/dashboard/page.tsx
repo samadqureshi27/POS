@@ -795,7 +795,7 @@ class DashboardAPI {
     period: string
   ): Promise<ApiResponse<DashboardData>> {
     await this.delay(600);
-
+    
     const metrics = this.mockMetrics[period] || this.mockMetrics.Week;
     const revenueData =
       this.mockRevenueData[period] || this.mockRevenueData.Week;
@@ -863,7 +863,8 @@ class DashboardAPI {
     period: string
   ): Promise<ApiResponse<DashboardData>> {
     await this.delay(800);
-
+    
+    // Simulate data refresh with slight variations
     const baseMetrics = this.mockMetrics[period] || this.mockMetrics.Week;
     const variation = (Math.random() - 0.5) * 0.1;
 
@@ -979,6 +980,7 @@ const Dashboard = () => {
     return `${day}.${month}.${year}`;
   };
 
+  
   // Date Range state
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     null,
@@ -1159,7 +1161,7 @@ const Dashboard = () => {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-blue-500 rounded-full mx-auto"></div>
+          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading Dashboard...</p>
         </div>
       </div>
@@ -1365,122 +1367,125 @@ const Dashboard = () => {
                   <h3 className="text-3xl font-bold text-gray-900">133</h3>
                 </div>
               </div>
-
+              
               {/* Chart */}
-              <div className="w-[100%] min-w-0">
-                <ResponsiveContainer width="100%" height={320}>
-                  <BarChart
-                    data={dashboardData.visitData}
-                    margin={{ top: 20, right: 0, left: 0, bottom: 20 }}
-                    barCategoryGap="2%"
-                  >
-                    <defs>
-                      {/* Green gradient for referrals */}
-                      <linearGradient
-                        id="referralsGradient"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#22c55e"
-                          stopOpacity={0.9}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#92fc7e"
-                          stopOpacity={1}
-                        />
-                      </linearGradient>
+<div className="w-[100%] min-w-0">
+  <ResponsiveContainer width="100%" height={320}>
+    <AreaChart
+      data={dashboardData.visitData}
+      margin={{ top: 20, right: 0, left: 0, bottom: 20 }}
+    >
+      <defs>
+        {/* Green gradient for referrals */}
+        <linearGradient
+          id="referralsGradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop
+            offset="0%"
+            stopColor="#22c55e"
+            stopOpacity={0.8}
+          />
+          <stop
+            offset="100%"
+            stopColor="#22c55e"
+            stopOpacity={0.1}
+          />
+        </linearGradient>
 
-                      {/* Blue gradient for repeat customers */}
-                      <linearGradient
-                        id="repeatGradient"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#93C5FD"
-                          stopOpacity={0.9}
-                        />
-                        <stop
-                          offset="50%"
-                          stopColor="#60A5FA"
-                          stopOpacity={0.8}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#1D4ED8"
-                          stopOpacity={1}
-                        />
-                      </linearGradient>
+        {/* Blue gradient for repeat customers */}
+        <linearGradient
+          id="repeatGradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop
+            offset="0%"
+            stopColor="#1D4ED8"
+            stopOpacity={0.8}
+          />
+          <stop
+            offset="100%"
+            stopColor="#1D4ED8"
+            stopOpacity={0.1}
+          />
+        </linearGradient>
 
-                      {/* Purple gradient for new members */}
-                      <linearGradient
-                        id="newMembersGradient"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#aab5df"
-                          stopOpacity={0.9}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#e4e8f5"
-                          stopOpacity={1}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                    <XAxis
-                      dataKey="date"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 10, fill: "#9CA3AF" }}
-                      height={30}
-                    />
-
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "6px",
-                        padding: "8px",
-                        fontSize: "12px",
-                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                      }}
-                    />
-                    <Bar
-                      dataKey="repeat"
-                      stackId="a"
-                      fill="#1d50cd"
-                      name="Repeat Customers"
-                    />
-                    <Bar
-                      dataKey="visits"
-                      stackId="a"
-                      fill="url(#newMembersGradient)"
-                      name="New Members"
-                    />
-                    <Bar
-                      dataKey="referrals"
-                      stackId="a"
-                      fill="url(#referralsGradient)"
-                      name="Referrals"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+        {/* Gray gradient for new members */}
+        <linearGradient
+          id="newMembersGradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop
+            offset="0%"
+            stopColor="#6B7280"
+            stopOpacity={0.8}
+          />
+          <stop
+            offset="100%"
+            stopColor="#6B7280"
+            stopOpacity={0.1}
+          />
+        </linearGradient>
+      </defs>
+      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+      <XAxis
+        dataKey="date"
+        axisLine={false}
+        tickLine={false}
+        tick={{ fontSize: 10, fill: "#9CA3AF" }}
+        height={30}
+      />
+      <Tooltip
+        contentStyle={{
+          backgroundColor: "#fff",
+          border: "1px solid #e5e7eb",
+          borderRadius: "6px",
+          padding: "8px",
+          fontSize: "12px",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        }}
+      />
+      <Area
+        type="monotone"
+        dataKey="repeat"
+        stackId="a"
+        fill="url(#repeatGradient)"
+        stroke="#1D4ED8"
+        strokeWidth={1}
+        name="Repeat Customers"
+      />
+      <Area
+        type="monotone"
+        dataKey="visits"
+        stackId="a"
+        fill="url(#newMembersGradient)"
+        stroke="#6B7280"
+        strokeWidth={1}
+        name="New Members"
+      />
+      <Area
+        type="monotone"
+        dataKey="referrals"
+        stackId="a"
+        fill="url(#referralsGradient)"
+        stroke="#22c55e"
+        strokeWidth={1}
+        name="Referrals"
+      />
+      <Legend />
+    </AreaChart>
+  </ResponsiveContainer>
+</div>
+</div>
 
             {/* Right side - Stats cards */}
             <div className="lg:w-80 flex-shrink-0 border-l border-gray-300 space-y-6">

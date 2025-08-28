@@ -322,18 +322,49 @@ const PosListPage = () => {
       Status: isActive ? "Active" : "Inactive",
     }));
   };
+
+  // Aggressive scrollbar protection
   useEffect(() => {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "unset";
+    let intervalId: NodeJS.Timeout;
+
+    const ensureScrollbar = () => {
+      if (!isModalOpen) {
+        // Force scrollbar to be visible when modal is not open
+        if (document.body.style.overflow === 'hidden') {
+          document.body.style.overflow = 'auto';
+          document.body.style.paddingRight = '0px';
+        }
       }
-  
-      // Cleanup function to restore scrolling when component unmounts
+    };
+
+    if (!isModalOpen) {
+      // Start monitoring when modal is not open
+      intervalId = setInterval(ensureScrollbar, 100);
+      ensureScrollbar(); // Run immediately
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isModalOpen]);
+
+  // Only hide scrollbar for modal using class-based approach
+  useEffect(() => {
+    if (isModalOpen) {
+      // Add class to body to hide scrollbar
+      document.body.classList.add('modal-open');
+      
       return () => {
-        document.body.style.overflow = "unset";
+        // Remove class when modal closes
+        document.body.classList.remove('modal-open');
+        // Ensure scrollbar is restored
+        document.body.style.overflow = 'auto';
+        document.body.style.paddingRight = '0px';
       };
-    }, [isModalOpen]);
+    }
+  }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -357,6 +388,20 @@ const PosListPage = () => {
 
   return (
     <div className=" p-6 bg-gray-50 min-h-screen">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          /* Force scrollbar to always be visible except when modal is open */
+          body:not(.modal-open) {
+            overflow: auto !important;
+            padding-right: 0 !important;
+          }
+          
+          /* Only hide scrollbar when modal is explicitly open */
+          body.modal-open {
+            overflow: hidden !important;
+          }
+        `
+      }} />
       {toast && (
         <Toast
           message={toast.message}
@@ -499,7 +544,7 @@ const PosListPage = () => {
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
                         <ChevronDown
@@ -508,11 +553,13 @@ const PosListPage = () => {
                         />
                       </DropdownMenu.Trigger>
 
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                          className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none ml-80"
-                          sideOffset={6}
-                        >
+                      <DropdownMenu.Content
+                        className="min-w=[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none ml-80"
+                        sideOffset={6}
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        onCloseAutoFocus={(e) => e.preventDefault()}
+                        style={{ zIndex: 1000 }}
+                      >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
                           <DropdownMenu.Item
                             className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
@@ -533,7 +580,6 @@ const PosListPage = () => {
                             Inactive
                           </DropdownMenu.Item>
                         </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                     <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </div>
@@ -652,7 +698,7 @@ const PosListPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
           <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] overflow-y-auto shadow-lg relative flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
