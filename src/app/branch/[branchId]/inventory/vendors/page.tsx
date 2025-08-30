@@ -493,43 +493,36 @@ const VendorsPage = () => {
 
       <div className="mb-8 mt-2">
         <h1 className="text-3xl font-semibold">
-           Vendors & Suppliers - Branch #{branchId} 
+          Vendors & Suppliers - Branch #{branchId}
         </h1>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+      <div className="grid grid-cols-1 max-w-[100vw]  lg:grid-cols-2   gap-4 mb-8 lg:max-w-[50vw]">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">{vendorItems.length}</p>
+            <p className="text-5xl mb-1">{vendorItems.length}</p>
             <p className="text-1xl text-gray-500">Total Vendors</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">
+            <p className="text-5xl mb-1">
               {itemsWithUsage.reduce((total, item) => total + item.usageCount, 0)}
             </p>
             <p className="text-1xl text-gray-500">Total Orders</p>
           </div>
         </div>
-
-
-
-
-
       </div>
 
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-
-
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 h-[40px]">
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 px-4 py-2 rounded-sm transition-colors ${selectedItems.length === 0
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -541,7 +534,7 @@ const VendorsPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -550,30 +543,30 @@ const VendorsPage = () => {
             {actionLoading ? "Deleting..." : "Delete Selected"}
           </button>
         </div>
+
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search Payment Methods..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             size={16}
           />
         </div>
-
       </div>
 
       {/* Responsive Table with Global CSS Classes */}
-      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
-        <div className="table-container">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm responsive-customer-table">
+        <div className="rounded-sm table-container">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-6 text-left w-24">
+                <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
@@ -622,31 +615,31 @@ const VendorsPage = () => {
                     }
                   />
                 </th>
-                <th className="relative px-4 py-3 text-left w-24">
+                <th className="relative px-4 py-3 text-left">
                   ID
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-40">
+                <th className="relative px-4 py-3 text-left">
                   Company Name
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-36">
+                <th className="relative px-4 py-3 text-left">
                   Contact Person
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-36">
+                <th className="relative px-4 py-3 text-left">
                   Contact
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-52">
+                <th className="relative px-4 py-3 text-left">
                   Email
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-44">
+                <th className="relative px-4 py-3 text-left">
                   Address
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-28">
+                <th className="relative px-4 py-3 text-left">
                   Actions
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
@@ -669,9 +662,9 @@ const VendorsPage = () => {
                 filteredItems.map((item) => (
                   <tr
                     key={item.ID}
-                    className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="bg-white hover:bg-gray-50"
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm card-customer-id" data-label="Select">
+                    <td className="px-6 py-8" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -722,35 +715,36 @@ const VendorsPage = () => {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Vendor ID">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Vendor ID">
                       {item.ID}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="Company Name">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Company Name">
                       <div className="name-content">
                         <span className="font-medium">{item.Company_Name}</span>
                       </div>
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact Person">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Contact Person">
                       {item.Name}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Contact">
                       {item.Contact}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Email">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Email">
                       {item.Email}
                     </td>
                     <td
-                      className="px-4 py-4 whitespace-nowrap text-sm "
+                      className="px-4 py-4 whitespace-nowrap"
                       data-label="Address"
                     >
                       {item.Address}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setEditingItem(item);
                             setIsModalOpen(true);
                           }}
@@ -781,7 +775,7 @@ const VendorsPage = () => {
             </div>
 
             {/* Scrollable Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 pl-1">
               {/* Company Name */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -800,7 +794,7 @@ const VendorsPage = () => {
               </div>
 
               {/* Contact Person Name */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Contact Person Name <span className="text-red-500">*</span>
                 </label>
@@ -817,7 +811,7 @@ const VendorsPage = () => {
               </div>
 
               {/* Contact Number */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Contact Number
                   <span className="text-xs text-gray-500 ml-1">
@@ -836,7 +830,7 @@ const VendorsPage = () => {
               </div>
 
               {/* Email */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
                   <span className="text-xs text-gray-500 ml-1">
@@ -875,12 +869,12 @@ const VendorsPage = () => {
             </div>
 
             {/* Fixed Action Buttons */}
-            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
               <button
                 type="button"
                 onClick={handleCloseModal}
                 disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X size={16} />
                 Cancel
@@ -893,7 +887,7 @@ const VendorsPage = () => {
                   !formData.Company_Name.trim() ||
                   actionLoading
                 }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
+                className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2  ${!formData.Name.trim() ||
                   !formData.Company_Name.trim() ||
                   actionLoading
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
