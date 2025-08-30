@@ -251,13 +251,14 @@ const NotificationSettingsPage = () => {
       <div className="flex-1 justify-center  items-center w-full px-6">
         <div className="mt-20">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-semibold text-gray-900">Notification Settings</h1>
-            <div className="flex gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
+            <h1 className="text-3xl font-semibold mb-5 text-gray-900">Notification Settings</h1>
+            <div className="flex justify-center items-center w-full  md:justify-end">
+            <div className="flex gap-3 w-full md:w-[40%] lg:w-[30%]">
               <button
                 onClick={handleSave}
                 disabled={!hasChanges || saving}
-                className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${hasChanges && !saving
+                className={`flex w-[100%] items-center gap-2 px-6 py-2 rounded-sm transition-colors ${hasChanges && !saving
                     ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
@@ -274,6 +275,7 @@ const NotificationSettingsPage = () => {
                   </>
                 )}
               </button>
+            </div>
             </div>
           </div>
 
