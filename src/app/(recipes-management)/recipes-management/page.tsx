@@ -572,51 +572,7 @@ const RecipesManagementPage = () => {
 
   return (
     <div className="bg-gray-50 min-w-full h-full overflow-y-auto thin-scroll">
-      <style jsx global>{`
-        .thin-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: #d1d5db #f9fafb;
-        }
-        .thin-scroll::-webkit-scrollbar {
-          width: 6px !important;
-        }
-        .thin-scroll::-webkit-scrollbar-track {
-          background: #f9fafb !important;
-          border-radius: 3px !important;
-        }
-        .thin-scroll::-webkit-scrollbar-thumb {
-          background: #d1d5db !important;
-          border-radius: 3px !important;
-        }
-        .thin-scroll::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af !important;
-        }
-        .modal-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: #d1d5db #f9fafb;
-        }
-        .modal-scroll::-webkit-scrollbar {
-          width: 4px !important;
-        }
-        .modal-scroll::-webkit-scrollbar-track {
-          background: #f9fafb !important;
-          border-radius: 2px !important;
-        }
-        .modal-scroll::-webkit-scrollbar-thumb {
-          background: #d1d5db !important;
-          border-radius: 2px !important;
-        }
-        .modal-scroll::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af !important;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none !important;
-          scrollbar-width: none !important;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-          display: none !important;
-        }
-      `}</style>
+      
 
       {toast && (
         <Toast
@@ -631,11 +587,11 @@ const RecipesManagementPage = () => {
       {/* Action bar: add, delete, search */}
       <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 h-[40px]">
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${
               selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -648,7 +604,7 @@ const RecipesManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${
               isSomeSelected && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -666,7 +622,7 @@ const RecipesManagementPage = () => {
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -676,8 +632,8 @@ const RecipesManagementPage = () => {
       </div>
 
       {/* Table + filters */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm">
-        <div className="rounded-sm">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm responsive-customer-table">
+        <div className="rounded-sm table-container">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
@@ -742,7 +698,7 @@ const RecipesManagementPage = () => {
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
                         <ChevronDown
@@ -850,11 +806,18 @@ const RecipesManagementPage = () => {
                       }
                     />
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="ID">
+                    {item.ID}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Name">
+                    {item.Name}
+                  </td>
+                  <td
+                    className="px-4 py-4 whitespace-nowrap"
+                    data-label="Status"
+                  >
                     <span
-                      className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium  ${
+                      className={`inline-block w-24 text-right  py-[2px] rounded-md text-xs font-medium  ${
                         item.Status === "Inactive"
                           ? "text-red-400 "
                           : "text-green-400 "
@@ -863,13 +826,22 @@ const RecipesManagementPage = () => {
                       {item.Status}
                     </span>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td
+                    className="px-4 py-4 whitespace-nowrap"
+                    data-label="Description"
+                  >
                     {item.Description}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td
+                    className="px-4 py-4 whitespace-nowrap text-sm text-gray-600"
+                    data-label="Priority"
+                  >
                     {item.Priority}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td
+                    className="px-4 py-4 whitespace-nowrap"
+                    data-label="Action"
+                  >
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => {
@@ -893,12 +865,12 @@ const RecipesManagementPage = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg w-[37vw] max-w-2xl min-h-[70vh] max-h-[70vh] overflow-hidden shadow-lg relative">
+          <div className="bg-white rounded-sm min-w-[35vw] max-w-2xl md:min-h-[70vh] max-h-[70vh] overflow-hidden shadow-lg relative flex flex-col">
             {/* Navbar inside modal */}
             <h1 className="text-2xl pl-5 pt-2 font-medium">
               {editingItem ? "Edit Recipe" : "Add Recipe"}
             </h1>
-            <div className="flex w-[350px] items-center justify-center border-b border-gray-200 mx-auto">
+            <div className="flex md:w-[350px] items-center justify-center border-b border-gray-200 mx-auto">
               {["Recipe Info", "Ingredients", "Recipe Option"].map((tab) => (
                 <button
                   key={tab}
@@ -915,9 +887,9 @@ const RecipesManagementPage = () => {
             </div>
 
             {/* Modal Content */}
-            <div className="p-6">
+            <div className="p-3 sm:p-6 flex-1 overflow-hidden">
               {activeTab === "Recipe Info" && (
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                   {/* Name - Fixed to use proper input */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -932,7 +904,7 @@ const RecipesManagementPage = () => {
                           Name: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                       placeholder="Enter recipe name"
                       required
                     />
@@ -952,7 +924,7 @@ const RecipesManagementPage = () => {
                           Priority: Number(e.target.value) || 1,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                       min={1}
                       required
                     />
@@ -972,13 +944,14 @@ const RecipesManagementPage = () => {
                           Description: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                       placeholder="Enter description"
                     />
                   </div>
+
                   {/* Status */}
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                    <label className="block text-sm font-medium text-gray-700">
                       Status
                     </label>
                     <ButtonPage
@@ -990,18 +963,21 @@ const RecipesManagementPage = () => {
               )}
 
               {activeTab === "Recipe Option" && (
-                <div className="">
+                <div className="space-y-4 h-full flex flex-col">
                   {/* Add Ingredient Button */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <DropdownMenu.Root>
-                      <DropdownMenu.Trigger className="min-w-[510px] flex items-center justify-between px-4 py-2 mb-2 text-black rounded-lg hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
+                      <DropdownMenu.Trigger className="w-full flex items-center justify-between px-4 py-2 mb-2 text-black rounded-sm hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
                         <span className="text-sm">Add New Recipe Options</span>
-                        <ChevronDown size={16} className="text-gray-500" />
+                        <ChevronDown
+                          size={16}
+                          className="text-gray-500 flex-shrink-0"
+                        />
                       </DropdownMenu.Trigger>
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[510px] rounded-md bg-white shadow-lg border border-gray-200 p-1 outline-none overflow-visible z-[99999]"
+                          className="w-full min-w-[280px] max-w-[90vw] sm:min-w-[510px] rounded-sm bg-white shadow-sm border border-gray-200 p-1 outline-none overflow-visible z-[99999]"
                           sideOffset={6}
                           avoidCollisions={true}
                           collisionPadding={20}
@@ -1037,177 +1013,286 @@ const RecipesManagementPage = () => {
                       </DropdownMenu.Portal>
                     </DropdownMenu.Root>
                   </div>
-                  {/* Fixed Header */}
-                  <div className="border border-gray-200 rounded-t-lg bg-gray-50">
-                    <table className="w-full">
-                      <thead>
-                        <tr>
-                          <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                          <th className="w-80 p-3 text-left text-sm font-medium text-gray-700">
-                            Name
-                          </th>
-                          <th className="p-3 text-center text-sm font-medium text-gray-700">
-                            Price
-                          </th>
-                          <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                        </tr>
-                      </thead>
-                    </table>
+
+                  {/* Mobile Card Layout */}
+                  <div className="block sm:hidden overflow-y-auto max-h-[300px]">
+                    <div className="space-y-3 pb-4">
+                      {formData.OptionValue.map((opt, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-white border border-gray-200 rounded-sm p-4 shadow-sm"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <Grip size={16} className="text-gray-400" />
+                              <span className="font-medium text-gray-700">
+                                Option {idx + 1}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updatedValues =
+                                  formData.OptionValue.filter(
+                                    (_, i) => i !== idx
+                                  );
+                                const updatedPrices =
+                                  formData.OptionPrice.filter(
+                                    (_, i) => i !== idx
+                                  );
+                                setFormData({
+                                  ...formData,
+                                  OptionValue: updatedValues,
+                                  OptionPrice: updatedPrices,
+                                });
+                              }}
+                              className="text-red-500 hover:text-red-700 p-1"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Name
+                              </label>
+                              <input
+                                type="text"
+                                value={opt}
+                                readOnly
+                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-gray-100 text-sm"
+                                placeholder="Ingredient name"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Price
+                              </label>
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                value={formData.OptionPrice[idx]}
+                                onChange={(e) => {
+                                  const updated = [...formData.OptionPrice];
+                                  updated[idx] =
+                                    Number(e.target.value.replace(/\D/g, "")) ||
+                                    0;
+                                  setFormData({
+                                    ...formData,
+                                    OptionPrice: updated,
+                                  });
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                                placeholder="0"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* Scrollable Body */}
-                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[197px] overflow-y-auto modal-scroll bg-white">
-                    <DragDropContext
-                      onDragEnd={(result: DropResult) => {
-                        const { source, destination } = result;
-                        if (!destination || source.index === destination.index)
-                          return;
+                  {/* Desktop Table Layout */}
+                  <div className="hidden sm:flex sm:flex-col flex-1 min-h-0">
+                    {/* Fixed Header */}
+                    <div className="border border-gray-200 rounded-t-sm bg-gray-50 flex-shrink-0">
+                      <table className="w-full">
+                        <thead>
+                          <tr>
+                            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                            <th className="p-3 text-left text-sm font-medium text-gray-700">
+                              Name
+                            </th>
+                            <th className="w-24 p-3 text-left text-sm font-medium text-gray-700">
+                              Price
+                            </th>
+                            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
 
-                        const newOptionValue = Array.from(formData.OptionValue);
-                        const [movedValue] = newOptionValue.splice(
-                          source.index,
-                          1
-                        );
-                        newOptionValue.splice(destination.index, 0, movedValue);
-
-                        const newOptionPrice = Array.from(formData.OptionPrice);
-                        const [movedPrice] = newOptionPrice.splice(
-                          source.index,
-                          1
-                        );
-                        newOptionPrice.splice(destination.index, 0, movedPrice);
-
-                        setFormData({
-                          ...formData,
-                          OptionValue: newOptionValue,
-                          OptionPrice: newOptionPrice,
-                        });
+                    {/* Scrollable Body */}
+                    <div
+                      className="border-l border-r border-b border-gray-200 rounded-b-sm overflow-y-auto bg-white max-h-[250px] min-h-[250px]"
+                      style={{
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "#cbd5e1 #f1f5f9",
                       }}
                     >
-                      <Droppable droppableId="ingredients">
-                        {(provided) => (
-                          <table className="w-full border-collapse">
-                            <tbody
-                              ref={provided.innerRef}
-                              {...provided.droppableProps}
-                            >
-                              {formData.OptionValue.map((opt, idx) => (
-                                <Draggable
-                                  key={idx}
-                                  draggableId={`ingredient-${idx}`}
-                                  index={idx}
-                                >
-                                  {(provided, snapshot) => (
-                                    <tr
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      className={`hover:bg-gray-50 ${
-                                        snapshot.isDragging
-                                          ? "bg-gray-100 shadow-lg"
-                                          : ""
-                                      } border-b border-gray-200`}
-                                    >
-                                      {/* Drag Handle */}
-                                      <td
-                                        className="p-3 text-center cursor-grab w-12"
-                                        {...provided.dragHandleProps}
+                      <DragDropContext
+                        onDragEnd={(result) => {
+                          const { source, destination } = result;
+                          if (
+                            !destination ||
+                            source.index === destination.index
+                          )
+                            return;
+
+                          const newOptionValue = Array.from(
+                            formData.OptionValue
+                          );
+                          const [movedValue] = newOptionValue.splice(
+                            source.index,
+                            1
+                          );
+                          newOptionValue.splice(
+                            destination.index,
+                            0,
+                            movedValue
+                          );
+
+                          const newOptionPrice = Array.from(
+                            formData.OptionPrice
+                          );
+                          const [movedPrice] = newOptionPrice.splice(
+                            source.index,
+                            1
+                          );
+                          newOptionPrice.splice(
+                            destination.index,
+                            0,
+                            movedPrice
+                          );
+
+                          setFormData({
+                            ...formData,
+                            OptionValue: newOptionValue,
+                            OptionPrice: newOptionPrice,
+                          });
+                        }}
+                      >
+                        <Droppable droppableId="recipe-options">
+                          {(provided) => (
+                            <table className="w-full border-collapse">
+                              <tbody
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                              >
+                                {formData.OptionValue.map((opt, idx) => (
+                                  <Draggable
+                                    key={idx}
+                                    draggableId={`recipe-option-${idx}`}
+                                    index={idx}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <tr
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        className={`hover:bg-gray-50 ${
+                                          snapshot.isDragging
+                                            ? "bg-gray-100 shadow-sm"
+                                            : ""
+                                        } border-b border-gray-200`}
                                       >
-                                        <Grip
-                                          size={18}
-                                          className="text-gray-500 mx-auto"
-                                        />
-                                      </td>
-
-                                      {/* Ingredient Name (readonly) */}
-                                      <td className="min-w-[300px] p-3">
-                                        <input
-                                          type="text"
-                                          value={opt}
-                                          readOnly
-                                          className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-gray-100"
-                                          placeholder="Ingredient name"
-                                        />
-                                      </td>
-
-                                      {/* Option Price */}
-                                      <td className="p-3 text-center">
-                                        <input
-                                          type="text"
-                                          inputMode="numeric"
-                                          pattern="[0-9]*"
-                                          value={formData.OptionPrice[idx]}
-                                          onChange={(e) => {
-                                            const updated = [
-                                              ...formData.OptionPrice,
-                                            ];
-                                            updated[idx] =
-                                              Number(
-                                                e.target.value.replace(
-                                                  /\D/g,
-                                                  ""
-                                                )
-                                              ) || 0;
-                                            setFormData({
-                                              ...formData,
-                                              OptionPrice: updated,
-                                            });
-                                          }}
-                                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
-                                          placeholder="0"
-                                        />
-                                      </td>
-
-                                      {/* Delete Button */}
-                                      <td className="p-3 text-center w-12">
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const updatedValues =
-                                              formData.OptionValue.filter(
-                                                (_, i) => i !== idx
-                                              );
-                                            const updatedPrices =
-                                              formData.OptionPrice.filter(
-                                                (_, i) => i !== idx
-                                              );
-                                            setFormData({
-                                              ...formData,
-                                              OptionValue: updatedValues,
-                                              OptionPrice: updatedPrices,
-                                            });
-                                          }}
-                                          className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                                        {/* Drag Handle */}
+                                        <td
+                                          className="p-3 text-center cursor-grab w-12"
+                                          {...provided.dragHandleProps}
                                         >
-                                          <X size={20} />
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </tbody>
-                          </table>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
+                                          <Grip
+                                            size={18}
+                                            className="text-gray-500 mx-auto"
+                                          />
+                                        </td>
+
+                                        {/* Ingredient Name (readonly) */}
+                                        <td className="p-3">
+                                          <input
+                                            type="text"
+                                            value={opt}
+                                            readOnly
+                                            className="w-full px-2 py-1 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-gray-100"
+                                            placeholder="Ingredient name"
+                                          />
+                                        </td>
+
+                                        {/* Option Price */}
+                                        <td className="p-3 text-center w-24">
+                                          <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
+                                            value={formData.OptionPrice[idx]}
+                                            onChange={(e) => {
+                                              const updated = [
+                                                ...formData.OptionPrice,
+                                              ];
+                                              updated[idx] =
+                                                Number(
+                                                  e.target.value.replace(
+                                                    /\D/g,
+                                                    ""
+                                                  )
+                                                ) || 0;
+                                              setFormData({
+                                                ...formData,
+                                                OptionPrice: updated,
+                                              });
+                                            }}
+                                            className="w-full px-2 py-1 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center"
+                                            placeholder="0"
+                                          />
+                                        </td>
+
+                                        {/* Delete Button */}
+                                        <td className="p-3 text-center w-12">
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updatedValues =
+                                                formData.OptionValue.filter(
+                                                  (_, i) => i !== idx
+                                                );
+                                              const updatedPrices =
+                                                formData.OptionPrice.filter(
+                                                  (_, i) => i !== idx
+                                                );
+                                              setFormData({
+                                                ...formData,
+                                                OptionValue: updatedValues,
+                                                OptionPrice: updatedPrices,
+                                              });
+                                            }}
+                                            className="text-black border-2 px-2 py-1 rounded-sm hover:text-gray-700"
+                                          >
+                                            <X size={20} />
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </tbody>
+                            </table>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </div>
                   </div>
                 </div>
               )}
 
               {activeTab === "Ingredients" && (
-                <div className="">
+                <div className="space-y-4 h-full flex flex-col">
                   {/* Add Ingredient Button */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <DropdownMenu.Root>
-                      <DropdownMenu.Trigger className="min-w-[510px] flex items-center justify-between px-4 py-2 mb-2 text-black rounded-lg hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
+                      <DropdownMenu.Trigger className="w-full flex items-center justify-between px-4 py-2 mb-2 text-black rounded-sm hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
                         <span className="text-sm">Add New Ingredients</span>
-                        <ChevronDown size={16} className="text-gray-500" />
+                        <ChevronDown
+                          size={16}
+                          className="text-gray-500 flex-shrink-0"
+                        />
                       </DropdownMenu.Trigger>
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[510px] rounded-md bg-white shadow-lg border border-gray-200 p-1 outline-none overflow-visible z-[99999]"
+                          className="w-full min-w-[280px] max-w-[90vw] sm:min-w-[510px] rounded-sm bg-white shadow-sm border border-gray-200 p-1 outline-none overflow-visible z-[99999]"
                           sideOffset={6}
                           avoidCollisions={true}
                           collisionPadding={20}
@@ -1217,20 +1302,23 @@ const RecipesManagementPage = () => {
                             {ingredients.map((ingredient) => (
                               <DropdownMenu.Item
                                 key={ingredient.ID}
-                                className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none select-none"
+                                className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded-sm outline-none select-none"
                                 onSelect={() => {
                                   if (
-                                    !formData.OptionValue.includes(
+                                    !formData.IngredientValue.includes(
                                       ingredient.Name
                                     )
                                   ) {
                                     setFormData({
                                       ...formData,
-                                      OptionValue: [
-                                        ...formData.OptionValue,
+                                      IngredientValue: [
+                                        ...formData.IngredientValue,
                                         ingredient.Name,
                                       ],
-                                      OptionPrice: [...formData.OptionPrice, 0],
+                                      IngredientPrice: [
+                                        ...formData.IngredientPrice,
+                                        0,
+                                      ],
                                     });
                                   }
                                 }}
@@ -1244,194 +1332,304 @@ const RecipesManagementPage = () => {
                     </DropdownMenu.Root>
                   </div>
 
-                  {/* Fixed Header */}
-                  <div className="border border-gray-200 rounded-t-lg bg-gray-50">
-                    <table className="w-full">
-                      <thead>
-                        <tr>
-                          <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                          <th className="w-80 p-3 text-left text-sm font-medium text-gray-700">
-                            Name
-                          </th>
-                          <th className="p-3 text-center text-sm font-medium text-gray-700">
-                            Amount
-                          </th>
-                          <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                        </tr>
-                      </thead>
-                    </table>
+                  {/* Mobile Card Layout */}
+                  <div className="block sm:hidden overflow-y-auto max-h-[300px]">
+                    <div className="space-y-3 pb-4">
+                      {formData.IngredientValue.map((opt, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-white border border-gray-200 rounded-sm p-4 shadow-sm"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <Grip size={16} className="text-gray-400" />
+                              <span className="font-medium text-gray-700">
+                                Ingredient {idx + 1}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updatedValues =
+                                  formData.IngredientValue.filter(
+                                    (_, i) => i !== idx
+                                  );
+                                const updatedPrices =
+                                  formData.IngredientPrice.filter(
+                                    (_, i) => i !== idx
+                                  );
+                                setFormData({
+                                  ...formData,
+                                  IngredientValue: updatedValues,
+                                  IngredientPrice: updatedPrices,
+                                });
+                              }}
+                              className="text-red-500 hover:text-red-700 p-1"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Name
+                              </label>
+                              <input
+                                type="text"
+                                value={opt}
+                                readOnly
+                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-gray-100 text-sm"
+                                placeholder="Ingredient name"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs  font-medium text-gray-600 mb-1">
+                                Amount
+                              </label>
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                value={formData.IngredientPrice[idx]}
+                                onChange={(e) => {
+                                  const updated = [...formData.IngredientPrice];
+                                  updated[idx] =
+                                    Number(e.target.value.replace(/\D/g, "")) ||
+                                    0;
+                                  setFormData({
+                                    ...formData,
+                                    IngredientPrice: updated,
+                                  });
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                                placeholder="0"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* Scrollable Body */}
-                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[197px] overflow-y-auto modal-scroll bg-white">
-                    <DragDropContext
-                      onDragEnd={(result: DropResult) => {
-                        const { source, destination } = result;
-                        if (!destination || source.index === destination.index)
-                          return;
+                  {/* Desktop Table Layout */}
+                  <div className="hidden sm:flex sm:flex-col flex-1 min-h-0">
+                    {/* Fixed Header */}
+                    <div className="border border-gray-200 rounded-t-sm bg-gray-50 flex-shrink-0">
+                      <table className="w-full">
+                        <thead>
+                          <tr>
+                            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                            <th className="p-3 text-left text-sm font-medium text-gray-700">
+                              Name
+                            </th>
+                            <th className="w-24 p-3 text-center text-sm font-medium text-gray-700">
+                              Amount
+                            </th>
+                            <th className="w-12 p-3 text-left text-sm font-medium text-gray-700"></th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
 
-                        const newOptionValue = Array.from(
-                          formData.IngredientValue
-                        );
-                        const [movedValue] = newOptionValue.splice(
-                          source.index,
-                          1
-                        );
-                        newOptionValue.splice(destination.index, 0, movedValue);
-
-                        const newOptionPrice = Array.from(
-                          formData.IngredientPrice
-                        );
-                        const [movedPrice] = newOptionPrice.splice(
-                          source.index,
-                          1
-                        );
-                        newOptionPrice.splice(destination.index, 0, movedPrice);
-
-                        setFormData({
-                          ...formData,
-                          IngredientValue: newOptionValue,
-                          IngredientPrice: newOptionPrice,
-                        });
+                    {/* Scrollable Body */}
+                    <div
+                      className="border-l border-r border-b border-gray-200 rounded-b-sm overflow-y-auto bg-white max-h-[250px] min-h-[250px]"
+                      style={{
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "#cbd5e1 #f1f5f9",
                       }}
                     >
-                      <Droppable droppableId="ingredients">
-                        {(provided) => (
-                          <table className="w-full border-collapse">
-                            <tbody
-                              ref={provided.innerRef}
-                              {...provided.droppableProps}
-                            >
-                              {formData.IngredientValue.map((opt, idx) => (
-                                <Draggable
-                                  key={idx}
-                                  draggableId={`ingredient-${idx}`}
-                                  index={idx}
-                                >
-                                  {(provided, snapshot) => (
-                                    <tr
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      className={`hover:bg-gray-50 ${
-                                        snapshot.isDragging
-                                          ? "bg-gray-100 shadow-lg"
-                                          : ""
-                                      } border-b border-gray-200`}
-                                    >
-                                      {/* Drag Handle */}
-                                      <td
-                                        className="p-3 text-center cursor-grab w-12"
-                                        {...provided.dragHandleProps}
+                      <DragDropContext
+                        onDragEnd={(result) => {
+                          const { source, destination } = result;
+                          if (
+                            !destination ||
+                            source.index === destination.index
+                          )
+                            return;
+
+                          const newOptionValue = Array.from(
+                            formData.IngredientValue
+                          );
+                          const [movedValue] = newOptionValue.splice(
+                            source.index,
+                            1
+                          );
+                          newOptionValue.splice(
+                            destination.index,
+                            0,
+                            movedValue
+                          );
+
+                          const newOptionPrice = Array.from(
+                            formData.IngredientPrice
+                          );
+                          const [movedPrice] = newOptionPrice.splice(
+                            source.index,
+                            1
+                          );
+                          newOptionPrice.splice(
+                            destination.index,
+                            0,
+                            movedPrice
+                          );
+
+                          setFormData({
+                            ...formData,
+                            IngredientValue: newOptionValue,
+                            IngredientPrice: newOptionPrice,
+                          });
+                        }}
+                      >
+                        <Droppable droppableId="ingredients">
+                          {(provided) => (
+                            <table className="w-full border-collapse">
+                              <tbody
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                              >
+                                {formData.IngredientValue.map((opt, idx) => (
+                                  <Draggable
+                                    key={idx}
+                                    draggableId={`ingredient-${idx}`}
+                                    index={idx}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <tr
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        className={`hover:bg-gray-50 ${
+                                          snapshot.isDragging
+                                            ? "bg-gray-100 shadow-sm"
+                                            : ""
+                                        } border-b border-gray-200`}
                                       >
-                                        <Grip
-                                          size={18}
-                                          className="text-gray-500 mx-auto"
-                                        />
-                                      </td>
-
-                                      {/* Ingredient Name (readonly) */}
-                                      <td className="min-w-[300px] p-3">
-                                        <input
-                                          type="text"
-                                          value={opt}
-                                          readOnly
-                                          className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-gray-100"
-                                          placeholder="Ingredient name"
-                                        />
-                                      </td>
-
-                                      {/* Option Price */}
-                                      <td className="p-3 text-center">
-                                        <input
-                                          type="text"
-                                          inputMode="numeric"
-                                          pattern="[0-9]*"
-                                          value={formData.IngredientPrice[idx]}
-                                          onChange={(e) => {
-                                            const updated = [
-                                              ...formData.IngredientPrice,
-                                            ];
-                                            updated[idx] =
-                                              Number(
-                                                e.target.value.replace(
-                                                  /\D/g,
-                                                  ""
-                                                )
-                                              ) || 0;
-                                            setFormData({
-                                              ...formData,
-                                              IngredientPrice: updated,
-                                            });
-                                          }}
-                                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
-                                          placeholder="0"
-                                        />
-                                      </td>
-
-                                      {/* Delete Button */}
-                                      <td className="p-3 text-center  w-12">
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const updatedValues =
-                                              formData.IngredientValue.filter(
-                                                (_, i) => i !== idx
-                                              );
-                                            const updatedPrices =
-                                              formData.IngredientPrice.filter(
-                                                (_, i) => i !== idx
-                                              );
-                                            setFormData({
-                                              ...formData,
-                                              IngredientValue: updatedValues,
-                                              IngredientPrice: updatedPrices,
-                                            });
-                                          }}
-                                          className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                                        {/* Drag Handle */}
+                                        <td
+                                          className="p-3 text-center cursor-grab w-12"
+                                          {...provided.dragHandleProps}
                                         >
-                                          <X size={20} />
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </tbody>
-                          </table>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
+                                          <Grip
+                                            size={18}
+                                            className="text-gray-500 mx-auto"
+                                          />
+                                        </td>
+
+                                        {/* Ingredient Name (readonly) */}
+                                        <td className="p-3">
+                                          <input
+                                            type="text"
+                                            value={opt}
+                                            readOnly
+                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-gray-100"
+                                            placeholder="Ingredient name"
+                                          />
+                                        </td>
+
+                                        {/* Option Price */}
+                                        <td className="p-3 text-center w-24">
+                                          <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
+                                            value={
+                                              formData.IngredientPrice[idx]
+                                            }
+                                            onChange={(e) => {
+                                              const updated = [
+                                                ...formData.IngredientPrice,
+                                              ];
+                                              updated[idx] =
+                                                Number(
+                                                  e.target.value.replace(
+                                                    /\D/g,
+                                                    ""
+                                                  )
+                                                ) || 0;
+                                              setFormData({
+                                                ...formData,
+                                                IngredientPrice: updated,
+                                              });
+                                            }}
+                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center"
+                                            placeholder="0"
+                                          />
+                                        </td>
+
+                                        {/* Delete Button */}
+                                        <td className="p-3 text-center w-12">
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updatedValues =
+                                                formData.IngredientValue.filter(
+                                                  (_, i) => i !== idx
+                                                );
+                                              const updatedPrices =
+                                                formData.IngredientPrice.filter(
+                                                  (_, i) => i !== idx
+                                                );
+                                              setFormData({
+                                                ...formData,
+                                                IngredientValue: updatedValues,
+                                                IngredientPrice: updatedPrices,
+                                              });
+                                            }}
+                                            className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                                          >
+                                            <X size={20} />
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </tbody>
+                            </table>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Action buttons */}
-            <div className="mt-8 ml-8 flex justify-end gap-3 p-4 border-t w-[33.5vw] border-gray-200 bg-white z-100">
+            {/* Fixed Action Buttons - Fixed alignment and separator */}
+            <div className="flex flex-col p-2 md:flex-row gap-3 pt-6 justify-end md:pr-6 border-t border-gray-200 mt-6">
               <button
+                type="button"
                 onClick={handleCloseModal}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                 disabled={actionLoading}
+                className="px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed order-2 md:order-1"
               >
+                <X size={16} />
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleModalSubmit}
-                disabled={actionLoading || !formData.Name.trim()}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  actionLoading || !formData.Name.trim()
+                disabled={!formData.Name.trim() || actionLoading}
+                className={`px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 order-1 md:order-2 ${
+                  !formData.Name.trim() || actionLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-black text-white hover:bg-gray-700"
+                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 }`}
               >
-                {actionLoading
-                  ? editingItem
-                    ? "Updating..."
-                    : "Saving..."
-                  : editingItem
-                  ? "Update"
-                  : "Save & Close"}
+                {actionLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                    {editingItem ? "Updating..." : "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editingItem ? "Update Item" : "Add Item"}
+                  </>
+                )}
               </button>
             </div>
           </div>

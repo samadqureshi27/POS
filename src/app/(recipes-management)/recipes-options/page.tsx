@@ -214,10 +214,14 @@ const Toast = ({
           : "translate-x-full opacity-0"
       }`}
     >
-      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      {type === "success" ? (
+        <CheckCircle size={16} />
+      ) : (
+        <AlertCircle size={16} />
+      )}
       <span>{message}</span>
-      <button 
-        onClick={handleClose} 
+      <button
+        onClick={handleClose}
         className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
       >
         <X size={16} />
@@ -397,17 +401,17 @@ const CategoryPage = () => {
       handleCreateItem(formData);
     }
   };
-   // Prevent background scrolling when modal is open
+  // Prevent background scrolling when modal is open
   useEffect(() => {
     if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     // Cleanup function to restore scrolling when component unmounts
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isModalOpen]);
 
@@ -446,11 +450,11 @@ const CategoryPage = () => {
       {/* Action bar */}
       <div className="mb-8 flex   items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 h-[40px]">
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${
               selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -463,7 +467,7 @@ const CategoryPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${
               isSomeSelected && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -481,7 +485,7 @@ const CategoryPage = () => {
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -491,8 +495,8 @@ const CategoryPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className=" rounded-sm ">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm  responsive-customer-table">
+        <div className=" rounded-sm table-container">
           <table className="min-w-full max-h-[800px] divide-y divide-gray-200   table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
@@ -635,17 +639,29 @@ const CategoryPage = () => {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap text-sm"
+                      data-label="ID"
+                    >
                       {item.ID}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap text-sm font-medium"
+                      data-label="Name"
+                    >
                       {item.Name}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap text-sm"
+                      data-label="Price"
+                    >
                       ${item.price}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap"
+                      data-label="Action"
+                    >
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => {
@@ -716,12 +732,12 @@ const CategoryPage = () => {
             </div>
 
             {/* Action buttons */}
-            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 pt-6 sm:justify-end border-t border-gray-200 mt-auto">
               <button
                 type="button"
                 onClick={handleCloseModal}
                 disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X size={16} />
                 Cancel
@@ -730,7 +746,7 @@ const CategoryPage = () => {
                 type="button"
                 onClick={handleModalSubmit}
                 disabled={!formData.Name.trim() || actionLoading}
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${
                   !formData.Name.trim() || actionLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#2C2C2C] text-white hover:bg-gray-700"

@@ -286,11 +286,11 @@ const IngredientsManagementPage = () => {
       {/* Action bar: add, delete, search */}
       <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 h-[40px] ">
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
             onClick={openAddModal}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${
               selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -303,7 +303,7 @@ const IngredientsManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${
               isSomeSelected && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -321,7 +321,7 @@ const IngredientsManagementPage = () => {
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full  h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -331,8 +331,8 @@ const IngredientsManagementPage = () => {
       </div>
 
       {/* Table + filters */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className=" rounded-sm ">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm responsive-customer-table ">
+        <div className=" rounded-sm table-container">
           <table className="min-w-full divide-y max-h-[800px] divide-gray-200   table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
@@ -398,7 +398,7 @@ const IngredientsManagementPage = () => {
 
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
                         <ChevronDown
@@ -517,12 +517,12 @@ const IngredientsManagementPage = () => {
                                      />
                                    </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="ID">{item.ID}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Name">{item.Name}</td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                     <span
-                      className={`inline-block w-24 text-center px-2 py-[2px] rounded-md text-xs font-medium 
+                      className={`inline-block w-24 text-right px-2 py-[2px] rounded-md text-xs font-medium 
                   ${
                     item.Status === "Inactive"
                       ? "text-red-400 "
@@ -540,15 +540,15 @@ const IngredientsManagementPage = () => {
                     </span>
                   </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap"data-label="Description">
                     {item.Description}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">{item.Unit}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Unit">{item.Unit}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600" data-label="Priority">
                     {item.Priority}
                   </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Action">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => openEditModal(item)}
@@ -665,12 +665,12 @@ const IngredientsManagementPage = () => {
             </div>
 
             {/* Fixed Action Buttons */}
-            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 pt-6 sm:justify-end border-t border-gray-200 mt-auto">
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
                 disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X size={16} />
                 Cancel
@@ -678,15 +678,9 @@ const IngredientsManagementPage = () => {
               <button
                 type="button"
                 onClick={handleSaveItem}
-                disabled={
-                  !formData.Name.trim() ||
-                  !formData.Description.trim() ||
-                  actionLoading
-                }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                  !formData.Name.trim() ||
-                  !formData.Description.trim() ||
-                  actionLoading
+                disabled={!formData.Name.trim() || actionLoading}
+                className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${
+                  !formData.Name.trim() || actionLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 }`}
@@ -699,7 +693,7 @@ const IngredientsManagementPage = () => {
                 ) : (
                   <>
                     <Save size={16} />
-                    {editItem ? "Update Item" : "Add Item"}
+                    {editItem ? "Update" : "Save & Close"}
                   </>
                 )}
               </button>
