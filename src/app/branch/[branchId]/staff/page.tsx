@@ -410,8 +410,8 @@ const EmployeeRecordsPage = () => {
   const handleCreateItem = async (itemData: Omit<StaffItem, "Staff_ID">) => {
     try {
       setActionLoading(true);
-      const cleanData = { 
-        ...itemData, 
+      const cleanData = {
+        ...itemData,
         Branch_ID_fk: branchId // Ensure branch ID is set
       };
       if (cleanData.Role !== "Cashier" && cleanData.Role !== "Manager") {
@@ -588,33 +588,34 @@ const EmployeeRecordsPage = () => {
       </div>
 
       {/* Summary Cards - Same layout as Branch page */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+      <div className="grid grid-cols-1 max-w-[100vw]  lg:grid-cols-2   gap-4 mb-8 lg:max-w-[50vw]">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">{staffItems.length}</p>
+            <p className="text-5xl mb-1">{staffItems.length}</p>
             <p className="text-1xl text-gray-500">Total Staff</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">
+            <p className="text-5xl mb-1">
               {staffItems.filter((item) => item.Status === "Active").length}
             </p>
             <p className="text-1xl text-gray-500">Active Staff</p>
           </div>
         </div>
 
-       
+
       </div>
 
       {/* Action bar */}
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex gap-3 h-[40px]">
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
+        {/* Action Buttons */}
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -626,7 +627,7 @@ const EmployeeRecordsPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -640,10 +641,10 @@ const EmployeeRecordsPage = () => {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            placeholder="Search Payment Methods..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -652,13 +653,13 @@ const EmployeeRecordsPage = () => {
         </div>
       </div>
 
-      {/* Table - Using responsive classes from branch page */}
-      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
-        <div className="table-container">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
+      {/* Responsive Table with Global CSS Classes */}
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table ">
+        <div className="rounded-sm table-container">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-6 text-left w-24">
+                <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
@@ -707,30 +708,30 @@ const EmployeeRecordsPage = () => {
                     }
                   />
                 </th>
-                <th className="relative px-4 py-3 text-left w-24">
+                <th className="relative px-4 py-3 text-left ">
                   Staff ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-52">
+                <th className="relative px-4 py-3 text-left">
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-32">
+                <th className="relative px-4 py-3 text-left">
                   Contact
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-40">
+                <th className="relative px-4 py-3 text-left">
                   Address
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-32">
+                <th className="relative px-4 py-3 text-left">
                   CNIC
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-36">
+                <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
                     <DropdownMenu.Root modal={false}>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded  bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
                         <ChevronDown
                           size={14}
@@ -747,19 +748,19 @@ const EmployeeRecordsPage = () => {
                       >
                         <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
                         <DropdownMenu.Item
-                          className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                          className="px-3 py-1  cursor-pointer hover:bg-gray-100 rounded outline-none"
                           onClick={() => setStatusFilter("")}
                         >
                           Status
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                          className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
+                          className="px-3 py-1  cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
                           onClick={() => setStatusFilter("Active")}
                         >
                           Active
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                          className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
+                          className="px-3 py-1  cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
                           onClick={() => setStatusFilter("Inactive")}
                         >
                           Inactive
@@ -769,10 +770,10 @@ const EmployeeRecordsPage = () => {
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-36">
+                <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
                     <DropdownMenu.Root modal={false}>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded  bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {roleFilter || "Role"}
                         <ChevronDown
                           size={14}
@@ -789,7 +790,7 @@ const EmployeeRecordsPage = () => {
                       >
                         <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
                         <DropdownMenu.Item
-                          className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                          className="px-3 py-1  cursor-pointer hover:bg-gray-100 rounded outline-none"
                           onClick={() => setRoleFilter("")}
                         >
                           Role
@@ -799,7 +800,7 @@ const EmployeeRecordsPage = () => {
                         ).map((role) => (
                           <DropdownMenu.Item
                             key={role}
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
+                            className="px-3 py-1  cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
                             onClick={() => setRoleFilter(role)}
                           >
                             {role}
@@ -810,23 +811,23 @@ const EmployeeRecordsPage = () => {
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-24">
+                <th className="relative px-4 py-3 text-left">
                   Salary
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-32">
+                <th className="relative px-4 py-3 text-left">
                   Shift Start Time
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-32">
+                <th className="relative px-4 py-3 text-left">
                   Shift End Time
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-28">
+                <th className="relative px-4 py-3 text-left">
                   Access Code
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-28">
+                <th className="relative px-4 py-3 text-left">
                   Actions
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
@@ -851,7 +852,7 @@ const EmployeeRecordsPage = () => {
                     key={item.Staff_ID}
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm" data-label="Select">
+                    <td className="px-6 py-8 whitespace-nowrap ">
                       <Checkbox
                         checked={selectedItems.includes(item.Staff_ID)}
                         onChange={(e) =>
@@ -902,47 +903,46 @@ const EmployeeRecordsPage = () => {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Staff ID">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Staff ID">
                       {`#${String(item.Staff_ID).padStart(3, "0")}`}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium card-name-cell" data-label="Name">
-                      <div className="name-content">
-                        <span className="font-medium">{item.Name}</span>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Name">
+                      <span className="font-medium">{item.Name}</span>
+
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Contact">
                       {item.Contact}
                     </td>
-                    <td className="px-4 py-4 text-sm max-w-[200px] truncate" data-label="Address" title={item.Address}>
+                    <td className="px-4 py-4  " data-label="Address" title={item.Address}>
                       {item.Address}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="CNIC">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="CNIC">
                       {item.CNIC}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-sm text-xs font-medium 
+                        className={`inline-block w-20 text-right lg:text-center px-2 py-[2px] rounded-sm text-xs font-medium 
                     ${item.Status === "Active" ? "text-green-400 border-green-600" : ""}
                     ${item.Status === "Inactive" ? "text-red-400 border-red-600" : ""}`}
                       >
                         {item.Status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Role">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Role">
                       {item.Role}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Salary">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Salary">
                       {item.Salary}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600" data-label="Shift Start Time">
+                    <td className="px-4 py-4 whitespace-nowrap  text-gray-600" data-label="Shift Start Time">
                       {item.Shift_Start_Time}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600" data-label="Shift End Time">
+                    <td className="px-4 py-4 whitespace-nowrap  text-gray-600" data-label="Shift End Time">
                       {item.Shift_End_Time}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Access Code">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Access Code">
                       {(item.Role === "Cashier" || item.Role === "Manager") &&
                         item.Access_Code ? (
                         <span
@@ -981,14 +981,11 @@ const EmployeeRecordsPage = () => {
 
       {/* Modal for Add/Edit */}
       {isModalOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 p-4"
-          onClick={handleCloseModal}
-        >
-          <div
-            className="bg-white rounded-lg min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-xl relative flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 px-4"
+          onClick={handleCloseModal}>
+          <div className="bg-white rounded-sm p-4 sm:p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col"
+            onClick={(e) => e.stopPropagation()}>
+
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-2xl font-semibold text-gray-800">
@@ -997,7 +994,7 @@ const EmployeeRecordsPage = () => {
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-2">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -1007,7 +1004,7 @@ const EmployeeRecordsPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Name */}
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block  font-medium text-gray-700 mb-2">
                       Staff Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -1025,7 +1022,7 @@ const EmployeeRecordsPage = () => {
 
                   {/* Contact */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block  font-medium text-gray-700 mb-2">
                       Contact Number
                     </label>
                     <input
@@ -1042,7 +1039,7 @@ const EmployeeRecordsPage = () => {
 
                   {/* CNIC */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block  font-medium text-gray-700 mb-2">
                       CNIC <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -1063,7 +1060,7 @@ const EmployeeRecordsPage = () => {
 
                   {/* Address */}
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block  font-medium text-gray-700 mb-2">
                       Address
                     </label>
                     <textarea
@@ -1079,12 +1076,12 @@ const EmployeeRecordsPage = () => {
 
                   {/* Role Dropdown */}
                   <div className="flex flex-col gap-1 relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block  font-medium text-gray-700 mb-2">
                       Role
                     </label>
 
-                    <DropdownMenu.Root>
-                      <DropdownMenu.Trigger className="px-3 py-2 rounded-lg text-sm border border-gray-300 bg-white flex items-center gap-2 w-full focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors hover:border-gray-400">
+                    <DropdownMenu.Root modal={false}>
+                      <DropdownMenu.Trigger className="px-3 py-2 rounded-lg  border border-gray-300 bg-white flex items-center gap-2 w-full focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors hover:border-gray-400">
                         <span
                           className={
                             formData.Role ? "text-gray-900" : "text-gray-500"
@@ -1106,7 +1103,7 @@ const EmployeeRecordsPage = () => {
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
 
                           <DropdownMenu.Item
-                            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none text-gray-500"
+                            className="px-3 py-2  cursor-pointer hover:bg-gray-100 rounded outline-none text-gray-500"
                             onClick={() =>
                               setFormData({ ...formData, Role: "" })
                             }
@@ -1124,7 +1121,7 @@ const EmployeeRecordsPage = () => {
                           ].map((role) => (
                             <DropdownMenu.Item
                               key={role}
-                              className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 hover:text-gray-700 rounded outline-none"
+                              className="px-3 py-2  cursor-pointer hover:bg-gray-100 hover:text-gray-700 rounded outline-none"
                               onClick={() =>
                                 setFormData({ ...formData, Role: role })
                               }
@@ -1139,7 +1136,7 @@ const EmployeeRecordsPage = () => {
 
                   {/* Salary */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block  font-medium text-gray-700 mb-2">
                       Salary (PKR)
                     </label>
                     <input
@@ -1157,7 +1154,7 @@ const EmployeeRecordsPage = () => {
 
                   {/* Shift Times */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block  font-medium text-gray-700 mb-2">
                       Shift Start Time
                     </label>
                     <input
@@ -1174,7 +1171,7 @@ const EmployeeRecordsPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block  font-medium text-gray-700 mb-2">
                       Shift End Time
                     </label>
                     <input
@@ -1192,9 +1189,10 @@ const EmployeeRecordsPage = () => {
 
                   {/* Access Code - Only for Cashier and Manager */}
                   {(formData.Role === "Cashier" ||
-                    formData.Role === "Manager") && (
+                    formData.Role === "Manager"||
+                    formData.Role === "Waiter") && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block  font-medium text-gray-700 mb-2">
                           Access Code <span className="text-red-500">*</span>
                           <span className="text-xs text-gray-500 ml-1">
                             (4 digits)
@@ -1227,12 +1225,12 @@ const EmployeeRecordsPage = () => {
 
                   {/* Status Toggle */}
                   <div className="flex items-center justify-between py-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block  font-medium text-gray-700">
                       Status
                     </label>
                     <div className="flex items-center gap-3">
                       <span
-                        className={`text-sm font-medium ${formData.Status === "Active"
+                        className={` font-medium ${formData.Status === "Active"
                           ? "text-green-600"
                           : "text-red-500"
                           }`}
@@ -1250,12 +1248,12 @@ const EmployeeRecordsPage = () => {
             </div>
 
             {/* Fixed Action Buttons */}
-            <div className="flex gap-3 p-6 justify-end border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
               <button
                 type="button"
                 onClick={handleCloseModal}
                 disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 bg-white rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
@@ -1271,7 +1269,7 @@ const EmployeeRecordsPage = () => {
                     (!formData.Access_Code ||
                       formData.Access_Code.length !== 4))
                 }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 font-medium ${!formData.Name.trim() ||
+                className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${!formData.Name.trim() ||
                   !formData.CNIC.trim() ||
                   actionLoading ||
                   ((formData.Role === "Cashier" ||
