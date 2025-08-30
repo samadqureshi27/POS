@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Button from '@/components/layout/UI/RoleButton';
 import Input from '@/components/layout/UI/Input';
 import ErrorMessage from '@/components/layout/UI/ErrorMessage';
+import authService from '@/lib/authService';
 import { 
   validateAdminLoginForm, 
   validateManagerPinForm, 
@@ -58,67 +59,70 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     
-    try {
-      // Replace with your actual admin login API call
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Handle successful login - store token, redirect, etc.
-        localStorage.setItem('admin_token', data.token);
+     try {
+    const response = await authService.adminLogin(email, password, role || 'admin');
+    
+    if (response.success && response.user) {
+      // Redirect based on role
+      if (response.user.role === 'admin' || response.user.role === 'superadmin') {
         router.push('/admin/dashboard');
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Login failed');
+        router.push('/dashboard');
       }
-    } catch (error) {
-      setError('An error occurred during login');
-      console.error('Admin login error:', error);
-    } finally {
-      setIsLoading(false);
+    } else {
+      setError(response.error || response.message || 'Login failed');
+      if (response.errors) {
+        // Handle field-specific errors from Django
+        const fieldErrors = Object.values(response.errors).flat().join(', ');
+        setError(fieldErrors);
+      }
     }
-  };
+  } catch (error: any) {
+    setError('Network error. Please check your connection.');
+    console.error('Admin login error:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleManagerLogin = async (pin: string) => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // Replace with your actual manager login API call
-      const response = await fetch('/api/manager/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ pin }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Handle successful login - store token, redirect, etc.
-        localStorage.setItem('manager_token', data.token);
-        router.push('/manager/dashboard');
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Invalid PIN');
+    const response = await authService.pinLogin(pin);
+    
+    if (response.success && response.user) {
+      // Redirect based on role
+      switch (response.user.role) {
+        case 'manager':
+          router.push('/manager/dashboard');
+          break;
+        case 'cashier':
+          router.push('/pos');
+          break;
+        case 'waiter':
+          router.push('/orders');
+          break;
+        default:
+          router.push('/dashboard');
       }
-    } catch (error) {
-      setError('An error occurred during login');
-      console.error('Manager login error:', error);
-    } finally {
-      setIsLoading(false);
+    } else {
+      setError(response.error || response.message || 'Invalid PIN');
     }
-  };
+  } catch (error: any) {
+    setError('Network error. Please check your connection.');
+    console.error('Manager login error:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+const [role, setRole] = useState<'admin' | 'manager' | null>(null);
 
   const handleAdminClick = () => {
     if (phase !== 'idle') return;
     setPhase('toGold');
+    setRole('admin');
     setError(null);
     
     // After the gold transition, show the login container
@@ -138,6 +142,7 @@ const LoginPage: React.FC = () => {
   const handleManagerClick = () => {
     if (phase !== 'idle') return;
     setPhase('toBlack');
+    setRole('manager');
     setError(null);
     
     // After the black transition, show the manager container
