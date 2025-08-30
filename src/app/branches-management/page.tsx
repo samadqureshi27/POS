@@ -161,20 +161,18 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
-        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
-      } ${
-        isVisible && !isClosing
+      className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+        } ${isVisible && !isClosing
           ? "translate-x-0 opacity-100"
           : isClosing
-          ? "translate-x-full opacity-0"
-          : "translate-x-full opacity-0"
-      }`}
+            ? "translate-x-full opacity-0"
+            : "translate-x-full opacity-0"
+        }`}
     >
       {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
       <span>{message}</span>
-      <button 
-        onClick={handleClose} 
+      <button
+        onClick={handleClose}
         className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
       >
         <X size={16} />
@@ -413,17 +411,17 @@ const BranchListPage = () => {
       </div>
 
       {/* Summary Cards - Same layout as POS page */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+      <div className="grid grid-cols-1 max-w-[100vw]  lg:grid-cols-2   gap-4 mb-8 lg:max-w-[50vw]">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">{branchItems.length}</p>
+            <p className="text-5xl mb-1">{branchItems.length}</p>
             <p className="text-1xl text-gray-500">Total Branches</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">
+            <p className="text-5xl mb-1">
               {branchItems.filter((item) => item.Status === "Active").length}
             </p>
             <p className="text-1xl text-gray-500">Active Branches</p>
@@ -432,17 +430,16 @@ const BranchListPage = () => {
 
       </div>
 
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 h-[40px]">
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 px-4 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Plus size={16} />
             Add
@@ -451,25 +448,24 @@ const BranchListPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
           </button>
         </div>
-        
+
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search Payment Methods..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -479,12 +475,13 @@ const BranchListPage = () => {
       </div>
 
       {/* Responsive Table with Global CSS Classes */}
-      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
-        <div className="table-container">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
+      {/* Responsive Table with Global CSS Classes */}
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table ">
+        <div className="rounded-sm table-container">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-6 text-left w-24">
+                <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
@@ -533,16 +530,16 @@ const BranchListPage = () => {
                     }
                   />
                 </th>
-                <th className="relative px-4 py-3 text-left w-24">
+                <th className="relative px-4 py-3 text-left">
                   Branch ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-52">
+                <th className="relative px-4 py-3 text-left">
                   Branch Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-36">
-                  <div className="flex flex-col gap-1">
+                <th className="relative px-4 py-3 text-left">
+                  <div className="flex items-center gap-2">
                     <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
@@ -555,7 +552,6 @@ const BranchListPage = () => {
                       <DropdownMenu.Content
                         className="min-w-[120px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                         sideOffset={6}
-                        onOpenAutoFocus={(e) => e.preventDefault()}
                         onCloseAutoFocus={(e) => e.preventDefault()}
                         style={{ zIndex: 1000 }}
                       >
@@ -583,19 +579,16 @@ const BranchListPage = () => {
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-32">
+                <th className="relative px-4 py-3 text-left">
                   Contact Info
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-40">
+                <th className="relative px-4 py-3 text-left">
                   Address
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-20">
-                  Details
-                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
-                </th>
-                <th className="relative px-4 py-3 text-left w-28">
+
+                <th className="relative px-4 py-3 text-left">
                   Actions
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
@@ -604,10 +597,11 @@ const BranchListPage = () => {
 
             <tbody className="divide-y text-gray-500 divide-gray-300">
               {filteredItems.length === 0 ? (
-                <tr>
+                <tr className="bg-white hover:bg-gray-50">
+
                   <td
                     colSpan={8}
-                    className="px-4 py-8 text-center text-gray-500"
+                    className="px-6 py-8"
                   >
                     {searchTerm || statusFilter
                       ? "No branches match your search criteria."
@@ -619,8 +613,9 @@ const BranchListPage = () => {
                   <tr
                     key={item["Branch-ID"]}
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                    onClick={() => handleCustomerClick(item["Branch-ID"])}
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm card-customer-id" data-label="Select">
+                    <td className="px-6 py-8 whitespace-nowrap text-sm " onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item["Branch-ID"])}
                         onChange={(e) =>
@@ -671,19 +666,17 @@ const BranchListPage = () => {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Branch ID">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Branch ID">
                       {`#${String(item["Branch-ID"]).padStart(3, "0")}`}
                     </td>
-                    
-                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="Branch Name">
-                      <div className="name-content">
-                        <span className="font-medium">{item.Branch_Name}</span>
-                      </div>
+
+                    <td className="px-4 py-4 whitespace-nowrap text-sm " data-label="Branch Name">
+                      <span className="font-medium">{item.Branch_Name}</span>
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-sm text-xs font-medium 
+                        className={`inline-block w-20  text-right px-2 py-[2px] rounded-md text-xs font-medium 
                           ${item.Status === "Active" ? "text-green-400 " : ""}
                           ${item.Status === "Inactive" ? "text-red-400 " : ""}`}
                       >
@@ -698,19 +691,12 @@ const BranchListPage = () => {
                         {item.Address}
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Details">
-                      <button
-                        onClick={() => handleCustomerClick(item["Branch-ID"])}
-                        className="text-gray-600 hover:text-gray-800 p-1 transition-colors"
-                        title="View Details"
-                      >
-                        <Info size={16} />
-                      </button>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions">
+
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setEditingItem(item);
                             setIsModalOpen(true);
                           }}
@@ -729,19 +715,20 @@ const BranchListPage = () => {
         </div>
       </div>
 
+
       {/* Modal for Add/Edit */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 px-4">
+          <div className="bg-white rounded-sm p-4 sm:p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
                 {editingItem ? "Edit Branch" : "Add New Branch"}
               </h2>
             </div>
 
             {/* Scrollable Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 p-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 flex-1 overflow-y-auto pr-1 p-2">
               {/* Branch Name */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -753,14 +740,14 @@ const BranchListPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Branch_Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="Enter branch name"
                   required
                 />
               </div>
 
               {/* Contact Info */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Contact Info <span className="text-red-500">*</span>
                 </label>
@@ -770,14 +757,14 @@ const BranchListPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, "Contact-Info": e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="Enter phone number"
                   required
                 />
               </div>
 
               {/* Email */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email
                   <span className="text-xs text-gray-500 ml-1">(Optional)</span>
@@ -788,13 +775,13 @@ const BranchListPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="Enter email address"
                 />
               </div>
 
               {/* Address */}
-              <div className="md:col-span-2">
+              <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Address <span className="text-red-500">*</span>
                 </label>
@@ -803,14 +790,14 @@ const BranchListPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Address: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent h-32 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent h-32 resize-none"
                   placeholder="Enter branch address"
                   required
                 />
               </div>
 
               {/* Postal Code */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Postal Code
                   <span className="text-xs text-gray-500 ml-1">(Optional)</span>
@@ -821,13 +808,13 @@ const BranchListPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, postalCode: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="Enter postal code"
                 />
               </div>
 
               {/* Status Toggle */}
-              <div className="flex items-center justify-between">
+              <div className="sm:col-span-2 flex items-center justify-between">
                 <label className="block text-sm font-medium text-gray-700">
                   Status
                 </label>
@@ -839,12 +826,12 @@ const BranchListPage = () => {
             </div>
 
             {/* Fixed Action Buttons */}
-            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
               <button
                 type="button"
                 onClick={handleCloseModal}
                 disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X size={16} />
                 Cancel
@@ -858,14 +845,13 @@ const BranchListPage = () => {
                   !formData.Address.trim() ||
                   actionLoading
                 }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                  !formData.Branch_Name.trim() ||
-                  !formData["Contact-Info"].trim() ||
-                  !formData.Address.trim() ||
-                  actionLoading
+                className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${!formData.Branch_Name.trim() ||
+                    !formData["Contact-Info"].trim() ||
+                    !formData.Address.trim() ||
+                    actionLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                }`}
+                  }`}
               >
                 {actionLoading ? (
                   <>

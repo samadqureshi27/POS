@@ -124,10 +124,10 @@ class StaffAPI {
 
   static async getStaffItemsByBranch(branchId: string): Promise<ApiResponse<StaffItem[]>> {
     await this.delay(800);
-    
+
     // Filter staff items by branch ID
     const filteredData = this.mockData.filter(item => item.Branch_ID_fk === branchId);
-    
+
     return {
       success: true,
       data: filteredData,
@@ -154,8 +154,8 @@ const Dropdown = ({ trigger, children, isOpen, onOpenChange }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
-          triggerRef.current && !triggerRef.current.contains(event.target)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+        triggerRef.current && !triggerRef.current.contains(event.target)) {
         onOpenChange(false);
       }
     };
@@ -163,7 +163,7 @@ const Dropdown = ({ trigger, children, isOpen, onOpenChange }) => {
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -207,7 +207,7 @@ const Toast = ({
 const StaffManagementPage = () => {
   // Get branch ID from URL - simulating useParams with URL parsing
   const [branchId, setBranchId] = useState(null);
-  
+
   useEffect(() => {
     // Extract branch ID from current URL path
     const path = window.location.pathname;
@@ -317,32 +317,32 @@ const StaffManagementPage = () => {
   // Helper function to get date ranges with proper boundary handling
   const getDateRange = (period) => {
     const today = new Date();
-    
+
     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
     const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
     switch (period) {
       case "Today":
         return { start: startOfToday, end: endOfToday };
-      
+
       case "Week": {
         const startOfWeek = new Date(today);
         startOfWeek.setDate(today.getDate() - today.getDay());
         startOfWeek.setHours(0, 0, 0, 0);
-        
+
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
         endOfWeek.setHours(23, 59, 59, 999);
-        
+
         return { start: startOfWeek, end: endOfWeek };
       }
-      
+
       case "Month": {
         const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0, 0);
         const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
         return { start: startOfMonth, end: endOfMonth };
       }
-      
+
       case "Quarter": {
         const currentMonth = today.getMonth();
         const quarter = Math.floor(currentMonth / 3);
@@ -350,13 +350,13 @@ const StaffManagementPage = () => {
         const endOfQuarter = new Date(today.getFullYear(), quarter * 3 + 3, 0, 23, 59, 59, 999);
         return { start: startOfQuarter, end: endOfQuarter };
       }
-      
+
       case "Year": {
         const startOfYear = new Date(today.getFullYear(), 0, 1, 0, 0, 0, 0);
         const endOfYear = new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999);
         return { start: startOfYear, end: endOfYear };
       }
-      
+
       case "Custom":
         if (customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) {
           const rangeStart = new Date(customDateRange[0].startDate);
@@ -366,7 +366,7 @@ const StaffManagementPage = () => {
           return { start: rangeStart, end: rangeEnd };
         }
         return null;
-      
+
       default:
         return null;
     }
@@ -383,16 +383,16 @@ const StaffManagementPage = () => {
         item.STAFF_ID.toLowerCase().includes(s);
       const matchesStatus = statusFilter ? item.Status === statusFilter : true;
       const matchesRole = roleFilter ? item.Role === roleFilter : true;
-      
+
       // Date filtering based on time period
       let matchesDate = true;
       const dateRange = getDateRange(activeTimePeriod);
-      
+
       if (dateRange) {
         const itemDate = new Date(item.JoinDate);
         matchesDate = itemDate >= dateRange.start && itemDate <= dateRange.end;
       }
-      
+
       return matchesSearch && matchesStatus && matchesRole && matchesDate;
     });
   }, [staffItems, searchTerm, statusFilter, roleFilter, activeTimePeriod, customDateRange]);
@@ -443,6 +443,7 @@ const StaffManagementPage = () => {
   }
 
   return (
+
     <div className="bg-gray-50 min-h-screen mt-17 w-full px-2">
       {toast && (
         <Toast
@@ -456,105 +457,116 @@ const StaffManagementPage = () => {
         <h1 className="text-3xl font-semibold">Payroll - Branch #{branchId}</h1>
       </div>
 
-      {/* Time Period Filter */}
-      <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center relative">
-        {periods.map((period) => (
-          <div key={period} className="relative">
-            <button
-              onClick={() => {
-                if (period === "Custom") {
-                  setActiveTimePeriod("Custom");
-                  setShowDatePicker((prev) => !prev);
-                } else {
-                  setActiveTimePeriod(period);
-                  setShowDatePicker(false);
-                }
-              }}
-              className={`flex items-center gap-2 px-4 py-2 text-sm rounded-sm transition-colors border ${
-                activeTimePeriod === period
+
+      <div className="flex mb-6 sm:mb-8 relative max-w-[88vw]">
+        <div className="flex overflow-x-auto pb-2 gap-2 w-full hide-scrollbar">
+          {periods.map((period) => (
+            <div key={period} className="relative flex-shrink-0">
+              <button
+                onClick={() => {
+                  if (period === "Custom") {
+                    setActiveTimePeriod("Custom");
+                    setShowDatePicker((prev) => !prev);
+                  } else {
+                    setActiveTimePeriod(period);
+                    setShowDatePicker(false);
+                  }
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors border ${activeTimePeriod === period
                   ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
                   : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
-              }`}
-            >
-              {period === "Custom" && <Calendar size={16} />}
+                  }`}
+              >
+                {period === "Custom" && <Calendar size={16} />}
+                <span className="whitespace-nowrap">
+                  {period === "Custom" &&
+                    customDateRange?.[0]?.startDate &&
+                    customDateRange?.[0]?.endDate
+                    ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
+                    : period}
+                </span>
+              </button>
+
+              {/* Calendar dropdown attached to Custom button */}
               {period === "Custom" &&
-              customDateRange?.[0]?.startDate &&
-              customDateRange?.[0]?.endDate
-                ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
-                : period}
-            </button>
-
-            {/* Calendar dropdown attached to Custom button */}
-            {period === "Custom" &&
-              activeTimePeriod === "Custom" &&
-              showDatePicker && (
-                <div 
-                  ref={calendarRef}
-                  className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-sm"
-                >
-                  <DateRange
-                    ranges={customDateRange?.length ? customDateRange : [{
-                      startDate: new Date(),
-                      endDate: new Date(),
-                      key: "selection",
-                    }]}
-                    onChange={(ranges) => {
-                      if (ranges.selection) {
-                        setCustomDateRange([ranges.selection]);
-
-                        if (ranges.selection.startDate && ranges.selection.endDate) {
-                          setShowDatePicker(false);
-                        }
-                      }
+                activeTimePeriod === "Custom" &&
+                showDatePicker && (
+                  <div
+                    ref={calendarRef}
+                    className="fixed z-50 mt-2 w-64 h-64 md:w-80 md:h-80 bg-white shadow-lg border border-gray-200 rounded-sm"
+                    style={{
+                      top: '120px', // Adjust based on your header height
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 'min(320px, calc(100vw - 32px))', // Responsive width
+                      height: 'min(320px, calc(100vh - 200px))', // Responsive height
                     }}
-                    moveRangeOnFirstSelection={false}
-                    className="rounded-lg"
-                  />
-                </div>
-              )}
-          </div>
-        ))}
+                  >
+                    <DateRange
+                      ranges={customDateRange?.length ? customDateRange : [{
+                        startDate: new Date(),
+                        endDate: new Date(),
+                        key: "selection",
+                      }]}
+                      onChange={(ranges) => {
+                        if (ranges.selection) {
+                          setCustomDateRange([ranges.selection]);
+
+                          if (ranges.selection.startDate && ranges.selection.endDate) {
+                            setShowDatePicker(false);
+                          }
+                        }
+                      }}
+                      moveRangeOnFirstSelection={false}
+                      className="rounded-lg calendar-mobile-responsive"
+                    />
+                  </div>
+                )}
+            </div>
+          ))}
+        </div>
       </div>
 
+
       {/* Summary Cards - Same layout as other pages */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  gap-4 mb-8 max-w-[100vw]">
         <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">{summaryData.totalStaff}</p>
+            <p className="text-5xl mb-1">{summaryData.totalStaff}</p>
             <p className="text-1xl text-gray-500">Total Staff</p>
           </div>
         </div>
 
         <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">{summaryData.paidStaff}</p>
+            <p className="text-5xl mb-1">{summaryData.paidStaff}</p>
             <p className="text-1xl text-gray-500">Paid Staff</p>
           </div>
         </div>
 
         <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">${summaryData.totalSalaries.toLocaleString()}</p>
+            <p className="text-5xl mb-1">${summaryData.totalSalaries.toLocaleString()}</p>
             <p className="text-1xl text-gray-500">Total Payroll</p>
           </div>
         </div>
 
         <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-6xl mb-1">${summaryData.unpaidSalaries.toLocaleString()}</p>
+            <p className="text-5xl mb-1">${summaryData.unpaidSalaries.toLocaleString()}</p>
             <p className="text-1xl text-gray-500">Pending Payments</p>
           </div>
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-8">
-        <div className="relative flex-1 min-w-[200px]">
+      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        {/* Search Bar */}
+        <div className="relative flex-1 min-w-[150px] max-w-[100vw]">
           <input
             type="text"
             placeholder="Search..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
@@ -565,12 +577,12 @@ const StaffManagementPage = () => {
       </div>
 
       {/* Responsive Table with Global CSS Classes */}
-      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
-        <div className="table-container">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table ">
+        <div className="rounded-sm table-container">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="relative px-6 py-6 text-left">
+                <th className="relative px-4 py-3 text-left">
                   Staff ID
                 </th>
                 <th className="relative px-4 py-3 text-left">
@@ -587,14 +599,14 @@ const StaffManagementPage = () => {
                       isOpen={roleDropdownOpen}
                       onOpenChange={setRoleDropdownOpen}
                       trigger={
-                        <button className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
+                        <button className="px-2 py-1 rounded  bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                           {roleFilter || "Role"}
                           <ChevronDown size={14} className="text-gray-500 ml-auto" />
                         </button>
                       }
                     >
                       <button
-                        className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none text-left"
+                        className="w-full px-3 py-1  cursor-pointer hover:bg-gray-100 rounded outline-none text-left"
                         onClick={() => {
                           setRoleFilter("");
                           setRoleDropdownOpen(false);
@@ -606,7 +618,7 @@ const StaffManagementPage = () => {
                         (role) => (
                           <button
                             key={role}
-                            className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 text-black-700 rounded outline-none text-left"
+                            className="w-full px-3 py-1  cursor-pointer hover:bg-gray-100 text-black-700 rounded outline-none text-left"
                             onClick={() => {
                               setRoleFilter(role);
                               setRoleDropdownOpen(false);
@@ -626,14 +638,14 @@ const StaffManagementPage = () => {
                       isOpen={statusDropdownOpen}
                       onOpenChange={setStatusDropdownOpen}
                       trigger={
-                        <button className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
+                        <button className="px-2 py-1 rounded  bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                           {statusFilter || "Status"}
                           <ChevronDown size={14} className="text-gray-500 ml-auto" />
                         </button>
                       }
                     >
                       <button
-                        className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none text-left"
+                        className="w-full px-3 py-1  cursor-pointer hover:bg-gray-100 rounded outline-none text-left"
                         onClick={() => {
                           setStatusFilter("");
                           setStatusDropdownOpen(false);
@@ -642,7 +654,7 @@ const StaffManagementPage = () => {
                         Status
                       </button>
                       <button
-                        className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none text-left"
+                        className="w-full px-3 py-1  cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none text-left"
                         onClick={() => {
                           setStatusFilter("Paid");
                           setStatusDropdownOpen(false);
@@ -651,7 +663,7 @@ const StaffManagementPage = () => {
                         Paid
                       </button>
                       <button
-                        className="w-full px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none text-left"
+                        className="w-full px-3 py-1  cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none text-left"
                         onClick={() => {
                           setStatusFilter("Unpaid");
                           setStatusDropdownOpen(false);
@@ -685,9 +697,9 @@ const StaffManagementPage = () => {
                     colSpan={8}
                     className="px-4 py-8 text-center text-gray-500"
                   >
-                    {searchTerm || statusFilter || roleFilter || 
-                     (activeTimePeriod === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) ||
-                     (activeTimePeriod !== "Week" && activeTimePeriod !== "Custom")
+                    {searchTerm || statusFilter || roleFilter ||
+                      (activeTimePeriod === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) ||
+                      (activeTimePeriod !== "Week" && activeTimePeriod !== "Custom")
                       ? `No staff members match your search criteria for Branch #${branchId}.`
                       : `No staff members found for Branch #${branchId}.`}
                   </td>
@@ -695,37 +707,35 @@ const StaffManagementPage = () => {
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item.STAFF_ID} className="bg-white hover:bg-gray-50 cursor-pointer transition-colors">
-                    <td className="px-6 py-8 whitespace-nowrap text-sm" data-label="Staff ID">
+                    <td className="px-6 py-8 whitespace-nowrap " data-label="Staff ID">
                       {`#${String(item.STAFF_ID).padStart(3, "0")}`}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium card-name-cell" data-label="Name">
-                      <div className="name-content">
-                        <span>{item.Name}</span>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap  " data-label="Name">
+                      <span>{item.Name}</span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Contact">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Contact">
                       {item.Contact}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Role">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Role">
                       {item.Role}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Status">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Status">
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-sm text-xs font-medium  ${item.Status === "Paid"
+                        className={`inline-block w-20  lg:text-center text-right px-2 py-[2px] rounded-md text-xs font-medium  ${item.Status === "Paid"
                           ? "text-green-400 border-green-600"
                           : ""
-                        } ${item.Status === "Unpaid"
-                          ? "text-red-400 border-red-600"
-                          : ""
-                        }`}
+                          } ${item.Status === "Unpaid"
+                            ? "text-red-400 border-red-600"
+                            : ""
+                          }`}
                       >
                         {item.Status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Salary">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Salary">
                       {item.Salary.toLocaleString()}Rs
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Join Date">
+                    <td className="px-4 py-4 whitespace-nowrap " data-label="Join Date">
                       {new Date(item.JoinDate).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Details">

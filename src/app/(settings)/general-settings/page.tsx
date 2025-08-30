@@ -163,21 +163,24 @@ class SettingsAPI {
 const Toast = React.memo<ToastProps>(
   ({ message, type, onClose, isVisible }) => (
     <div
-      className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[450px] transition-all duration-500 ease-in-out transform ${isVisible
+      className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[450px] transition-all duration-500 ease-in-out transform ${
+        isVisible
           ? "translate-x-0 opacity-100 scale-100"
           : "translate-x-full opacity-0 scale-95"
-        } ${type === "success"
+      } ${
+        type === "success"
           ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200"
           : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
-        }`}
+      }`}
       style={{
         backdropFilter: "blur(10px)",
         border: "1px solid rgba(255, 255, 255, 0.2)",
       }}
     >
       <div
-        className={`flex-shrink-0 p-1 rounded-full ${type === "success" ? "bg-green-400/20" : "bg-red-400/20"
-          }`}
+        className={`flex-shrink-0 p-1 rounded-full ${
+          type === "success" ? "bg-green-400/20" : "bg-red-400/20"
+        }`}
       >
         {type === "success" ? (
           <CheckCircle size={20} className="text-white" />
@@ -398,45 +401,48 @@ const GeneralSettingsPage = () => {
       )}
       <div className="flex-1 justify-center  items-center w-full px-6">
         <div className="mt-20     ">
-          <div className="flex items-center justify-between mb-12">
-            <h1 className="text-3xl font-semibold text-gray-900">
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
+            <h1 className="text-3xl font-semibold mb-5 text-gray-900">
               General Settings
             </h1>
-            <div className="flex gap-3 ">
-              <button
-                onClick={handleResetToDefaults}
-                disabled={resetting}
-                className="flex items-center gap-2 px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {resetting ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-b-2 border-gray-600 rounded-full"></div>
-                    Resetting...
-                  </>
-                ) : (
-                  "Reset to Defaults"
-                )}
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={!hasChanges || saving}
-                className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${hasChanges && !saving
-                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            <div className="flex justify-center items-center w-full  md:justify-end">
+              <div className="flex gap-3 w-full lg:w-[60%] ">
+                <button
+                  onClick={handleResetToDefaults}
+                  disabled={resetting}
+                  className="flex  w-[50%] items-center gap-2 px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {resetting ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-b-2 border-gray-600 rounded-full"></div>
+                      Resetting...
+                    </>
+                  ) : (
+                    "Reset to Defaults"
+                  )}
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={!hasChanges || saving}
+                  className={`flex  w-[50%] items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
+                    hasChanges && !saving
+                      ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
-              >
-                {saving ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save size={16} />
-                    Save Changes
-                  </>
-                )}
-              </button>
+                >
+                  {saving ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={16} />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -474,7 +480,10 @@ const GeneralSettingsPage = () => {
                         value="before"
                         checked={settings.currencyPosition === "before"}
                         onChange={(e) =>
-                          handleSettingChange("currencyPosition", e.target.value)
+                          handleSettingChange(
+                            "currencyPosition",
+                            e.target.value
+                          )
                         }
                         className="mr-2 text-blue-600"
                       />
@@ -486,7 +495,10 @@ const GeneralSettingsPage = () => {
                         value="after"
                         checked={settings.currencyPosition === "after"}
                         onChange={(e) =>
-                          handleSettingChange("currencyPosition", e.target.value)
+                          handleSettingChange(
+                            "currencyPosition",
+                            e.target.value
+                          )
                         }
                         className="mr-2 text-blue-600"
                       />
@@ -715,7 +727,10 @@ const GeneralSettingsPage = () => {
                   <ButtonPage
                     checked={settings.requireManagerForDiscounts}
                     onChange={(isActive) =>
-                      handleSettingChange("requireManagerForDiscounts", isActive)
+                      handleSettingChange(
+                        "requireManagerForDiscounts",
+                        isActive
+                      )
                     }
                   />
                 </div>
@@ -748,7 +763,9 @@ const GeneralSettingsPage = () => {
             <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[450px]">
               <div className="flex items-center gap-2 mb-8">
                 <Bell className="text-black" size={24} />
-                <h2 className="text-xl font-semibold">Notifications & Alerts</h2>
+                <h2 className="text-xl font-semibold">
+                  Notifications & Alerts
+                </h2>
               </div>
 
               <div className="space-y-6">

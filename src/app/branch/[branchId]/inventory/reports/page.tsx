@@ -363,15 +363,15 @@ const ReportsPage = () => {
       </div>
 
       {/* Summary Cards - Most and Least Used Items */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+      <div className="grid grid-cols-1 max-w-[100vw]  lg:grid-cols-2   gap-4 mb-8 lg:max-w-[50vw]">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">{mostUsedItem ? mostUsedItem.Name : "N/A"}</p>
             <p className="text-1xl text-gray-500">Most Used({mostUsedItem ? mostUsedItem.usageCount : 0} times)</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1"> {leastUsedItem ? leastUsedItem.Name : "N/A"}
             </p>
@@ -399,12 +399,12 @@ const ReportsPage = () => {
 
 
       {/* Responsive Table with Global CSS Classes */}
-      <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm overflow-x-auto responsive-customer-table">
-        <div className="table-container">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm responsive-customer-table">
+        <div className="rounded-sm table-container">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-6 text-left w-20">
+                <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
@@ -453,15 +453,15 @@ const ReportsPage = () => {
                     }
                   />
                 </th>
-                <th className="relative px-4 py-3 text-left w-16">
+                <th className="relative px-4 py-3 text-left">
                   ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-40">
+                <th className="relative px-4 py-3 text-left">
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-40">
+                <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
                     <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
@@ -553,7 +553,7 @@ const ReportsPage = () => {
                     key={item.ID}
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm card-customer-id" data-label="Select">
+                    <td className="px-6 py-8 whitespace-nowrap text-sm ">
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -608,14 +608,14 @@ const ReportsPage = () => {
                       {item.ID}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="Name">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm " data-label="Name">
                       <div className="name-content">
                         <span className="font-medium">{item.Name}</span>
                       </div>
                     </td>
 
                     <td
-                      className="px-4 py-4 text-sm text-gray-600 max-w-xs truncate"
+                      className="px-4 py-4 text-sm text-gray-600 "
                       title={item.Unit}
                       data-label="Unit"
                     >

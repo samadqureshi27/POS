@@ -4,7 +4,13 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React, { useState, useEffect, useRef } from "react";
-import { RadialBarChart, RadialBar, Legend, Tooltip } from "recharts";
+import {
+  RadialBarChart,
+  RadialBar,
+  Legend,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 
@@ -323,27 +329,36 @@ const OrderManagementPage = () => {
         start.setDate(today.getDate() - today.getDay());
         const end = new Date(start);
         end.setDate(start.getDate() + 6);
-        return `This week, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+        return `This week, ${format(start, "dd MMM")} - ${format(
+          end,
+          "dd MMM yyyy"
+        )}`;
       }
       case "Month": {
         const start = new Date(today.getFullYear(), today.getMonth(), 1);
         const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        return `This month, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+        return `This month, ${format(start, "dd MMM")} - ${format(
+          end,
+          "dd MMM yyyy"
+        )}`;
       }
       case "Quarter": {
         const currentMonth = today.getMonth();
         const quarter = Math.floor(currentMonth / 3);
         const start = new Date(today.getFullYear(), quarter * 3, 1);
         const end = new Date(today.getFullYear(), quarter * 3 + 3, 0);
-        return `This quarter (Q${quarter + 1}), ${format(start, "dd MMM")} - ${format(
-          end,
-          "dd MMM yyyy"
-        )}`;
+        return `This quarter (Q${quarter + 1}), ${format(
+          start,
+          "dd MMM"
+        )} - ${format(end, "dd MMM yyyy")}`;
       }
       case "Year": {
         const start = new Date(today.getFullYear(), 0, 1);
         const end = new Date(today.getFullYear(), 11, 31);
-        return `This year, ${format(start, "dd MMM yyyy")} - ${format(end, "dd MMM yyyy")}`;
+        return `This year, ${format(start, "dd MMM yyyy")} - ${format(
+          end,
+          "dd MMM yyyy"
+        )}`;
       }
       case "Custom": {
         if (
@@ -352,10 +367,10 @@ const OrderManagementPage = () => {
           customDateRange[0].startDate &&
           customDateRange[0].endDate
         ) {
-          return `${format(customDateRange[0].startDate, "dd MMM yyyy")} - ${format(
-            customDateRange[0].endDate,
+          return `${format(
+            customDateRange[0].startDate,
             "dd MMM yyyy"
-          )}`;
+          )} - ${format(customDateRange[0].endDate, "dd MMM yyyy")}`;
         }
         return "Custom range";
       }
@@ -371,9 +386,7 @@ const OrderManagementPage = () => {
 
     switch (period) {
       case "Today":
-        return (
-          orderDate.toDateString() === today.toDateString()
-        );
+        return orderDate.toDateString() === today.toDateString();
       case "Week": {
         const start = new Date(today);
         start.setDate(today.getDate() - today.getDay());
@@ -484,7 +497,15 @@ const OrderManagementPage = () => {
   // Apply filters whenever filter criteria change - updated to include period
   useEffect(() => {
     applyFilters();
-  }, [searchTerm, statusFilter, unitFilter, customDate, selectedPeriod, customDateRange, items]);
+  }, [
+    searchTerm,
+    statusFilter,
+    unitFilter,
+    customDate,
+    selectedPeriod,
+    customDateRange,
+    items,
+  ]);
 
   const applyFilters = async () => {
     try {
@@ -499,12 +520,12 @@ const OrderManagementPage = () => {
       if (response.success) {
         // Apply period filtering on top of API filters
         let periodFilteredData = response.data;
-        
+
         // Apply period filtering
-        periodFilteredData = response.data.filter(item => 
+        periodFilteredData = response.data.filter((item) =>
           isDateInPeriod(item.Time_Date, selectedPeriod)
         );
-        
+
         setFilteredItems(periodFilteredData);
       }
     } catch (error) {
@@ -558,72 +579,80 @@ const OrderManagementPage = () => {
       <h1 className="text-3xl font-semibold mb-8 ">Order Management</h1>
 
       {/* Time Period Buttons */}
-      <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center relative">
-        {periods.map((period) => (
-          <div key={period} className="relative">
-            <button
-              onClick={() => {
-                if (period === "Custom") {
-                  setSelectedPeriod("Custom");
-                  setShowDatePicker((prev) => !prev);
-                } else {
-                  handlePeriodChange(period);
-                }
-              }}
-              disabled={loading}
-              className={`flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors disabled:opacity-50 ${
-                selectedPeriod === period
-                  ? "bg-gray-800 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-              }`}
-            >
-              {period === "Custom" && <Calendar size={16} />}
+      <div className="flex mb-6 sm:mb-8 relative max-w-[88vw]">
+        <div className="flex overflow-x-auto pb-2 gap-2 w-full hide-scrollbar">
+          {periods.map((period) => (
+            <div key={period} className="relative flex-shrink-0">
+              <button
+                onClick={() => {
+                  if (period === "Custom") {
+                    setSelectedPeriod("Custom");
+                    setShowDatePicker((prev) => !prev);
+                  } else {
+                    handlePeriodChange(period);
+                    setShowDatePicker(false);
+                  }
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors border ${selectedPeriod === period
+                  ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
+                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
+                  }`}
+              >
+                {period === "Custom" && <Calendar size={16} />}
+                <span className="whitespace-nowrap">
+                  {period === "Custom" &&
+                    customDateRange?.[0]?.startDate &&
+                    customDateRange?.[0]?.endDate
+                    ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
+                    : period}
+                </span>
+              </button>
+
+              {/* Calendar dropdown attached to Custom button */}
               {period === "Custom" &&
-              customDateRange?.[0]?.startDate &&
-              customDateRange?.[0]?.endDate
-                ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
-                : period}
-            </button>
-
-            {/* Calendar dropdown attached to Custom button */}
-            {period === "Custom" &&
-              selectedPeriod === "Custom" &&
-              showDatePicker && (
-                <div 
-                  ref={calendarRef}
-                  className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-md"
-                >
-                  <DateRange
-                    ranges={customDateRange?.length ? customDateRange : [{
-                      startDate: new Date(),
-                      endDate: new Date(),
-                      key: "selection",
-                    }]}
-                    onChange={(ranges) => {
-                      if (ranges.selection) {
-                        setCustomDateRange([ranges.selection]);
-
-                        if (ranges.selection.startDate && ranges.selection.endDate) {
-                          setSelectedPeriod("Custom");
-                          setShowDatePicker(false);
-                          setTimeout(() => applyFilters(), 100); // Apply filters after state update
-                        }
-                      }
+                selectedPeriod === "Custom" &&
+                showDatePicker && (
+                  <div
+                    ref={calendarRef}
+                    className="fixed z-50 mt-2 w-64 h-64 md:w-80 md:h-80 bg-white shadow-lg border border-gray-200 rounded-sm"
+                    style={{
+                      top: '120px', // Adjust based on your header height
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 'min(320px, calc(100vw - 32px))', // Responsive width
+                      height: 'min(320px, calc(100vh - 200px))', // Responsive height
                     }}
-                    moveRangeOnFirstSelection={false}
-                    className="rounded-lg"
-                  />
-                </div>
-              )}
-          </div>
-        ))}
+                  >
+                    <DateRange
+                      ranges={customDateRange?.length ? customDateRange : [{
+                        startDate: new Date(),
+                        endDate: new Date(),
+                        key: "selection",
+                      }]}
+                      onChange={(ranges) => {
+                        if (ranges.selection) {
+                          setCustomDateRange([ranges.selection]);
+
+                          if (ranges.selection.startDate && ranges.selection.endDate) {
+                            setShowDatePicker(false);
+                          }
+                        }
+                      }}
+                      moveRangeOnFirstSelection={false}
+                      className="rounded-lg calendar-mobile-responsive"
+                    />
+                  </div>
+                )}
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="flex gap-6">
+      <div className="grid grid-cols-1  lg:grid-cols-3 gap-6">
         {/* Most Ordered Table */}
-        <div className="bg-gray-50  rounded-sm overflow-x-auto w-1/3">
+        <div className="bg-gray-50  rounded-sm overflow-x-auto">
           <div className="max-h-[300px] overflow-y-auto">
-            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] border border-gray-300 rounded-sm mb-2 p-4 bg-white shadow-sm">
+            <div className="flex items-center justify-center flex-1 gap-2  max-h-[50px] border border-gray-300 rounded-sm mb-2 p-4 bg-white shadow-sm">
               <div>
                 <p className="text-2xl mb-1">Most Ordered</p>
               </div>
@@ -662,9 +691,9 @@ const OrderManagementPage = () => {
         </div>
 
         {/* Least Ordered Table */}
-        <div className="bg-gray-50 rounded-sm overflow-x-auto w-1/3">
+        <div className="bg-gray-50 rounded-sm overflow-x-auto">
           <div className="max-h-[300px] overflow-y-auto">
-            <div className="flex items-center justify-center flex-1 gap-2 max-w-[450px] max-h-[50px] border border-gray-300 rounded-sm mb-2 p-4 bg-white shadow-sm">
+            <div className="flex items-center justify-center flex-1 gap-2  max-h-[50px] border border-gray-300 rounded-sm mb-2 p-4 bg-white shadow-sm">
               <div>
                 <p className="text-2xl mb-1">Least Ordered</p>
               </div>
@@ -702,67 +731,62 @@ const OrderManagementPage = () => {
         </div>
 
         {/* Radial Chart */}
-     <div className="w-1/3 flex items-center justify-center overflow-hidden outline-none border-none">              
-  <div className="max-h-[300px] outline-none border-none">                  
-    <div className="flex items-center justify-center">                      
-      <p className="text-2xl mb-1">Most Type of Orders</p>                  
-    </div>                  
-    <div className="flex items-center justify-center outline-none border-none">                      
-      {statsLoading ? (                          
-        <div className="flex items-center justify-center h-[250px]">                              
-          <div className="animate-spin h-8 w-8 border-b-2 border-gray-600 rounded-full"></div>                          
-        </div>                      
-      ) : (  
-        <div style={{
-          outline: 'none',
-          border: 'none',
-          boxShadow: 'none'
-        }}>                        
-          <RadialBarChart                              
-            width={370}                              
-            height={250}                              
-            cx="40%"                              
-            cy="50%"                              
-            innerRadius="50%"                              
-            outerRadius="80%"                              
-            barSize={20}                              
-            data={orderStats.orderTypeStats}
-            style={{
-              outline: 'none', 
-              border: 'none',
-              boxShadow: 'none'
-            }}
-          >                              
-            <RadialBar minAngle={15} clockWise dataKey="value" />                              
-            <Legend                                  
-              iconSize={10}                                  
-              layout="vertical"                                  
-              verticalAlign="middle"                                  
-              align="right"                              
-            />                              
-            <Tooltip                                  
-              formatter={(value, name, props) => [                                      
-                `${value} Orders`,                                      
-                props.payload.name,                                  
-              ]}                              
-            />                          
-          </RadialBarChart>
-        </div>                      
-      )}                  
-    </div>              
-  </div>          
-</div>
+        <div className="w-full flex items-center justify-center overflow-hidden outline-none border-none">
+          <div className="w-full max-h-[300px] outline-none border-none">
+            <div className="flex items-center justify-center">
+              <p className="text-2xl mb-1">Most Type of Orders</p>
+            </div>
+            <div className="w-full flex items-center justify-center outline-none border-none">
+              {statsLoading ? (
+                <div className="flex items-center justify-center h-[250px]">
+                  <div className="animate-spin h-8 w-8 border-b-2 border-gray-600 rounded-full"></div>
+                </div>
+              ) : (
+                <div
+                  className="w-full"
+                  style={{
+                    outline: "none",
+                    border: "none",
+                    boxShadow: "none",
+                  }}
+                >
+                  <ResponsiveContainer width="100%" height={250}>
+                    <RadialBarChart
+                      cx="40%"
+                      cy="50%"
+                      innerRadius="50%"
+                      outerRadius="80%"
+                      barSize={20}
+                      data={orderStats.orderTypeStats}
+                      style={{
+                        outline: "none",
+                        border: "none",
+                        boxShadow: "none",
+                      }}
+                    >
+                      <RadialBar minAngle={15} clockWise dataKey="value" />
+                      <Legend
+                        iconSize={10}
+                        layout="vertical"
+                        verticalAlign="middle"
+                        align="right"
+                      />
+                      <Tooltip
+                        formatter={(value, name, props) => [
+                          `${value} Orders`,
+                          props.payload.name,
+                        ]}
+                      />
+                    </RadialBarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-{/* Add this style tag at the bottom of your component or in your CSS file */}
-<style jsx global>{`
-  .recharts-wrapper,
-  .recharts-wrapper svg,
-  .recharts-surface {
-    outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-`}</style>
+        {/* Add this style tag at the bottom of your component or in your CSS file */}
+   
       </div>
 
       {/* Search Bar */}
@@ -773,7 +797,7 @@ const OrderManagementPage = () => {
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -783,8 +807,8 @@ const OrderManagementPage = () => {
       </div>
 
       {/* Table + filters */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm ">
-        <div className=" rounded-sm ">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table">
+        <div className=" rounded-sm table-container">
           <table className="min-w-full  divide-y divide-gray-200   table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
@@ -853,7 +877,7 @@ const OrderManagementPage = () => {
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
                         <ChevronDown
@@ -896,7 +920,7 @@ const OrderManagementPage = () => {
 
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {unitFilter || "Type"}
                         <ChevronDown
@@ -1021,17 +1045,31 @@ const OrderManagementPage = () => {
                       />
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap font-medium text-gray-900"
+                      data-label="Order"
+                    >
                       {item.Order}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
-                    <td className="px-4 py-4 whitespace-nowrap text-center">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap"
+                      data-label="Name"
+                    >
+                      {item.Name}
+                    </td>
+                    <td
+                      className="px-4 py-4 whitespace-nowrap text-center"
+                      data-label="Quantity"
+                    >
                       {item.number_item}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap"
+                      data-label="Status"
+                    >
                       <span
-                        className={`inline-block w-20 text-center px-2 py-1 rounded-md text-xs font-medium 
+                        className={`inline-block w-20 text-right px-2 py-1 rounded-md text-xs font-medium 
                     ${
                       item.Status === "Inactive"
                         ? "text-red-400 "
@@ -1042,19 +1080,31 @@ const OrderManagementPage = () => {
                         {item.Status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1  text-blue-400 rounded-md text-sm">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap"
+                      data-label="Type"
+                    >
+                      <span className="px-2 py-1 text-right  text-blue-400 rounded-md text-sm">
                         {item.Type}
                       </span>
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap"
+                      data-label="Payment"
+                    >
                       {item.Payment}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap font-semibold text-gray-900">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap font-semibold text-gray-900"
+                      data-label="Total"
+                    >
                       {item.Total}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td
+                      className="px-4 py-4 whitespace-nowrap text-sm text-gray-600"
+                      data-label="Date"
+                    >
                       {item.Time_Date}
                     </td>
                   </tr>

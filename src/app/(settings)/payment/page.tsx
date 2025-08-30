@@ -466,7 +466,7 @@ const PaymentManagementPage = () => {
         
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-3xl font-semibold mb-1">
+            <p className="text-5xl  mb-1">
               {activeMethodsCount}
             </p>
             <p className="text-gray-500">
@@ -477,7 +477,7 @@ const PaymentManagementPage = () => {
 
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
-            <p className="text-3xl font-semibold mb-1">
+            <p className="text-5xl  mb-1">
               {topTaxType?.[0] || "N/A"}
             </p>
             <p className="text-gray-500">
@@ -520,7 +520,7 @@ const PaymentManagementPage = () => {
         <div className="relative flex-1 min-w-[200px]">
                   <input
                     type="text"
-                    placeholder="Search Payment Methods..."
+                    placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
@@ -599,7 +599,7 @@ const PaymentManagementPage = () => {
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Payment Type"}
                         <ChevronDown
@@ -648,7 +648,7 @@ const PaymentManagementPage = () => {
 
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {taxTypeFilter || "Tax Type"}
                         <ChevronDown
@@ -768,7 +768,7 @@ const PaymentManagementPage = () => {
 
                   <td className="px-4 py-4 whitespace-nowrap"data-label="Payment Type">
                     <span
-                      className={`inline-block w-20  text-right px-2 py-[2px] rounded-md text-xs font-medium 
+                      className={`inline-block w-20  text-right  py-[2px] rounded-md text-xs font-medium 
                   ${item.PaymentType === "Cash" ? "text-red-400 border-red-600" : ""}
                   ${item.PaymentType === "Card" ? "text-blue-400 border-blue-600" : ""}
                   ${item.PaymentType === "Online" ? "text-green-400 border-green-700" : ""}
@@ -783,7 +783,7 @@ const PaymentManagementPage = () => {
 
                   <td className="px-4 py-4 whitespace-nowrap"data-label="Status">
                     <span
-                      className={`inline-block w-20 text-right px-2 py-[2px] rounded-md text-xs font-medium 
+                      className={`inline-block w-20 text-right  py-[2px] rounded-md text-xs font-medium 
                   ${item.Status === "Active" ? "text-green-400 border-green-700" : "text-red-400 border-red-600"}
                 `}
                     >
@@ -815,7 +815,7 @@ const PaymentManagementPage = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[71]">
-          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+          <div className="bg-white rounded-lg p-6 min-w-[35vw]   max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
 
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
@@ -825,7 +825,7 @@ const PaymentManagementPage = () => {
             </div>
 
             {/* Scrollable Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 pl-1">
               {/* Payment Method Name */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
