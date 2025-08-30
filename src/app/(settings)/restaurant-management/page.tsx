@@ -58,7 +58,9 @@ class RestaurantAPI {
     closingTime: "",
   };
 
-  static async getProfile(): Promise<ApiResponse<Omit<RestaurantData, "logo">>> {
+  static async getProfile(): Promise<
+    ApiResponse<Omit<RestaurantData, "logo">>
+  > {
     await this.delay(800);
     const data = this.mockData;
     return {
@@ -89,41 +91,49 @@ interface ToastProps {
 }
 
 // Enhanced Toast Component with advanced animations (matching backup page)
-const Toast = React.memo<ToastProps>(({ message, type, onClose, isVisible }) => (
-  <div
-    className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${isVisible
-        ? 'translate-x-0 opacity-100 scale-100'
-        : 'translate-x-full opacity-0 scale-95'
-      } ${type === "success"
-        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200"
-        : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
+const Toast = React.memo<ToastProps>(
+  ({ message, type, onClose, isVisible }) => (
+    <div
+      className={`fixed top-24 right-6 px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-500 ease-in-out transform ${
+        isVisible
+          ? "translate-x-0 opacity-100 scale-100"
+          : "translate-x-full opacity-0 scale-95"
+      } ${
+        type === "success"
+          ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200"
+          : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200"
       }`}
-    style={{
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.2)'
-    }}
-  >
-    <div className={`flex-shrink-0 p-1 rounded-full ${type === "success" ? "bg-green-400/20" : "bg-red-400/20"}`}>
-      {type === "success" ? (
-        <CheckCircle size={20} className="text-white" />
-      ) : (
-        <AlertCircle size={20} className="text-white" />
-      )}
-    </div>
-
-    <div className="flex-1">
-      <p className="font-medium text-sm">{message}</p>
-    </div>
-
-    <button
-      onClick={onClose}
-      className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200"
-      aria-label="Close"
+      style={{
+        backdropFilter: "blur(10px)",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
+      }}
     >
-      <X size={16} className="text-white" />
-    </button>
-  </div>
-));
+      <div
+        className={`flex-shrink-0 p-1 rounded-full ${
+          type === "success" ? "bg-green-400/20" : "bg-red-400/20"
+        }`}
+      >
+        {type === "success" ? (
+          <CheckCircle size={20} className="text-white" />
+        ) : (
+          <AlertCircle size={20} className="text-white" />
+        )}
+      </div>
+
+      <div className="flex-1">
+        <p className="font-medium text-sm">{message}</p>
+      </div>
+
+      <button
+        onClick={onClose}
+        className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors duration-200"
+        aria-label="Close"
+      >
+        <X size={16} className="text-white" />
+      </button>
+    </div>
+  )
+);
 
 // Enhanced Dropdown Component
 const RestaurantDropdown = ({
@@ -151,7 +161,9 @@ const RestaurantDropdown = ({
         </span>
         <ChevronDown
           size={16}
-          className={`text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          className={`text-gray-400 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
         />
       </button>
 
@@ -239,27 +251,34 @@ const RestaurantProfilePage = () => {
   const [dragActive, setDragActive] = useState(false);
 
   // Advanced toast state management (matching backup page)
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error"; id: number } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+    id: number;
+  } | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Advanced toast management with animations (matching backup page)
-  const showToast = useCallback((message: string, type: "success" | "error") => {
-    const id = Date.now();
-    setToast({ message, type, id });
-    setToastVisible(true);
+  const showToast = useCallback(
+    (message: string, type: "success" | "error") => {
+      const id = Date.now();
+      setToast({ message, type, id });
+      setToastVisible(true);
 
-    // Auto hide after 4 seconds
-    setTimeout(() => {
-      setToastVisible(false);
-    }, 4000);
+      // Auto hide after 4 seconds
+      setTimeout(() => {
+        setToastVisible(false);
+      }, 4000);
 
-    // Remove from DOM after animation completes
-    setTimeout(() => {
-      setToast(null);
-    }, 4500);
-  }, []);
+      // Remove from DOM after animation completes
+      setTimeout(() => {
+        setToast(null);
+      }, 4500);
+    },
+    []
+  );
 
   const hideToast = useCallback(() => {
     setToastVisible(false);
@@ -277,7 +296,7 @@ const RestaurantProfilePage = () => {
       setLoading(true);
       const response = await RestaurantAPI.getProfile();
       if (!response.success) throw new Error(response.message);
-      setFormData(prev => ({ ...prev, ...response.data }));
+      setFormData((prev) => ({ ...prev, ...response.data }));
     } catch {
       showToast("Failed to load restaurant profile", "error");
     } finally {
@@ -289,12 +308,12 @@ const RestaurantProfilePage = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setHasChanges(true);
   };
 
   const handleDropdownChange = (key: keyof RestaurantData, value: string) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
+    setFormData((prev) => ({ ...prev, [key]: value }));
     setHasChanges(true);
   };
 
@@ -305,7 +324,7 @@ const RestaurantProfilePage = () => {
         showToast("File size must be less than 5MB", "error");
         return;
       }
-      setFormData(prev => ({ ...prev, logo: file }));
+      setFormData((prev) => ({ ...prev, logo: file }));
       setPreviewUrl(URL.createObjectURL(file));
       setHasChanges(true);
       showToast("Logo uploaded successfully!", "success");
@@ -333,7 +352,7 @@ const RestaurantProfilePage = () => {
         showToast("File size must be less than 5MB", "error");
         return;
       }
-      setFormData(prev => ({ ...prev, logo: file }));
+      setFormData((prev) => ({ ...prev, logo: file }));
       setPreviewUrl(URL.createObjectURL(file));
       setHasChanges(true);
       showToast("Logo uploaded successfully!", "success");
@@ -345,7 +364,7 @@ const RestaurantProfilePage = () => {
   };
 
   const removeLogo = () => {
-    setFormData(prev => ({ ...prev, logo: null }));
+    setFormData((prev) => ({ ...prev, logo: null }));
     setPreviewUrl(null);
     setHasChanges(true);
     showToast("Logo removed successfully", "success");
@@ -353,15 +372,17 @@ const RestaurantProfilePage = () => {
 
   const handleSave = async () => {
     // Validation
-    const requiredFields = ['name', 'type', 'contact', 'email', 'address'];
-    const missingFields = requiredFields.filter(field => !formData[field as keyof RestaurantData]);
+    const requiredFields = ["name", "type", "contact", "email", "address"];
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field as keyof RestaurantData]
+    );
 
     if (missingFields.length > 0) {
       showToast("Please fill in all required fields", "error");
       return;
     }
 
-    if (!formData.email.includes('@')) {
+    if (!formData.email.includes("@")) {
       showToast("Please enter a valid email address", "error");
       return;
     }
@@ -372,7 +393,10 @@ const RestaurantProfilePage = () => {
       const response = await RestaurantAPI.updateProfile(dataToSave);
       if (response.success) {
         setHasChanges(false);
-        showToast(response.message || "Restaurant profile updated successfully! ✨", "success");
+        showToast(
+          response.message || "Restaurant profile updated successfully! ✨",
+          "success"
+        );
       }
     } catch {
       showToast("Failed to save restaurant profile", "error");
@@ -394,15 +418,19 @@ const RestaurantProfilePage = () => {
 
     const now = new Date();
     const currentTime = now.getHours() * 60 + now.getMinutes();
-    const openTime = parseInt(formData.openingTime.split(':')[0]) * 60 + parseInt(formData.openingTime.split(':')[1]);
-    const closeTime = parseInt(formData.closingTime.split(':')[0]) * 60 + parseInt(formData.closingTime.split(':')[1]);
+    const openTime =
+      parseInt(formData.openingTime.split(":")[0]) * 60 +
+      parseInt(formData.openingTime.split(":")[1]);
+    const closeTime =
+      parseInt(formData.closingTime.split(":")[0]) * 60 +
+      parseInt(formData.closingTime.split(":")[1]);
 
     const isOpen = currentTime >= openTime && currentTime <= closeTime;
 
     return {
       isOpen,
       status: isOpen ? "Open Now" : "Closed",
-      color: isOpen ? "text-green-600 bg-green-100" : "text-red-600 bg-red-100"
+      color: isOpen ? "text-green-600 bg-green-100" : "text-red-600 bg-red-100",
     };
   };
 
@@ -430,33 +458,37 @@ const RestaurantProfilePage = () => {
         />
       )}
 
-
       <div className="flex-1 justify-center  items-center w-full px-6">
         <div className=" mt-20">
           {/* Header - Consistent with Billing & License page */}
-          <div className="flex items-center justify-between mb-12">
-            <h1 className="text-3xl font-semibold text-gray-900">Restaurant Profile</h1>
-            <div className="flex gap-3">
-              <button
-                onClick={handleSave}
-                disabled={!hasChanges || saving}
-                className={`flex items-center gap-2 px-6 py-2 rounded-sm transition-colors ${hasChanges && !saving
-                    ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
+            <h1 className="text-3xl font-semibold mb-5 text-gray-900">
+              Restaurant Profile
+            </h1>
+            <div className="flex justify-center items-center w-full  md:justify-end">
+              <div className="flex gap-3 w-full md:w-[40%] lg:w-[30%]">
+                <button
+                  onClick={handleSave}
+                  disabled={!hasChanges || saving}
+                  className={`flex w-[100%] items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
+                    hasChanges && !saving
+                      ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
-              >
-                {saving ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save size={16} />
-                    Save Changes
-                  </>
-                )}
-              </button>
+                >
+                  {saving ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={16} />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -487,7 +519,9 @@ const RestaurantProfilePage = () => {
                   <RestaurantDropdown
                     value={formData.type}
                     options={restaurantTypeOptions}
-                    onValueChange={(value) => handleDropdownChange("type", value)}
+                    onValueChange={(value) =>
+                      handleDropdownChange("type", value)
+                    }
                     placeholder="Select restaurant type"
                   />
                 </div>
@@ -566,8 +600,11 @@ const RestaurantProfilePage = () => {
                     Restaurant Logo
                   </label>
                   <div
-                    className={`relative border-2 border-dashed rounded-sm p-6 bg-gray-50 flex flex-col justify-center items-center hover:bg-gray-100 transition-all duration-300 cursor-pointer ${dragActive ? "border-gray-500 bg-blue-50" : "border-gray-300"
-                      }`}
+                    className={`relative border-2 border-dashed rounded-sm p-6 bg-gray-50 flex flex-col justify-center items-center hover:bg-gray-100 transition-all duration-300 cursor-pointer ${
+                      dragActive
+                        ? "border-gray-500 bg-blue-50"
+                        : "border-gray-300"
+                    }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
                     onDragOver={handleDrag}
@@ -603,7 +640,9 @@ const RestaurantProfilePage = () => {
                             <Trash2 size={16} />
                           </button>
                         </div>
-                        <p className="text-sm text-gray-600 text-center mt-2">Click to change logo</p>
+                        <p className="text-sm text-gray-600 text-center mt-2">
+                          Click to change logo
+                        </p>
                       </div>
                     ) : (
                       <>
@@ -639,9 +678,13 @@ const RestaurantProfilePage = () => {
                 <div className="pt-4">
                   <div className="flex items-center gap-2 mb-4">
                     <Clock className="text-black" size={20} />
-                    <h3 className="font-medium text-gray-900">Operating Hours</h3>
+                    <h3 className="font-medium text-gray-900">
+                      Operating Hours
+                    </h3>
                     {operatingStatus && (
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${operatingStatus.color} ml-auto`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full font-medium ${operatingStatus.color} ml-auto`}
+                      >
                         {operatingStatus.status}
                       </span>
                     )}
@@ -666,7 +709,9 @@ const RestaurantProfilePage = () => {
 
                     {formData.openingTime && formData.closingTime && (
                       <div className="bg-gray-50 rounded-sm p-3 border">
-                        <p className="text-xs font-medium text-gray-700 mb-1">Daily Hours</p>
+                        <p className="text-xs font-medium text-gray-700 mb-1">
+                          Daily Hours
+                        </p>
                         <p className="text-sm font-semibold text-gray-900">
                           {formData.openingTime} - {formData.closingTime}
                         </p>
