@@ -310,7 +310,7 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+      className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
         } ${isVisible && !isClosing
           ? "translate-x-0 opacity-100"
           : isClosing
@@ -598,15 +598,15 @@ const InventoryManagementPage = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[95vw]">
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+      <div className="grid grid-cols-1 max-w-[100vw]  lg:grid-cols-2   gap-4 mb-8 lg:max-w-[50vw]">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">{mostUsedItem?.Name || "N/A"}</p>
             <p className="text-1xl text-gray-500">Most Used ({mostUsedItem?.usageCount || 0} times)</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-4xl mb-1">{leastUsedItem?.Name || "N/A"}
             </p>
@@ -614,19 +614,16 @@ const InventoryManagementPage = () => {
               Least Used ({leastUsedItem?.usageCount || 0} times)</p>
           </div>
         </div>
-
-
-
       </div>
 
       {/* Action bar: add, delete, search */}
       <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 h-[40px]">
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -638,7 +635,7 @@ const InventoryManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
               ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
@@ -652,10 +649,10 @@ const InventoryManagementPage = () => {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search Payment Methods..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -665,10 +662,9 @@ const InventoryManagementPage = () => {
       </div>
 
       {/* Table + filters */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm">
-        <div className="rounded-sm">
-          <table className="min-w-full max-w-[800px] divide-y divide-gray-200 table-fixed">
-
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm responsive-customer-table">
+        <div className="rounded-sm table-container">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-6 text-left w-[2.5px]">
@@ -677,11 +673,10 @@ const InventoryManagementPage = () => {
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     disableRipple
                     sx={{
-                      transform: "scale(1.5)", // size adjustment
-                      p: 0, // remove extra padding
+                      transform: "scale(1.5)",
+                      p: 0,
                     }}
                     icon={
-                      // unchecked grey box
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -690,14 +685,13 @@ const InventoryManagementPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#d1d1d1" // border grey
+                          fill="#e0e0e0"
+                          stroke="#d1d1d1"
                           strokeWidth="2"
                         />
                       </svg>
                     }
                     checkedIcon={
-                      // checked with tick
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <rect
                           x="3"
@@ -706,8 +700,8 @@ const InventoryManagementPage = () => {
                           height="18"
                           rx="3"
                           ry="3"
-                          fill="#e0e0e0" // grey inside
-                          stroke="#2C2C2C" // dark border
+                          fill="#e0e0e0"
+                          stroke="#2C2C2C"
                           strokeWidth="2"
                         />
                         <path
@@ -731,8 +725,8 @@ const InventoryManagementPage = () => {
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  <div className="flex items-center gap-2">
-                    <DropdownMenu.Root>
+                  <div className="flex flex-col gap-1">
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {unitFilter || "Unit"}
                         <ChevronDown
@@ -741,33 +735,32 @@ const InventoryManagementPage = () => {
                         />
                       </DropdownMenu.Trigger>
 
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                          className="min-w-[240px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
-                          sideOffset={6}
+                      <DropdownMenu.Content
+                        className="min-w-[120px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
+                        sideOffset={6}
+                        onCloseAutoFocus={(e) => e.preventDefault()}
+                        style={{ zIndex: 1000 }}
+                      >
+                        <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                        <DropdownMenu.Item
+                          className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                          onClick={() => setUnitFilter("")}
                         >
-                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                          Unit
+                        </DropdownMenu.Item>
 
-                          <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                            onClick={() => setUnitFilter("")}
-                          >
-                            Unit
-                          </DropdownMenu.Item>
-
-                          {Array.from(new Set(Item.map((i) => i.Unit))).map(
-                            (unit) => (
-                              <DropdownMenu.Item
-                                key={unit}
-                                className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                                onClick={() => setUnitFilter(unit)}
-                              >
-                                {unit}
-                              </DropdownMenu.Item>
-                            )
-                          )}
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
+                        {Array.from(new Set(Item.map((i) => i.Unit))).map(
+                          (unit) => (
+                            <DropdownMenu.Item
+                              key={unit}
+                              className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                              onClick={() => setUnitFilter(unit)}
+                            >
+                              {unit}
+                            </DropdownMenu.Item>
+                          )
+                        )}
+                      </DropdownMenu.Content>
                     </DropdownMenu.Root>
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
@@ -775,7 +768,7 @@ const InventoryManagementPage = () => {
 
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex items-center gap-2">
-                    <DropdownMenu.Root>
+                    <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {statusFilter || "Status"}
                         <ChevronDown
@@ -858,7 +851,7 @@ const InventoryManagementPage = () => {
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-6 py-8">
+                    <td className="px-6 py-8" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -910,45 +903,40 @@ const InventoryManagementPage = () => {
                       />
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap">{item.ID}</td>
-                    <td className="px-4 py-4 whitespace-nowrap">{item.Name}</td>
-                    <td className="px-4 py-4 whitespace-nowrap">{item.Unit}</td>
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="ID">{item.ID}</td>
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Name">{item.Name}</td>
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Unit">{item.Unit}</td>
 
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-24 text-center px-2 py-[2px] rounded-sm text-xs font-medium 
+                        className={`inline-block w-20 text-right px-2 py-[2px] rounded-sm text-xs font-medium
                     ${item.Status === "Low" ? "text-red-400 border-red-400" : ""}
-                    ${item.Status === "Medium"
-                            ? "text-yellow-400 border-yellow-600"
-                            : ""
-                          }
-                    ${item.Status === "High"
-                            ? "text-green-400 border-green-700"
-                            : ""
-                          }
+                    ${item.Status === "Medium" ? "text-yellow-400 border-yellow-600" : ""}
+                    ${item.Status === "High" ? "text-green-400 border-green-700" : ""}
                   `}
                       >
                         {item.Status}
                       </span>
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Initial Stock">
                       {item.InitialStock}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600" data-label="Added Stock">
                       {item.AddedStock}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600" data-label="Updated Stock">
                       {item.UpdatedStock}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Threshold">
                       {item.Threshold}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setEditingItem(item);
                             setIsModalOpen(true);
                           }}
@@ -966,19 +954,18 @@ const InventoryManagementPage = () => {
           </table>
         </div>
       </div>
-
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg p-6 w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 px-4">
+          <div className="bg-white rounded-sm p-4 sm:p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
                 {editingItem ? "Edit Inventory Item" : `Add New Inventory Item - Branch #${branchId}`}
               </h2>
             </div>
 
             {/* Scrollable Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 flex-1 overflow-y-auto pr-1 pl-1">
               {/* Item Name */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -990,7 +977,7 @@ const InventoryManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="Enter item name"
                   required
                 />
@@ -1007,21 +994,21 @@ const InventoryManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, supplier: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="Enter supplier name"
                   required
                 />
               </div>
 
               {/* Unit */}
-              <div className="">
+              <div className="sm:col-span-2 md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Unit Measurement
                 </label>
 
                 <div className="flex items-center gap-2">
                   <DropdownMenu.Root>
-                    <DropdownMenu.Trigger className="px-3 py-2 w-full rounded-lg text-sm bg-white border border-gray-300 outline-none flex items-center justify-between hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
+                    <DropdownMenu.Trigger className="px-3 py-2 w-full rounded-sm text-sm bg-white border border-gray-300 outline-none flex items-center justify-between hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
                       {formData.Unit || "Select Unit"}
                       <ChevronDown size={16} className="text-gray-500" />
                     </DropdownMenu.Trigger>
@@ -1129,7 +1116,7 @@ const InventoryManagementPage = () => {
               </div>
 
               {/* Threshold */}
-              <div>
+              <div className="sm:col-span-2 md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Low Stock Threshold
                   <span className="text-xs text-gray-500 ml-1">
@@ -1137,22 +1124,27 @@ const InventoryManagementPage = () => {
                   </span>
                 </label>
                 <input
-                  type="number"
-                  value={formData.Threshold}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      Threshold: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  type="text"
+                  value={formData.Threshold || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow numbers and empty string
+                    if (value === '' || /^\d+$/.test(value)) {
+                      setFormData({
+                        ...formData,
+                        Threshold: value === '' ? 0 : Number(value)
+                      });
+                    }
+                    // If invalid input, just ignore it (don't update state)
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="0"
                   min="0"
                 />
               </div>
 
               {/* Initial Stock */}
-              <div>
+              <div className="sm:col-span-1 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Initial Stock
                   <span className="text-xs text-gray-500 ml-1">
@@ -1160,50 +1152,60 @@ const InventoryManagementPage = () => {
                   </span>
                 </label>
                 <input
-                  type="number"
-                  value={formData.InitialStock}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      InitialStock: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  type="text"
+                  value={formData.InitialStock || ''} // Handle NaN display
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow numbers and empty string
+                    if (value === '' || /^\d+$/.test(value)) {
+                      setFormData({
+                        ...formData,
+                        InitialStock: value === '' ? 0 : Number(value)
+                      });
+                    }
+                    // If invalid input, just ignore it (don't update state)
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="0"
                   min="0"
                 />
               </div>
 
               {/* Added Stock */}
-              <div>
+              <div className="sm:col-span-1 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Additional Stock
                   <span className="text-xs text-gray-500 ml-1">
                     (Stock to add)
                   </span>
                 </label>
-                <input
-                  type="number"
-                  value={formData.AddedStock}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      AddedStock: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  <input
+                  type="text"
+                  value={formData.AddedStock || ''} // Handle NaN display
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow numbers and empty string
+                    if (value === '' || /^\d+$/.test(value)) {
+                      setFormData({
+                        ...formData,
+                        AddedStock: value === '' ? 0 : Number(value)
+                      });
+                    }
+                    // If invalid input, just ignore it (don't update state)
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="0"
                   min="0"
                 />
               </div>
 
               {/* Current Stock Display */}
-              <div className="md:col-span-2">
+              <div className="col-span-1 sm:col-span-2 md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Total Current Stock
                 </label>
-                <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600">
-                  <div className="flex items-center justify-between">
+                <div className="w-full px-3 py-2 border border-gray-200 rounded-sm bg-gray-50 text-gray-600">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <span className="font-medium text-lg">
                       {(formData.InitialStock || 0) +
                         (formData.AddedStock || 0)}{" "}
@@ -1218,16 +1220,16 @@ const InventoryManagementPage = () => {
               </div>
 
               {/* Stock Status Indicator */}
-              {(formData.InitialStock || 0) + (formData.AddedStock || 0) >
-                0 && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Stock Status
-                      <span className="text-xs text-gray-500 ml-1">
-                        (Auto-calculated based on threshold)
-                      </span>
-                    </label>
-                    <div className="flex items-center gap-3 p-3 rounded-lg border bg-gray-50">
+              {(formData.InitialStock || 0) + (formData.AddedStock || 0) > 0 && (
+                <div className="col-span-1 sm:col-span-2 md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Stock Status
+                    <span className="text-xs text-gray-500 ml-1">
+                      (Auto-calculated based on threshold)
+                    </span>
+                  </label>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-sm border bg-gray-50">
+                    <div className="flex items-center gap-3">
                       <div
                         className={`w-4 h-4 rounded-full ${formData.Status === "Low"
                           ? "bg-red-500"
@@ -1246,22 +1248,23 @@ const InventoryManagementPage = () => {
                       >
                         {formData.Status.toUpperCase()} STOCK
                       </span>
-                      <span className="text-xs text-gray-500 ml-auto">
-                        Threshold: {formData.Threshold || 0}{" "}
-                        {formData.Unit || "units"}
-                      </span>
                     </div>
+                    <span className="text-xs text-gray-500 sm:ml-auto">
+                      Threshold: {formData.Threshold || 0}{" "}
+                      {formData.Unit || "units"}
+                    </span>
                   </div>
-                )}
+                </div>
+              )}
             </div>
 
             {/* Fixed Action Buttons */}
-            <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
               <button
                 type="button"
                 onClick={handleCloseModal}
                 disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X size={16} />
                 Cancel
@@ -1270,7 +1273,7 @@ const InventoryManagementPage = () => {
                 type="button"
                 onClick={handleModalSubmit}
                 disabled={!formData.Name.trim() || !formData.supplier.trim() || actionLoading}
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() || !formData.supplier.trim() || actionLoading
+                className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${!formData.Name.trim() || !formData.supplier.trim() || actionLoading
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-[#2C2C2C] text-white hover:bg-gray-700"
                   }`}

@@ -144,35 +144,35 @@ class MenuAPI {
     item: Omit<MenuItemOptions, "ID">
   ): Promise<ApiResponse<MenuItemOptions>> {
     await this.delay(1000);
-    
+
     // Validation
     if (!item.Name || item.Name.trim().length === 0) {
       throw new Error("Name is required");
     }
-    
+
     if (!["Radio", "Select", "Checkbox"].includes(item.DisplayType)) {
       throw new Error("Invalid DisplayType");
     }
-    
+
     if (!item.Priority || item.Priority < 1) {
       throw new Error("Priority must be at least 1");
     }
-    
+
     // Check for duplicate priority
     if (this.mockData.some(existing => existing.Priority === item.Priority)) {
       throw new Error("Priority already exists");
     }
-    
+
     // Ensure OptionValue and OptionPrice arrays have same length
     if (item.OptionValue.length !== item.OptionPrice.length) {
       throw new Error("OptionValue and OptionPrice arrays must have the same length");
     }
-    
+
     // Validate option values are not empty
     if (item.OptionValue.some(val => !val || val.trim().length === 0)) {
       throw new Error("All option values must be non-empty");
     }
-    
+
     // Validate prices are non-negative
     if (item.OptionPrice.some(price => price < 0)) {
       throw new Error("All prices must be non-negative");
@@ -212,13 +212,13 @@ class MenuAPI {
         throw new Error("Name is required");
       }
     }
-    
+
     if (item.DisplayType !== undefined) {
       if (!["Radio", "Select", "Checkbox"].includes(item.DisplayType)) {
         throw new Error("Invalid DisplayType");
       }
     }
-    
+
     if (item.Priority !== undefined) {
       if (!item.Priority || item.Priority < 1) {
         throw new Error("Priority must be at least 1");
@@ -228,18 +228,18 @@ class MenuAPI {
         throw new Error("Priority already exists");
       }
     }
-    
+
     if (item.OptionValue && item.OptionPrice) {
       // Ensure arrays have same length
       if (item.OptionValue.length !== item.OptionPrice.length) {
         throw new Error("OptionValue and OptionPrice arrays must have the same length");
       }
-      
+
       // Validate option values are not empty
       if (item.OptionValue.some(val => !val || val.trim().length === 0)) {
         throw new Error("All option values must be non-empty");
       }
-      
+
       // Validate prices are non-negative
       if (item.OptionPrice.some(price => price < 0)) {
         throw new Error("All prices must be non-negative");
@@ -291,11 +291,11 @@ class MenuAPI {
     ids: number[]
   ): Promise<ApiResponse<null>> {
     await this.delay(1000);
-    
+
     if (!ids || ids.length === 0) {
       throw new Error("No items selected for deletion");
     }
-    
+
     this.mockData = this.mockData.filter((item) => !ids.includes(item.ID));
 
     // Reassign IDs sequentially
@@ -329,7 +329,7 @@ class MenuAPI {
     reorderedItems: { ID: number; Priority: number }[]
   ): Promise<ApiResponse<MenuItemOptions[]>> {
     await this.delay(800);
-    
+
     // Update priorities
     reorderedItems.forEach(({ ID, Priority }) => {
       const item = this.mockData.find(i => i.ID === ID);
@@ -376,20 +376,18 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
-        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
-      } ${
-        isVisible && !isClosing
+      className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+        } ${isVisible && !isClosing
           ? "translate-x-0 opacity-100"
           : isClosing
-          ? "translate-x-full opacity-0"
-          : "translate-x-full opacity-0"
-      }`}
+            ? "translate-x-full opacity-0"
+            : "translate-x-full opacity-0"
+        }`}
     >
       {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
       <span>{message}</span>
-      <button 
-        onClick={handleClose} 
+      <button
+        onClick={handleClose}
         className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
       >
         <X size={16} />
@@ -448,10 +446,10 @@ const CategoryPage = () => {
       setActiveTab("Details");
     } else {
       // When creating new item, calculate next available priority
-      const maxPriority = MenuItemOptionss.length > 0 
-        ? Math.max(...MenuItemOptionss.map(item => item.Priority)) 
+      const maxPriority = MenuItemOptionss.length > 0
+        ? Math.max(...MenuItemOptionss.map(item => item.Priority))
         : 0;
-      
+
       setFormData({
         Name: "",
         DisplayType: "Radio",
@@ -544,7 +542,7 @@ const CategoryPage = () => {
 
   const handleDeleteSelected = async () => {
     if (selectedItems.length === 0) return;
-    
+
     try {
       setActionLoading(true);
       const response = await MenuAPI.bulkDeleteMenuItemOptions(selectedItems);
@@ -586,7 +584,7 @@ const CategoryPage = () => {
     if (formData.OptionValue.length > 0) {
       // Check that arrays have same length
       if (formData.OptionValue.length !== formData.OptionPrice.length) return false;
-      
+
       // Check option values (must not be empty if provided)
       for (let i = 0; i < formData.OptionValue.length; i++) {
         if (!formData.OptionValue[i] || !formData.OptionValue[i].trim()) return false;
@@ -595,8 +593,8 @@ const CategoryPage = () => {
     }
 
     // Check for duplicate priority (excluding current item when editing)
-    const duplicatePriority = MenuItemOptionss.some(item => 
-      item.Priority === formData.Priority && 
+    const duplicatePriority = MenuItemOptionss.some(item =>
+      item.Priority === formData.Priority &&
       (!editingItem || item.ID !== editingItem.ID)
     );
     if (duplicatePriority) return false;
@@ -618,17 +616,17 @@ const CategoryPage = () => {
     }
   };
   useEffect(() => {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "unset";
-      }
-  
-      // Cleanup function to restore scrolling when component unmounts
-      return () => {
-        document.body.style.overflow = "unset";
-      };
-    }, [isModalOpen]);
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -684,15 +682,14 @@ const CategoryPage = () => {
       {/* Action bar */}
       <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         {/* Action Buttons */}
-        <div className="flex gap-3 h-[40px]">
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
             onClick={() => setIsModalOpen(true)}
-            disabled={selectedItems.length > 0 || actionLoading}
-            className={`flex items-center text-center gap-2 w-[100px] px-6.5 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0 && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            disabled={selectedItems.length > 0}
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Plus size={16} />
             Add
@@ -701,11 +698,10 @@ const CategoryPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -716,10 +712,10 @@ const CategoryPage = () => {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search Payment Methods..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -729,10 +725,10 @@ const CategoryPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm ">
-        <div className=" rounded-sm ">
-          <table className="min-w-full max-w-[800px] divide-y divide-gray-200 table-fixed">
-            <thead className="bg-white border-b text-gray-500 border-gray-200 sticky top-0 z-10">
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table ">
+        <div className="rounded-sm table-container">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-6 text-left w-[2.5px]">
                   <Checkbox
@@ -793,8 +789,8 @@ const CategoryPage = () => {
                 </th>
                 <th className="relative px-4 py-3 text-left">
                   <div className="flex flex-col gap-1">
-                    <DropdownMenu.Root>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                    <DropdownMenu.Root modal={false}>
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded  bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
                         {DisplayFilter || "Display Type"}
                         <ChevronDown
                           size={14}
@@ -804,31 +800,31 @@ const CategoryPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[320px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                          className="min-w-[320px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
 
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            className="px-3 py-1  cursor-pointer hover:bg-gray-100 rounded outline-none"
                             onClick={() => setDisplayFilter("")}
                           >
                             Display Type
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
+                            className="px-3 py-1  cursor-pointer hover:bg-green-100 text-green-400 rounded outline-none"
                             onClick={() => setDisplayFilter("Radio")}
                           >
                             Radio
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
+                            className="px-3 py-1  cursor-pointer hover:bg-red-100 text-red-400 rounded outline-none"
                             onClick={() => setDisplayFilter("Select")}
                           >
                             Select
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-blue-400 rounded outline-none"
+                            className="px-3 py-1  cursor-pointer hover:bg-blue-100 text-blue-400 rounded outline-none"
                             onClick={() => setDisplayFilter("Checkbox")}
                           >
                             Checkbox
@@ -864,8 +860,13 @@ const CategoryPage = () => {
                 </tr>
               ) : (
                 filteredItems.map((item) => (
-                  <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-6 py-8">
+                  <tr
+                    key={item.ID}
+                    className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
+                    <td
+                      className="px-6 py-8 whitespace-nowrap"
+                    >
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -916,28 +917,47 @@ const CategoryPage = () => {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+
+                    <td
+                      data-label="ID"
+                      className="px-4 py-4 whitespace-nowrap"
+                    >
                       {item.ID}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+
+                    <td
+                      data-label="Name"
+                      className="px-4 py-4 whitespace-nowrap font-medium"
+                    >
                       {item.Name}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+
+                    <td
+                      data-label="Display Type"
+                      className="px-4 py-4 whitespace-nowrap"
+                    >
                       <span
-                        className={`inline-block w-20 text-center px-2 py-[2px] rounded-md text-xs font-medium
-      ${item.DisplayType === "Radio" ? "text-green-400 " : ""}
-      ${item.DisplayType === "Select" ? "text-red-400 " : ""}
-      ${item.DisplayType === "Checkbox" ? "text-blue-400 " : ""}
-    `}
+                        className={`inline-block w-20 text-right lg:text-center py-[2px] rounded-sm text-xs font-medium 
+              ${item.DisplayType === "Radio" ? "text-green-400" : ""}
+              ${item.DisplayType === "Select" ? "text-red-400" : ""}
+              ${item.DisplayType === "Checkbox" ? "text-blue-400" : ""}
+            `}
                       >
                         {item.DisplayType}
                       </span>
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <td
+                      data-label="Priority"
+                      className="px-4 py-4 whitespace-nowrap"
+                    >
                       {item.Priority}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+
+                    <td
+                      data-label="Actions"
+                      className="px-2 py-4 whitespace-nowrap"
+                    >
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => {
@@ -955,31 +975,36 @@ const CategoryPage = () => {
                 ))
               )}
             </tbody>
+
           </table>
         </div>
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg w-[37vw] max-w-2xl h-[70vh] shadow-lg flex flex-col">
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 px-2 sm:px-4"
+          onClick={handleCloseModal}
+        >
+          <div
+            className="bg-white rounded-sm w-full max-w-lg lg:max-w-2xl h-[70vh] shadow-lg relative flex flex-col mx-2 sm:mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header - Fixed */}
-            <div className="flex-shrink-0">
-              <h1 className="text-2xl pl-5 pt-2 font-medium">
-                {editingItem ? "Edit Option " : "Add Option "}
+            <div className="flex-shrink-0 p-3 sm:p-4 md:p-6">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-medium text-center sm:text-left pl-0 sm:pl-1 md:pl-5 pt-0 sm:pt-1 md:pt-2">
+                {editingItem ? "Edit Option" : "Add Option"}
               </h1>
 
               {/* Tab Navigation */}
-              <div className="flex w-[250px] items-center justify-center border-b border-gray-200 mx-auto">
+              <div className="flex w-full sm:w-[280px] md:w-[320px] lg:w-[350px] items-center justify-center border-b border-gray-200 mx-auto mt-4">
                 {["Details", "Option Values"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                      activeTab === tab
+                    className={`flex-1 px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors ${activeTab === tab
                         ? "border-b-2 border-black text-black"
                         : "text-gray-500 hover:text-black hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     {tab}
                   </button>
@@ -988,12 +1013,12 @@ const CategoryPage = () => {
             </div>
 
             {/* Modal Content - Scrollable */}
-            <div className="flex-1  overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6" style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e1 #f1f5f9" }}>
               {activeTab === "Details" && (
-                <div className="space-y-8">
+                <div className="space-y-4 sm:space-y-6 md:space-y-8 pb-4">
                   {/* Name */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
                       Name
                     </label>
                     <input
@@ -1002,18 +1027,19 @@ const CategoryPage = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, Name: e.target.value })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      placeholder="Enter option name"
                     />
                   </div>
 
                   {/* Display Type */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
                       Display Type
                     </label>
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger asChild>
-                        <button className="w-full px-3 py-2 border border-gray-300 rounded-lg flex items-center justify-between text-sm bg-white outline-none hover:bg-gray-50 focus:ring-2 focus:ring-[#d9d9e1]">
+                        <button className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm flex items-center justify-between bg-white outline-none hover:bg-gray-50 focus:ring-2 focus:ring-[#d9d9e1]">
                           <span>
                             {formData.DisplayType || "Select Display Type"}
                           </span>
@@ -1023,12 +1049,12 @@ const CategoryPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[220px] rounded-md bg-white shadow-md border border-gray-200 p-1 outline-none z-72"
+                          className="min-w-[220px] sm:min-w-[280px] rounded-sm bg-white shadow-md border border-gray-200 p-1 outline-none z-[72]"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
                           <DropdownMenu.Item
-                            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            className="px-3 py-2 text-sm sm:text-base cursor-pointer hover:bg-gray-100 rounded outline-none"
                             onClick={() =>
                               setFormData({ ...formData, DisplayType: "Radio" })
                             }
@@ -1036,7 +1062,7 @@ const CategoryPage = () => {
                             Radio
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            className="px-3 py-2 text-sm sm:text-base cursor-pointer hover:bg-gray-100 rounded outline-none"
                             onClick={() =>
                               setFormData({
                                 ...formData,
@@ -1047,7 +1073,7 @@ const CategoryPage = () => {
                             Select
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
+                            className="px-3 py-2 text-sm sm:text-base cursor-pointer hover:bg-gray-100 rounded outline-none"
                             onClick={() =>
                               setFormData({
                                 ...formData,
@@ -1064,7 +1090,7 @@ const CategoryPage = () => {
 
                   {/* Priority */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
                       Priority
                     </label>
                     <input
@@ -1076,7 +1102,7 @@ const CategoryPage = () => {
                           Priority: Number(e.target.value) || 1,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                       min={1}
                       required
                     />
@@ -1085,205 +1111,286 @@ const CategoryPage = () => {
               )}
 
               {activeTab === "Option Values" && (
-                <div className="space-y-4">
-                  {/* Fixed Header */}
-                  <div className="border border-gray-200 rounded-t-lg bg-gray-50">
-                    <table className="w-full">
-                      <thead>
-                        <tr>
-                          <th className="w-8 p-2 text-center text-sm font-medium text-gray-700">
+                <div className="space-y-4 pb-4">
+                  {/* Mobile Card Layout */}
+                  <div className="block md:hidden">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-medium">Option Values</h3>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData({
+                            ...formData,
+                            OptionValue: [...formData.OptionValue, ""],
+                            OptionPrice: [...formData.OptionPrice, 0],
+                          })
+                        }
+                        className="bg-black text-white px-3 py-2 rounded-sm text-sm flex items-center gap-2 hover:bg-gray-700 transition-colors"
+                      >
+                        <Plus size={16} />
+                        Add Option
+                      </button>
+                    </div>
+
+                    <div className="space-y-3 max-h-96 overflow-y-auto" style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e1 #f1f5f9" }}>
+                      {formData.OptionValue.map((opt, idx) => (
+                        <div key={idx} className="bg-white border border-gray-200 rounded-sm p-4 shadow-sm">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <Grip size={16} className="text-gray-400" />
+                              <span className="font-medium text-gray-700">Option {idx + 1}</span>
+                            </div>
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                const updatedValues = formData.OptionValue.filter((_, i) => i !== idx);
+                                const updatedPrices = formData.OptionPrice.filter((_, i) => i !== idx);
                                 setFormData({
                                   ...formData,
-                                  OptionValue: [...formData.OptionValue, ""],
-                                  OptionPrice: [...formData.OptionPrice, 0],
-                                })
-                              }
-                              className="w-8 h-8 flex items-center justify-center text-black rounded-lg hover:bg-gray-200 transition-colors"
+                                  OptionValue: updatedValues,
+                                  OptionPrice: updatedPrices,
+                                });
+                              }}
+                              className="text-red-500 hover:text-red-700 p-1"
                             >
-                              <Plus size={18} />
+                              <X size={18} />
                             </button>
-                          </th>
-                          <th className="w-80 p-3 text-left text-sm font-medium text-gray-700">
-                            Option Value
-                          </th>
-                          <th className="p-3 text-center text-sm font-medium text-gray-700">
-                            Option Price
-                          </th>
-                          <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                        </tr>
-                      </thead>
-                    </table>
+                          </div>
+
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Option Value
+                              </label>
+                              <input
+                                type="text"
+                                value={opt}
+                                onChange={(e) => {
+                                  const updated = [...formData.OptionValue];
+                                  updated[idx] = e.target.value;
+                                  setFormData({
+                                    ...formData,
+                                    OptionValue: updated,
+                                  });
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                                placeholder="Enter option value"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Option Price
+                              </label>
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                value={formData.OptionPrice[idx]}
+                                onChange={(e) => {
+                                  const updated = [...formData.OptionPrice];
+                                  updated[idx] = Number(e.target.value.replace(/\D/g, "")) || 0;
+                                  setFormData({
+                                    ...formData,
+                                    OptionPrice: updated,
+                                  });
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                                placeholder="0"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* Scrollable Body */}
-                  <div className="border-l border-r border-b border-gray-200 rounded-b-lg max-h-60 overflow-y-auto bg-white">
-                    <DragDropContext
-                      onDragEnd={(result) => {
-                        const { source, destination } = result;
-                        if (!destination || source.index === destination.index)
-                          return;
+                  {/* Desktop Table Layout */}
+                  <div className="hidden md:block">
+                    {/* Fixed Header */}
+                    <div className="border border-gray-200 rounded-t-lg bg-gray-50">
+                      <table className="w-full">
+                        <thead>
+                          <tr>
+                            <th className="w-12 p-2 lg:p-3 text-center text-sm font-medium text-gray-700">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setFormData({
+                                    ...formData,
+                                    OptionValue: [...formData.OptionValue, ""],
+                                    OptionPrice: [...formData.OptionPrice, 0],
+                                  })
+                                }
+                                className="w-8 h-8 flex items-center justify-center text-black rounded-sm hover:bg-gray-200 transition-colors"
+                              >
+                                <Plus size={18} />
+                              </button>
+                            </th>
+                            <th className="p-2 lg:p-3 text-left text-sm font-medium text-gray-700">
+                              Option Value
+                            </th>
+                            <th className="p-2 lg:p-3 text-center text-sm font-medium text-gray-700 w-24 lg:w-32">
+                              Option Price
+                            </th>
+                            <th className="w-12 p-2 lg:p-3 text-center text-sm font-medium text-gray-700"></th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
 
-                        const newOptionValue = Array.from(formData.OptionValue);
-                        const [movedValue] = newOptionValue.splice(
-                          source.index,
-                          1
-                        );
-                        newOptionValue.splice(destination.index, 0, movedValue);
+                    {/* Scrollable Body */}
+                    <div className="border-l border-r border-b border-gray-200 rounded-b-lg max-h-60 lg:max-h-80 overflow-y-auto bg-white" style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e1 #f1f5f9" }}>
+                      <DragDropContext
+                        onDragEnd={(result) => {
+                          const { source, destination } = result;
+                          if (!destination || source.index === destination.index)
+                            return;
 
-                        const newOptionPrice = Array.from(formData.OptionPrice);
-                        const [movedPrice] = newOptionPrice.splice(
-                          source.index,
-                          1
-                        );
-                        newOptionPrice.splice(destination.index, 0, movedPrice);
+                          const newOptionValue = Array.from(formData.OptionValue);
+                          const [movedValue] = newOptionValue.splice(source.index, 1);
+                          newOptionValue.splice(destination.index, 0, movedValue);
 
-                        setFormData({
-                          ...formData,
-                          OptionValue: newOptionValue,
-                          OptionPrice: newOptionPrice,
-                        });
-                      }}
-                    >
-                      <Droppable droppableId="option-values">
-                        {(provided) => (
-                          <table className="w-full border-collapse">
-                            <tbody
-                              ref={provided.innerRef}
-                              {...provided.droppableProps}
-                            >
-                              {formData.OptionValue.map((opt, idx) => (
-                                <Draggable
-                                  key={idx}
-                                  draggableId={`option-${idx}`}
-                                  index={idx}
-                                >
-                                  {(provided, snapshot) => (
-                                    <tr
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      className={`hover:bg-gray-50 ${
-                                        snapshot.isDragging
-                                          ? "bg-gray-100 shadow-lg"
-                                          : ""
-                                      } border-b border-gray-200`}
-                                    >
-                                      {/* Drag Handle */}
-                                      <td
-                                        className="p-3 text-center cursor-grab w-12"
-                                        {...provided.dragHandleProps}
+                          const newOptionPrice = Array.from(formData.OptionPrice);
+                          const [movedPrice] = newOptionPrice.splice(source.index, 1);
+                          newOptionPrice.splice(destination.index, 0, movedPrice);
+
+                          setFormData({
+                            ...formData,
+                            OptionValue: newOptionValue,
+                            OptionPrice: newOptionPrice,
+                          });
+                        }}
+                      >
+                        <Droppable droppableId="option-values">
+                          {(provided) => (
+                            <table className="w-full border-collapse">
+                              <tbody
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                              >
+                                {formData.OptionValue.map((opt, idx) => (
+                                  <Draggable
+                                    key={idx}
+                                    draggableId={`option-${idx}`}
+                                    index={idx}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <tr
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        className={`hover:bg-gray-50 ${snapshot.isDragging
+                                            ? "bg-gray-100 shadow-lg"
+                                            : ""
+                                          } border-b border-gray-200`}
                                       >
-                                        <Grip
-                                          size={18}
-                                          className="text-gray-500 mx-auto"
-                                        />
-                                      </td>
-
-                                      {/* Option Name */}
-                                      <td className="min-w-[300px] p-3">
-                                        <input
-                                          type="text"
-                                          value={opt}
-                                          onChange={(e) => {
-                                            const updated = [
-                                              ...formData.OptionValue,
-                                            ];
-                                            updated[idx] = e.target.value;
-                                            setFormData({
-                                              ...formData,
-                                              OptionValue: updated,
-                                            });
-                                          }}
-                                          className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                                          placeholder="Enter option value"
-                                        />
-                                      </td>
-
-                                      {/* Option Price */}
-                                      <td className="p-3 text-center">
-                                        <input
-                                          type="text"
-                                          inputMode="numeric"
-                                          pattern="[0-9]*"
-                                          value={formData.OptionPrice[idx]}
-                                          onChange={(e) => {
-                                            const updated = [
-                                              ...formData.OptionPrice,
-                                            ];
-                                            updated[idx] =
-                                              Number(
-                                                e.target.value.replace(
-                                                  /\D/g,
-                                                  ""
-                                                )
-                                              ) || 0;
-                                            setFormData({
-                                              ...formData,
-                                              OptionPrice: updated,
-                                            });
-                                          }}
-                                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
-                                          placeholder="0"
-                                        />
-                                      </td>
-
-                                      {/* Delete Button */}
-                                      <td className="p-3 text-center w-12">
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const updatedValues =
-                                              formData.OptionValue.filter(
-                                                (_, i) => i !== idx
-                                              );
-                                            const updatedPrices =
-                                              formData.OptionPrice.filter(
-                                                (_, i) => i !== idx
-                                              );
-                                            setFormData({
-                                              ...formData,
-                                              OptionValue: updatedValues,
-                                              OptionPrice: updatedPrices,
-                                            });
-                                          }}
-                                          className="text-black px-2 py-1 rounded hover:text-gray-700"
+                                        {/* Drag Handle */}
+                                        <td
+                                          className="p-2 lg:p-3 text-center cursor-grab w-12"
+                                          {...provided.dragHandleProps}
                                         >
-                                          <X size={20} />
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </tbody>
-                          </table>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
+                                          <Grip
+                                            size={18}
+                                            className="text-gray-500 mx-auto"
+                                          />
+                                        </td>
+
+                                        {/* Option Name */}
+                                        <td className="p-2 lg:p-3">
+                                          <input
+                                            type="text"
+                                            value={opt}
+                                            onChange={(e) => {
+                                              const updated = [...formData.OptionValue];
+                                              updated[idx] = e.target.value;
+                                              setFormData({
+                                                ...formData,
+                                                OptionValue: updated,
+                                              });
+                                            }}
+                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                                            placeholder="Enter option value"
+                                          />
+                                        </td>
+
+                                        {/* Option Price */}
+                                        <td className="p-2 lg:p-3 text-center">
+                                          <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
+                                            value={formData.OptionPrice[idx]}
+                                            onChange={(e) => {
+                                              const updated = [...formData.OptionPrice];
+                                              updated[idx] =
+                                                Number(
+                                                  e.target.value.replace(/\D/g, "")
+                                                ) || 0;
+                                              setFormData({
+                                                ...formData,
+                                                OptionPrice: updated,
+                                              });
+                                            }}
+                                            className="w-16 lg:w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center text-sm mx-auto"
+                                            placeholder="0"
+                                          />
+                                        </td>
+
+                                        {/* Delete Button */}
+                                        <td className="p-2 lg:p-3 text-center w-12">
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updatedValues =
+                                                formData.OptionValue.filter(
+                                                  (_, i) => i !== idx
+                                                );
+                                              const updatedPrices =
+                                                formData.OptionPrice.filter(
+                                                  (_, i) => i !== idx
+                                                );
+                                              setFormData({
+                                                ...formData,
+                                                OptionValue: updatedValues,
+                                                OptionPrice: updatedPrices,
+                                              });
+                                            }}
+                                            className="text-black px-2 py-1 rounded hover:text-gray-700"
+                                          >
+                                            <X size={20} />
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </tbody>
+                            </table>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Action buttons - Fixed at bottom */}
-            <div className="flex-shrink-0 flex justify-end gap-3 p-4 border-t border-gray-200 bg-white">
+            <div className="flex-shrink-0 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 p-3 sm:p-4 border-t border-gray-200 bg-white">
               <button
                 onClick={handleCloseModal}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="order-2 sm:order-1 px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleModalSubmit}
                 disabled={!isFormValid()}
-                className={`px-4 py-2 rounded-lg ${
-                  isFormValid()
+                className={`order-1 sm:order-2 px-4 py-2 text-sm sm:text-base rounded-sm transition-colors ${isFormValid()
                     ? "bg-black text-white hover:bg-gray-700"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+                  }`}
               >
                 {editingItem ? "Update" : "Save & Close"}
               </button>
