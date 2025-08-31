@@ -1,7 +1,6 @@
 "use client";
 import { ChevronDown, AlertCircle } from "lucide-react";
 import { useParams } from "next/navigation";
-import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
@@ -210,7 +209,6 @@ const ReportsPage = () => {
   const branchId = params?.branchId as string;
 
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{
@@ -302,23 +300,6 @@ const ReportsPage = () => {
     return items.reduce((sum, item) => sum + item.Total_Value, 0);
   }, [items]);
 
-  const handleSelectAll = useCallback(
-    (checked: boolean) => {
-      setSelectedItems(checked ? filteredItems.map((item) => item.ID) : []);
-    },
-    [filteredItems]
-  );
-
-  const handleSelectItem = useCallback((itemId: number, checked: boolean) => {
-    setSelectedItems((prev) =>
-      checked ? [...prev, itemId] : prev.filter((id) => id !== itemId)
-    );
-  }, []);
-
-  const isAllSelected =
-    selectedItems.length === filteredItems.length && filteredItems.length > 0;
-  const isSomeSelected = selectedItems.length > 0;
-
   // Get unique units for dropdown
   const uniqueUnits = useMemo(() => {
     return Array.from(new Set(items.map((i) => i.Unit)));
@@ -404,55 +385,6 @@ const ReportsPage = () => {
           <table className="min-w-full divide-y max-w-[800px] divide-gray-200 table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-6 text-left w-[2.5px]">
-                  <Checkbox
-                    checked={isAllSelected}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    disableRipple
-                    sx={{
-                      transform: "scale(1.5)",
-                      p: 0,
-                    }}
-                    icon={
-                      <svg width="20" height="20" viewBox="0 0 24 24">
-                        <rect
-                          x="3"
-                          y="3"
-                          width="18"
-                          height="18"
-                          rx="3"
-                          ry="3"
-                          fill="#e0e0e0"
-                          stroke="#d1d1d1"
-                          strokeWidth="2"
-                        />
-                      </svg>
-                    }
-                    checkedIcon={
-                      <svg width="20" height="20" viewBox="0 0 24 24">
-                        <rect
-                          x="3"
-                          y="3"
-                          width="18"
-                          height="18"
-                          rx="3"
-                          ry="3"
-                          fill="#e0e0e0"
-                          stroke="#2C2C2C"
-                          strokeWidth="2"
-                        />
-                        <path
-                          d="M9 12.5l2 2 4-4.5"
-                          fill="none"
-                          stroke="#2C2C2C"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    }
-                  />
-                </th>
                 <th className="relative px-4 py-3 text-left">
                   ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
@@ -537,7 +469,7 @@ const ReportsPage = () => {
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={11}
+                    colSpan={10}
                     className="px-4 py-8 text-center text-gray-500"
                   >
                     {searchTerm !== "" || unitFilter !== ""
@@ -553,62 +485,11 @@ const ReportsPage = () => {
                     key={item.ID}
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm ">
-                      <Checkbox
-                        checked={selectedItems.includes(item.ID)}
-                        onChange={(e) =>
-                          handleSelectItem(item.ID, e.target.checked)
-                        }
-                        disableRipple
-                        sx={{
-                          p: 0,
-                          transform: "scale(1.5)",
-                        }}
-                        icon={
-                          <svg width="20" height="20" viewBox="0 0 24 24">
-                            <rect
-                              x="3"
-                              y="3"
-                              width="18"
-                              height="18"
-                              rx="3"
-                              ry="3"
-                              fill="#e0e0e0"
-                              stroke="#d1d1d1"
-                              strokeWidth="2"
-                            />
-                          </svg>
-                        }
-                        checkedIcon={
-                          <svg width="20" height="20" viewBox="0 0 24 24">
-                            <rect
-                              x="3"
-                              y="3"
-                              width="18"
-                              height="18"
-                              rx="3"
-                              ry="3"
-                              fill="#e0e0e0"
-                              stroke="#2C2C2C"
-                              strokeWidth="2"
-                            />
-                            <path
-                              d="M9 12.5l2 2 4-4.5"
-                              fill="none"
-                              stroke="#2C2C2C"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        }
-                      />
-                    </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="ID">
                       {item.ID}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm " data-label="Name">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm  card-name-cell" data-label="Name">
                       <div className="name-content">
                         <span className="font-medium">{item.Name}</span>
                       </div>

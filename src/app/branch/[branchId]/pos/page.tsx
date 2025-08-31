@@ -16,6 +16,7 @@ import {
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ButtonPage from "@/components/layout/UI/button";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 // Types
 interface MenuItem {
   Branch_ID_fk: string;
@@ -36,12 +37,12 @@ class PosAPI {
     new Promise((resolve) => setTimeout(resolve, ms));
 
   private static mockData: MenuItem[] = [
-    { Branch_ID_fk: "1", POS_ID: "1", POS_Name: "Main Branch POS 1", Status: "Active" },
-    { Branch_ID_fk: "1", POS_ID: "2", POS_Name: "Main Branch POS 2", Status: "Inactive" },
-    { Branch_ID_fk: "1", POS_ID: "3", POS_Name: "Main Branch POS 3", Status: "Active" },
-    { Branch_ID_fk: "2", POS_ID: "4", POS_Name: "North Branch POS 1", Status: "Active" },
-    { Branch_ID_fk: "2", POS_ID: "5", POS_Name: "North Branch POS 2", Status: "Inactive" },
-    { Branch_ID_fk: "3", POS_ID: "6", POS_Name: "South Branch POS 1", Status: "Active" },
+    { Branch_ID_fk: "1", POS_ID: "1", POS_Name: "POS 1", Status: "Active" },
+    { Branch_ID_fk: "1", POS_ID: "2", POS_Name: "POS 2", Status: "Inactive" },
+    { Branch_ID_fk: "1", POS_ID: "3", POS_Name: "POS 3", Status: "Active" },
+    { Branch_ID_fk: "2", POS_ID: "4", POS_Name: "POS 1", Status: "Active" },
+    { Branch_ID_fk: "2", POS_ID: "5", POS_Name: "POS 2", Status: "Inactive" },
+    { Branch_ID_fk: "3", POS_ID: "6", POS_Name: "POS 1", Status: "Active" },
   ];
 
   static async getPosItemsByBranch(branchId: string): Promise<ApiResponse<MenuItem[]>> {
@@ -580,7 +581,7 @@ const PosListPage = () => {
                     key={item.POS_ID}
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm" >
+                    <td className="px-6 py-8 whitespace-nowrap text-sm card-checkbox-cell" >
                       <Checkbox
                         checked={selectedItems.includes(item.POS_ID)}
                         onChange={(e) =>
@@ -635,33 +636,28 @@ const PosListPage = () => {
                       {`#${String(item.POS_ID).padStart(3, "0")}`}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm " data-label="POS Name">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="POS Name">
                       <span className="font-medium">{item.POS_Name}</span>
 
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20  text-right px-2 py-[2px] rounded-md text-xs font-medium 
+                        className={`inline-block w-20  text-right  py-[2px] rounded-md text-xs font-medium 
                           ${item.Status === "Active" ? "text-green-400 " : ""}
                           ${item.Status === "Inactive" ? "text-red-400 " : ""}`}
                       >
                         {item.Status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                     <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))

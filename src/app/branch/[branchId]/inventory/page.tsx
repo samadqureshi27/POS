@@ -15,6 +15,7 @@ import {
   Edit,
   Save,
 } from "lucide-react";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 
 interface InventoryItem {
   ID: number;
@@ -851,7 +852,7 @@ const InventoryManagementPage = () => {
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-6 py-8" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-6 py-8 card-checkbox-cell" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -904,12 +905,12 @@ const InventoryManagementPage = () => {
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap" data-label="ID">{item.ID}</td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Name">{item.Name}</td>
+                    <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Name">{item.Name}</td>
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Unit">{item.Unit}</td>
 
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20 text-right px-2 py-[2px] rounded-sm text-xs font-medium
+                        className={`inline-block w-20 text-right  py-[2px] rounded-sm text-xs font-medium
                     ${item.Status === "Low" ? "text-red-400 border-red-400" : ""}
                     ${item.Status === "Medium" ? "text-yellow-400 border-yellow-600" : ""}
                     ${item.Status === "High" ? "text-green-400 border-green-700" : ""}
@@ -932,20 +933,14 @@ const InventoryManagementPage = () => {
                       {item.Threshold}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                  <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))
