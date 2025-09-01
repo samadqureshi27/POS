@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@mui/material";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 
 interface CategoryItem {
   ID: number;
@@ -232,9 +233,8 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-35 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
+    className={`fixed top-35 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -300,7 +300,7 @@ const CategoryPage = () => {
         Status: "Active",
         Description: "",
         Parent: "",
-        Priority: 1,
+        Priority: 0,
         Image: "",
       });
       setPreview(null);
@@ -511,11 +511,10 @@ const CategoryPage = () => {
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
-            className={`flex  w-[50%] items-center text-center gap-2 md:w-[40%]v px-6.5 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Plus size={16} />
             Add
@@ -524,11 +523,10 @@ const CategoryPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -539,7 +537,7 @@ const CategoryPage = () => {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search Payment Methods..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
@@ -692,7 +690,7 @@ const CategoryPage = () => {
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-6 py-8">
+                    <td className="px-6 py-8 card-checkbox-cell">
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -752,7 +750,7 @@ const CategoryPage = () => {
                       {item.ID}
                     </td>
                     <td
-                      className="px-4 py-4 whitespace-nowrap text-sm font-medium"
+                      className="px-4 py-4 whitespace-nowrap text-sm font-medium card-name-cell"
                       data-label="Name"
                     >
                       {item.Name}
@@ -762,7 +760,7 @@ const CategoryPage = () => {
                       data-label="Status"
                     >
                       <span
-                        className={`inline-block w-20 text-right px-2 py-[2px] rounded-md text-xs font-medium 
+                        className={`inline-block w-20 text-right  py-[2px] rounded-md text-xs font-medium 
       ${item.Status === "Active" ? "text-green-400 " : ""}
       ${item.Status === "Inactive" ? "text-red-400 " : ""}
     `}
@@ -789,22 +787,14 @@ const CategoryPage = () => {
                     >
                       {item.Priority}
                     </td>
-                    <td
-                      className="px-4 py-4 whitespace-nowrap"
-                      data-label="Action"
-                    >
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))
@@ -931,16 +921,21 @@ const CategoryPage = () => {
                   Priority
                 </label>
                 <input
-                  type="number"
-                  value={formData.Priority}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      Priority: Number(e.target.value) || 1,
-                    })
-                  }
+                  type="text"
+                  value={formData.Priority || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow numbers and empty string
+                    if (value === '' || /^\d+$/.test(value)) {
+                      setFormData({
+                        ...formData,
+                        Priority: value === '' ? 0 : Number(value)
+                      });
+                    }
+                    // If invalid input, just ignore it (don't update state)
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  placeholder="Priority"
+                  placeholder="1"
                   min={1}
                   required
                 />
@@ -977,13 +972,12 @@ const CategoryPage = () => {
                   !formData.Description.trim() ||
                   actionLoading
                 }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                  !formData.Name.trim() ||
+                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
                   !formData.Description.trim() ||
                   actionLoading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                }`}
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  }`}
               >
                 {actionLoading ? (
                   <>
