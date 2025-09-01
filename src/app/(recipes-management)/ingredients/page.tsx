@@ -15,7 +15,7 @@ import {
   Save,
   Edit,
 } from "lucide-react";
-
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 interface InventoryItem {
   ID: string;
   Name: string;
@@ -36,9 +36,8 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
-      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-    }`}
+    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
     <span>{message}</span>
@@ -185,7 +184,7 @@ const IngredientsManagementPage = () => {
       Status: isActive ? "Active" : "Inactive",
     });
   };
-  
+
   const openAddModal = () => {
     if (selectedItems.length > 0) return; // keep original behaviour (disable add when selections exist)
     // generate next ID like "#006"
@@ -210,7 +209,7 @@ const IngredientsManagementPage = () => {
     });
     setModalOpen(true);
   };
-   // Prevent background scrolling when modal is open
+  // Prevent background scrolling when modal is open
   useEffect(() => {
     if (modalOpen) {
       document.body.style.overflow = 'hidden';
@@ -236,7 +235,7 @@ const IngredientsManagementPage = () => {
       showToast("Please enter a Name.", "error");
       return;
     }
-    
+
 
     setActionLoading(true);
     setTimeout(() => {
@@ -290,11 +289,10 @@ const IngredientsManagementPage = () => {
           <button
             onClick={openAddModal}
             disabled={selectedItems.length > 0}
-            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+              }`}
           >
             <Plus size={16} />
             Add
@@ -303,11 +301,10 @@ const IngredientsManagementPage = () => {
           <button
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
-            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${
-              isSomeSelected && !actionLoading
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
                 ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+              }`}
           >
             <Trash2 size={16} />
             {actionLoading ? "Deleting..." : "Delete Selected"}
@@ -337,56 +334,56 @@ const IngredientsManagementPage = () => {
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-6 text-left w-[2.5px]">
-                                  <Checkbox
-                                    checked={isAllSelected}
-                                    onChange={(e) => handleSelectAll(e.target.checked)}
-                                    disableRipple
-                                    sx={{
-                                      transform: "scale(1.5)", // size adjustment
-                                      p: 0, // remove extra padding
-                                    }}
-                                    icon={
-                                      // unchecked grey box
-                                      <svg width="20" height="20" viewBox="0 0 24 24">
-                                        <rect
-                                          x="3"
-                                          y="3"
-                                          width="18"
-                                          height="18"
-                                          rx="3"
-                                          ry="3"
-                                          fill="#e0e0e0" // grey inside
-                                          stroke="#d1d1d1" // border grey
-                                          strokeWidth="2"
-                                        />
-                                      </svg>
-                                    }
-                                    checkedIcon={
-                                      // checked with tick
-                                      <svg width="20" height="20" viewBox="0 0 24 24">
-                                        <rect
-                                          x="3"
-                                          y="3"
-                                          width="18"
-                                          height="18"
-                                          rx="3"
-                                          ry="3"
-                                          fill="#e0e0e0" // grey inside
-                                          stroke="#2C2C2C" // dark border
-                                          strokeWidth="2"
-                                        />
-                                        <path
-                                          d="M9 12.5l2 2 4-4.5"
-                                          fill="none"
-                                          stroke="#2C2C2C"
-                                          strokeWidth="2"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        />
-                                      </svg>
-                                    }
-                                  />
-                                </th>
+                  <Checkbox
+                    checked={isAllSelected}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    disableRipple
+                    sx={{
+                      transform: "scale(1.5)", // size adjustment
+                      p: 0, // remove extra padding
+                    }}
+                    icon={
+                      // unchecked grey box
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#d1d1d1" // border grey
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    }
+                    checkedIcon={
+                      // checked with tick
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#2C2C2C" // dark border
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12.5l2 2 4-4.5"
+                          fill="none"
+                          stroke="#2C2C2C"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
+                  />
+                </th>
                 <th className="relative px-4 py-3 text-left">
                   ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
@@ -463,84 +460,82 @@ const IngredientsManagementPage = () => {
             <tbody className="divide-y text-gray-500  divide-gray-300">
               {filteredItems.map((item) => (
                 <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                 <td className="px-6 py-8">
-                                     <Checkbox
-                                       checked={selectedItems.includes(item.ID)}
-                                       onChange={(e) =>
-                                         handleSelectItem(item.ID, e.target.checked)
-                                       }
-                                       disableRipple
-                                       sx={{
-                                         p: 0, // remove extra padding
-                                         transform: "scale(1.5)", // optional size tweak
-                                       }}
-                                       icon={
-                                         // unchecked grey box
-                                         <svg width="20" height="20" viewBox="0 0 24 24">
-                                           <rect
-                                             x="3"
-                                             y="3"
-                                             width="18"
-                                             height="18"
-                                             rx="3"
-                                             ry="3"
-                                             fill="#e0e0e0" // grey inside
-                                             stroke="#d1d1d1" // border grey
-                                             strokeWidth="2"
-                                           />
-                                         </svg>
-                                       }
-                                       checkedIcon={
-                                         // checked with tick
-                                         <svg width="20" height="20" viewBox="0 0 24 24">
-                                           <rect
-                                             x="3"
-                                             y="3"
-                                             width="18"
-                                             height="18"
-                                             rx="3"
-                                             ry="3"
-                                             fill="#e0e0e0" // grey inside
-                                             stroke="#2C2C2C" // dark border
-                                             strokeWidth="2"
-                                           />
-                                           <path
-                                             d="M9 12.5l2 2 4-4.5"
-                                             fill="none"
-                                             stroke="#2C2C2C"
-                                             strokeWidth="2"
-                                             strokeLinecap="round"
-                                             strokeLinejoin="round"
-                                           />
-                                         </svg>
-                                       }
-                                     />
-                                   </td>
+                  <td className="px-6 py-8 card-checkbox-cell" >
+                    <Checkbox
+                      checked={selectedItems.includes(item.ID)}
+                      onChange={(e) =>
+                        handleSelectItem(item.ID, e.target.checked)
+                      }
+                      disableRipple
+                      sx={{
+                        p: 0, // remove extra padding
+                        transform: "scale(1.5)", // optional size tweak
+                      }}
+                      icon={
+                        // unchecked grey box
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="3"
+                            ry="3"
+                            fill="#e0e0e0" // grey inside
+                            stroke="#d1d1d1" // border grey
+                            strokeWidth="2"
+                          />
+                        </svg>
+                      }
+                      checkedIcon={
+                        // checked with tick
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="3"
+                            ry="3"
+                            fill="#e0e0e0" // grey inside
+                            stroke="#2C2C2C" // dark border
+                            strokeWidth="2"
+                          />
+                          <path
+                            d="M9 12.5l2 2 4-4.5"
+                            fill="none"
+                            stroke="#2C2C2C"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      }
+                    />
+                  </td>
 
                   <td className="px-4 py-4 whitespace-nowrap" data-label="ID">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Name">{item.Name}</td>
+                  <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Name">{item.Name}</td>
 
                   <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                     <span
-                      className={`inline-block w-24 text-right px-2 py-[2px] rounded-md text-xs font-medium 
-                  ${
-                    item.Status === "Inactive"
-                      ? "text-red-400 "
-                      : ""
-                  }
+                      className={`inline-block w-24 text-right  py-[2px] rounded-md text-xs font-medium 
+                  ${item.Status === "Inactive"
+                          ? "text-red-400 "
+                          : ""
+                        }
                  
-                  ${
-                    item.Status === "Active"
-                      ? "text-green-400 "
-                      : ""
-                  }
+                  ${item.Status === "Active"
+                          ? "text-green-400 "
+                          : ""
+                        }
                 `}
                     >
                       {item.Status}
                     </span>
                   </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Description">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Description">
                     {item.Description}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap" data-label="Unit">{item.Unit}</td>
@@ -548,16 +543,13 @@ const IngredientsManagementPage = () => {
                     {item.Priority}
                   </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Action">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => openEditModal(item)}
-                        className="text-black hover:text-gray-800 transition-colors"
-                        title="Edit"
-                      >
-                        <Edit size={16} />
-                      </button>
-                    </div>
+                  <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                    <ResponsiveEditButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditModal(item);
+                      }}
+                    />
                   </td>
                 </tr>
               ))}
@@ -635,18 +627,23 @@ const IngredientsManagementPage = () => {
                   Priority
                 </label>
                 <input
-                  type="number"
-                  value={formData.Priority}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      Priority: Number(e.target.value) || 1,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  placeholder="Priority"
-                  min={1}
-                  required
+                   type="text"
+                      value={formData.Priority || ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Only allow numbers and empty string
+                        if (value === '' || /^\d+$/.test(value)) {
+                          setFormData({
+                            ...formData,
+                            Priority: value === '' ? 0 : Number(value)
+                          });
+                        }
+                        // If invalid input, just ignore it (don't update state)
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      placeholder="1"
+                      min={1}
+                      required
                 />
               </div>
 
@@ -665,12 +662,12 @@ const IngredientsManagementPage = () => {
             </div>
 
             {/* Fixed Action Buttons */}
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 pt-6 sm:justify-end border-t border-gray-200 mt-auto">
+            <div className="flex flex-col p-2 md:flex-row gap-3 pt-6 justify-end md:pr-6 border-t border-gray-200 mt-6">
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
                 disabled={actionLoading}
-                className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed order-2 md:order-1"
               >
                 <X size={16} />
                 Cancel
@@ -679,11 +676,10 @@ const IngredientsManagementPage = () => {
                 type="button"
                 onClick={handleSaveItem}
                 disabled={!formData.Name.trim() || actionLoading}
-                className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${
-                  !formData.Name.trim() || actionLoading
+                className={`px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 order-1 md:order-2 ${!formData.Name.trim() || actionLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                }`}
+                  }`}
               >
                 {actionLoading ? (
                   <>
@@ -693,7 +689,7 @@ const IngredientsManagementPage = () => {
                 ) : (
                   <>
                     <Save size={16} />
-                    {editItem ? "Update" : "Save & Close"}
+                    {editItem ? "Update Item" : "Add Item"}
                   </>
                 )}
               </button>
@@ -705,4 +701,4 @@ const IngredientsManagementPage = () => {
   );
 };
 
-export default IngredientsManagementPage;
+      export default IngredientsManagementPage;

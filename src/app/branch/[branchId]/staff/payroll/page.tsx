@@ -16,6 +16,7 @@ import {
   Calendar,
 } from "lucide-react";
 import ResponsiveDetailButton from "@/components/layout/UI/ResponsiveDetailButton";
+import ActionBar from "@/components/layout/UI/ActionBar";
 
 // Types
 interface StaffItem {
@@ -556,22 +557,11 @@ const StaffManagementPage = () => {
         </div>
       </div>
 
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[150px] max-w-[100vw]">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-          <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-        </div>
-      </div>
+       <ActionBar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search"
+      />
 
       {/* Responsive Table with Global CSS Classes */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table ">

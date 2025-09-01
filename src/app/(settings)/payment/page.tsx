@@ -808,18 +808,18 @@ const PaymentManagementPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[71]">
-          <div className="bg-white rounded-lg p-6 min-w-[35vw]   max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 px-4">
+          <div className="bg-white rounded-sm p-4 sm:p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
 
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
                 {editingItem ? "Edit Payment Method" : "Add New Payment Method"}
               </h2>
             </div>
 
             {/* Scrollable Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 pl-1">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 flex-1 overflow-y-auto pr-1 pl-1">
               {/* Payment Method Name */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -831,29 +831,29 @@ const PaymentManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="Enter payment method name"
                   required
                 />
               </div>
 
               {/* Payment Type */}
-              <div>
+              <div className="sm:col-span-1 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Payment Type
                 </label>
                 <DropdownMenu.Root>
-                  <DropdownMenu.Trigger className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent flex items-center justify-between bg-white hover:bg-gray-50">
-                    <span>{formData.PaymentType}</span>
+                  <DropdownMenu.Trigger className="px-3 py-2 w-full rounded-sm text-sm bg-white border border-gray-300 outline-none flex items-center justify-between hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
+                    {formData.PaymentType}
                     <ChevronDown size={16} className="text-gray-500" />
                   </DropdownMenu.Trigger>
 
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
-                      className="min-w-[200px] rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none z-[72]"
-                      sideOffset={4}
+                      className="min-w-[240px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none z-100"
+                      sideOffset={6}
                     >
-                      <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                      <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
 
                       <DropdownMenu.Item
                         className="px-3 py-2 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
@@ -881,7 +881,7 @@ const PaymentManagementPage = () => {
               </div>
 
               {/* Tax Type */}
-              <div>
+              <div className="sm:col-span-1 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tax Type <span className="text-red-500">*</span>
                 </label>
@@ -891,37 +891,47 @@ const PaymentManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, TaxType: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="e.g., GST, VAT, Service Tax"
                   required
                 />
               </div>
 
               {/* Tax Percentage */}
-              <div>
+              <div className="sm:col-span-2 md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tax Percentage (%)
+                  <span className="text-xs text-gray-500 ml-1">
+                    (Enter rate between 0-100)
+                  </span>
                 </label>
                 <input
-                  type="number"
-                  value={formData.TaxPercentage}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      TaxPercentage: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  type="text"
+                  value={formData.TaxPercentage || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Allow numbers with decimal points
+                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                      const numValue = value === '' ? 0 : parseFloat(value);
+                      if (value === '' || (numValue >= 0 && numValue <= 100)) {
+                        setFormData({
+                          ...formData,
+                          TaxPercentage: value === '' ? 0 : numValue
+                        });
+                      }
+                    }
+                    // If invalid input, just ignore it (don't update state)
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="0"
                   min="0"
                   max="100"
-                  step="0.1"
                 />
               </div>
 
               {/* Status - Replaced with Toggle */}
               <div className="md:col-span-2">
-                <div className="flex items-center justify-items-start gap-45">
+                <div className="flex items-center justify-between gap-4">
                   <label className="block text-sm font-medium text-gray-700">
                     Status
                   </label>
@@ -933,13 +943,13 @@ const PaymentManagementPage = () => {
               </div>
             </div>
 
-            {/* Fixed Action Buttons - Fixed alignment and separator */}
-            <div className="flex gap-3 pt-6 justify-start border-t border-gray-200 mt-6">
+            {/* Fixed Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
               <button
                 type="button"
                 onClick={handleCloseModal}
                 disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X size={16} />
                 Cancel
@@ -947,12 +957,8 @@ const PaymentManagementPage = () => {
               <button
                 type="button"
                 onClick={handleModalSubmit}
-                disabled={
-                  !formData.Name.trim() ||
-                  actionLoading
-                }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
-                  actionLoading
+                disabled={!formData.Name.trim() || actionLoading}
+                className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${!formData.Name.trim() || actionLoading
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-[#2C2C2C] text-white hover:bg-gray-700"
                   }`}
