@@ -17,6 +17,7 @@ import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ButtonPage from "@/components/layout/UI/button";
 import { useRouter } from "next/navigation";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton"; ``
 
 // Types
 interface BranchItem {
@@ -612,10 +613,10 @@ const BranchListPage = () => {
                 filteredItems.map((item) => (
                   <tr
                     key={item["Branch-ID"]}
-                    className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="bg-white hover:bg-gray-50 cursor-pointer transition-colors "
                     onClick={() => handleCustomerClick(item["Branch-ID"])}
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm " onClick={(e) => e.stopPropagation()}>
+                    <td className="px-6 py-8 whitespace-nowrap text-sm card-checkbox-cell " onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item["Branch-ID"])}
                         onChange={(e) =>
@@ -670,13 +671,13 @@ const BranchListPage = () => {
                       {`#${String(item["Branch-ID"]).padStart(3, "0")}`}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm " data-label="Branch Name">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="Branch Name">
                       <span className="font-medium">{item.Branch_Name}</span>
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20  text-right px-2 py-[2px] rounded-md text-xs font-medium 
+                        className={`inline-block w-20  text-right  py-[2px] rounded-md text-xs font-medium 
                           ${item.Status === "Active" ? "text-green-400 " : ""}
                           ${item.Status === "Inactive" ? "text-red-400 " : ""}`}
                       >
@@ -692,20 +693,14 @@ const BranchListPage = () => {
                       </div>
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))
@@ -846,11 +841,11 @@ const BranchListPage = () => {
                   actionLoading
                 }
                 className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${!formData.Branch_Name.trim() ||
-                    !formData["Contact-Info"].trim() ||
-                    !formData.Address.trim() ||
-                    actionLoading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                  !formData["Contact-Info"].trim() ||
+                  !formData.Address.trim() ||
+                  actionLoading
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#2C2C2C] text-white hover:bg-gray-700"
                   }`}
               >
                 {actionLoading ? (

@@ -16,6 +16,7 @@ import {
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ButtonPage from "@/components/layout/UI/button";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 
 // Types
 interface StaffItem {
@@ -55,7 +56,7 @@ class StaffAPI {
   private static mockData: StaffItem[] = [
     {
       Staff_ID: "1",
-      Name: "efe",
+      Name: "Ali Raza",
       Contact: "03001231234",
       Address: "123 Main Street, Lahore",
       CNIC: "35202-1234567-8",
@@ -68,7 +69,7 @@ class StaffAPI {
     },
     {
       Staff_ID: "2",
-      Name: "andd",
+      Name: "Faraz Aslam",
       Contact: "03001234567",
       Address: "456 Park Avenue, Karachi",
       CNIC: "42101-9876543-2",
@@ -82,7 +83,7 @@ class StaffAPI {
     },
     {
       Staff_ID: "3",
-      Name: "ghie",
+      Name: "Faris Shafi",
       Contact: "03001231238",
       Address: "789 Garden Road, Islamabad",
       CNIC: "61101-5555555-1",
@@ -852,7 +853,7 @@ const EmployeeRecordsPage = () => {
                     key={item.Staff_ID}
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-8 whitespace-nowrap ">
+                    <td className="px-6 py-8 whitespace-nowrap card-checkbox-cell">
                       <Checkbox
                         checked={selectedItems.includes(item.Staff_ID)}
                         onChange={(e) =>
@@ -907,7 +908,7 @@ const EmployeeRecordsPage = () => {
                       {`#${String(item.Staff_ID).padStart(3, "0")}`}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Name">
+                    <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Name">
                       <span className="font-medium">{item.Name}</span>
 
                     </td>
@@ -923,7 +924,7 @@ const EmployeeRecordsPage = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20 text-right lg:text-center px-2 py-[2px] rounded-sm text-xs font-medium 
+                        className={`inline-block w-20 text-right lg:text-center py-[2px] rounded-sm text-xs font-medium 
                     ${item.Status === "Active" ? "text-green-400 border-green-600" : ""}
                     ${item.Status === "Inactive" ? "text-red-400 border-red-600" : ""}`}
                       >
@@ -957,19 +958,14 @@ const EmployeeRecordsPage = () => {
                         <span className="text-gray-400">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))
