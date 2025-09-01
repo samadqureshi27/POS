@@ -65,8 +65,8 @@ const login = useCallback(
   async (email: string, password: string, role?: "admin" | "manager"): Promise<LoginResponse> => {
     try {
       setIsLoading(true);
-      const response = await authService.adminLogin(email, password, role);
-      
+      const response = await authService.adminLogin(email, password, role || 'admin');
+
       if (response.success && response.user) {
         setUser(response.user);
         setIsAuthenticated(true);
@@ -79,17 +79,17 @@ const login = useCallback(
         };
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('useAuth Login error:', error);
       return { success: false, error: 'Network error during login' };
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const pinLogin = useCallback(async (pin: string): Promise<LoginResponse> => {
+  const pinLogin = useCallback(async (pin: string, role?: string): Promise<LoginResponse> => {
     try {
       setIsLoading(true);
-      const response = await authService.pinLogin(pin);
+      const response = await authService.pinLogin(pin, role);
       
       if (response.success && response.user) {
         setUser(response.user);
