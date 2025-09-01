@@ -15,6 +15,7 @@ import {
   Edit,
   Save,
 } from "lucide-react";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 
 interface VendorItem {
   ID: number;
@@ -664,7 +665,7 @@ const VendorsPage = () => {
                     key={item.ID}
                     className="bg-white hover:bg-gray-50"
                   >
-                    <td className="px-6 py-8" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-6 py-8 card-checkbox-cell" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -719,7 +720,7 @@ const VendorsPage = () => {
                       {item.ID}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Company Name">
+                    <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Company Name">
                       <div className="name-content">
                         <span className="font-medium">{item.Company_Name}</span>
                       </div>
@@ -740,20 +741,14 @@ const VendorsPage = () => {
                     >
                       {item.Address}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))

@@ -15,6 +15,7 @@ import {
   Info,
   Calendar,
 } from "lucide-react";
+import ResponsiveDetailButton from "@/components/layout/UI/ResponsiveDetailButton";
 
 // Types
 interface StaffItem {
@@ -205,17 +206,12 @@ const Toast = ({
 );
 
 const StaffManagementPage = () => {
-  // Get branch ID from URL - simulating useParams with URL parsing
-  const [branchId, setBranchId] = useState(null);
+  // For demo purposes, let's set a default branch ID since we can't access real routing
+  const [branchId, setBranchId] = useState("1"); // Default to branch 1 for demo
 
-  useEffect(() => {
-    // Extract branch ID from current URL path
-    const path = window.location.pathname;
-    const branchMatch = path.match(/\/branch\/(\d+)/);
-    if (branchMatch) {
-      setBranchId(branchMatch[1]);
-    }
-  }, []);
+  // In a real Next.js app, you would use:
+  // const params = useParams();
+  // const branchId = params?.branchId;
 
   const [staffItems, setStaffItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -286,6 +282,7 @@ const StaffManagementPage = () => {
     }
   }, [toast]);
 
+  // Load staff items when branchId is available
   useEffect(() => {
     if (branchId) {
       loadStaffItems();
@@ -307,7 +304,7 @@ const StaffManagementPage = () => {
       const response = await StaffAPI.getStaffItemsByBranch(branchId);
       if (!response.success) throw new Error(response.message);
       setStaffItems(response.data);
-    } catch {
+    } catch (error) {
       showToast("Failed to load staff members", "error");
     } finally {
       setLoading(false);
@@ -565,8 +562,8 @@ const StaffManagementPage = () => {
           <input
             type="text"
             placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           />
           <Search
@@ -582,13 +579,13 @@ const StaffManagementPage = () => {
           <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
             <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
               <tr>
-                <th className="relative px-4 py-3 text-left">
+                <td className="card-checkbox-cell relative px-4 py-3 text-left">
                   Staff ID
-                </th>
-                <th className="relative px-4 py-3 text-left">
+                </td>
+                <td className="card-name-cell relative px-4 py-3 text-left">
                   Name
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
-                </th>
+                </td>
                 <th className="relative px-4 py-3 text-left">
                   Contact
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-[#d9d9e1]"></span>
@@ -683,9 +680,9 @@ const StaffManagementPage = () => {
                   Join Date
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left">
+               <th className="relative px-4 py-3 text-left">
                   Details
-                  <span className="absolute left-0 top-[15%] w-[1.5px] bg-gray-300"></span>
+                  <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
               </tr>
             </thead>
@@ -710,7 +707,7 @@ const StaffManagementPage = () => {
                     <td className="px-6 py-8 whitespace-nowrap " data-label="Staff ID">
                       {`#${String(item.STAFF_ID).padStart(3, "0")}`}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap  " data-label="Name">
+                    <td className="card-name-cell px-4 py-4 whitespace-nowrap  " data-label="Name">
                       <span>{item.Name}</span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap " data-label="Contact">
@@ -721,7 +718,7 @@ const StaffManagementPage = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap " data-label="Status">
                       <span
-                        className={`inline-block w-20  lg:text-center text-right px-2 py-[2px] rounded-md text-xs font-medium  ${item.Status === "Paid"
+                        className={`inline-block w-20  lg:text-center text-right  py-[2px] rounded-md text-xs font-medium  ${item.Status === "Paid"
                           ? "text-green-400 border-green-600"
                           : ""
                           } ${item.Status === "Unpaid"
@@ -738,15 +735,12 @@ const StaffManagementPage = () => {
                     <td className="px-4 py-4 whitespace-nowrap " data-label="Join Date">
                       {new Date(item.JoinDate).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Details">
-                      <div className="flex items-center gap-2">
-                        <button
-                          className="text-gray-600 hover:text-gray-800 p-1 transition-colors"
-                          title="View Details"
-                        >
-                          <Info size={16} />
-                        </button>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveDetailButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      />
                     </td>
                   </tr>
                 ))

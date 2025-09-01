@@ -15,6 +15,7 @@ import {
   Edit,
   Save
 } from "lucide-react";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 
 interface PaymentMethod {
   ID: number;
@@ -205,20 +206,18 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
-        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
-      } ${
-        isVisible && !isClosing
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+        } ${isVisible && !isClosing
           ? "translate-x-0 opacity-100"
           : isClosing
-          ? "translate-x-full opacity-0"
-          : "translate-x-full opacity-0"
-      }`}
+            ? "translate-x-full opacity-0"
+            : "translate-x-full opacity-0"
+        }`}
     >
       {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
       <span>{message}</span>
-      <button 
-        onClick={handleClose} 
+      <button
+        onClick={handleClose}
         className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
       >
         <X size={16} />
@@ -397,17 +396,17 @@ const PaymentManagementPage = () => {
     }
   };
   useEffect(() => {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "unset";
-      }
-  
-      // Cleanup function to restore scrolling when component unmounts
-      return () => {
-        document.body.style.overflow = "unset";
-      };
-    }, [isModalOpen]);
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -463,7 +462,7 @@ const PaymentManagementPage = () => {
 
       {/* Top summary row */}
       <div className="grid grid-cols-1 max-w-[100vw]  lg:grid-cols-2   gap-4 mb-8 lg:max-w-[50vw]">
-        
+
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-5xl  mb-1">
@@ -518,77 +517,77 @@ const PaymentManagementPage = () => {
 
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  />
-                  <Search
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={16}
-                  />
-                </div>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
+          />
+        </div>
       </div>
 
       {/* Table + filters */}
-     <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table  ">
-             <div className=" rounded-sm table-container ">
-               <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
-                 <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
-                   <tr>
-                     <th className="px-6 py-6 text-left w-[2.5px]">
-                       <Checkbox
-                         checked={isAllSelected}
-                         onChange={(e) => handleSelectAll(e.target.checked)}
-                         disableRipple
-                         sx={{
-                           transform: "scale(1.5)", // size adjustment
-                           p: 0, // remove extra padding
-                         }}
-                         icon={
-                           // unchecked grey box
-                           <svg width="20" height="20" viewBox="0 0 24 24">
-                             <rect
-                               x="3"
-                               y="3"
-                               width="18"
-                               height="18"
-                               rx="3"
-                               ry="3"
-                               fill="#e0e0e0" // grey inside
-                               stroke="#d1d1d1" // border grey
-                               strokeWidth="2"
-                             />
-                           </svg>
-                         }
-                         checkedIcon={
-                           // checked with tick
-                           <svg width="20" height="20" viewBox="0 0 24 24">
-                             <rect
-                               x="3"
-                               y="3"
-                               width="18"
-                               height="18"
-                               rx="3"
-                               ry="3"
-                               fill="#e0e0e0" // grey inside
-                               stroke="#2C2C2C" // dark border
-                               strokeWidth="2"
-                             />
-                             <path
-                               d="M9 12.5l2 2 4-4.5"
-                               fill="none"
-                               stroke="#2C2C2C"
-                               strokeWidth="2"
-                               strokeLinecap="round"
-                               strokeLinejoin="round"
-                             />
-                           </svg>
-                         }
-                       />
-                     </th>
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table  ">
+        <div className=" rounded-sm table-container ">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+              <tr>
+                <th className="px-6 py-6 text-left w-[2.5px]">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    disableRipple
+                    sx={{
+                      transform: "scale(1.5)", // size adjustment
+                      p: 0, // remove extra padding
+                    }}
+                    icon={
+                      // unchecked grey box
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#d1d1d1" // border grey
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    }
+                    checkedIcon={
+                      // checked with tick
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#2C2C2C" // dark border
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12.5l2 2 4-4.5"
+                          fill="none"
+                          stroke="#2C2C2C"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
+                  />
+                </th>
                 <th className="relative px-4 py-3 text-left">
                   ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
@@ -708,65 +707,65 @@ const PaymentManagementPage = () => {
 
             <tbody className="divide-y text-gray-500  divide-gray-300">
               {filteredItems.map((item) => (
-                <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                  <td className="px-6 py-8">
-                                        <Checkbox
-                                          checked={selectedItems.includes(item.ID)}
-                                          onChange={(e) =>
-                                            handleSelectItem(item.ID, e.target.checked)
-                                          }
-                                          disableRipple
-                                          sx={{
-                                            p: 0, // remove extra padding
-                                            transform: "scale(1.5)", // optional size tweak
-                                          }}
-                                          icon={
-                                            // unchecked grey box
-                                            <svg width="20" height="20" viewBox="0 0 24 24">
-                                              <rect
-                                                x="3"
-                                                y="3"
-                                                width="18"
-                                                height="18"
-                                                rx="3"
-                                                ry="3"
-                                                fill="#e0e0e0" // grey inside
-                                                stroke="#d1d1d1" // border grey
-                                                strokeWidth="2"
-                                              />
-                                            </svg>
-                                          }
-                                          checkedIcon={
-                                            // checked with tick
-                                            <svg width="20" height="20" viewBox="0 0 24 24">
-                                              <rect
-                                                x="3"
-                                                y="3"
-                                                width="18"
-                                                height="18"
-                                                rx="3"
-                                                ry="3"
-                                                fill="#e0e0e0" // grey inside
-                                                stroke="#2C2C2C" // dark border
-                                                strokeWidth="2"
-                                              />
-                                              <path
-                                                d="M9 12.5l2 2 4-4.5"
-                                                fill="none"
-                                                stroke="#2C2C2C"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                              />
-                                            </svg>
-                                          }
-                                        />
-                                      </td>
+                <tr key={item.ID} className="bg-white hover:bg-gray-50 ">
+                  <td className="px-6 py-8 card-checkbox-cell">
+                    <Checkbox
+                      checked={selectedItems.includes(item.ID)}
+                      onChange={(e) =>
+                        handleSelectItem(item.ID, e.target.checked)
+                      }
+                      disableRipple
+                      sx={{
+                        p: 0, // remove extra padding
+                        transform: "scale(1.5)", // optional size tweak
+                      }}
+                      icon={
+                        // unchecked grey box
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="3"
+                            ry="3"
+                            fill="#e0e0e0" // grey inside
+                            stroke="#d1d1d1" // border grey
+                            strokeWidth="2"
+                          />
+                        </svg>
+                      }
+                      checkedIcon={
+                        // checked with tick
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="3"
+                            ry="3"
+                            fill="#e0e0e0" // grey inside
+                            stroke="#2C2C2C" // dark border
+                            strokeWidth="2"
+                          />
+                          <path
+                            d="M9 12.5l2 2 4-4.5"
+                            fill="none"
+                            stroke="#2C2C2C"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      }
+                    />
+                  </td>
 
                   <td className="px-4 py-4 whitespace-nowrap" data-label="ID">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Name">{item.Name}</td>
+                  <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Name">{item.Name}</td>
 
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Payment Type">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Payment Type">
                     <span
                       className={`inline-block w-20  text-right  py-[2px] rounded-md text-xs font-medium 
                   ${item.PaymentType === "Cash" ? "text-red-400 border-red-600" : ""}
@@ -781,9 +780,9 @@ const PaymentManagementPage = () => {
                   <td className="px-4 py-4 whitespace-nowrap" data-label="Tax Type">{item.TaxType}</td>
                   <td className="px-4 py-4 whitespace-nowrap" data-label="Tax Percentage">{item.TaxPercentage}%</td>
 
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Status">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                     <span
-                      className={`inline-block w-20 text-right  py-[2px] rounded-md text-xs font-medium 
+                      className={`inline-block w-20 text-right  py-[2px] rounded-sm text-xs font-medium 
                   ${item.Status === "Active" ? "text-green-400 border-green-700" : "text-red-400 border-red-600"}
                 `}
                     >
@@ -791,19 +790,14 @@ const PaymentManagementPage = () => {
                     </span>
                   </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Action">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingItem(item);
-                          setIsModalOpen(true);
-                        }}
-                        className="text-gray-600 hover:text-gray-800 p-1"
-                        title="Edit"
-                      >
-                        <Edit size={16} />
-                      </button>
-                    </div>
+                  <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                    <ResponsiveEditButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingItem(item);
+                        setIsModalOpen(true);
+                      }}
+                    />
                   </td>
                 </tr>
               ))}
