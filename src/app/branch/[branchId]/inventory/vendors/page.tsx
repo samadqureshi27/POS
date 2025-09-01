@@ -15,6 +15,8 @@ import {
   Edit,
   Save,
 } from "lucide-react";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
+import ActionBar from "@/components/layout/UI/ActionBar";
 
 interface VendorItem {
   ID: number;
@@ -141,20 +143,13 @@ class VendorAPI {
     };
   }
 
-  // DELETE /api/vendors/{id}/
+  // DELETE /api/vendors/{id}/ - FIXED VERSION (removed ID reassignment)
   static async deleteVendorItem(id: number, branchId: number): Promise<ApiResponse<null>> {
     await this.delay(600);
     const index = this.mockData.findIndex((i) => i.ID === id);
     if (index === -1) throw new Error("Item not found");
 
     this.mockData.splice(index, 1);
-
-    // Reassign IDs sequentially for the specific branch
-    const branchVendors = this.mockData.filter(item => item.Branch_ID === branchId);
-    branchVendors.forEach((item, idx) => {
-      const originalIndex = this.mockData.findIndex(vendor => vendor.ID === item.ID);
-      this.mockData[originalIndex].ID = idx + 1;
-    });
 
     return {
       success: true,
@@ -163,20 +158,13 @@ class VendorAPI {
     };
   }
 
-  // DELETE /api/vendors/branch/{branchId}/bulk-delete/
+  // DELETE /api/vendors/branch/{branchId}/bulk-delete/ - FIXED VERSION (removed ID reassignment)
   static async bulkDeleteVendorItems(
     ids: number[],
     branchId: number
   ): Promise<ApiResponse<null>> {
     await this.delay(1000);
     this.mockData = this.mockData.filter((item) => !ids.includes(item.ID));
-
-    // Reassign IDs sequentially for the specific branch
-    const branchVendors = this.mockData.filter(item => item.Branch_ID === branchId);
-    branchVendors.forEach((item, idx) => {
-      const originalIndex = this.mockData.findIndex(vendor => vendor.ID === item.ID);
-      this.mockData[originalIndex].ID = idx + 1;
-    });
 
     return {
       success: true,
@@ -264,6 +252,12 @@ const VendorsPage = () => {
   useEffect(() => {
     loadVendorItems();
   }, [branchId]);
+
+  // FIXED: Clean up invalid selections when vendorItems change
+  useEffect(() => {
+    const validIds = vendorItems.map(item => item.ID);
+    setSelectedItems(prev => prev.filter(id => validIds.includes(id)));
+  }, [vendorItems]);
 
   // Modal form effect
   useEffect(() => {
@@ -388,16 +382,16 @@ const VendorsPage = () => {
     }
   };
 
+  // FIXED: Simplified delete function without ID reassignment
   const handleDeleteSelected = async () => {
     if (selectedItems.length === 0) return;
     try {
       setActionLoading(true);
       const response = await VendorAPI.bulkDeleteVendorItems(selectedItems, branchId);
       if (response.success) {
-        setVendorItems((prev) => {
-          const remaining = prev.filter((i) => !selectedItems.includes(i.ID));
-          return remaining.map((it, idx) => ({ ...it, ID: idx + 1 }));
-        });
+        // Simply filter out deleted items - no ID reassignment
+        setVendorItems(prev => prev.filter(item => !selectedItems.includes(item.ID)));
+        // Clear selection immediately
         setSelectedItems([]);
         showToast(
           response.message || "Vendors deleted successfully",
@@ -411,16 +405,22 @@ const VendorsPage = () => {
     }
   };
 
+  // FIXED: Improved selection handlers
   const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(checked ? filteredItems.map((item) => item.ID) : []);
+    if (checked) {
+      // Only select items that actually exist in filtered results
+      setSelectedItems(filteredItems.map((item) => item.ID));
+    } else {
+      setSelectedItems([]);
+    }
   };
 
   const handleSelectItem = (itemId: number, checked: boolean) => {
-    setSelectedItems(
-      checked
-        ? [...selectedItems, itemId]
-        : selectedItems.filter((id) => id !== itemId)
-    );
+    if (checked) {
+      setSelectedItems(prev => [...prev, itemId]);
+    } else {
+      setSelectedItems(prev => prev.filter(id => id !== itemId));
+    }
   };
 
   // Modal form handlers
@@ -466,9 +466,16 @@ const VendorsPage = () => {
     };
   }, [isModalOpen]);
 
-  const isAllSelected =
-    selectedItems.length === filteredItems.length && filteredItems.length > 0;
-  const isSomeSelected = selectedItems.length > 0;
+  // FIXED: More robust selection state calculations
+  const isAllSelected = useMemo(() => {
+    return filteredItems.length > 0 && 
+           filteredItems.every(item => selectedItems.includes(item.ID));
+  }, [selectedItems, filteredItems]);
+
+  const isSomeSelected = useMemo(() => {
+    return selectedItems.length > 0 && 
+           selectedItems.some(id => filteredItems.find(item => item.ID === id));
+  }, [selectedItems, filteredItems]);
 
   if (loading) {
     return (
@@ -516,49 +523,16 @@ const VendorsPage = () => {
         </div>
       </div>
 
-      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-        {/* Action Buttons */}
-        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            disabled={selectedItems.length > 0}
-            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-          >
-            <Plus size={16} />
-            Add
-          </button>
-
-          <button
-            onClick={handleDeleteSelected}
-            disabled={!isSomeSelected || actionLoading}
-            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-          >
-            <Trash2 size={16} />
-            {actionLoading ? "Deleting..." : "Delete Selected"}
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            placeholder="Search Payment Methods..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-          <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-        </div>
-      </div>
+     <ActionBar
+        onAdd={() => setIsModalOpen(true)}
+        addDisabled={selectedItems.length > 0}
+        onDelete={handleDeleteSelected}
+        deleteDisabled={selectedItems.length === 0}
+        isDeleting={actionLoading}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search..."
+      />
 
       {/* Responsive Table with Global CSS Classes */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm responsive-customer-table">
@@ -664,7 +638,7 @@ const VendorsPage = () => {
                     key={item.ID}
                     className="bg-white hover:bg-gray-50"
                   >
-                    <td className="px-6 py-8" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-6 py-8 card-checkbox-cell" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -719,7 +693,7 @@ const VendorsPage = () => {
                       {item.ID}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Company Name">
+                    <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Company Name">
                       <div className="name-content">
                         <span className="font-medium">{item.Company_Name}</span>
                       </div>
@@ -740,20 +714,14 @@ const VendorsPage = () => {
                     >
                       {item.Address}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))
@@ -863,7 +831,7 @@ const VendorsPage = () => {
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent h-24 resize-none"
                   placeholder="Enter complete business address..."
-                  rows="3"
+                  rows={3}
                 />
               </div>
             </div>

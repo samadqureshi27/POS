@@ -15,6 +15,7 @@ import {
   Edit,
   Save
 } from "lucide-react";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 
 interface PaymentMethod {
   ID: number;
@@ -205,20 +206,18 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
-        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
-      } ${
-        isVisible && !isClosing
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+        } ${isVisible && !isClosing
           ? "translate-x-0 opacity-100"
           : isClosing
-          ? "translate-x-full opacity-0"
-          : "translate-x-full opacity-0"
-      }`}
+            ? "translate-x-full opacity-0"
+            : "translate-x-full opacity-0"
+        }`}
     >
       {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
       <span>{message}</span>
-      <button 
-        onClick={handleClose} 
+      <button
+        onClick={handleClose}
         className="ml-2 hover:bg-black/10 rounded p-1 transition-colors duration-200"
       >
         <X size={16} />
@@ -397,17 +396,17 @@ const PaymentManagementPage = () => {
     }
   };
   useEffect(() => {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "unset";
-      }
-  
-      // Cleanup function to restore scrolling when component unmounts
-      return () => {
-        document.body.style.overflow = "unset";
-      };
-    }, [isModalOpen]);
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -463,7 +462,7 @@ const PaymentManagementPage = () => {
 
       {/* Top summary row */}
       <div className="grid grid-cols-1 max-w-[100vw]  lg:grid-cols-2   gap-4 mb-8 lg:max-w-[50vw]">
-        
+
         <div className="flex items-center justify-start flex-1 gap-2 max-w-[100%] min-h-[100px] rounded-sm p-4 bg-white shadow-sm">
           <div>
             <p className="text-5xl  mb-1">
@@ -518,77 +517,77 @@ const PaymentManagementPage = () => {
 
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px]">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  />
-                  <Search
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={16}
-                  />
-                </div>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
+          />
+        </div>
       </div>
 
       {/* Table + filters */}
-     <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table  ">
-             <div className=" rounded-sm table-container ">
-               <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
-                 <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
-                   <tr>
-                     <th className="px-6 py-6 text-left w-[2.5px]">
-                       <Checkbox
-                         checked={isAllSelected}
-                         onChange={(e) => handleSelectAll(e.target.checked)}
-                         disableRipple
-                         sx={{
-                           transform: "scale(1.5)", // size adjustment
-                           p: 0, // remove extra padding
-                         }}
-                         icon={
-                           // unchecked grey box
-                           <svg width="20" height="20" viewBox="0 0 24 24">
-                             <rect
-                               x="3"
-                               y="3"
-                               width="18"
-                               height="18"
-                               rx="3"
-                               ry="3"
-                               fill="#e0e0e0" // grey inside
-                               stroke="#d1d1d1" // border grey
-                               strokeWidth="2"
-                             />
-                           </svg>
-                         }
-                         checkedIcon={
-                           // checked with tick
-                           <svg width="20" height="20" viewBox="0 0 24 24">
-                             <rect
-                               x="3"
-                               y="3"
-                               width="18"
-                               height="18"
-                               rx="3"
-                               ry="3"
-                               fill="#e0e0e0" // grey inside
-                               stroke="#2C2C2C" // dark border
-                               strokeWidth="2"
-                             />
-                             <path
-                               d="M9 12.5l2 2 4-4.5"
-                               fill="none"
-                               stroke="#2C2C2C"
-                               strokeWidth="2"
-                               strokeLinecap="round"
-                               strokeLinejoin="round"
-                             />
-                           </svg>
-                         }
-                       />
-                     </th>
+      <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table  ">
+        <div className=" rounded-sm table-container ">
+          <table className="min-w-full divide-y max-w-[800px] divide-gray-200   table-fixed">
+            <thead className="bg-white border-b text-gray-500 border-gray-200  py-50 sticky top-0 z-10">
+              <tr>
+                <th className="px-6 py-6 text-left w-[2.5px]">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    disableRipple
+                    sx={{
+                      transform: "scale(1.5)", // size adjustment
+                      p: 0, // remove extra padding
+                    }}
+                    icon={
+                      // unchecked grey box
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#d1d1d1" // border grey
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    }
+                    checkedIcon={
+                      // checked with tick
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          ry="3"
+                          fill="#e0e0e0" // grey inside
+                          stroke="#2C2C2C" // dark border
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12.5l2 2 4-4.5"
+                          fill="none"
+                          stroke="#2C2C2C"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
+                  />
+                </th>
                 <th className="relative px-4 py-3 text-left">
                   ID
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
@@ -708,65 +707,65 @@ const PaymentManagementPage = () => {
 
             <tbody className="divide-y text-gray-500  divide-gray-300">
               {filteredItems.map((item) => (
-                <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                  <td className="px-6 py-8">
-                                        <Checkbox
-                                          checked={selectedItems.includes(item.ID)}
-                                          onChange={(e) =>
-                                            handleSelectItem(item.ID, e.target.checked)
-                                          }
-                                          disableRipple
-                                          sx={{
-                                            p: 0, // remove extra padding
-                                            transform: "scale(1.5)", // optional size tweak
-                                          }}
-                                          icon={
-                                            // unchecked grey box
-                                            <svg width="20" height="20" viewBox="0 0 24 24">
-                                              <rect
-                                                x="3"
-                                                y="3"
-                                                width="18"
-                                                height="18"
-                                                rx="3"
-                                                ry="3"
-                                                fill="#e0e0e0" // grey inside
-                                                stroke="#d1d1d1" // border grey
-                                                strokeWidth="2"
-                                              />
-                                            </svg>
-                                          }
-                                          checkedIcon={
-                                            // checked with tick
-                                            <svg width="20" height="20" viewBox="0 0 24 24">
-                                              <rect
-                                                x="3"
-                                                y="3"
-                                                width="18"
-                                                height="18"
-                                                rx="3"
-                                                ry="3"
-                                                fill="#e0e0e0" // grey inside
-                                                stroke="#2C2C2C" // dark border
-                                                strokeWidth="2"
-                                              />
-                                              <path
-                                                d="M9 12.5l2 2 4-4.5"
-                                                fill="none"
-                                                stroke="#2C2C2C"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                              />
-                                            </svg>
-                                          }
-                                        />
-                                      </td>
+                <tr key={item.ID} className="bg-white hover:bg-gray-50 ">
+                  <td className="px-6 py-8 card-checkbox-cell">
+                    <Checkbox
+                      checked={selectedItems.includes(item.ID)}
+                      onChange={(e) =>
+                        handleSelectItem(item.ID, e.target.checked)
+                      }
+                      disableRipple
+                      sx={{
+                        p: 0, // remove extra padding
+                        transform: "scale(1.5)", // optional size tweak
+                      }}
+                      icon={
+                        // unchecked grey box
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="3"
+                            ry="3"
+                            fill="#e0e0e0" // grey inside
+                            stroke="#d1d1d1" // border grey
+                            strokeWidth="2"
+                          />
+                        </svg>
+                      }
+                      checkedIcon={
+                        // checked with tick
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="3"
+                            ry="3"
+                            fill="#e0e0e0" // grey inside
+                            stroke="#2C2C2C" // dark border
+                            strokeWidth="2"
+                          />
+                          <path
+                            d="M9 12.5l2 2 4-4.5"
+                            fill="none"
+                            stroke="#2C2C2C"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      }
+                    />
+                  </td>
 
                   <td className="px-4 py-4 whitespace-nowrap" data-label="ID">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Name">{item.Name}</td>
+                  <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Name">{item.Name}</td>
 
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Payment Type">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Payment Type">
                     <span
                       className={`inline-block w-20  text-right  py-[2px] rounded-md text-xs font-medium 
                   ${item.PaymentType === "Cash" ? "text-red-400 border-red-600" : ""}
@@ -781,9 +780,9 @@ const PaymentManagementPage = () => {
                   <td className="px-4 py-4 whitespace-nowrap" data-label="Tax Type">{item.TaxType}</td>
                   <td className="px-4 py-4 whitespace-nowrap" data-label="Tax Percentage">{item.TaxPercentage}%</td>
 
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Status">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                     <span
-                      className={`inline-block w-20 text-right  py-[2px] rounded-md text-xs font-medium 
+                      className={`inline-block w-20 text-right  py-[2px] rounded-sm text-xs font-medium 
                   ${item.Status === "Active" ? "text-green-400 border-green-700" : "text-red-400 border-red-600"}
                 `}
                     >
@@ -791,19 +790,14 @@ const PaymentManagementPage = () => {
                     </span>
                   </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Action">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingItem(item);
-                          setIsModalOpen(true);
-                        }}
-                        className="text-gray-600 hover:text-gray-800 p-1"
-                        title="Edit"
-                      >
-                        <Edit size={16} />
-                      </button>
-                    </div>
+                  <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                    <ResponsiveEditButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingItem(item);
+                        setIsModalOpen(true);
+                      }}
+                    />
                   </td>
                 </tr>
               ))}
@@ -814,18 +808,18 @@ const PaymentManagementPage = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[71]">
-          <div className="bg-white rounded-lg p-6 min-w-[35vw]   max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 px-4">
+          <div className="bg-white rounded-sm p-4 sm:p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
 
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
                 {editingItem ? "Edit Payment Method" : "Add New Payment Method"}
               </h2>
             </div>
 
             {/* Scrollable Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 pl-1">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 flex-1 overflow-y-auto pr-1 pl-1">
               {/* Payment Method Name */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -837,29 +831,29 @@ const PaymentManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="Enter payment method name"
                   required
                 />
               </div>
 
               {/* Payment Type */}
-              <div>
+              <div className="sm:col-span-1 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Payment Type
                 </label>
                 <DropdownMenu.Root>
-                  <DropdownMenu.Trigger className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent flex items-center justify-between bg-white hover:bg-gray-50">
-                    <span>{formData.PaymentType}</span>
+                  <DropdownMenu.Trigger className="px-3 py-2 w-full rounded-sm text-sm bg-white border border-gray-300 outline-none flex items-center justify-between hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
+                    {formData.PaymentType}
                     <ChevronDown size={16} className="text-gray-500" />
                   </DropdownMenu.Trigger>
 
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
-                      className="min-w-[200px] rounded-md bg-white shadow-md border border-gray-200 p-1 relative outline-none z-[72]"
-                      sideOffset={4}
+                      className="min-w-[240px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none z-100"
+                      sideOffset={6}
                     >
-                      <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
+                      <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
 
                       <DropdownMenu.Item
                         className="px-3 py-2 text-sm cursor-pointer hover:bg-red-100 text-red-700 rounded outline-none"
@@ -887,7 +881,7 @@ const PaymentManagementPage = () => {
               </div>
 
               {/* Tax Type */}
-              <div>
+              <div className="sm:col-span-1 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tax Type <span className="text-red-500">*</span>
                 </label>
@@ -897,37 +891,47 @@ const PaymentManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, TaxType: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="e.g., GST, VAT, Service Tax"
                   required
                 />
               </div>
 
               {/* Tax Percentage */}
-              <div>
+              <div className="sm:col-span-2 md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tax Percentage (%)
+                  <span className="text-xs text-gray-500 ml-1">
+                    (Enter rate between 0-100)
+                  </span>
                 </label>
                 <input
-                  type="number"
-                  value={formData.TaxPercentage}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      TaxPercentage: Number(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                  type="text"
+                  value={formData.TaxPercentage || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Allow numbers with decimal points
+                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                      const numValue = value === '' ? 0 : parseFloat(value);
+                      if (value === '' || (numValue >= 0 && numValue <= 100)) {
+                        setFormData({
+                          ...formData,
+                          TaxPercentage: value === '' ? 0 : numValue
+                        });
+                      }
+                    }
+                    // If invalid input, just ignore it (don't update state)
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                   placeholder="0"
                   min="0"
                   max="100"
-                  step="0.1"
                 />
               </div>
 
               {/* Status - Replaced with Toggle */}
               <div className="md:col-span-2">
-                <div className="flex items-center justify-items-start gap-45">
+                <div className="flex items-center justify-between gap-4">
                   <label className="block text-sm font-medium text-gray-700">
                     Status
                   </label>
@@ -939,13 +943,13 @@ const PaymentManagementPage = () => {
               </div>
             </div>
 
-            {/* Fixed Action Buttons - Fixed alignment and separator */}
-            <div className="flex gap-3 pt-6 justify-start border-t border-gray-200 mt-6">
+            {/* Fixed Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
               <button
                 type="button"
                 onClick={handleCloseModal}
                 disabled={actionLoading}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X size={16} />
                 Cancel
@@ -953,12 +957,8 @@ const PaymentManagementPage = () => {
               <button
                 type="button"
                 onClick={handleModalSubmit}
-                disabled={
-                  !formData.Name.trim() ||
-                  actionLoading
-                }
-                className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
-                  actionLoading
+                disabled={!formData.Name.trim() || actionLoading}
+                className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${!formData.Name.trim() || actionLoading
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-[#2C2C2C] text-white hover:bg-gray-700"
                   }`}

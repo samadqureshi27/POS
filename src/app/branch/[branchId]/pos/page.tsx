@@ -16,6 +16,8 @@ import {
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ButtonPage from "@/components/layout/UI/button";
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
+import ActionBar from "@/components/layout/UI/ActionBar";
 // Types
 interface MenuItem {
   Branch_ID_fk: string;
@@ -36,12 +38,12 @@ class PosAPI {
     new Promise((resolve) => setTimeout(resolve, ms));
 
   private static mockData: MenuItem[] = [
-    { Branch_ID_fk: "1", POS_ID: "1", POS_Name: "Main Branch POS 1", Status: "Active" },
-    { Branch_ID_fk: "1", POS_ID: "2", POS_Name: "Main Branch POS 2", Status: "Inactive" },
-    { Branch_ID_fk: "1", POS_ID: "3", POS_Name: "Main Branch POS 3", Status: "Active" },
-    { Branch_ID_fk: "2", POS_ID: "4", POS_Name: "North Branch POS 1", Status: "Active" },
-    { Branch_ID_fk: "2", POS_ID: "5", POS_Name: "North Branch POS 2", Status: "Inactive" },
-    { Branch_ID_fk: "3", POS_ID: "6", POS_Name: "South Branch POS 1", Status: "Active" },
+    { Branch_ID_fk: "1", POS_ID: "1", POS_Name: "POS 1", Status: "Active" },
+    { Branch_ID_fk: "1", POS_ID: "2", POS_Name: "POS 2", Status: "Inactive" },
+    { Branch_ID_fk: "1", POS_ID: "3", POS_Name: "POS 3", Status: "Active" },
+    { Branch_ID_fk: "2", POS_ID: "4", POS_Name: "POS 1", Status: "Active" },
+    { Branch_ID_fk: "2", POS_ID: "5", POS_Name: "POS 2", Status: "Inactive" },
+    { Branch_ID_fk: "3", POS_ID: "6", POS_Name: "POS 1", Status: "Active" },
   ];
 
   static async getPosItemsByBranch(branchId: string): Promise<ApiResponse<MenuItem[]>> {
@@ -407,49 +409,16 @@ const PosListPage = () => {
         </div>
       </div>
 
-      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-        {/* Action Buttons */}
-        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            disabled={selectedItems.length > 0}
-            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-          >
-            <Plus size={16} />
-            Add
-          </button>
-
-          <button
-            onClick={handleDeleteSelected}
-            disabled={!isSomeSelected || actionLoading}
-            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-          >
-            <Trash2 size={16} />
-            {actionLoading ? "Deleting..." : "Delete Selected"}
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            placeholder="Search Payment Methods..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-          <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-        </div>
-      </div>
+       <ActionBar
+        onAdd={() => setIsModalOpen(true)}
+        addDisabled={selectedItems.length > 0}
+        onDelete={handleDeleteSelected}
+        deleteDisabled={selectedItems.length === 0}
+        isDeleting={actionLoading}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search"
+      />
 
       {/* Responsive Table with Global CSS Classes */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table ">
@@ -580,7 +549,7 @@ const PosListPage = () => {
                     key={item.POS_ID}
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-8 whitespace-nowrap text-sm" >
+                    <td className="px-6 py-8 whitespace-nowrap text-sm card-checkbox-cell" >
                       <Checkbox
                         checked={selectedItems.includes(item.POS_ID)}
                         onChange={(e) =>
@@ -635,33 +604,28 @@ const PosListPage = () => {
                       {`#${String(item.POS_ID).padStart(3, "0")}`}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-sm " data-label="POS Name">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm card-name-cell" data-label="POS Name">
                       <span className="font-medium">{item.POS_Name}</span>
 
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20  text-right px-2 py-[2px] rounded-md text-xs font-medium 
+                        className={`inline-block w-20  text-right  py-[2px] rounded-md text-xs font-medium 
                           ${item.Status === "Active" ? "text-green-400 " : ""}
                           ${item.Status === "Inactive" ? "text-red-400 " : ""}`}
                       >
                         {item.Status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap" data-label="Actions">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                     <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))

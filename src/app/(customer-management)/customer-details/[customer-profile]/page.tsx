@@ -14,6 +14,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
+import ResponsiveDetailButton from "@/components/layout/UI/ResponsiveDetailButton";
 
 // Types (same as before)
 interface CustomerItem {
@@ -51,7 +52,7 @@ class CustomerAPI {
   private static delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
-  private static mockCustomers: CustomerItem[] = [
+   private static mockCustomers: CustomerItem[] = [
     {
       Customer_ID: 1,
       Name: "Ahmed Ali",
@@ -59,7 +60,7 @@ class CustomerAPI {
       Email: "ahmed.ali@gmail.com",
       Address: "123 Main Street, Lahore",
       Feedback_Rating: 5,
-      Total_Orders: 12,
+      Total_Orders: 3, // Updated to match actual orders
       Birthdate: "09/13/1995",
       Registration_Date: "2024-01-15",
       Profile_Creation_Date: "01/15/2024 09:30",
@@ -72,7 +73,7 @@ class CustomerAPI {
       Email: "fatima.khan@gmail.com",
       Address: "456 Park Avenue, Karachi",
       Feedback_Rating: 4,
-      Total_Orders: 8,
+      Total_Orders: 4, // Updated to match actual orders
       Birthdate: "05/22/1988",
       Registration_Date: "2024-02-20",
       Profile_Creation_Date: "02/20/2024 14:45",
@@ -85,7 +86,7 @@ class CustomerAPI {
       Email: "hassan@gmail.com",
       Address: "789 Garden Road, Islamabad",
       Feedback_Rating: 3,
-      Total_Orders: 15,
+      Total_Orders: 5, // Updated to match actual orders
       Birthdate: "12/08/1992",
       Registration_Date: "2023-12-10",
       Profile_Creation_Date: "12/10/2023 11:20",
@@ -98,7 +99,7 @@ class CustomerAPI {
       Email: "mariam.qureshi@yahoo.com",
       Address: "112 F-6 Sector, Islamabad",
       Feedback_Rating: 5,
-      Total_Orders: 25,
+      Total_Orders: 6, // Matches existing orders
       Birthdate: "03/15/1990",
       Registration_Date: "2022-01-15",
       Profile_Creation_Date: "01/15/2022 10:30",
@@ -126,6 +127,15 @@ class CustomerAPI {
         Total: 1200,
         Status: "Completed",
       },
+      {
+        Customer_fk_ID: 1,
+        Order_ID: "ORD003",
+        Order_Number: "12347",
+        Type: "Delivery",
+        Date: "2024-08-15",
+        Total: 950,
+        Status: "Completed",
+      },
     ],
     2: [
       {
@@ -137,10 +147,8 @@ class CustomerAPI {
         Total: 650,
         Status: "Pending",
       },
-    ],
-    3: [
       {
-        Customer_fk_ID: 3,
+        Customer_fk_ID: 2,
         Order_ID: "ORD008",
         Order_Number: "12352",
         Type: "Dine in",
@@ -148,12 +156,77 @@ class CustomerAPI {
         Total: 1100,
         Status: "Completed",
       },
+      {
+        Customer_fk_ID: 2,
+        Order_ID: "ORD009",
+        Order_Number: "12353",
+        Type: "Takeaway",
+        Date: "2024-08-12",
+        Total: 750,
+        Status: "Completed",
+      },
+      {
+        Customer_fk_ID: 2,
+        Order_ID: "ORD010",
+        Order_Number: "12354",
+        Type: "Delivery",
+        Date: "2024-08-05",
+        Total: 890,
+        Status: "Cancelled",
+      },
+    ],
+    3: [
+      {
+        Customer_fk_ID: 3,
+        Order_ID: "ORD011",
+        Order_Number: "12355",
+        Type: "Dine in",
+        Date: "2024-08-18",
+        Total: 1100,
+        Status: "Completed",
+      },
+      {
+        Customer_fk_ID: 3,
+        Order_ID: "ORD012",
+        Order_Number: "12356",
+        Type: "Takeaway",
+        Date: "2024-08-14",
+        Total: 675,
+        Status: "Completed",
+      },
+      {
+        Customer_fk_ID: 3,
+        Order_ID: "ORD013",
+        Order_Number: "12357",
+        Type: "Delivery",
+        Date: "2024-08-10",
+        Total: 825,
+        Status: "Pending",
+      },
+      {
+        Customer_fk_ID: 3,
+        Order_ID: "ORD014",
+        Order_Number: "12358",
+        Type: "Dine in",
+        Date: "2024-08-06",
+        Total: 1250,
+        Status: "Completed",
+      },
+      {
+        Customer_fk_ID: 3,
+        Order_ID: "ORD015",
+        Order_Number: "12359",
+        Type: "Takeaway",
+        Date: "2024-08-01",
+        Total: 550,
+        Status: "Completed",
+      },
     ],
     12: [
       {
         Customer_fk_ID: 12,
-        Order_ID: "ORD001",
-        Order_Number: "12345",
+        Order_ID: "ORD016",
+        Order_Number: "12360",
         Type: "Dine in",
         Date: "2024-08-25",
         Total: 850,
@@ -161,8 +234,8 @@ class CustomerAPI {
       },
       {
         Customer_fk_ID: 12,
-        Order_ID: "ORD002",
-        Order_Number: "12346",
+        Order_ID: "ORD017",
+        Order_Number: "12361",
         Type: "Takeaway",
         Date: "2024-08-20",
         Total: 1200,
@@ -170,8 +243,8 @@ class CustomerAPI {
       },
       {
         Customer_fk_ID: 12,
-        Order_ID: "ORD003",
-        Order_Number: "12347",
+        Order_ID: "ORD018",
+        Order_Number: "12362",
         Type: "Delivery",
         Date: "2024-08-15",
         Total: 750,
@@ -179,8 +252,8 @@ class CustomerAPI {
       },
       {
         Customer_fk_ID: 12,
-        Order_ID: "ORD004",
-        Order_Number: "12348",
+        Order_ID: "ORD019",
+        Order_Number: "12363",
         Type: "Dine in",
         Date: "2024-08-10",
         Total: 950,
@@ -188,8 +261,8 @@ class CustomerAPI {
       },
       {
         Customer_fk_ID: 12,
-        Order_ID: "ORD005",
-        Order_Number: "12349",
+        Order_ID: "ORD020",
+        Order_Number: "12364",
         Type: "Takeaway",
         Date: "2024-08-05",
         Total: 650,
@@ -197,8 +270,8 @@ class CustomerAPI {
       },
       {
         Customer_fk_ID: 12,
-        Order_ID: "ORD006",
-        Order_Number: "12350",
+        Order_ID: "ORD021",
+        Order_Number: "12365",
         Type: "Delivery",
         Date: "2024-08-01",
         Total: 900,
@@ -506,7 +579,7 @@ const CustomerProfilePage = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500">Card Status:</span>
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium
+                      className={` py-1 rounded-full text-xs font-medium
       ${
         customer.Card_Status === "Active" ? " text-green-400" : " text-red-400"
       }`}
@@ -716,6 +789,10 @@ const CustomerProfilePage = () => {
                     </div>
                     <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </th>
+                   <th className="relative px-4 py-3 text-left w-32">
+                    Details
+                    <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+                  </th>
                 </tr>
               </thead>
 
@@ -737,7 +814,7 @@ const CustomerProfilePage = () => {
                       key={order.Order_ID}
                       className="bg-white hover:bg-gray-50"
                     >
-                      <td className="px-6 py-8 whitespace-nowrap text-sm" data-label="ID">
+                      <td className="px-6 py-8 whitespace-nowrap text-sm card-name-cell" data-label="ID">
                         {order.Order_ID}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Order Number">
@@ -745,7 +822,7 @@ const CustomerProfilePage = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap"data-label="Type" >
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          className={`inline-flex  py-1 text-xs font-medium rounded-full ${
                             order.Type === "Dine in"
                               ? " text-yellow-400"
                               : order.Type === "Takeaway"
@@ -764,7 +841,7 @@ const CustomerProfilePage = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          className={`inline-flex  py-1 text-xs font-medium rounded-full ${
                             order.Status === "Completed"
                               ? " text-green-400"
                               : order.Status === "Pending"
@@ -775,6 +852,13 @@ const CustomerProfilePage = () => {
                           {order.Status}
                         </span>
                       </td>
+                      <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveDetailButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      />
+                    </td>
                     </tr>
                   ))
                 )}

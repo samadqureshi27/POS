@@ -25,7 +25,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 interface RecipeOption {
   ID: number;
   Name: string;
@@ -417,7 +417,7 @@ const RecipesManagementPage = () => {
         OptionPrice: [],
         IngredientValue: [],
         IngredientPrice: [],
-        Priority: 1,
+        Priority: 0,
       });
       setPreview(null);
     }
@@ -753,7 +753,7 @@ const RecipesManagementPage = () => {
             <tbody className="divide-y text-gray-500 divide-gray-300">
               {filteredItems.map((item) => (
                 <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                  <td className="px-6 py-8">
+                  <td className="px-6 py-8 card-checkbox-cell">
                     <Checkbox
                       checked={selectedItems.includes(item.ID)}
                       onChange={(e) =>
@@ -809,7 +809,7 @@ const RecipesManagementPage = () => {
                   <td className="px-4 py-4 whitespace-nowrap" data-label="ID">
                     {item.ID}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Name">
+                  <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Name">
                     {item.Name}
                   </td>
                   <td
@@ -838,23 +838,15 @@ const RecipesManagementPage = () => {
                   >
                     {item.Priority}
                   </td>
-                  <td
-                    className="px-4 py-4 whitespace-nowrap"
-                    data-label="Action"
-                  >
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
+                   <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setEditingItem(item);
                           setIsModalOpen(true);
                         }}
-                        className="text-black hover:text-gray-800 transition-colors"
-                        title="Edit"
-                      >
-                        <Edit size={16} />
-                      </button>
-                    </div>
-                  </td>
+                      />
+                    </td>
                 </tr>
               ))}
             </tbody>
@@ -916,15 +908,21 @@ const RecipesManagementPage = () => {
                       Priority
                     </label>
                     <input
-                      type="number"
-                      value={formData.Priority}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          Priority: Number(e.target.value) || 1,
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                       type="text"
+                      value={formData.Priority || ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Only allow numbers and empty string
+                        if (value === '' || /^\d+$/.test(value)) {
+                          setFormData({
+                            ...formData,
+                            Priority: value === '' ? 0 : Number(value)
+                          });
+                        }
+                        // If invalid input, just ignore it (don't update state)
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      placeholder="1"
                       min={1}
                       required
                     />
