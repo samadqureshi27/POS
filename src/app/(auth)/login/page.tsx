@@ -55,21 +55,26 @@ const LoginPage: React.FC = () => {
   const transitionMs = 900;
 
   // Login handlers
-  const handleAdminLogin = async (email: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
+const handleAdminLogin = async (email: string, password: string) => {
+  setIsLoading(true);
+  setError(null);
+  
+  try {
+    console.log('Admin login attempt:', { email, role }); // Debug log
     
-     try {
+    // Use the role state that was set when clicking ADMIN label
     const response = await authService.adminLogin(email, password, role || 'admin');
     
     if (response.success && response.user) {
+      console.log('Admin login successful:', response.user);
       // Redirect based on role
       if (response.user.role === 'admin' || response.user.role === 'superadmin') {
-        router.push('/admin/dashboard');
+        router.push('/dashboard');
       } else {
         router.push('/dashboard');
       }
     } else {
+      console.log('Admin login failed:', response);
       setError(response.error || response.message || 'Login failed');
       if (response.errors) {
         // Handle field-specific errors from Django
@@ -78,25 +83,29 @@ const LoginPage: React.FC = () => {
       }
     }
   } catch (error: any) {
-    setError('Network error. Please check your connection.');
     console.error('Admin login error:', error);
+    setError('Network error. Please check your connection.');
   } finally {
     setIsLoading(false);
   }
 };
 
   const handleManagerLogin = async (pin: string) => {
-    setIsLoading(true);
-    setError(null);
+  setIsLoading(true);
+  setError(null);
+  
+  try {
+    console.log('Manager login attempt:', { pin: pin.replace(/./g, '*'), role }); // Debug log
     
-    try {
-    const response = await authService.pinLogin(pin);
+    // Pass the role state that was set when clicking MANAGER label
+    const response = await authService.pinLogin(pin, role || 'manager');
     
     if (response.success && response.user) {
-      // Redirect based on role
+      console.log('Manager login successful:', response.user);
+      // Redirect based on actual user role from backend
       switch (response.user.role) {
         case 'manager':
-          router.push('/manager/dashboard');
+          router.push('/dashboard');
           break;
         case 'cashier':
           router.push('/pos');
@@ -108,11 +117,12 @@ const LoginPage: React.FC = () => {
           router.push('/dashboard');
       }
     } else {
+      console.log('Manager login failed:', response);
       setError(response.error || response.message || 'Invalid PIN');
     }
   } catch (error: any) {
-    setError('Network error. Please check your connection.');
     console.error('Manager login error:', error);
+    setError('Network error. Please check your connection.');
   } finally {
     setIsLoading(false);
   }
@@ -121,6 +131,7 @@ const [role, setRole] = useState<'admin' | 'manager' | null>(null);
 
   const handleAdminClick = () => {
     if (phase !== 'idle') return;
+    console.log('admin label clicked, setting role to admin');
     setPhase('toGold');
     setRole('admin');
     setError(null);
@@ -141,6 +152,7 @@ const [role, setRole] = useState<'admin' | 'manager' | null>(null);
 
   const handleManagerClick = () => {
     if (phase !== 'idle') return;
+    console.log('Manager label clicked, setting role to manager');
     setPhase('toBlack');
     setRole('manager');
     setError(null);
@@ -172,10 +184,15 @@ const [role, setRole] = useState<'admin' | 'manager' | null>(null);
   };
 
   const handleLogin = () => {
-    if (validateForm()) {
-      handleAdminLogin(email, password);
-    }
-  };
+  console.log('Form data:', { email, password }); // Debug line
+  console.log('Email length:', email.length, 'Password length:', password.length); // Debug line
+  
+  if (validateForm()) {
+    handleAdminLogin(email, password);
+  } else {
+    console.log('Form validation failed'); // Debug line
+  }
+};
 
   const handleManagerPinLogin = () => {
     if (validatePin()) {
