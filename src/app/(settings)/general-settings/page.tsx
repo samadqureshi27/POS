@@ -424,7 +424,7 @@ const GeneralSettingsPage = () => {
                 <button
                   onClick={handleSave}
                   disabled={!hasChanges || saving}
-                  className={`flex  w-[50%] items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
+                  className={`flex  w-[50%] items-center gap-2 px-6 py-2 rounded-sm transition-colors  ${
                     hasChanges && !saving
                       ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
                       : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -487,7 +487,7 @@ const GeneralSettingsPage = () => {
                         }
                         className="mr-2 text-blue-600"
                       />
-                      Before amount ($100.00)
+                      Before amount (PKR 100.00)
                     </label>
                     <label className="flex items-center">
                       <input
@@ -502,7 +502,7 @@ const GeneralSettingsPage = () => {
                         }
                         className="mr-2 text-blue-600"
                       />
-                      After amount (100.00$)
+                      After amount (100.00 PKR)
                     </label>
                   </div>
                 </div>

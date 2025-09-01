@@ -24,7 +24,7 @@ import {
   ImageIcon,
   Move,
 } from "lucide-react";
-
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 import { useState, useEffect, useRef } from "react";
 
 interface MenuItemOptions {
@@ -455,7 +455,7 @@ const CategoryPage = () => {
         DisplayType: "Radio",
         OptionValue: [],
         OptionPrice: [],
-        Priority: maxPriority + 1,
+        Priority: 0,
       });
       setActiveTab("Details");
     }
@@ -865,7 +865,7 @@ const CategoryPage = () => {
                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                   >
                     <td
-                      className="px-6 py-8 whitespace-nowrap"
+                      className="px-6 py-8 whitespace-nowrap card-checkbox-cell"
                     >
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
@@ -927,7 +927,7 @@ const CategoryPage = () => {
 
                     <td
                       data-label="Name"
-                      className="px-4 py-4 whitespace-nowrap font-medium"
+                      className="px-4 py-4 whitespace-nowrap font-medium card-name-cell"
                     >
                       {item.Name}
                     </td>
@@ -954,22 +954,14 @@ const CategoryPage = () => {
                       {item.Priority}
                     </td>
 
-                    <td
-                      data-label="Actions"
-                      className="px-2 py-4 whitespace-nowrap"
-                    >
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))
@@ -1002,8 +994,8 @@ const CategoryPage = () => {
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`flex-1 px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors ${activeTab === tab
-                        ? "border-b-2 border-black text-black"
-                        : "text-gray-500 hover:text-black hover:bg-gray-50"
+                      ? "border-b-2 border-black text-black"
+                      : "text-gray-500 hover:text-black hover:bg-gray-50"
                       }`}
                   >
                     {tab}
@@ -1094,15 +1086,21 @@ const CategoryPage = () => {
                       Priority
                     </label>
                     <input
-                      type="number"
-                      value={formData.Priority}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          Priority: Number(e.target.value) || 1,
-                        })
-                      }
-                      className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      type="text"
+                      value={formData.Priority || ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Only allow numbers and empty string
+                        if (value === '' || /^\d+$/.test(value)) {
+                          setFormData({
+                            ...formData,
+                            Priority: value === '' ? 0 : Number(value)
+                          });
+                        }
+                        // If invalid input, just ignore it (don't update state)
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      placeholder="1"
                       min={1}
                       required
                     />
@@ -1280,8 +1278,8 @@ const CategoryPage = () => {
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
                                         className={`hover:bg-gray-50 ${snapshot.isDragging
-                                            ? "bg-gray-100 shadow-lg"
-                                            : ""
+                                          ? "bg-gray-100 shadow-lg"
+                                          : ""
                                           } border-b border-gray-200`}
                                       >
                                         {/* Drag Handle */}
@@ -1388,8 +1386,8 @@ const CategoryPage = () => {
                 onClick={handleModalSubmit}
                 disabled={!isFormValid()}
                 className={`order-1 sm:order-2 px-4 py-2 text-sm sm:text-base rounded-sm transition-colors ${isFormValid()
-                    ? "bg-black text-white hover:bg-gray-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  ? "bg-black text-white hover:bg-gray-700"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
               >
                 {editingItem ? "Update" : "Save & Close"}

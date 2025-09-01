@@ -17,7 +17,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 interface RecipeOption {
   ID: number;
   Name: string;
@@ -586,7 +586,7 @@ const CategoryPage = () => {
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                    <td className="px-6 py-8">
+                    <td className="px-6 py-8 card-checkbox-cell">
                       <Checkbox
                         checked={selectedItems.includes(item.ID)}
                         onChange={(e) =>
@@ -646,7 +646,7 @@ const CategoryPage = () => {
                       {item.ID}
                     </td>
                     <td
-                      className="px-4 py-4 whitespace-nowrap text-sm font-medium"
+                      className="px-4 py-4 whitespace-nowrap text-sm font-medium card-name-cell"
                       data-label="Name"
                     >
                       {item.Name}
@@ -658,22 +658,14 @@ const CategoryPage = () => {
                     >
                       ${item.price}
                     </td>
-                    <td
-                      className="px-4 py-4 whitespace-nowrap"
-                      data-label="Action"
-                    >
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                    <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <ResponsiveEditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))
@@ -720,10 +712,18 @@ const CategoryPage = () => {
                 </label>
                 <input
                   type="number"
-                  value={formData.price}
-                  onChange={(e) =>
-                    setFormData({ ...formData, price: Number(e.target.value) })
-                  }
+                  value={formData.price||''}
+                 onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow numbers and empty string
+                    if (value === '' || /^\d+$/.test(value)) {
+                      setFormData({
+                        ...formData,
+                        price: value === '' ? 0 : Number(value)
+                      });
+                    }
+                    // If invalid input, just ignore it (don't update state)
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   placeholder="Enter price"
                   required

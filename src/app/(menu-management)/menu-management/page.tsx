@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { grey } from "@mui/material/colors";
-
+import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 interface MenuItem {
   ID: number;
   Name: string;
@@ -774,17 +774,17 @@ const MenuManagementPage = () => {
     }
   };
   useEffect(() => {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "unset";
-      }
-  
-      // Cleanup function to restore scrolling when component unmounts
-      return () => {
-        document.body.style.overflow = "unset";
-      };
-    }, [isModalOpen]);
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
 
   const handleStatusChange = (
     field: keyof typeof formData,
@@ -835,8 +835,8 @@ const MenuManagementPage = () => {
             onClick={() => setIsModalOpen(true)}
             disabled={selectedItems.length > 0}
             className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
           >
             <Plus size={16} />
@@ -847,8 +847,8 @@ const MenuManagementPage = () => {
             onClick={handleDeleteSelected}
             disabled={!isSomeSelected || actionLoading}
             className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
           >
             <Trash2 size={16} />
@@ -1022,7 +1022,7 @@ const MenuManagementPage = () => {
             <tbody className="divide-y text-gray-500 divide-gray-300">
               {filteredItems.map((item) => (
                 <tr key={item.ID} className="bg-white hover:bg-gray-50">
-                  <td className="px-6 py-8">
+                  <td className="px-6 py-8 card-checkbox-cell">
                     <Checkbox
                       checked={selectedItems.includes(item.ID)}
                       onChange={(e) =>
@@ -1073,35 +1073,29 @@ const MenuManagementPage = () => {
                       }
                     />
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="ID">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Name">{item.Name}</td>
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Price">${item.Price}</td>
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Category">{item.Category}</td>
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="StockQty">{item.StockQty}</td>
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Status">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="ID">{item.ID}</td>
+                  <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Name">{item.Name}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Price">${item.Price}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Category">{item.Category}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="StockQty">{item.StockQty}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                     <span
-                      className={`inline-block w-24 text-right px-2 py-[2px] rounded-sm text-xs font-medium ${item.Status === "Inactive"
-                          ? "text-red-400"
-                          : "text-green-400"
+                      className={`inline-block w-24 text-right  py-[2px] rounded-sm text-xs font-medium ${item.Status === "Inactive"
+                        ? "text-red-400"
+                        : "text-green-400"
                         }`}
                     >
                       {item.Status}
                     </span>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap"data-label="Action">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingItem(item);
-                          setIsModalOpen(true);
-                        }}
-                        className="text-black hover:text-gray-800 transition-colors"
-                        title="Edit"
-                      >
-                        <Edit size={16} />
-                      </button>
-
-                    </div>
+                  <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                    <ResponsiveEditButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingItem(item);
+                        setIsModalOpen(true);
+                      }}
+                    />
                   </td>
                 </tr>
               ))}
@@ -1113,1306 +1107,1319 @@ const MenuManagementPage = () => {
       {/* Modal remains the same from here... */}
 
       {isModalOpen && (
-  <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-sm w-full max-w-lg   h-[70vh] lg:max-w-2xl shadow-sm flex flex-col sm:mx-4">
-      {/* Modal Header - Fixed */}
-      <div className="flex-shrink-0">
-        <h1 className="text-xl sm:text-2xl px-4 sm:px-6 pt-3 sm:pt-4 font-medium">
-          {editingItem ? "Edit Menu Item" : "Add Menu Item"}
-        </h1>
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-sm w-full max-w-lg   h-[70vh] lg:max-w-2xl shadow-sm flex flex-col sm:mx-4">
+            {/* Modal Header - Fixed */}
+            <div className="flex-shrink-0">
+              <h1 className="text-xl sm:text-2xl px-4 sm:px-6 pt-3 sm:pt-4 font-medium">
+                {editingItem ? "Edit Menu Item" : "Add Menu Item"}
+              </h1>
 
-        {/* Tab Navigation */}
-        <div className="flex w-full  items-center justify-center border-b border-gray-200 mt-2 overflow-x-auto">
-          {[
-            "Menu Items",
-            "Details", 
-            "Options",
-            "Meal",
-            "Specials",
-            "Price",
-          ].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 min-w-[60px] px-2  py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
-                activeTab === tab
-                  ? "border-b-2 border-black text-black"
-                  : "text-gray-500 hover:text-black hover:bg-gray-50"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Modal Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-        {activeTab === "Menu Items" && (
-          <div className="space-y-6 max-w-2xl mx-auto">
-            {/* Menu Item Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Menu Item Name
-              </label>
-              <input
-                type="text"
-                value={formData.Name}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    Name: e.target.value,
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                placeholder="Sweet / Spicy Sausage Wrap"
-                required
-              />
-            </div>
-
-            {/* Category & Type */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white hover:bg-gray-50">
-                    <span className="text-sm truncate">
-                      {formData.DisplayType || "Select display type"}
-                    </span>
-                    <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.Content
-                      className="w-full min-w-[200px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none z-100"
-                      sideOffset={6}
-                    >
-                      <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                      {["Radio", "Select", "Checkbox"].map((type) => (
-                        <DropdownMenu.Item
-                          key={type}
-                          className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 rounded outline-none"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              DisplayType: type,
-                            })
-                          }
-                        >
-                          {type}
-                        </DropdownMenu.Item>
-                      ))}
-                    </DropdownMenu.Content>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Root>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Type
-                </label>
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white hover:bg-gray-50">
-                    <span className="text-sm truncate">
-                      {formData.Displaycat || "Select display type"}
-                    </span>
-                    <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.Content
-                      className="w-full min-w-[200px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none z-100"
-                      sideOffset={6}
-                    >
-                      <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                      {["Qty", "Weight", "Var"].map((type) => (
-                        <DropdownMenu.Item
-                          key={type}
-                          className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 rounded outline-none"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              Displaycat: type,
-                            })
-                          }
-                        >
-                          {type}
-                        </DropdownMenu.Item>
-                      ))}
-                    </DropdownMenu.Content>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Root>
+              {/* Tab Navigation */}
+              <div className="flex w-full  items-center justify-center border-b border-gray-200 mt-2 overflow-x-auto">
+                {[
+                  "Menu Items",
+                  "Details",
+                  "Options",
+                  "Meal",
+                  "Specials",
+                  "Price",
+                ].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-1 min-w-[60px] px-2  py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab
+                      ? "border-b-2 border-black text-black"
+                      : "text-gray-500 hover:text-black hover:bg-gray-50"
+                      }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Price */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.Price}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    Price: Number(e.target.value),
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                placeholder="12.99"
-                required
-              />
-            </div>
-
-            {/* Image Upload */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Image
-              </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-sm p-6 sm:p-8 text-center">
-                {preview ? (
-                  <div className="relative">
-                    <img
-                      src={preview}
-                      alt="Preview"
-                      className="max-w-full max-h-32 sm:max-h-40 mx-auto rounded"
+            {/* Modal Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {activeTab === "Menu Items" && (
+                <div className="space-y-6 max-w-2xl mx-auto">
+                  {/* Menu Item Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Menu Item Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.Name}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          Name: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      placeholder="Sweet / Spicy Sausage Wrap"
+                      required
                     />
-                    <button
-                      onClick={() => setPreview(null)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
-                    >
-                      <X size={16} />
-                    </button>
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    <ImageIcon className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
-                    <div className="text-sm text-gray-600">
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="text-blue-600 hover:text-blue-500"
-                      >
-                        Upload a file
-                      </button>
-                      <span className="hidden sm:inline"> or drag and drop</span>
+
+                  {/* Category & Type */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Category
+                      </label>
+                      <DropdownMenu.Root>
+                        <DropdownMenu.Trigger className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white hover:bg-gray-50">
+                          <span className="text-sm truncate">
+                            {formData.DisplayType || "Select display type"}
+                          </span>
+                          <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Portal>
+                          <DropdownMenu.Content
+                            className="w-full min-w-[200px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none z-100"
+                            sideOffset={6}
+                          >
+                            <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
+                            {["Radio", "Select", "Checkbox"].map((type) => (
+                              <DropdownMenu.Item
+                                key={type}
+                                className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 rounded outline-none"
+                                onClick={() =>
+                                  setFormData({
+                                    ...formData,
+                                    DisplayType: type,
+                                  })
+                                }
+                              >
+                                {type}
+                              </DropdownMenu.Item>
+                            ))}
+                          </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                      </DropdownMenu.Root>
                     </div>
-                    <p className="text-xs text-gray-500">
-                      PNG, JPG, GIF up to 10MB
-                    </p>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Type
+                      </label>
+                      <DropdownMenu.Root>
+                        <DropdownMenu.Trigger className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white hover:bg-gray-50">
+                          <span className="text-sm truncate">
+                            {formData.Displaycat || "Select display type"}
+                          </span>
+                          <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Portal>
+                          <DropdownMenu.Content
+                            className="w-full min-w-[200px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none z-100"
+                            sideOffset={6}
+                          >
+                            <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
+                            {["Qty", "Weight", "Var"].map((type) => (
+                              <DropdownMenu.Item
+                                key={type}
+                                className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 rounded outline-none"
+                                onClick={() =>
+                                  setFormData({
+                                    ...formData,
+                                    Displaycat: type,
+                                  })
+                                }
+                              >
+                                {type}
+                              </DropdownMenu.Item>
+                            ))}
+                          </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                      </DropdownMenu.Root>
+                    </div>
                   </div>
-                )}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (e) =>
-                        setPreview(e.target?.result as string);
-                      reader.readAsDataURL(file);
+
+                  {/* Price */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Price
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.Price || ''}
+
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Only allow numbers and empty string
+                        if (value === '' || /^\d+$/.test(value)) {
+                          setFormData({
+                            ...formData,
+                            Price: value === '' ? 0 : Number(value)
+                          });
+                        }
+                        // If invalid input, just ignore it (don't update state)
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      placeholder="0"
+                      required
+                    />
+                  </div>
+
+                  {/* Image Upload */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Image
+                    </label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-sm p-6 sm:p-8 text-center">
+                      {preview ? (
+                        <div className="relative">
+                          <img
+                            src={preview}
+                            alt="Preview"
+                            className="max-w-full max-h-32 sm:max-h-40 mx-auto rounded"
+                          />
+                          <button
+                            onClick={() => setPreview(null)}
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <ImageIcon className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
+                          <div className="text-sm text-gray-600">
+                            <button
+                              onClick={() => fileInputRef.current?.click()}
+                              className="text-blue-600 hover:text-blue-500"
+                            >
+                              Upload a file
+                            </button>
+                            <span className="hidden sm:inline"> or drag and drop</span>
+                          </div>
+                          <p className="text-xs text-gray-500">
+                            PNG, JPG, GIF up to 10MB
+                          </p>
+                        </div>
+                      )}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) =>
+                              setPreview(e.target?.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      value={formData.Description}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          Description: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      rows={3}
+                      placeholder="Enter description"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "Details" && (
+                <div className="space-y-6 max-w-2xl mx-auto">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Meal Time */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Meal Time
+                      </label>
+                      <DropdownMenu.Root>
+                        <DropdownMenu.Trigger className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white hover:bg-gray-50">
+                          <span className="text-sm truncate">
+                            {formData.MealType || "Select meal time"}
+                          </span>
+                          <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Portal>
+                          <DropdownMenu.Content
+                            className="w-full min-w-[200px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none z-100"
+                            sideOffset={6}
+                          >
+                            <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
+                            {mealTimeOptions.map((time) => (
+                              <DropdownMenu.Item
+                                key={time}
+                                className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 rounded outline-none"
+                                onClick={() =>
+                                  setFormData({ ...formData, MealType: time })
+                                }
+                              >
+                                {time}
+                              </DropdownMenu.Item>
+                            ))}
+                          </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                      </DropdownMenu.Root>
+                    </div>
+
+                    {/* Priority */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Priority
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.Priority || ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Only allow numbers and empty string
+                          if (value === '' || /^\d+$/.test(value)) {
+                            setFormData({
+                              ...formData,
+                              Priority: value === '' ? 0 : Number(value)
+                            });
+                          }
+                        }
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                        placeholder="0"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Minimum Quantity */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Minimum Quantity
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.MinimumQuantity || ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Only allow numbers and empty string
+                        if (value === '' || /^\d+$/.test(value)) {
+                          setFormData({
+                            ...formData,
+                            MinimumQuantity: value === '' ? 0 : Number(value)
+                          });
+                        }
+                        // If invalid input, just ignore it (don't update state)
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      placeholder="Stock Qty to place successful"
+                      min={0}
+                    />
+                  </div>
+
+                  {/* Toggle Options */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Feature
+                      </label>
+                      <ButtonPage
+                        checked={formData.Featured === "Active"}
+                        onChange={(checked) =>
+                          handleStatusChange("Featured", checked)
+                        }
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Staff pick
+                      </label>
+                      <ButtonPage
+                        checked={formData.StaffPick === "Active"}
+                        onChange={(checked) =>
+                          handleStatusChange("StaffPick", checked)
+                        }
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Show on Main
+                      </label>
+                      <ButtonPage
+                        checked={formData.ShowOnMain === "Active"}
+                        onChange={(checked) =>
+                          handleStatusChange("ShowOnMain", checked)
+                        }
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Subtract Stock
+                      </label>
+                      <ButtonPage
+                        checked={formData.SubTBE === "Active"}
+                        onChange={(checked) =>
+                          handleStatusChange("SubTBE", checked)
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "Options" && (
+                <div className="max-w-4xl mx-auto">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Menu Item Option
+                  </label>
+
+                  <div className="flex items-center gap-2 mb-4">
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger className="w-full flex items-center justify-between px-4 py-2 text-black rounded-sm hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
+                        <span className="text-sm">Add New Size Option</span>
+                        <ChevronDown size={16} className="text-gray-500" />
+                      </DropdownMenu.Trigger>
+                      <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                          className="w-full min-w-[300px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 overflow-y-auto z-100"
+                          sideOffset={6}
+                        >
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
+                          {sizeOptions.map((size, i) => (
+                            <DropdownMenu.Item
+                              key={i}
+                              className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
+                              onClick={() => {
+                                if (!formData.OptionValue?.includes(size)) {
+                                  setFormData({
+                                    ...formData,
+                                    OptionValue: [
+                                      ...(formData.OptionValue || []),
+                                      size,
+                                    ],
+                                    OptionPrice: [
+                                      ...(formData.OptionPrice || []),
+                                      0,
+                                    ],
+                                  });
+                                }
+                              }}
+                            >
+                              {size}
+                            </DropdownMenu.Item>
+                          ))}
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block">
+                    {/* Fixed Header */}
+                    <div className="border border-gray-200 rounded-t-lg bg-gray-50">
+                      <table className="w-full">
+                        <thead>
+                          <tr>
+                            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                            <th className="p-3 text-left text-sm font-medium text-gray-700">
+                              Name
+                            </th>
+                            <th className="w-32 p-3 text-center text-sm font-medium text-gray-700">
+                              Price
+                            </th>
+                            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
+
+                    {/* Scrollable Body */}
+                    <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[217px] overflow-y-auto bg-white">
+                      <DragDropContext
+                        onDragEnd={(result) => {
+                          const { source, destination } = result;
+                          if (!destination || source.index === destination.index)
+                            return;
+
+                          const newOptionValue = Array.from(
+                            formData.OptionValue || []
+                          );
+                          const [movedValue] = newOptionValue.splice(source.index, 1);
+                          newOptionValue.splice(destination.index, 0, movedValue);
+
+                          const newOptionPrice = Array.from(
+                            formData.OptionPrice || []
+                          );
+                          const [movedPrice] = newOptionPrice.splice(source.index, 1);
+                          newOptionPrice.splice(destination.index, 0, movedPrice);
+
+                          setFormData({
+                            ...formData,
+                            OptionValue: newOptionValue,
+                            OptionPrice: newOptionPrice,
+                          });
+                        }}
+                      >
+                        <Droppable droppableId="sizes">
+                          {(provided) => (
+                            <table className="w-full border-collapse">
+                              <tbody
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                              >
+                                {(formData.OptionValue || []).map((opt, idx) => (
+                                  <Draggable
+                                    key={idx}
+                                    draggableId={`size-${idx}`}
+                                    index={idx}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <tr
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        className={`hover:bg-gray-50 ${snapshot.isDragging
+                                          ? "bg-gray-100 shadow-lg"
+                                          : ""
+                                          } border-b border-gray-200`}
+                                      >
+                                        <td
+                                          className="p-3 text-center cursor-grab w-12"
+                                          {...provided.dragHandleProps}
+                                        >
+                                          <Grip
+                                            size={18}
+                                            className="text-gray-500 mx-auto"
+                                          />
+                                        </td>
+                                        <td className="p-3">
+                                          <input
+                                            type="text"
+                                            value={opt}
+                                            onChange={(e) => {
+                                              const updated = [
+                                                ...(formData.OptionValue || []),
+                                              ];
+                                              updated[idx] = e.target.value;
+                                              setFormData({
+                                                ...formData,
+                                                OptionValue: updated,
+                                              });
+                                            }}
+                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                                            placeholder="Size name"
+                                          />
+                                        </td>
+                                        <td className="p-3 text-center">
+                                          <input
+                                            type="number"
+                                            step="0.01"
+                                            value={formData.OptionPrice?.[idx] || 0}
+                                            onChange={(e) => {
+                                              const updated = [
+                                                ...(formData.OptionPrice || []),
+                                              ];
+                                              updated[idx] =
+                                                Number(e.target.value) || 0;
+                                              setFormData({
+                                                ...formData,
+                                                OptionPrice: updated,
+                                              });
+                                            }}
+                                            className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
+                                            placeholder="0.00"
+                                          />
+                                        </td>
+                                        <td className="p-3 text-center w-12">
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updatedValues = (
+                                                formData.OptionValue || []
+                                              ).filter((_, i) => i !== idx);
+                                              const updatedPrices = (
+                                                formData.OptionPrice || []
+                                              ).filter((_, i) => i !== idx);
+                                              setFormData({
+                                                ...formData,
+                                                OptionValue: updatedValues,
+                                                OptionPrice: updatedPrices,
+                                              });
+                                            }}
+                                            className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                                          >
+                                            <X size={20} />
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </tbody>
+                            </table>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </div>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-4">
+                    {(formData.OptionValue || []).map((opt, idx) => (
+                      <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
+                        <div className="flex items-center justify-between mb-3">
+                          <Grip size={18} className="text-gray-500" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedValues = (formData.OptionValue || []).filter((_, i) => i !== idx);
+                              const updatedPrices = (formData.OptionPrice || []).filter((_, i) => i !== idx);
+                              setFormData({
+                                ...formData,
+                                OptionValue: updatedValues,
+                                OptionPrice: updatedPrices,
+                              });
+                            }}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <X size={20} />
+                          </button>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                            <input
+                              type="text"
+                              value={opt}
+                              onChange={(e) => {
+                                const updated = [...(formData.OptionValue || [])];
+                                updated[idx] = e.target.value;
+                                setFormData({
+                                  ...formData,
+                                  OptionValue: updated,
+                                });
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                              placeholder="Size name"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={formData.OptionPrice?.[idx] || 0}
+                              onChange={(e) => {
+                                const updated = [...(formData.OptionPrice || [])];
+                                updated[idx] = Number(e.target.value) || 0;
+                                setFormData({
+                                  ...formData,
+                                  OptionPrice: updated,
+                                });
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                              placeholder="0.00"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "Meal" && (
+                <div className="max-w-4xl mx-auto">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Menu Item Option
+                  </label>
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger className="w-full sm:flex-1 flex items-center justify-between px-4 py-2 text-black rounded-sm hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
+                        <span className="text-sm">Add New Size Option</span>
+                        <ChevronDown size={16} className="text-gray-500" />
+                      </DropdownMenu.Trigger>
+                      <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                          className="w-full min-w-[300px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 overflow-y-auto z-100"
+                          sideOffset={6}
+                        >
+                          <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
+                          {sizeOptions.map((size, i) => (
+                            <DropdownMenu.Item
+                              key={i}
+                              className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
+                              onClick={() => {
+                                if (!formData.MealValue?.includes(size)) {
+                                  setFormData({
+                                    ...formData,
+                                    MealValue: [
+                                      ...(formData.MealValue || []),
+                                      size,
+                                    ],
+                                    MealPrice: [
+                                      ...(formData.MealPrice || []),
+                                      0,
+                                    ],
+                                  });
+                                }
+                              }}
+                            >
+                              {size}
+                            </DropdownMenu.Item>
+                          ))}
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
+
+                    <div className="flex flex-col items-center gap-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Deal?
+                      </label>
+                      <ButtonPage
+                        checked={formData.Deal === "Active"}
+                        onChange={(checked) =>
+                          handleStatusChange("Deal", checked)
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden lg:block">
+                    <div className="border border-gray-200 rounded-t-lg bg-gray-50">
+                      <table className="w-full">
+                        <thead>
+                          <tr>
+                            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                            <th className="p-3 text-left text-sm font-medium text-gray-700">Name</th>
+                            <th className="w-24 p-3 text-center text-sm font-medium text-gray-700">Price</th>
+                            <th className="w-20 p-3 text-center text-sm font-medium text-gray-700">Override</th>
+                            <th className="w-20 p-3 text-center text-sm font-medium text-gray-700">Status</th>
+                            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
+
+                    <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[197px] overflow-y-auto bg-white">
+                      <DragDropContext
+                        onDragEnd={(result) => {
+                          const { source, destination } = result;
+                          if (!destination || source.index === destination.index)
+                            return;
+
+                          const newMealValue = Array.from(formData.MealValue || []);
+                          const [movedValue] = newMealValue.splice(source.index, 1);
+                          newMealValue.splice(destination.index, 0, movedValue);
+
+                          const newMealPrice = Array.from(formData.MealPrice || []);
+                          const [movedPrice] = newMealPrice.splice(source.index, 1);
+                          newMealPrice.splice(destination.index, 0, movedPrice);
+
+                          setFormData({
+                            ...formData,
+                            MealValue: newMealValue,
+                            MealPrice: newMealPrice,
+                          });
+                        }}
+                      >
+                        <Droppable droppableId="meal-sizes">
+                          {(provided) => (
+                            <table className="w-full border-collapse">
+                              <tbody
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                              >
+                                {(formData.MealValue || []).map((opt, idx) => (
+                                  <Draggable
+                                    key={idx}
+                                    draggableId={`meal-${idx}`}
+                                    index={idx}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <tr
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        className={`hover:bg-gray-50 ${snapshot.isDragging
+                                          ? "bg-gray-100 shadow-lg"
+                                          : ""
+                                          } border-b border-gray-200`}
+                                      >
+                                        <td
+                                          className="p-3 text-center cursor-grab w-12"
+                                          {...provided.dragHandleProps}
+                                        >
+                                          <Grip
+                                            size={18}
+                                            className="text-gray-500 mx-auto"
+                                          />
+                                        </td>
+                                        <td className="p-3">
+                                          <input
+                                            type="text"
+                                            value={opt}
+                                            onChange={(e) => {
+                                              const updated = [
+                                                ...(formData.MealValue || []),
+                                              ];
+                                              updated[idx] = e.target.value;
+                                              setFormData({
+                                                ...formData,
+                                                MealValue: updated,
+                                              });
+                                            }}
+                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                                            placeholder="Size name"
+                                          />
+                                        </td>
+                                        <td className="p-3 text-center">
+                                          <input
+                                            type="number"
+                                            step="0.01"
+                                            value={formData.MealPrice?.[idx] || 0}
+                                            onChange={(e) => {
+                                              const updated = [
+                                                ...(formData.MealPrice || []),
+                                              ];
+                                              updated[idx] =
+                                                Number(e.target.value) || 0;
+                                              setFormData({
+                                                ...formData,
+                                                MealPrice: updated,
+                                              });
+                                            }}
+                                            className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
+                                            placeholder="0.00"
+                                          />
+                                        </td>
+                                        <td className="p-3 text-center">
+                                          <ButtonPage
+                                            checked={
+                                              formData.OverRide?.[idx] === "Active"
+                                            }
+                                            onChange={(checked) => {
+                                              const updated = [
+                                                ...(formData.OverRide || []),
+                                              ];
+                                              updated[idx] = checked
+                                                ? "Active"
+                                                : "Inactive";
+                                              setFormData({
+                                                ...formData,
+                                                OverRide: updated,
+                                              });
+                                            }}
+                                          />
+                                        </td>
+                                        <td className="p-3 text-center">
+                                          <ButtonPage
+                                            checked={
+                                              formData.Status?.[idx] === "Active"
+                                            }
+                                            onChange={(checked) => {
+                                              const updated = [
+                                                ...(formData.Status || []),
+                                              ];
+                                              updated[idx] = checked
+                                                ? "Active"
+                                                : "Inactive";
+                                              setFormData({
+                                                ...formData,
+                                                Status: updated,
+                                              });
+                                            }}
+                                          />
+                                        </td>
+                                        <td className="p-3 text-center w-12">
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updatedValues = (
+                                                formData.MealValue || []
+                                              ).filter((_, i) => i !== idx);
+                                              const updatedPrices = (
+                                                formData.MealPrice || []
+                                              ).filter((_, i) => i !== idx);
+                                              setFormData({
+                                                ...formData,
+                                                MealValue: updatedValues,
+                                                MealPrice: updatedPrices,
+                                              });
+                                            }}
+                                            className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                                          >
+                                            <X size={20} />
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </tbody>
+                            </table>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </div>
+                  </div>
+
+                  {/* Mobile Card View for Meal Tab */}
+                  <div className="lg:hidden space-y-4">
+                    {(formData.MealValue || []).map((opt, idx) => (
+                      <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
+                        <div className="flex items-center justify-between mb-3">
+                          <Grip size={18} className="text-gray-500" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedValues = (formData.MealValue || []).filter((_, i) => i !== idx);
+                              const updatedPrices = (formData.MealPrice || []).filter((_, i) => i !== idx);
+                              setFormData({
+                                ...formData,
+                                MealValue: updatedValues,
+                                MealPrice: updatedPrices,
+                              });
+                            }}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <X size={20} />
+                          </button>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                            <input
+                              type="text"
+                              value={opt}
+                              onChange={(e) => {
+                                const updated = [...(formData.MealValue || [])];
+                                updated[idx] = e.target.value;
+                                setFormData({
+                                  ...formData,
+                                  MealValue: updated,
+                                });
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                              placeholder="Size name"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={formData.MealPrice?.[idx] || 0}
+                              onChange={(e) => {
+                                const updated = [...(formData.MealPrice || [])];
+                                updated[idx] = Number(e.target.value) || 0;
+                                setFormData({
+                                  ...formData,
+                                  MealPrice: updated,
+                                });
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                              placeholder="0.00"
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <label className="block text-xs font-medium text-gray-700">Override</label>
+                            <ButtonPage
+                              checked={formData.OverRide?.[idx] === "Active"}
+                              onChange={(checked) => {
+                                const updated = [...(formData.OverRide || [])];
+                                updated[idx] = checked ? "Active" : "Inactive";
+                                setFormData({
+                                  ...formData,
+                                  OverRide: updated,
+                                });
+                              }}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <label className="block text-xs font-medium text-gray-700">Status</label>
+                            <ButtonPage
+                              checked={formData.Status?.[idx] === "Active"}
+                              onChange={(checked) => {
+                                const updated = [...(formData.Status || [])];
+                                updated[idx] = checked ? "Active" : "Inactive";
+                                setFormData({
+                                  ...formData,
+                                  Status: updated,
+                                });
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "Specials" && (
+                <div className="space-y-6 max-w-2xl mx-auto">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Special
+                    </label>
+                    <ButtonPage
+                      checked={formData.Special === "Active"}
+                      onChange={(checked) =>
+                        handleStatusChange("Special", checked)
+                      }
+                    />
+                  </div>
+
+                  {/* Special Dates */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="relative">
+                      <label className="absolute -top-2 left-2 bg-white px-1 text-xs font-medium text-gray-700">
+                        Special Start Date
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.SpecialStartDate}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            SpecialStartDate: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      />
+                    </div>
+
+                    <div className="relative">
+                      <label className="absolute -top-2 left-2 bg-white px-1 text-xs font-medium text-gray-700">
+                        Special End Date
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.SpecialEndDate}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            SpecialEndDate: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Special Price */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Special Price
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.SpecialPrice|| ''}
+                      onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow numbers and empty string
+                    if (value === '' || /^\d+$/.test(value)) {
+                      setFormData({
+                        ...formData,
+                      SpecialPrice: value === '' ? 0 : Number(value)
+                      });
                     }
+                    // If invalid input, just ignore it (don't update state)
                   }}
-                  className="hidden"
-                />
-              </div>
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                value={formData.Description}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    Description: e.target.value,
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                rows={3}
-                placeholder="Enter description"
-              />
-            </div>
-          </div>
-        )}
-
-        {activeTab === "Details" && (
-          <div className="space-y-6 max-w-2xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Meal Time */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Meal Time
-                </label>
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-white hover:bg-gray-50">
-                    <span className="text-sm truncate">
-                      {formData.MealType || "Select meal time"}
-                    </span>
-                    <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.Content
-                      className="w-full min-w-[200px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none z-100"
-                      sideOffset={6}
-                    >
-                      <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                      {mealTimeOptions.map((time) => (
-                        <DropdownMenu.Item
-                          key={time}
-                          className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 rounded outline-none"
-                          onClick={() =>
-                            setFormData({ ...formData, MealType: time })
-                          }
-                        >
-                          {time}
-                        </DropdownMenu.Item>
-                      ))}
-                    </DropdownMenu.Content>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Root>
-              </div>
-
-              {/* Priority */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Priority
-                </label>
-                <input
-                  type="number"
-                  step="1"
-                  value={formData.Priority}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      Priority: Number(e.target.value),
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                  placeholder="1"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Minimum Quantity */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Minimum Quantity
-              </label>
-              <input
-                type="number"
-                value={formData.MinimumQuantity}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    MinimumQuantity: Number(e.target.value) || 0,
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                placeholder="Stock Qty to place successful"
-                min={0}
-              />
-            </div>
-
-            {/* Toggle Options */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-gray-700">
-                  Feature
-                </label>
-                <ButtonPage
-                  checked={formData.Featured === "Active"}
-                  onChange={(checked) =>
-                    handleStatusChange("Featured", checked)
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-gray-700">
-                  Staff pick
-                </label>
-                <ButtonPage
-                  checked={formData.StaffPick === "Active"}
-                  onChange={(checked) =>
-                    handleStatusChange("StaffPick", checked)
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-gray-700">
-                  Show on Main
-                </label>
-                <ButtonPage
-                  checked={formData.ShowOnMain === "Active"}
-                  onChange={(checked) =>
-                    handleStatusChange("ShowOnMain", checked)
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-gray-700">
-                  Subtract Stock
-                </label>
-                <ButtonPage
-                  checked={formData.SubTBE === "Active"}
-                  onChange={(checked) =>
-                    handleStatusChange("SubTBE", checked)
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "Options" && (
-          <div className="max-w-4xl mx-auto">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Menu Item Option
-            </label>
-
-            <div className="flex items-center gap-2 mb-4">
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger className="w-full flex items-center justify-between px-4 py-2 text-black rounded-sm hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
-                  <span className="text-sm">Add New Size Option</span>
-                  <ChevronDown size={16} className="text-gray-500" />
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content
-                    className="w-full min-w-[300px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 overflow-y-auto z-100"
-                    sideOffset={6}
-                  >
-                    <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                    {sizeOptions.map((size, i) => (
-                      <DropdownMenu.Item
-                        key={i}
-                        className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                        onClick={() => {
-                          if (!formData.OptionValue?.includes(size)) {
-                            setFormData({
-                              ...formData,
-                              OptionValue: [
-                                ...(formData.OptionValue || []),
-                                size,
-                              ],
-                              OptionPrice: [
-                                ...(formData.OptionPrice || []),
-                                0,
-                              ],
-                            });
-                          }
-                        }}
-                      >
-                        {size}
-                      </DropdownMenu.Item>
-                    ))}
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Root>
-            </div>
-
-            {/* Desktop Table View */}
-            <div className="hidden md:block">
-              {/* Fixed Header */}
-              <div className="border border-gray-200 rounded-t-lg bg-gray-50">
-                <table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                      <th className="p-3 text-left text-sm font-medium text-gray-700">
-                        Name
-                      </th>
-                      <th className="w-32 p-3 text-center text-sm font-medium text-gray-700">
-                        Price
-                      </th>
-                      <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-
-              {/* Scrollable Body */}
-              <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[217px] overflow-y-auto bg-white">
-                <DragDropContext
-                  onDragEnd={(result) => {
-                    const { source, destination } = result;
-                    if (!destination || source.index === destination.index)
-                      return;
-
-                    const newOptionValue = Array.from(
-                      formData.OptionValue || []
-                    );
-                    const [movedValue] = newOptionValue.splice(source.index, 1);
-                    newOptionValue.splice(destination.index, 0, movedValue);
-
-                    const newOptionPrice = Array.from(
-                      formData.OptionPrice || []
-                    );
-                    const [movedPrice] = newOptionPrice.splice(source.index, 1);
-                    newOptionPrice.splice(destination.index, 0, movedPrice);
-
-                    setFormData({
-                      ...formData,
-                      OptionValue: newOptionValue,
-                      OptionPrice: newOptionPrice,
-                    });
-                  }}
-                >
-                  <Droppable droppableId="sizes">
-                    {(provided) => (
-                      <table className="w-full border-collapse">
-                        <tbody
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                        >
-                          {(formData.OptionValue || []).map((opt, idx) => (
-                            <Draggable
-                              key={idx}
-                              draggableId={`size-${idx}`}
-                              index={idx}
-                            >
-                              {(provided, snapshot) => (
-                                <tr
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  className={`hover:bg-gray-50 ${
-                                    snapshot.isDragging
-                                      ? "bg-gray-100 shadow-lg"
-                                      : ""
-                                  } border-b border-gray-200`}
-                                >
-                                  <td
-                                    className="p-3 text-center cursor-grab w-12"
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <Grip
-                                      size={18}
-                                      className="text-gray-500 mx-auto"
-                                    />
-                                  </td>
-                                  <td className="p-3">
-                                    <input
-                                      type="text"
-                                      value={opt}
-                                      onChange={(e) => {
-                                        const updated = [
-                                          ...(formData.OptionValue || []),
-                                        ];
-                                        updated[idx] = e.target.value;
-                                        setFormData({
-                                          ...formData,
-                                          OptionValue: updated,
-                                        });
-                                      }}
-                                      className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                                      placeholder="Size name"
-                                    />
-                                  </td>
-                                  <td className="p-3 text-center">
-                                    <input
-                                      type="number"
-                                      step="0.01"
-                                      value={formData.OptionPrice?.[idx] || 0}
-                                      onChange={(e) => {
-                                        const updated = [
-                                          ...(formData.OptionPrice || []),
-                                        ];
-                                        updated[idx] =
-                                          Number(e.target.value) || 0;
-                                        setFormData({
-                                          ...formData,
-                                          OptionPrice: updated,
-                                        });
-                                      }}
-                                      className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
-                                      placeholder="0.00"
-                                    />
-                                  </td>
-                                  <td className="p-3 text-center w-12">
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        const updatedValues = (
-                                          formData.OptionValue || []
-                                        ).filter((_, i) => i !== idx);
-                                        const updatedPrices = (
-                                          formData.OptionPrice || []
-                                        ).filter((_, i) => i !== idx);
-                                        setFormData({
-                                          ...formData,
-                                          OptionValue: updatedValues,
-                                          OptionPrice: updatedPrices,
-                                        });
-                                      }}
-                                      className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
-                                    >
-                                      <X size={20} />
-                                    </button>
-                                  </td>
-                                </tr>
-                              )}
-                            </Draggable>
-                          ))}
-                          {provided.placeholder}
-                        </tbody>
-                      </table>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              </div>
-            </div>
-
-            {/* Mobile Card View */}
-            <div className="md:hidden space-y-4">
-              {(formData.OptionValue || []).map((opt, idx) => (
-                <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
-                  <div className="flex items-center justify-between mb-3">
-                    <Grip size={18} className="text-gray-500" />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updatedValues = (formData.OptionValue || []).filter((_, i) => i !== idx);
-                        const updatedPrices = (formData.OptionPrice || []).filter((_, i) => i !== idx);
-                        setFormData({
-                          ...formData,
-                          OptionValue: updatedValues,
-                          OptionPrice: updatedPrices,
-                        });
-                      }}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <X size={20} />
-                    </button>
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
-                      <input
-                        type="text"
-                        value={opt}
-                        onChange={(e) => {
-                          const updated = [...(formData.OptionValue || [])];
-                          updated[idx] = e.target.value;
-                          setFormData({
-                            ...formData,
-                            OptionValue: updated,
-                          });
-                        }}
-                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                        placeholder="Size name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={formData.OptionPrice?.[idx] || 0}
-                        onChange={(e) => {
-                          const updated = [...(formData.OptionPrice || [])];
-                          updated[idx] = Number(e.target.value) || 0;
-                          setFormData({
-                            ...formData,
-                            OptionPrice: updated,
-                          });
-                        }}
-                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                        placeholder="0.00"
-                      />
-                    </div>
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      placeholder="499.00"
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              )}
 
-        {activeTab === "Meal" && (
-          <div className="max-w-4xl mx-auto">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Menu Item Option
-            </label>
+              {activeTab === "Price" && (
+                <div className="max-w-4xl mx-auto">
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block">
+                    <div className="border border-gray-200 rounded-t-lg bg-gray-50">
+                      <table className="w-full">
+                        <thead>
+                          <tr>
+                            <th className="w-12 p-2 text-center text-sm font-medium text-gray-700">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setFormData({
+                                    ...formData,
+                                    PName: [...formData.PName, ""],
+                                    PPrice: [...formData.PPrice, 0],
+                                  })
+                                }
+                                className="w-8 h-8 flex items-center justify-center text-black rounded-sm hover:bg-gray-200 transition-colors"
+                              >
+                                <Plus size={18} />
+                              </button>
+                            </th>
+                            <th className="p-3 text-left text-sm font-medium text-gray-700">
+                              Name
+                            </th>
+                            <th className="w-32 p-3 text-center text-sm font-medium text-gray-700">
+                              Price
+                            </th>
+                            <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger className="w-full sm:flex-1 flex items-center justify-between px-4 py-2 text-black rounded-sm hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
-                  <span className="text-sm">Add New Size Option</span>
-                  <ChevronDown size={16} className="text-gray-500" />
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content
-                    className="w-full min-w-[300px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 overflow-y-auto z-100"
-                    sideOffset={6}
-                  >
-                    <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                    {sizeOptions.map((size, i) => (
-                      <DropdownMenu.Item
-                        key={i}
-                        className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                        onClick={() => {
-                          if (!formData.MealValue?.includes(size)) {
-                            setFormData({
-                              ...formData,
-                              MealValue: [
-                                ...(formData.MealValue || []),
-                                size,
-                              ],
-                              MealPrice: [
-                                ...(formData.MealPrice || []),
-                                0,
-                              ],
-                            });
-                          }
+                    <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[217px] overflow-y-auto bg-white">
+                      <DragDropContext
+                        onDragEnd={(result) => {
+                          const { source, destination } = result;
+                          if (!destination || source.index === destination.index)
+                            return;
+
+                          const newPValue = Array.from(formData.PName);
+                          const [movedValue] = newPValue.splice(source.index, 1);
+                          newPValue.splice(destination.index, 0, movedValue);
+
+                          const newPPrice = Array.from(formData.PPrice);
+                          const [movedPrice] = newPPrice.splice(source.index, 1);
+                          newPPrice.splice(destination.index, 0, movedPrice);
+
+                          setFormData({
+                            ...formData,
+                            PName: newPValue,
+                            PPrice: newPPrice,
+                          });
                         }}
                       >
-                        {size}
-                      </DropdownMenu.Item>
-                    ))}
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Root>
-
-              <div className="flex flex-col items-center gap-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Deal?
-                </label>
-                <ButtonPage
-                  checked={formData.Deal === "Active"}
-                  onChange={(checked) =>
-                    handleStatusChange("Deal", checked)
-                  }
-                />
-              </div>
-            </div>
-
-            {/* Desktop Table View */}
-            <div className="hidden lg:block">
-              <div className="border border-gray-200 rounded-t-lg bg-gray-50">
-                <table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                      <th className="p-3 text-left text-sm font-medium text-gray-700">Name</th>
-                      <th className="w-24 p-3 text-center text-sm font-medium text-gray-700">Price</th>
-                      <th className="w-20 p-3 text-center text-sm font-medium text-gray-700">Override</th>
-                      <th className="w-20 p-3 text-center text-sm font-medium text-gray-700">Status</th>
-                      <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-
-              <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[197px] overflow-y-auto bg-white">
-                <DragDropContext
-                  onDragEnd={(result) => {
-                    const { source, destination } = result;
-                    if (!destination || source.index === destination.index)
-                      return;
-
-                    const newMealValue = Array.from(formData.MealValue || []);
-                    const [movedValue] = newMealValue.splice(source.index, 1);
-                    newMealValue.splice(destination.index, 0, movedValue);
-
-                    const newMealPrice = Array.from(formData.MealPrice || []);
-                    const [movedPrice] = newMealPrice.splice(source.index, 1);
-                    newMealPrice.splice(destination.index, 0, movedPrice);
-
-                    setFormData({
-                      ...formData,
-                      MealValue: newMealValue,
-                      MealPrice: newMealPrice,
-                    });
-                  }}
-                >
-                  <Droppable droppableId="meal-sizes">
-                    {(provided) => (
-                      <table className="w-full border-collapse">
-                        <tbody
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                        >
-                          {(formData.MealValue || []).map((opt, idx) => (
-                            <Draggable
-                              key={idx}
-                              draggableId={`meal-${idx}`}
-                              index={idx}
-                            >
-                              {(provided, snapshot) => (
-                                <tr
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  className={`hover:bg-gray-50 ${
-                                    snapshot.isDragging
-                                      ? "bg-gray-100 shadow-lg"
-                                      : ""
-                                  } border-b border-gray-200`}
-                                >
-                                  <td
-                                    className="p-3 text-center cursor-grab w-12"
-                                    {...provided.dragHandleProps}
+                        <Droppable droppableId="p-values">
+                          {(provided) => (
+                            <table className="w-full border-collapse">
+                              <tbody
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                              >
+                                {formData.PName.map((opt, idx) => (
+                                  <Draggable
+                                    key={idx}
+                                    draggableId={`p-${idx}`}
+                                    index={idx}
                                   >
-                                    <Grip
-                                      size={18}
-                                      className="text-gray-500 mx-auto"
-                                    />
-                                  </td>
-                                  <td className="p-3">
-                                    <input
-                                      type="text"
-                                      value={opt}
-                                      onChange={(e) => {
-                                        const updated = [
-                                          ...(formData.MealValue || []),
-                                        ];
-                                        updated[idx] = e.target.value;
-                                        setFormData({
-                                          ...formData,
-                                          MealValue: updated,
-                                        });
-                                      }}
-                                      className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                                      placeholder="Size name"
-                                    />
-                                  </td>
-                                  <td className="p-3 text-center">
-                                    <input
-                                      type="number"
-                                      step="0.01"
-                                      value={formData.MealPrice?.[idx] || 0}
-                                      onChange={(e) => {
-                                        const updated = [
-                                          ...(formData.MealPrice || []),
-                                        ];
-                                        updated[idx] =
-                                          Number(e.target.value) || 0;
-                                        setFormData({
-                                          ...formData,
-                                          MealPrice: updated,
-                                        });
-                                      }}
-                                      className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
-                                      placeholder="0.00"
-                                    />
-                                  </td>
-                                  <td className="p-3 text-center">
-                                    <ButtonPage
-                                      checked={
-                                        formData.OverRide?.[idx] === "Active"
-                                      }
-                                      onChange={(checked) => {
-                                        const updated = [
-                                          ...(formData.OverRide || []),
-                                        ];
-                                        updated[idx] = checked
-                                          ? "Active"
-                                          : "Inactive";
-                                        setFormData({
-                                          ...formData,
-                                          OverRide: updated,
-                                        });
-                                      }}
-                                    />
-                                  </td>
-                                  <td className="p-3 text-center">
-                                    <ButtonPage
-                                      checked={
-                                        formData.Status?.[idx] === "Active"
-                                      }
-                                      onChange={(checked) => {
-                                        const updated = [
-                                          ...(formData.Status || []),
-                                        ];
-                                        updated[idx] = checked
-                                          ? "Active"
-                                          : "Inactive";
-                                        setFormData({
-                                          ...formData,
-                                          Status: updated,
-                                        });
-                                      }}
-                                    />
-                                  </td>
-                                  <td className="p-3 text-center w-12">
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        const updatedValues = (
-                                          formData.MealValue || []
-                                        ).filter((_, i) => i !== idx);
-                                        const updatedPrices = (
-                                          formData.MealPrice || []
-                                        ).filter((_, i) => i !== idx);
-                                        setFormData({
-                                          ...formData,
-                                          MealValue: updatedValues,
-                                          MealPrice: updatedPrices,
-                                        });
-                                      }}
-                                      className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
-                                    >
-                                      <X size={20} />
-                                    </button>
-                                  </td>
-                                </tr>
-                              )}
-                            </Draggable>
-                          ))}
-                          {provided.placeholder}
-                        </tbody>
-                      </table>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              </div>
-            </div>
+                                    {(provided, snapshot) => (
+                                      <tr
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        className={`hover:bg-gray-50 ${snapshot.isDragging
+                                          ? "bg-gray-100 shadow-lg"
+                                          : ""
+                                          } border-b border-gray-200`}
+                                      >
+                                        <td
+                                          className="p-3 text-center cursor-grab w-12"
+                                          {...provided.dragHandleProps}
+                                        >
+                                          <Grip
+                                            size={18}
+                                            className="text-gray-500 mx-auto"
+                                          />
+                                        </td>
+                                        <td className="p-3">
+                                          <input
+                                            type="text"
+                                            value={opt}
+                                            onChange={(e) => {
+                                              const updated = [...formData.PName];
+                                              updated[idx] = e.target.value;
+                                              setFormData({
+                                                ...formData,
+                                                PName: updated,
+                                              });
+                                            }}
+                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                                          />
+                                        </td>
+                                        <td className="p-3 text-center">
+                                          <input
+                                            type="number"
+                                            value={formData.PPrice[idx]}
+                                            onChange={(e) => {
+                                              const updated = [...formData.PPrice];
+                                              updated[idx] =
+                                                Number(e.target.value) || 0;
+                                              setFormData({
+                                                ...formData,
+                                                PPrice: updated,
+                                              });
+                                            }}
+                                            className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm text-center"
+                                          />
+                                        </td>
+                                        <td className="p-3 text-center w-12">
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updatedValues = formData.PName.filter(
+                                                (_, i) => i !== idx
+                                              );
+                                              const updatedPrices = formData.PPrice.filter(
+                                                (_, i) => i !== idx
+                                              );
+                                              setFormData({
+                                                ...formData,
+                                                PName: updatedValues,
+                                                PPrice: updatedPrices,
+                                              });
+                                            }}
+                                            className="text-black px-2 py-1 rounded hover:text-gray-700"
+                                          >
+                                            <X size={20} />
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </tbody>
+                            </table>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </div>
+                  </div>
 
-            {/* Mobile Card View for Meal Tab */}
-            <div className="lg:hidden space-y-4">
-              {(formData.MealValue || []).map((opt, idx) => (
-                <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
-                  <div className="flex items-center justify-between mb-3">
-                    <Grip size={18} className="text-gray-500" />
+                  {/* Mobile Add Button */}
+                  <div className="md:hidden mb-4">
                     <button
                       type="button"
-                      onClick={() => {
-                        const updatedValues = (formData.MealValue || []).filter((_, i) => i !== idx);
-                        const updatedPrices = (formData.MealPrice || []).filter((_, i) => i !== idx);
+                      onClick={() =>
                         setFormData({
                           ...formData,
-                          MealValue: updatedValues,
-                          MealPrice: updatedPrices,
-                        });
-                      }}
-                      className="text-red-500 hover:text-red-700"
+                          PName: [...formData.PName, ""],
+                          PPrice: [...formData.PPrice, 0],
+                        })
+                      }
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 text-black border-2 border-dashed border-gray-300 rounded-sm hover:bg-gray-50 transition-colors"
                     >
-                      <X size={20} />
+                      <Plus size={18} />
+                      Add Price Item
                     </button>
                   </div>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
-                      <input
-                        type="text"
-                        value={opt}
-                        onChange={(e) => {
-                          const updated = [...(formData.MealValue || [])];
-                          updated[idx] = e.target.value;
-                          setFormData({
-                            ...formData,
-                            MealValue: updated,
-                          });
-                        }}
-                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                        placeholder="Size name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={formData.MealPrice?.[idx] || 0}
-                        onChange={(e) => {
-                          const updated = [...(formData.MealPrice || [])];
-                          updated[idx] = Number(e.target.value) || 0;
-                          setFormData({
-                            ...formData,
-                            MealPrice: updated,
-                          });
-                        }}
-                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label className="block text-xs font-medium text-gray-700">Override</label>
-                      <ButtonPage
-                        checked={formData.OverRide?.[idx] === "Active"}
-                        onChange={(checked) => {
-                          const updated = [...(formData.OverRide || [])];
-                          updated[idx] = checked ? "Active" : "Inactive";
-                          setFormData({
-                            ...formData,
-                            OverRide: updated,
-                          });
-                        }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label className="block text-xs font-medium text-gray-700">Status</label>
-                      <ButtonPage
-                        checked={formData.Status?.[idx] === "Active"}
-                        onChange={(checked) => {
-                          const updated = [...(formData.Status || [])];
-                          updated[idx] = checked ? "Active" : "Inactive";
-                          setFormData({
-                            ...formData,
-                            Status: updated,
-                          });
-                        }}
-                      />
-                    </div>
+
+                  {/* Mobile Card View for Price Tab */}
+                  <div className="md:hidden space-y-4">
+                    {formData.PName.map((opt, idx) => (
+                      <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
+                        <div className="flex items-center justify-between mb-3">
+                          <Grip size={18} className="text-gray-500" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedValues = formData.PName.filter((_, i) => i !== idx);
+                              const updatedPrices = formData.PPrice.filter((_, i) => i !== idx);
+                              setFormData({
+                                ...formData,
+                                PName: updatedValues,
+                                PPrice: updatedPrices,
+                              });
+                            }}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <X size={20} />
+                          </button>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                            <input
+                              type="text"
+                              value={opt}
+                              onChange={(e) => {
+                                const updated = [...formData.PName];
+                                updated[idx] = e.target.value;
+                                setFormData({
+                                  ...formData,
+                                  PName: updated,
+                                });
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                              placeholder="Price item name"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={formData.PPrice[idx]}
+                              onChange={(e) => {
+                                const updated = [...formData.PPrice];
+                                updated[idx] = Number(e.target.value) || 0;
+                                setFormData({
+                                  ...formData,
+                                  PPrice: updated,
+                                });
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                              placeholder="0.00"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "Specials" && (
-          <div className="space-y-6 max-w-2xl mx-auto">
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">
-                Special
-              </label>
-              <ButtonPage
-                checked={formData.Special === "Active"}
-                onChange={(checked) =>
-                  handleStatusChange("Special", checked)
-                }
-              />
+              )}
             </div>
 
-            {/* Special Dates */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="relative">
-                <label className="absolute -top-2 left-2 bg-white px-1 text-xs font-medium text-gray-700">
-                  Special Start Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.SpecialStartDate}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      SpecialStartDate: e.target.value,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                />
-              </div>
-
-              <div className="relative">
-                <label className="absolute -top-2 left-2 bg-white px-1 text-xs font-medium text-gray-700">
-                  Special End Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.SpecialEndDate}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      SpecialEndDate: e.target.value,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                />
-              </div>
-            </div>
-
-            {/* Special Price */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Special Price
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.SpecialPrice}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    SpecialPrice: Number(e.target.value) || 0,
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                placeholder="499.00"
-              />
-            </div>
-          </div>
-        )}
-
-        {activeTab === "Price" && (
-          <div className="max-w-4xl mx-auto">
-            {/* Desktop Table View */}
-            <div className="hidden md:block">
-              <div className="border border-gray-200 rounded-t-lg bg-gray-50">
-                <table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="w-12 p-2 text-center text-sm font-medium text-gray-700">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              PName: [...formData.PName, ""],
-                              PPrice: [...formData.PPrice, 0],
-                            })
-                          }
-                          className="w-8 h-8 flex items-center justify-center text-black rounded-sm hover:bg-gray-200 transition-colors"
-                        >
-                          <Plus size={18} />
-                        </button>
-                      </th>
-                      <th className="p-3 text-left text-sm font-medium text-gray-700">
-                        Name
-                      </th>
-                      <th className="w-32 p-3 text-center text-sm font-medium text-gray-700">
-                        Price
-                      </th>
-                      <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-
-              <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[217px] overflow-y-auto bg-white">
-                <DragDropContext
-                  onDragEnd={(result) => {
-                    const { source, destination } = result;
-                    if (!destination || source.index === destination.index)
-                      return;
-
-                    const newPValue = Array.from(formData.PName);
-                    const [movedValue] = newPValue.splice(source.index, 1);
-                    newPValue.splice(destination.index, 0, movedValue);
-
-                    const newPPrice = Array.from(formData.PPrice);
-                    const [movedPrice] = newPPrice.splice(source.index, 1);
-                    newPPrice.splice(destination.index, 0, movedPrice);
-
-                    setFormData({
-                      ...formData,
-                      PName: newPValue,
-                      PPrice: newPPrice,
-                    });
-                  }}
-                >
-                  <Droppable droppableId="p-values">
-                    {(provided) => (
-                      <table className="w-full border-collapse">
-                        <tbody
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                        >
-                          {formData.PName.map((opt, idx) => (
-                            <Draggable
-                              key={idx}
-                              draggableId={`p-${idx}`}
-                              index={idx}
-                            >
-                              {(provided, snapshot) => (
-                                <tr
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  className={`hover:bg-gray-50 ${
-                                    snapshot.isDragging
-                                      ? "bg-gray-100 shadow-lg"
-                                      : ""
-                                  } border-b border-gray-200`}
-                                >
-                                  <td
-                                    className="p-3 text-center cursor-grab w-12"
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <Grip
-                                      size={18}
-                                      className="text-gray-500 mx-auto"
-                                    />
-                                  </td>
-                                  <td className="p-3">
-                                    <input
-                                      type="text"
-                                      value={opt}
-                                      onChange={(e) => {
-                                        const updated = [...formData.PName];
-                                        updated[idx] = e.target.value;
-                                        setFormData({
-                                          ...formData,
-                                          PName: updated,
-                                        });
-                                      }}
-                                      className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
-                                    />
-                                  </td>
-                                  <td className="p-3 text-center">
-                                    <input
-                                      type="number"
-                                      value={formData.PPrice[idx]}
-                                      onChange={(e) => {
-                                        const updated = [...formData.PPrice];
-                                        updated[idx] =
-                                          Number(e.target.value) || 0;
-                                        setFormData({
-                                          ...formData,
-                                          PPrice: updated,
-                                        });
-                                      }}
-                                      className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm text-center"
-                                    />
-                                  </td>
-                                  <td className="p-3 text-center w-12">
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        const updatedValues = formData.PName.filter(
-                                          (_, i) => i !== idx
-                                        );
-                                        const updatedPrices = formData.PPrice.filter(
-                                          (_, i) => i !== idx
-                                        );
-                                        setFormData({
-                                          ...formData,
-                                          PName: updatedValues,
-                                          PPrice: updatedPrices,
-                                        });
-                                      }}
-                                      className="text-black px-2 py-1 rounded hover:text-gray-700"
-                                    >
-                                      <X size={20} />
-                                    </button>
-                                  </td>
-                                </tr>
-                              )}
-                            </Draggable>
-                          ))}
-                          {provided.placeholder}
-                        </tbody>
-                      </table>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              </div>
-            </div>
-
-            {/* Mobile Add Button */}
-            <div className="md:hidden mb-4">
+            {/* Fixed Action Buttons */}
+            <div className="flex-shrink-0 flex flex-col sm:flex-row justify-end gap-3 p-4 border-t border-gray-200 bg-white">
+              <button
+                onClick={handleCloseModal}
+                className="px-4 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 order-2 sm:order-1"
+                disabled={actionLoading}
+              >
+                Cancel
+              </button>
               <button
                 type="button"
-                onClick={() =>
-                  setFormData({
-                    ...formData,
-                    PName: [...formData.PName, ""],
-                    PPrice: [...formData.PPrice, 0],
-                  })
-                }
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-black border-2 border-dashed border-gray-300 rounded-sm hover:bg-gray-50 transition-colors"
+                onClick={handleModalSubmit}
+                disabled={actionLoading || !isFormValid()}
+                className={`px-4 py-2 min-w-[120px] rounded-sm transition-colors text-white order-1 sm:order-2 ${actionLoading || !isFormValid()
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-black hover:bg-gray-700"
+                  }`}
               >
-                <Plus size={18} />
-                Add Price Item
+                {actionLoading ? (
+                  <div className="flex items-center gap-2 justify-center">
+                    <Loader2 className="animate-spin w-4 h-4" />
+                    {editingItem ? "Updating..." : "Saving..."}
+                  </div>
+                ) : editingItem ? (
+                  "Update"
+                ) : (
+                  "Save & Close"
+                )}
               </button>
             </div>
-
-            {/* Mobile Card View for Price Tab */}
-            <div className="md:hidden space-y-4">
-              {formData.PName.map((opt, idx) => (
-                <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
-                  <div className="flex items-center justify-between mb-3">
-                    <Grip size={18} className="text-gray-500" />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updatedValues = formData.PName.filter((_, i) => i !== idx);
-                        const updatedPrices = formData.PPrice.filter((_, i) => i !== idx);
-                        setFormData({
-                          ...formData,
-                          PName: updatedValues,
-                          PPrice: updatedPrices,
-                        });
-                      }}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <X size={20} />
-                    </button>
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
-                      <input
-                        type="text"
-                        value={opt}
-                        onChange={(e) => {
-                          const updated = [...formData.PName];
-                          updated[idx] = e.target.value;
-                          setFormData({
-                            ...formData,
-                            PName: updated,
-                          });
-                        }}
-                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                        placeholder="Price item name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={formData.PPrice[idx]}
-                        onChange={(e) => {
-                          const updated = [...formData.PPrice];
-                          updated[idx] = Number(e.target.value) || 0;
-                          setFormData({
-                            ...formData,
-                            PPrice: updated,
-                          });
-                        }}
-                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
-        )}
-      </div>
-
-      {/* Fixed Action Buttons */}
-      <div className="flex-shrink-0 flex flex-col sm:flex-row justify-end gap-3 p-4 border-t border-gray-200 bg-white">
-        <button
-          onClick={handleCloseModal}
-          className="px-4 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 order-2 sm:order-1"
-          disabled={actionLoading}
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleModalSubmit}
-          disabled={actionLoading || !isFormValid()}
-          className={`px-4 py-2 min-w-[120px] rounded-sm transition-colors text-white order-1 sm:order-2 ${
-            actionLoading || !isFormValid()
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-black hover:bg-gray-700"
-          }`}
-        >
-          {actionLoading ? (
-            <div className="flex items-center gap-2 justify-center">
-              <Loader2 className="animate-spin w-4 h-4" />
-              {editingItem ? "Updating..." : "Saving..."}
-            </div>
-          ) : editingItem ? (
-            "Update"
-          ) : (
-            "Save & Close"
-          )}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        </div>
+      )}
 
     </div>
   );

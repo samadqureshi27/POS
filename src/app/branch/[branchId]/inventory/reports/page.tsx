@@ -11,6 +11,7 @@ import {
   X,
   Edit,
 } from "lucide-react";
+import ActionBar from "@/components/layout/UI/ActionBar";
 
 interface InventoryItem {
   ID: number;
@@ -361,22 +362,11 @@ const ReportsPage = () => {
         </div>
       </div>
 
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-          <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-        </div>
-      </div>
+     <ActionBar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search"
+      />
 
 
       {/* Responsive Table with Global CSS Classes */}
@@ -434,31 +424,31 @@ const ReportsPage = () => {
                   </div>
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-24">
+                <th className="relative px-4 py-3 text-left ">
                   Initial Stock
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-24">
+                <th className="relative px-4 py-3 text-left ">
                   Purchased
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-20">
+                <th className="relative px-4 py-3 text-left ">
                   Used
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-24">
+                <th className="relative px-4 py-3 text-left ">
                   Variance
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-24">
+                <th className="relative px-4 py-3 text-left ">
                   Wasteage
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-28">
+                <th className="relative px-4 py-3 text-left ">
                   Closing Stock
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
-                <th className="relative px-4 py-3 text-left w-24">
+                <th className="relative px-4 py-3 text-left ">
                   Total Value
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
