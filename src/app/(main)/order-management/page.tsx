@@ -26,6 +26,7 @@ import {
   X,
   Edit,
 } from "lucide-react";
+import ActionBar from "@/components/layout/UI/ActionBar";
 
 interface OrderItem {
   Order: string;
@@ -259,7 +260,7 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
       }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
@@ -638,7 +639,7 @@ const OrderManagementPage = () => {
                         }
                       }}
                       moveRangeOnFirstSelection={false}
-                      className="rounded-lg calendar-mobile-responsive"
+                      className="rounded-sm calendar-mobile-responsive"
                     />
                   </div>
                 )}
@@ -789,21 +790,11 @@ const OrderManagementPage = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="mb-8 mt-8  flex items-center justify-end gap-4 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-          <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-        </div>
-      </div>
+       <ActionBar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search"
+      />
 
       {/* Table + filters */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm responsive-customer-table">
@@ -837,7 +828,7 @@ const OrderManagementPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                          className="min-w-[240px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
@@ -880,7 +871,7 @@ const OrderManagementPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                          className="min-w-[240px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
@@ -970,7 +961,7 @@ const OrderManagementPage = () => {
                       data-label="Status"
                     >
                       <span
-                        className={`inline-block w-20 text-right  py-1 rounded-md text-xs font-medium 
+                        className={`inline-block w-20 text-right  py-1 rounded-sm text-xs font-medium 
                     ${item.Status === "Inactive"
                             ? "text-red-400 "
                             : "text-green-400 "
@@ -984,7 +975,7 @@ const OrderManagementPage = () => {
                       className="px-4 py-4 whitespace-nowrap"
                       data-label="Type"
                     >
-                      <span className=" py-1 text-right  text-blue-400 rounded-md text-sm">
+                      <span className=" py-1 text-right  text-blue-400 rounded-sm text-sm">
                         {item.Type}
                       </span>
                     </td>

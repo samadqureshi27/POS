@@ -384,9 +384,9 @@ const ReportsPage = () => {
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  <div className="flex flex-col gap-1">
+                  <div className="flex  flex-col gap-1">
                     <DropdownMenu.Root modal={false}>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                         {unitFilter || "Unit"}
                         <ChevronDown
                           size={14}

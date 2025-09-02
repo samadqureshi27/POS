@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
+import ActionBar from "@/components/layout/UI/ActionBar";
 interface RecipeOption {
   ID: number;
   Name: string;
@@ -204,7 +205,7 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+      className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
         type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
       } ${
         isVisible && !isClosing
@@ -448,51 +449,16 @@ const CategoryPage = () => {
       <h1 className="text-3xl font-semibold mt-14 mb-8">Recipe Options</h1>
 
       {/* Action bar */}
-      <div className="mb-8 flex   items-center justify-between gap-4 flex-wrap">
-        {/* Action Buttons */}
-        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            disabled={selectedItems.length > 0}
-            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            <Plus size={16} />
-            Add
-          </button>
-
-          <button
-            onClick={handleDeleteSelected}
-            disabled={!isSomeSelected || actionLoading}
-            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            <Trash2 size={16} />
-            {actionLoading ? "Deleting..." : "Delete Selected"}
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-          <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-        </div>
-      </div>
+       <ActionBar
+        onAdd={() => setIsModalOpen(true)}
+        addDisabled={selectedItems.length > 0}
+        onDelete={handleDeleteSelected}
+        deleteDisabled={selectedItems.length === 0}
+        isDeleting={actionLoading}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search"
+      />
 
       {/* Table */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw]  shadow-sm  responsive-customer-table">
@@ -678,7 +644,7 @@ const CategoryPage = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+          <div className="bg-white rounded-sm p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
@@ -699,7 +665,7 @@ const CategoryPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   placeholder="Enter category name"
                   required
                 />
@@ -724,7 +690,7 @@ const CategoryPage = () => {
                     }
                     // If invalid input, just ignore it (don't update state)
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   placeholder="Enter price"
                   required
                 />

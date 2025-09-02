@@ -16,6 +16,7 @@ import {
   Edit,
 } from "lucide-react";
 import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
+import ActionBar from "@/components/layout/UI/ActionBar";
 interface InventoryItem {
   ID: string;
   Name: string;
@@ -36,7 +37,7 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
       }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
@@ -283,49 +284,16 @@ const IngredientsManagementPage = () => {
       <h1 className="text-3xl font-semibold mt-14 mb-8 ">Ingredients</h1>
 
       {/* Action bar: add, delete, search */}
-      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-        {/* Action Buttons */}
-        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
-          <button
-            onClick={openAddModal}
-            disabled={selectedItems.length > 0}
-            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-          >
-            <Plus size={16} />
-            Add
-          </button>
-
-          <button
-            onClick={handleDeleteSelected}
-            disabled={!isSomeSelected || actionLoading}
-            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-          >
-            <Trash2 size={16} />
-            {actionLoading ? "Deleting..." : "Delete Selected"}
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full  h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-          <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-        </div>
-      </div>
+      <ActionBar
+        onAdd={() => openAddModal()}
+        addDisabled={selectedItems.length > 0}
+        onDelete={handleDeleteSelected}
+        deleteDisabled={selectedItems.length === 0}
+        isDeleting={actionLoading}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search"
+      />
 
       {/* Table + filters */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw]  shadow-sm responsive-customer-table ">
@@ -394,9 +362,9 @@ const IngredientsManagementPage = () => {
                 </th>
 
                 <th className="relative px-4 py-3 text-left">
-                  <div className="flex items-center gap-2">
+                  <div className="flex  flex-col gap-1">
                     <DropdownMenu.Root modal={false}>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                         {statusFilter || "Status"}
                         <ChevronDown
                           size={14}
@@ -406,7 +374,7 @@ const IngredientsManagementPage = () => {
 
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                          className="min-w-[240px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
@@ -519,7 +487,7 @@ const IngredientsManagementPage = () => {
 
                   <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                     <span
-                      className={`inline-block w-24 text-right  py-[2px] rounded-md text-xs font-medium 
+                      className={`inline-block w-24 text-right  py-[2px] rounded-sm text-xs font-medium 
                   ${item.Status === "Inactive"
                           ? "text-red-400 "
                           : ""
@@ -561,7 +529,7 @@ const IngredientsManagementPage = () => {
       {/* Modal for Add/Edit */}
       {modalOpen && (
         <div className="fixed inset-0  bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-          <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
+          <div className="bg-white rounded-sm p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
@@ -582,7 +550,7 @@ const IngredientsManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   placeholder="Enter item name"
                   required
                 />
@@ -599,7 +567,7 @@ const IngredientsManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Description: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   placeholder="Enter description"
                   required
                 />
@@ -616,7 +584,7 @@ const IngredientsManagementPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, Unit: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   placeholder="Unit (e.g. Kg, Bottles)"
                 />
               </div>
@@ -640,7 +608,7 @@ const IngredientsManagementPage = () => {
                         }
                         // If invalid input, just ignore it (don't update state)
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                       placeholder="1"
                       min={1}
                       required

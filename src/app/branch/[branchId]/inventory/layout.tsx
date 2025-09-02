@@ -13,8 +13,8 @@ export default function InventoryLayout({ children }: { children: React.ReactNod
   ];
 
   return (
-    <div className="flex">
-      <BaseSubmenu items={items} />
+   <div className="flex">
+      <BaseSubmenu items={items} showBackArrow={true} />
       <div className="flex-1 p-4">{children}</div>
     </div>
   );
