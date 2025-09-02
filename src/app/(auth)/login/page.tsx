@@ -428,7 +428,7 @@ const [role, setRole] = useState<'admin' | 'manager' | null>(null);
     >
       {/* Rest of your JSX remains exactly the same */}
       <img
-        src="/images/login-left.png"
+        src="/logos/Blacka.svg"
         alt=""
         aria-hidden="true"
         className="pointer-events-none select-none absolute left-0 top-0 h-full w-auto object-contain z-0"
@@ -451,7 +451,7 @@ const [role, setRole] = useState<'admin' | 'manager' | null>(null);
         onClick={phase === 'idle' ? handleManagerClick : undefined}
       >
         <img
-          src="/images/login-right.png"
+          src="/logos/d1ab35a.svg"
           alt=""
           aria-hidden="true"
           className="pointer-events-none select-none absolute right-0 top-0 h-full w-auto object-contain"
