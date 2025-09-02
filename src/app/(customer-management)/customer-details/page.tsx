@@ -5,6 +5,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { ChevronDown, Search, AlertCircle, CheckCircle, X, Star, Download, Upload, Trophy } from "lucide-react";
 import { useRouter } from 'next/navigation'; // Next.js 13+ App Router
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import ActionBar from "@/components/layout/UI/ActionBar";
 
 // Types
 interface CustomerItem {
@@ -107,7 +108,7 @@ const Toast = ({
   onClose: () => void;
 }) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
       }`}
   >
     {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
@@ -337,7 +338,7 @@ const CustomerManagementPage = () => {
 
         {/* Import/Export Buttons */}
         <div className="flex gap-4 justify-start md:justify-end mt-4 md:mt-0">
-          <label className="flex items-center gap-2 px-4 py-2 bg-[#2C2C2C] text-white rounded-md cursor-pointer hover:bg-gray-700 transition-colors">
+          <label className="flex items-center gap-2 px-4 py-2 bg-[#2C2C2C] text-white rounded-sm cursor-pointer hover:bg-gray-700 transition-colors">
             <Upload size={16} />
             Import
             <input
@@ -350,7 +351,7 @@ const CustomerManagementPage = () => {
 
           <button
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2C2C2C] text-white rounded-md hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#2C2C2C] text-white rounded-sm hover:bg-gray-700 transition-colors"
           >
             <Download size={16} />
             Export
@@ -410,22 +411,11 @@ const CustomerManagementPage = () => {
         </div>
       </div>
 
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[150px] max-w-[100vw]">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-          <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-        </div>
-      </div>
+       <ActionBar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search"
+      />
 
       {/* Responsive Table with Global CSS Classes */}
       <div className="bg-gray-50 md:bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm overflow-x-auto responsive-customer-table">

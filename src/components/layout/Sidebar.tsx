@@ -19,12 +19,13 @@ export default function Sidebar() {
   const menuItems = [
     { icon: <Home className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Home', link: '/' },
     { icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Menu Management', link: '/menu-management' },
-    { icon: <Package2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Recipes Management', link: '/recipes-management' },
-    { icon: <AlignJustify className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'POS Management', link: '/pos-list' },
+    { icon: <Package2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Recipe Management', link: '/recipes-management' },
+    
+    { icon: <Building2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Branch Management', link: '/branches-management' },
     { icon: <DollarSign className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Financial Reports', link: '/financial-reports' },
-    { icon: <ShoppingCart className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Orders Management', link: '/order-management' },
+    
     { icon: <User className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Customer Management', link: '/customer-details' },
-    { icon: <Building2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Branches Management', link: '/branches-management' },
+    { icon: <ShoppingCart className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Order Management', link: '/order-management' },
     { icon: <Settings className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Settings', link: '/general-settings' },
   ];
 
@@ -38,9 +39,9 @@ export default function Sidebar() {
             <Link
               key={idx}
               href={item.link}
-              className="group relative flex items-center justify-center p-1 rounded hover:bg-[#2e2e2e] transition"
+              className="group relative flex items-center justify-center p-1 rounded hover:bg-[#454545]  focus:bg-[#454545] transition-all"
             >
-              <span className="text-black group-hover:text-white transition">
+              <span className="text-black group-hover:text-white transition group-focus:text-white">
                 {item.icon}
               </span>
 

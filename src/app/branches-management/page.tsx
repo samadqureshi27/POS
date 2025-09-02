@@ -508,9 +508,9 @@ const BranchListPage = () => {
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-1">
                     <DropdownMenu.Root modal={false}>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                         {statusFilter || "Status"}
                         <ChevronDown
                           size={14}
@@ -645,7 +645,7 @@ const BranchListPage = () => {
 
                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                       <span
-                        className={`inline-block w-20  text-right  py-[2px] rounded-md text-xs font-medium 
+                        className={`inline-block w-20  text-right  py-[2px] rounded-sm text-xs font-medium 
                           ${item.Status === "Active" ? "text-green-400 " : ""}
                           ${item.Status === "Inactive" ? "text-red-400 " : ""}`}
                       >
