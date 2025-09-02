@@ -13,7 +13,7 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex">
-      <BaseSubmenu items={items} />
+      <BaseSubmenu items={items} showBackArrow={true} />
       <div className="flex-1 p-4">{children}</div>
     </div>
   );

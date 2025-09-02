@@ -15,6 +15,7 @@ import {
   Tooltip,
 } from "recharts";
 import ResponsiveDetailButton from "@/components/layout/UI/ResponsiveDetailButton";
+import ActionBar from "@/components/layout/UI/ActionBar";
 
 // Types (same as before)
 interface CustomerItem {
@@ -52,7 +53,7 @@ class CustomerAPI {
   private static delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
-   private static mockCustomers: CustomerItem[] = [
+  private static mockCustomers: CustomerItem[] = [
     {
       Customer_ID: 1,
       Name: "Ahmed Ali",
@@ -514,7 +515,7 @@ const CustomerProfilePage = () => {
           </p>
           <button
             onClick={handleBackClick}
-            className="px-4 py-2 bg-[#2C2C2C] text-white rounded-md hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 bg-[#2C2C2C] text-white rounded-sm hover:bg-gray-700 transition-colors"
           >
             Back to Customers
           </button>
@@ -534,7 +535,7 @@ const CustomerProfilePage = () => {
           <ArrowLeft size={20} className="text-gray-600" />
         </button>
         <h1 className="text-3xl font-semibold">Customer Profile</h1>
-        
+
       </div>
 
       {/* Main Grid Layout */}
@@ -580,9 +581,8 @@ const CustomerProfilePage = () => {
                     <span className="text-gray-500">Card Status:</span>
                     <span
                       className={` py-1 rounded-full text-xs font-medium
-      ${
-        customer.Card_Status === "Active" ? " text-green-400" : " text-red-400"
-      }`}
+      ${customer.Card_Status === "Active" ? " text-green-400" : " text-red-400"
+                        }`}
                     >
                       {customer.Card_Status}
                     </span>
@@ -668,22 +668,11 @@ const CustomerProfilePage = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-          <div className="relative flex-1 min-w-[200px]">
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pr-10 pl-4 h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-            />
-            <Search
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              size={16}
-            />
-          </div>
-        </div>
-
+        <ActionBar
+          searchValue={searchTerm}
+          onSearchChange={setSearchTerm}
+          searchPlaceholder="Search"
+        />
         {/* Orders Table */}
         <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm overflow-x-auto responsive-customer-table">
           <div className="rounded-sm table-container">
@@ -698,9 +687,9 @@ const CustomerProfilePage = () => {
                     <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </th>
                   <th className="relative px-4 py-3 text-left w-36">
-                    <div className="flex items-center gap-2">
-                      <DropdownMenu.Root>
-                        <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                    <div className="flex  flex-col gap-1">
+                      <DropdownMenu.Root modal={false}>
+                        <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                           {typeFilter || "Type"}
                           <ChevronDown
                             size={14}
@@ -709,7 +698,7 @@ const CustomerProfilePage = () => {
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
                           <DropdownMenu.Content
-                            className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                            className="min-w-[240px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                             sideOffset={6}
                           >
                             <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
@@ -724,7 +713,7 @@ const CustomerProfilePage = () => {
                             ).map((type) => (
                               <DropdownMenu.Item
                                 key={type}
-                                className="px-3 py-1 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
+                                className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 text-black rounded outline-none"
                                 onClick={() => setTypeFilter(type)}
                               >
                                 {type}
@@ -745,9 +734,9 @@ const CustomerProfilePage = () => {
                     <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </th>
                   <th className="relative px-4 py-3 text-left w-32">
-                    <div className="flex items-center gap-2">
-                      <DropdownMenu.Root>
-                        <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                    <div className="flex  flex-col gap-1">
+                      <DropdownMenu.Root modal={false}>
+                        <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                           {statusFilter || "Status"}
                           <ChevronDown
                             size={14}
@@ -756,7 +745,7 @@ const CustomerProfilePage = () => {
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
                           <DropdownMenu.Content
-                            className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                            className="min-w-[240px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                             sideOffset={6}
                           >
                             <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
@@ -771,13 +760,12 @@ const CustomerProfilePage = () => {
                             ).map((status) => (
                               <DropdownMenu.Item
                                 key={status}
-                                className={`px-3 py-1 text-sm cursor-pointer rounded outline-none ${
-                                  status === "Completed"
-                                    ? "hover:bg-green-100 text-green-400"
+                                className={`px-3 py-1 text-sm cursor-pointer rounded outline-none ${status === "Completed"
+                                    ? "hover:bg-gray-100 text-green-400"
                                     : status === "Pending"
-                                    ? "hover:bg-blue-100 text-blue-400"
-                                    : "hover:bg-red-100 text-red-400"
-                                }`}
+                                      ? "hover:bg-gray-100 text-blue-400"
+                                      : "hover:bg-gray-100 text-red-400"
+                                  }`}
                                 onClick={() => setStatusFilter(status)}
                               >
                                 {status}
@@ -789,7 +777,7 @@ const CustomerProfilePage = () => {
                     </div>
                     <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </th>
-                   <th className="relative px-4 py-3 text-left w-32">
+                  <th className="relative px-4 py-3 text-left w-32">
                     Details
                     <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                   </th>
@@ -820,15 +808,14 @@ const CustomerProfilePage = () => {
                       <td className="px-4 py-4 whitespace-nowrap text-sm" data-label="Order Number">
                         {order.Order_Number}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap"data-label="Type" >
+                      <td className="px-4 py-4 whitespace-nowrap" data-label="Type" >
                         <span
-                          className={`inline-flex  py-1 text-xs font-medium rounded-full ${
-                            order.Type === "Dine in"
+                          className={`inline-flex  py-1 text-xs font-medium rounded-full ${order.Type === "Dine in"
                               ? " text-yellow-400"
                               : order.Type === "Takeaway"
-                              ? " text-green-400"
-                              : " text-blue-400"
-                          }`}
+                                ? " text-green-400"
+                                : " text-blue-400"
+                            }`}
                         >
                           {order.Type}
                         </span>
@@ -841,24 +828,23 @@ const CustomerProfilePage = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                         <span
-                          className={`inline-flex  py-1 text-xs font-medium rounded-full ${
-                            order.Status === "Completed"
+                          className={`inline-flex  py-1 text-xs font-medium rounded-full ${order.Status === "Completed"
                               ? " text-green-400"
                               : order.Status === "Pending"
-                              ? " text-blue-400"
-                              : " text-red-400"
-                          }`}
+                                ? " text-blue-400"
+                                : " text-red-400"
+                            }`}
                         >
                           {order.Status}
                         </span>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
-                      <ResponsiveDetailButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      />
-                    </td>
+                        <ResponsiveDetailButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        />
+                      </td>
                     </tr>
                   ))
                 )}
