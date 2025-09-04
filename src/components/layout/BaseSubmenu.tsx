@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
 type SubmenuItem = {
@@ -16,36 +16,43 @@ type SubmenuItem = {
 type BaseSubmenuProps = {
   items: SubmenuItem[];
   showBackArrow?: boolean;
+  backPath?: string;
 };
 
-export default function BaseSubmenu({ items, showBackArrow = false }: BaseSubmenuProps) {
+export default function BaseSubmenu({ 
+  items, 
+  showBackArrow = false, 
+  backPath ='/branches-management/'
+}: BaseSubmenuProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
 
   // Check if current path belongs to any submenu and auto-expand
   useEffect(() => {
     for (const item of items) {
       if (item.hasSubmenu && item.submenuItems) {
+        const isParentPath = pathname === item.href;
         const isInSubmenu = item.submenuItems.some(subItem => pathname === subItem.href);
-        if (isInSubmenu) {
-          setActiveSubmenu(item.label);
+        
+        if (isParentPath || isInSubmenu) {
+          if (activeSubmenu !== item.label) {
+            setActiveSubmenu(item.label);
+          }
           return;
         }
       }
     }
-    // If not in any submenu, collapse
-    setActiveSubmenu(null);
-  }, [pathname, items]);
+    if (activeSubmenu !== null) {
+      setActiveSubmenu(null);
+    }
+  }, [pathname, items, activeSubmenu]);
 
   const handleBack = () => {
-    window.history.back();
-  };
-
-  const handleParentClick = (e: React.MouseEvent, item: SubmenuItem) => {
-    e.preventDefault();
-    if (item.hasSubmenu) {
-      // Toggle submenu for items that have submenus
-      setActiveSubmenu(activeSubmenu === item.label ? null : item.label);
+    if (backPath) {
+      router.push(backPath);
+    } else {
+      window.history.back();
     }
   };
 
@@ -54,50 +61,83 @@ export default function BaseSubmenu({ items, showBackArrow = false }: BaseSubmen
       <div className={`w-full px-3 sm:px-6 ${showBackArrow ? 'lg:px-4' : 'lg:px-22.5'}`}>
         <div className="flex items-center">
           {showBackArrow && (
-            <ArrowLeft 
-              size={20} 
-              className="text-white mb-1 cursor-pointer hidden md:block mr-7" 
+            <button
               onClick={handleBack}
-            />
+              className="text-white mb-1 cursor-pointer hidden md:flex mr-7 items-center justify-center
+                       hover:text-gray-300 transition-all duration-200 ease-in-out
+                       hover:scale-110 active:scale-95 transform"
+              aria-label="Go back"
+            >
+              <ArrowLeft size={20} />
+            </button>
           )}
-          <nav className={`flex flex-wrap items-baseline py-3 ${showBackArrow ? 'md:ml-4' : ''}`}>
+          
+          <nav className={`flex flex-wrap items-center py-3 ${showBackArrow ? 'md:ml-4' : ''}`}>
             {items.map((item, idx) => {
-              const isActive = pathname === item.href || item.isActive;
+              let isActive = false;
+              if (item.hasSubmenu && item.submenuItems) {
+                isActive = pathname === item.href;
+              } else {
+                isActive = pathname === item.href || item.isActive;
+              }
+              
               const isParentActive = activeSubmenu === item.label;
+              const hasActiveSubmenu = item.hasSubmenu && isParentActive;
               
               return (
-                <div key={idx} className="flex items-baseline mr-5">
-                  {item.hasSubmenu ? (
-                    <>
-                      <Link
-                        href={item.href}
-                        onClick={(e) => handleParentClick(e, item)}
-                        className={`border-[0.1rem] border-[#83838a] px-4 py-2 rounded text-sm font-medium transition-colors whitespace-nowrap ${
-                          isActive || isParentActive
-                            ? 'bg-[#F6F6F6] text-gray-800 shadow-sm'
-                            : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#161616]'
-                        }`}
+                <div key={idx} className="flex items-center">
+                  {/* Left separator - shows only when this item has an active submenu */}
+                  {hasActiveSubmenu && (
+                    <div className="h-8 w-px bg-[#83838a] mr-3 animate-in fade-in duration-300" />
+                  )}
+                  
+                  <div className="flex items-center">
+                    <Link
+                      href={item.hasSubmenu && item.submenuItems ? item.submenuItems[0].href : item.href}
+                      className={`
+                        border border-[#83838a] px-4 py-2 rounded text-sm font-medium 
+                        transition-all duration-200 ease-in-out whitespace-nowrap
+                        transform hover:scale-[1.02] active:scale-[0.98]
+                        ${isActive
+                          ? 'bg-[#F6F6F6] text-gray-800 shadow-lg border-gray-300'
+                          : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#161616] hover:border-[#a0a0a0] hover:shadow-md'
+                        }
+                      `}
+                    >
+                      {item.label}
+                    </Link>
+                    
+                    {/* Submenu items with Tailwind animations */}
+                    {item.submenuItems && (
+                      <div 
+                        className={`
+                          overflow-hidden transition-all duration-300 ease-in-out
+                          ${isParentActive 
+                            ? 'max-w-[800px] opacity-100 translate-x-0' 
+                            : 'max-w-0 opacity-0 -translate-x-5'
+                          }
+                        `}
                       >
-                        {item.label}
-                      </Link>
-                      
-                      {/* Submenu items rendered inline after their parent */}
-                      {isParentActive && item.submenuItems && (
-                        <div className="flex items-baseline ml-3">
-                          {item.submenuItems.map((subItem, subIndex) => {
+                        <div className={`flex items-center ml-3 ${isParentActive ? 'animate-in slide-in-from-left-3 fade-in duration-300' : ''}`}>
+                          {item.submenuItems.slice(1).map((subItem, subIndex) => {
                             const isSubActive = pathname === subItem.href || subItem.isActive;
                             return (
                               <Link
                                 key={subIndex}
                                 href={subItem.href}
-                                onClick={() => setActiveSubmenu(null)}
-                                className={`border-[0.1rem] border-[#83838a] px-4 py-2 rounded text-sm font-medium transition-colors whitespace-nowrap ml-3 animate-fadeIn ${
-                                  isSubActive
-                                    ? 'bg-[#F6F6F6] text-gray-800 shadow-sm'
-                                    : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#161616]'
-                                }`}
+                                className={`
+                                  border border-[#83838a] px-4 py-2 rounded text-sm font-medium 
+                                  transition-all duration-200 ease-in-out whitespace-nowrap ml-3
+                                  transform hover:scale-[1.02] active:scale-[0.98]
+                                  animate-in fade-in zoom-in-95 duration-200
+                                  ${isSubActive
+                                    ? 'bg-[#F6F6F6] text-gray-800 shadow-lg border-gray-300'
+                                    : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#161616] hover:border-[#a0a0a0] hover:shadow-md'
+                                  }
+                                `}
                                 style={{
-                                  animationDelay: `${subIndex * 100}ms`
+                                  animationDelay: `${subIndex * 50}ms`,
+                                  animationFillMode: 'both'
                                 }}
                               >
                                 {subItem.label}
@@ -105,20 +145,18 @@ export default function BaseSubmenu({ items, showBackArrow = false }: BaseSubmen
                             );
                           })}
                         </div>
-                      )}
-                    </>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      onClick={() => setActiveSubmenu(null)}
-                      className={`border-[0.1rem] border-[#83838a] px-4 py-2 rounded text-sm font-medium transition-colors whitespace-nowrap ${
-                        isActive
-                          ? 'bg-[#F6F6F6] text-gray-800 shadow-sm'
-                          : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#161616]'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Right separator - shows only when this item has an active submenu */}
+                  {hasActiveSubmenu && (
+                    <div className="h-8 w-px bg-[#83838a] ml-3 animate-in fade-in duration-300 mr-4" />
+                  )}
+                  
+                  {/* Regular spacing between menu items when no submenu is active */}
+                  {!hasActiveSubmenu && idx < items.length - 1 && (
+                    <div className="mr-5" />
                   )}
                 </div>
               );
@@ -126,18 +164,6 @@ export default function BaseSubmenu({ items, showBackArrow = false }: BaseSubmen
           </nav>
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        .animate-fadeIn {
-          opacity: 0;
-          animation: fadeIn 0.3s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 }
