@@ -76,12 +76,14 @@ const Toggle = ({
 }) => (
   <button
     onClick={() => onChange(!checked)}
-    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${checked ? "bg-black" : "bg-gray-200"
-      }`}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+      checked ? "bg-black" : "bg-gray-200"
+    }`}
   >
     <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${checked ? "translate-x-6" : "translate-x-1"
-        }`}
+      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+        checked ? "translate-x-6" : "translate-x-1"
+      }`}
     />
   </button>
 );
@@ -436,7 +438,7 @@ class MenuAPI {
     };
   }
 }
-
+const sizeOptionss = ["Cheese", "Pepperoni", "Olives", "Onions","Bacon","Pineapple"];
 const sizeOptions = ["Small", "Regular", "Large", "Extra Large"];
 const mealTimeOptions = ["Morning", "Afternoon", "Evening"];
 
@@ -467,15 +469,21 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
-        } ${isVisible && !isClosing
+      className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+        type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
+      } ${
+        isVisible && !isClosing
           ? "translate-x-0 opacity-100"
           : isClosing
-            ? "translate-x-full opacity-0"
-            : "translate-x-full opacity-0"
-        }`}
+          ? "translate-x-full opacity-0"
+          : "translate-x-full opacity-0"
+      }`}
     >
-      {type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      {type === "success" ? (
+        <CheckCircle size={16} />
+      ) : (
+        <AlertCircle size={16} />
+      )}
       <span>{message}</span>
       <button
         onClick={handleClose}
@@ -521,7 +529,7 @@ const MenuManagementPage = () => {
     ShowOnMenu: "Inactive",
     Featured: "Inactive",
     StaffPick: "Inactive",
-    DisplayType: "Radio",
+    DisplayType: "Select a type",
     Displaycat: "Var",
     SpecialStartDate: "",
     SpecialEndDate: "",
@@ -569,7 +577,7 @@ const MenuManagementPage = () => {
         Deal: editingItem.Deal || "Inactive",
         Special: editingItem.Special || "Inactive",
         SubTBE: editingItem.SubTBE || "Inactive",
-        DisplayType: editingItem.DisplayType || "Radio",
+        DisplayType: editingItem.DisplayType || "Select a type",
         Displaycat: editingItem.Displaycat || "Var",
         SpecialStartDate: editingItem.SpecialStartDate || "",
         SpecialEndDate: editingItem.SpecialEndDate || "",
@@ -597,7 +605,7 @@ const MenuManagementPage = () => {
         ShowOnMenu: "Inactive",
         Featured: "Inactive",
         StaffPick: "Inactive",
-        DisplayType: "Radio",
+        DisplayType: "Select a type",
         Displaycat: "Var",
         SpecialStartDate: "",
         SpecialEndDate: "",
@@ -652,21 +660,24 @@ const MenuManagementPage = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const isFormValid = () => {
-    return (
-      formData.Name?.trim() &&
-      formData.DisplayType &&
-      formData.Price > 0 &&
-      preview && // image uploaded
-      formData.Description?.trim() &&
-      formData.MealType &&
-      formData.Priority > 0 &&
-      formData.MinimumQuantity >= 0 &&
-      formData.OptionValue?.length > 0 &&
-      formData.OptionValue.every((val) => val.trim() !== "") &&
-      formData.OptionPrice?.length === formData.OptionValue?.length
-    );
-  };
+ const isFormValid = () => {
+  // Price is required when Displaycat is not "Var"
+  const isPriceValid = formData.Displaycat === "Var" || formData.Price > 0;
+  
+  return (
+    formData.Name?.trim() &&
+    formData.DisplayType &&
+    isPriceValid &&
+    preview && // image uploaded
+    formData.Description?.trim() &&
+    formData.MealType &&
+    formData.Priority > 0 &&
+    formData.MinimumQuantity >= 0 &&
+    formData.OptionValue?.length > 0 &&
+    formData.OptionValue.every((val) => val.trim() !== "") &&
+    formData.OptionPrice?.length === formData.OptionValue?.length
+  );
+};
 
   const categories = [...new Set(menuItems.map((item) => item.Category))];
 
@@ -830,16 +841,51 @@ const MenuManagementPage = () => {
       <h1 className="text-3xl font-semibold mt-14 mb-8">Menu Management</h1>
 
       {/* Action bar */}
-       <ActionBar
-        onAdd={() => setIsModalOpen(true)}
-        addDisabled={selectedItems.length > 0}
-        onDelete={handleDeleteSelected}
-        deleteDisabled={selectedItems.length === 0}
-        isDeleting={actionLoading}
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search"
-      />
+
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            disabled={selectedItems.length > 0}
+            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${
+              selectedItems.length === 0
+                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            <Plus size={16} />
+            Add
+          </button>
+
+          <button
+            onClick={handleDeleteSelected}
+            disabled={!isSomeSelected || actionLoading}
+            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${
+              isSomeSelected && !actionLoading
+                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            <Trash2 size={16} />
+            {actionLoading ? "Deleting..." : "Delete Selected"}
+          </button>
+        </div>
+
+        <div className="relative flex-1 min-w-[200px]">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
+          />
+        </div>
+      </div>
+
 
       {/* Table */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm responsive-customer-table">
@@ -913,7 +959,10 @@ const MenuManagementPage = () => {
                     <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                         {categoryFilter || "Category"}
-                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                        <ChevronDown
+                          size={14}
+                          className="text-gray-500 ml-auto"
+                        />
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
@@ -951,7 +1000,10 @@ const MenuManagementPage = () => {
                     <DropdownMenu.Root modal={false}>
                       <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                         {statusFilter || "Status"}
-                        <ChevronDown size={14} className="text-gray-500 ml-auto" />
+                        <ChevronDown
+                          size={14}
+                          className="text-gray-500 ml-auto"
+                        />
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
@@ -1043,22 +1095,52 @@ const MenuManagementPage = () => {
                       }
                     />
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="ID">{item.ID}</td>
-                  <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Name">{item.Name}</td>
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Price">${item.Price}</td>
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Category">{item.Category}</td>
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="StockQty">{item.StockQty}</td>
-                  <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
+                  <td className="px-4 py-4 whitespace-nowrap" data-label="ID">
+                    {item.ID}
+                  </td>
+                  <td
+                    className="px-4 py-4 whitespace-nowrap card-name-cell"
+                    data-label="Name"
+                  >
+                    {item.Name}
+                  </td>
+                  <td
+                    className="px-4 py-4 whitespace-nowrap"
+                    data-label="Price"
+                  >
+                    ${item.Price}
+                  </td>
+                  <td
+                    className="px-4 py-4 whitespace-nowrap"
+                    data-label="Category"
+                  >
+                    {item.Category}
+                  </td>
+                  <td
+                    className="px-4 py-4 whitespace-nowrap"
+                    data-label="StockQty"
+                  >
+                    {item.StockQty}
+                  </td>
+                  <td
+                    className="px-4 py-4 whitespace-nowrap"
+                    data-label="Status"
+                  >
                     <span
-                      className={`inline-block w-24 text-right  py-[2px] rounded-sm text-xs font-medium ${item.Status === "Inactive"
-                        ? "text-red-400"
-                        : "text-green-400"
-                        }`}
+                      className={`inline-block w-24 text-right  py-[2px] rounded-sm text-xs font-medium ${
+                        item.Status === "Inactive"
+                          ? "text-red-400"
+                          : "text-green-400"
+                      }`}
                     >
                       {item.Status}
                     </span>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                  <td
+                    className="px-4 py-4 whitespace-nowrap card-actions-cell"
+                    data-label="Actions"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <ResponsiveEditButton
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1086,6 +1168,7 @@ const MenuManagementPage = () => {
               </h1>
 
               {/* Tab Navigation */}
+
               <div className="flex w-full  items-center justify-center border-b border-gray-200 mt-2 overflow-x-auto">
                 {[
                   "Menu Items",
@@ -1098,10 +1181,14 @@ const MenuManagementPage = () => {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`flex-1 min-w-[60px] px-2  py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab
-                      ? "border-b-2 border-black text-black"
-                      : "text-gray-500 hover:text-black hover:bg-gray-50"
-                      }`}
+                    disabled={tab === "Price" && formData.Displaycat !== "Var"}
+                    className={`flex-1 min-w-[60px] px-2  py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+                      tab === "Price" && formData.Displaycat !== "Var"
+                        ? "text-gray-300 cursor-not-allowed"
+                        : activeTab === tab
+                        ? "border-b-2 border-black text-black"
+                        : "text-gray-500 hover:text-black hover:bg-gray-50"
+                    }`}
                   >
                     {tab}
                   </button>
@@ -1144,7 +1231,10 @@ const MenuManagementPage = () => {
                           <span className="text-sm truncate">
                             {formData.DisplayType || "Select display type"}
                           </span>
-                          <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
+                          <ChevronDown
+                            size={16}
+                            className="text-gray-500 flex-shrink-0"
+                          />
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
                           <DropdownMenu.Content
@@ -1152,7 +1242,7 @@ const MenuManagementPage = () => {
                             sideOffset={6}
                           >
                             <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                            {["Radio", "Select", "Checkbox"].map((type) => (
+                            {["Burger", "Pizza", "Dessert"].map((type) => (
                               <DropdownMenu.Item
                                 key={type}
                                 className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 rounded outline-none"
@@ -1180,7 +1270,10 @@ const MenuManagementPage = () => {
                           <span className="text-sm truncate">
                             {formData.Displaycat || "Select display type"}
                           </span>
-                          <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
+                          <ChevronDown
+                            size={16}
+                            className="text-gray-500 flex-shrink-0"
+                          />
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
                           <DropdownMenu.Content
@@ -1215,22 +1308,17 @@ const MenuManagementPage = () => {
                     </label>
                     <input
                       type="text"
-                      value={formData.Price || ''}
-
+                      value={formData.Price || ""}
+                      disabled={formData.Displaycat === "Var"}
                       onChange={(e) => {
-                        const value = e.target.value;
-                        // Only allow numbers and empty string
-                        if (value === '' || /^\d+$/.test(value)) {
-                          setFormData({
-                            ...formData,
-                            Price: value === '' ? 0 : Number(value)
-                          });
-                        }
-                        // If invalid input, just ignore it (don't update state)
+                        // ... existing onChange logic
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                      placeholder="0"
-                      required
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] ${
+                        formData.Displaycat === "Var"
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : ""
+                      }`}
+                      // ... rest of props
                     />
                   </div>
 
@@ -1264,7 +1352,10 @@ const MenuManagementPage = () => {
                             >
                               Upload a file
                             </button>
-                            <span className="hidden sm:inline"> or drag and drop</span>
+                            <span className="hidden sm:inline">
+                              {" "}
+                              or drag and drop
+                            </span>
                           </div>
                           <p className="text-xs text-gray-500">
                             PNG, JPG, GIF up to 10MB
@@ -1288,7 +1379,6 @@ const MenuManagementPage = () => {
                       />
                     </div>
                   </div>
-
                   {/* Description */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1323,7 +1413,10 @@ const MenuManagementPage = () => {
                           <span className="text-sm truncate">
                             {formData.MealType || "Select meal time"}
                           </span>
-                          <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
+                          <ChevronDown
+                            size={16}
+                            className="text-gray-500 flex-shrink-0"
+                          />
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
                           <DropdownMenu.Content
@@ -1354,18 +1447,17 @@ const MenuManagementPage = () => {
                       </label>
                       <input
                         type="text"
-                        value={formData.Priority || ''}
+                        value={formData.Priority || ""}
                         onChange={(e) => {
                           const value = e.target.value;
                           // Only allow numbers and empty string
-                          if (value === '' || /^\d+$/.test(value)) {
+                          if (value === "" || /^\d+$/.test(value)) {
                             setFormData({
                               ...formData,
-                              Priority: value === '' ? 0 : Number(value)
+                              Priority: value === "" ? 0 : Number(value),
                             });
                           }
-                        }
-                        }
+                        }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                         placeholder="0"
                         required
@@ -1380,14 +1472,14 @@ const MenuManagementPage = () => {
                     </label>
                     <input
                       type="text"
-                      value={formData.MinimumQuantity || ''}
+                      value={formData.MinimumQuantity || ""}
                       onChange={(e) => {
                         const value = e.target.value;
                         // Only allow numbers and empty string
-                        if (value === '' || /^\d+$/.test(value)) {
+                        if (value === "" || /^\d+$/.test(value)) {
                           setFormData({
                             ...formData,
-                            MinimumQuantity: value === '' ? 0 : Number(value)
+                            MinimumQuantity: value === "" ? 0 : Number(value),
                           });
                         }
                         // If invalid input, just ignore it (don't update state)
@@ -1522,20 +1614,37 @@ const MenuManagementPage = () => {
                       <DragDropContext
                         onDragEnd={(result) => {
                           const { source, destination } = result;
-                          if (!destination || source.index === destination.index)
+                          if (
+                            !destination ||
+                            source.index === destination.index
+                          )
                             return;
 
                           const newOptionValue = Array.from(
                             formData.OptionValue || []
                           );
-                          const [movedValue] = newOptionValue.splice(source.index, 1);
-                          newOptionValue.splice(destination.index, 0, movedValue);
+                          const [movedValue] = newOptionValue.splice(
+                            source.index,
+                            1
+                          );
+                          newOptionValue.splice(
+                            destination.index,
+                            0,
+                            movedValue
+                          );
 
                           const newOptionPrice = Array.from(
                             formData.OptionPrice || []
                           );
-                          const [movedPrice] = newOptionPrice.splice(source.index, 1);
-                          newOptionPrice.splice(destination.index, 0, movedPrice);
+                          const [movedPrice] = newOptionPrice.splice(
+                            source.index,
+                            1
+                          );
+                          newOptionPrice.splice(
+                            destination.index,
+                            0,
+                            movedPrice
+                          );
 
                           setFormData({
                             ...formData,
@@ -1551,93 +1660,100 @@ const MenuManagementPage = () => {
                                 ref={provided.innerRef}
                                 {...provided.droppableProps}
                               >
-                                {(formData.OptionValue || []).map((opt, idx) => (
-                                  <Draggable
-                                    key={idx}
-                                    draggableId={`size-${idx}`}
-                                    index={idx}
-                                  >
-                                    {(provided, snapshot) => (
-                                      <tr
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        className={`hover:bg-gray-50 ${snapshot.isDragging
-                                          ? "bg-gray-100 shadow-lg"
-                                          : ""
+                                {(formData.OptionValue || []).map(
+                                  (opt, idx) => (
+                                    <Draggable
+                                      key={idx}
+                                      draggableId={`size-${idx}`}
+                                      index={idx}
+                                    >
+                                      {(provided, snapshot) => (
+                                        <tr
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          className={`hover:bg-gray-50 ${
+                                            snapshot.isDragging
+                                              ? "bg-gray-100 shadow-lg"
+                                              : ""
                                           } border-b border-gray-200`}
-                                      >
-                                        <td
-                                          className="p-3 text-center cursor-grab w-12"
-                                          {...provided.dragHandleProps}
                                         >
-                                          <Grip
-                                            size={18}
-                                            className="text-gray-500 mx-auto"
-                                          />
-                                        </td>
-                                        <td className="p-3">
-                                          <input
-                                            type="text"
-                                            value={opt}
-                                            onChange={(e) => {
-                                              const updated = [
-                                                ...(formData.OptionValue || []),
-                                              ];
-                                              updated[idx] = e.target.value;
-                                              setFormData({
-                                                ...formData,
-                                                OptionValue: updated,
-                                              });
-                                            }}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                                            placeholder="Size name"
-                                          />
-                                        </td>
-                                        <td className="p-3 text-center">
-                                          <input
-                                            type="number"
-                                            step="0.01"
-                                            value={formData.OptionPrice?.[idx] || 0}
-                                            onChange={(e) => {
-                                              const updated = [
-                                                ...(formData.OptionPrice || []),
-                                              ];
-                                              updated[idx] =
-                                                Number(e.target.value) || 0;
-                                              setFormData({
-                                                ...formData,
-                                                OptionPrice: updated,
-                                              });
-                                            }}
-                                            className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
-                                            placeholder="0.00"
-                                          />
-                                        </td>
-                                        <td className="p-3 text-center w-12">
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              const updatedValues = (
-                                                formData.OptionValue || []
-                                              ).filter((_, i) => i !== idx);
-                                              const updatedPrices = (
-                                                formData.OptionPrice || []
-                                              ).filter((_, i) => i !== idx);
-                                              setFormData({
-                                                ...formData,
-                                                OptionValue: updatedValues,
-                                                OptionPrice: updatedPrices,
-                                              });
-                                            }}
-                                            className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                                          <td
+                                            className="p-3 text-center cursor-grab w-12"
+                                            {...provided.dragHandleProps}
                                           >
-                                            <X size={20} />
-                                          </button>
-                                        </td>
-                                      </tr>
-                                    )}
-                                  </Draggable>
-                                ))}
+                                            <Grip
+                                              size={18}
+                                              className="text-gray-500 mx-auto"
+                                            />
+                                          </td>
+                                          <td className="p-3">
+                                            <input
+                                              type="text"
+                                              value={opt}
+                                              onChange={(e) => {
+                                                const updated = [
+                                                  ...(formData.OptionValue ||
+                                                    []),
+                                                ];
+                                                updated[idx] = e.target.value;
+                                                setFormData({
+                                                  ...formData,
+                                                  OptionValue: updated,
+                                                });
+                                              }}
+                                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                                              placeholder="Size name"
+                                            />
+                                          </td>
+                                          <td className="p-3 text-center">
+                                            <input
+                                              type="number"
+                                              step="0.01"
+                                              value={
+                                                formData.OptionPrice?.[idx] || 0
+                                              }
+                                              onChange={(e) => {
+                                                const updated = [
+                                                  ...(formData.OptionPrice ||
+                                                    []),
+                                                ];
+                                                updated[idx] =
+                                                  Number(e.target.value) || 0;
+                                                setFormData({
+                                                  ...formData,
+                                                  OptionPrice: updated,
+                                                });
+                                              }}
+                                              className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
+                                              placeholder="0.00"
+                                            />
+                                          </td>
+                                          <td className="p-3 text-center w-12">
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                const updatedValues = (
+                                                  formData.OptionValue || []
+                                                ).filter((_, i) => i !== idx);
+                                                const updatedPrices = (
+                                                  formData.OptionPrice || []
+                                                ).filter((_, i) => i !== idx);
+                                                setFormData({
+                                                  ...formData,
+                                                  OptionValue: updatedValues,
+                                                  OptionPrice: updatedPrices,
+                                                });
+                                              }}
+                                              className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                                            >
+                                              <X size={20} />
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      )}
+                                    </Draggable>
+                                  )
+                                )}
                                 {provided.placeholder}
                               </tbody>
                             </table>
@@ -1650,14 +1766,21 @@ const MenuManagementPage = () => {
                   {/* Mobile Card View */}
                   <div className="md:hidden space-y-4">
                     {(formData.OptionValue || []).map((opt, idx) => (
-                      <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
+                      <div
+                        key={idx}
+                        className="border border-gray-200 rounded-sm p-4 bg-white"
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <Grip size={18} className="text-gray-500" />
                           <button
                             type="button"
                             onClick={() => {
-                              const updatedValues = (formData.OptionValue || []).filter((_, i) => i !== idx);
-                              const updatedPrices = (formData.OptionPrice || []).filter((_, i) => i !== idx);
+                              const updatedValues = (
+                                formData.OptionValue || []
+                              ).filter((_, i) => i !== idx);
+                              const updatedPrices = (
+                                formData.OptionPrice || []
+                              ).filter((_, i) => i !== idx);
                               setFormData({
                                 ...formData,
                                 OptionValue: updatedValues,
@@ -1671,12 +1794,16 @@ const MenuManagementPage = () => {
                         </div>
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Name
+                            </label>
                             <input
                               type="text"
                               value={opt}
                               onChange={(e) => {
-                                const updated = [...(formData.OptionValue || [])];
+                                const updated = [
+                                  ...(formData.OptionValue || []),
+                                ];
                                 updated[idx] = e.target.value;
                                 setFormData({
                                   ...formData,
@@ -1688,13 +1815,17 @@ const MenuManagementPage = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Price
+                            </label>
                             <input
                               type="number"
                               step="0.01"
                               value={formData.OptionPrice?.[idx] || 0}
                               onChange={(e) => {
-                                const updated = [...(formData.OptionPrice || [])];
+                                const updated = [
+                                  ...(formData.OptionPrice || []),
+                                ];
                                 updated[idx] = Number(e.target.value) || 0;
                                 setFormData({
                                   ...formData,
@@ -1721,7 +1852,7 @@ const MenuManagementPage = () => {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger className="w-full sm:flex-1 flex items-center justify-between px-4 py-2 text-black rounded-sm hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
-                        <span className="text-sm">Add New Size Option</span>
+                        <span className="text-sm">Add New Option</span>
                         <ChevronDown size={16} className="text-gray-500" />
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>
@@ -1730,7 +1861,7 @@ const MenuManagementPage = () => {
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-                          {sizeOptions.map((size, i) => (
+                          {sizeOptionss.map((size, i) => (
                             <DropdownMenu.Item
                               key={i}
                               className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
@@ -1777,10 +1908,18 @@ const MenuManagementPage = () => {
                         <thead>
                           <tr>
                             <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                            <th className="p-3 text-left text-sm font-medium text-gray-700">Name</th>
-                            <th className="w-24 p-3 text-center text-sm font-medium text-gray-700">Price</th>
-                            <th className="w-20 p-3 text-center text-sm font-medium text-gray-700">Override</th>
-                            <th className="w-20 p-3 text-center text-sm font-medium text-gray-700">Status</th>
+                            <th className="p-3 text-left text-sm font-medium text-gray-700">
+                              Name
+                            </th>
+                            <th className="w-24 p-3 text-center text-sm font-medium text-gray-700">
+                              Price
+                            </th>
+                            <th className="w-20 p-3 text-center text-sm font-medium text-gray-700">
+                              Override
+                            </th>
+                            <th className="w-20 p-3 text-center text-sm font-medium text-gray-700">
+                              Status
+                            </th>
                             <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
                           </tr>
                         </thead>
@@ -1791,15 +1930,28 @@ const MenuManagementPage = () => {
                       <DragDropContext
                         onDragEnd={(result) => {
                           const { source, destination } = result;
-                          if (!destination || source.index === destination.index)
+                          if (
+                            !destination ||
+                            source.index === destination.index
+                          )
                             return;
 
-                          const newMealValue = Array.from(formData.MealValue || []);
-                          const [movedValue] = newMealValue.splice(source.index, 1);
+                          const newMealValue = Array.from(
+                            formData.MealValue || []
+                          );
+                          const [movedValue] = newMealValue.splice(
+                            source.index,
+                            1
+                          );
                           newMealValue.splice(destination.index, 0, movedValue);
 
-                          const newMealPrice = Array.from(formData.MealPrice || []);
-                          const [movedPrice] = newMealPrice.splice(source.index, 1);
+                          const newMealPrice = Array.from(
+                            formData.MealPrice || []
+                          );
+                          const [movedPrice] = newMealPrice.splice(
+                            source.index,
+                            1
+                          );
                           newMealPrice.splice(destination.index, 0, movedPrice);
 
                           setFormData({
@@ -1826,10 +1978,11 @@ const MenuManagementPage = () => {
                                       <tr
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
-                                        className={`hover:bg-gray-50 ${snapshot.isDragging
-                                          ? "bg-gray-100 shadow-lg"
-                                          : ""
-                                          } border-b border-gray-200`}
+                                        className={`hover:bg-gray-50 ${
+                                          snapshot.isDragging
+                                            ? "bg-gray-100 shadow-lg"
+                                            : ""
+                                        } border-b border-gray-200`}
                                       >
                                         <td
                                           className="p-3 text-center cursor-grab w-12"
@@ -1862,7 +2015,9 @@ const MenuManagementPage = () => {
                                           <input
                                             type="number"
                                             step="0.01"
-                                            value={formData.MealPrice?.[idx] || 0}
+                                            value={
+                                              formData.MealPrice?.[idx] || 0
+                                            }
                                             onChange={(e) => {
                                               const updated = [
                                                 ...(formData.MealPrice || []),
@@ -1881,7 +2036,8 @@ const MenuManagementPage = () => {
                                         <td className="p-3 text-center">
                                           <ButtonPage
                                             checked={
-                                              formData.OverRide?.[idx] === "Active"
+                                              formData.OverRide?.[idx] ===
+                                              "Active"
                                             }
                                             onChange={(checked) => {
                                               const updated = [
@@ -1900,7 +2056,8 @@ const MenuManagementPage = () => {
                                         <td className="p-3 text-center">
                                           <ButtonPage
                                             checked={
-                                              formData.Status?.[idx] === "Active"
+                                              formData.Status?.[idx] ===
+                                              "Active"
                                             }
                                             onChange={(checked) => {
                                               const updated = [
@@ -1953,14 +2110,21 @@ const MenuManagementPage = () => {
                   {/* Mobile Card View for Meal Tab */}
                   <div className="lg:hidden space-y-4">
                     {(formData.MealValue || []).map((opt, idx) => (
-                      <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
+                      <div
+                        key={idx}
+                        className="border border-gray-200 rounded-sm p-4 bg-white"
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <Grip size={18} className="text-gray-500" />
                           <button
                             type="button"
                             onClick={() => {
-                              const updatedValues = (formData.MealValue || []).filter((_, i) => i !== idx);
-                              const updatedPrices = (formData.MealPrice || []).filter((_, i) => i !== idx);
+                              const updatedValues = (
+                                formData.MealValue || []
+                              ).filter((_, i) => i !== idx);
+                              const updatedPrices = (
+                                formData.MealPrice || []
+                              ).filter((_, i) => i !== idx);
                               setFormData({
                                 ...formData,
                                 MealValue: updatedValues,
@@ -1974,7 +2138,9 @@ const MenuManagementPage = () => {
                         </div>
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Name
+                            </label>
                             <input
                               type="text"
                               value={opt}
@@ -1991,7 +2157,9 @@ const MenuManagementPage = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Price
+                            </label>
                             <input
                               type="number"
                               step="0.01"
@@ -2009,7 +2177,9 @@ const MenuManagementPage = () => {
                             />
                           </div>
                           <div className="flex items-center justify-between">
-                            <label className="block text-xs font-medium text-gray-700">Override</label>
+                            <label className="block text-xs font-medium text-gray-700">
+                              Override
+                            </label>
                             <ButtonPage
                               checked={formData.OverRide?.[idx] === "Active"}
                               onChange={(checked) => {
@@ -2023,7 +2193,9 @@ const MenuManagementPage = () => {
                             />
                           </div>
                           <div className="flex items-center justify-between">
-                            <label className="block text-xs font-medium text-gray-700">Status</label>
+                            <label className="block text-xs font-medium text-gray-700">
+                              Status
+                            </label>
                             <ButtonPage
                               checked={formData.Status?.[idx] === "Active"}
                               onChange={(checked) => {
@@ -2101,18 +2273,18 @@ const MenuManagementPage = () => {
                     </label>
                     <input
                       type="text"
-                      value={formData.SpecialPrice|| ''}
+                      value={formData.SpecialPrice || ""}
                       onChange={(e) => {
-                    const value = e.target.value;
-                    // Only allow numbers and empty string
-                    if (value === '' || /^\d+$/.test(value)) {
-                      setFormData({
-                        ...formData,
-                      SpecialPrice: value === '' ? 0 : Number(value)
-                      });
-                    }
-                    // If invalid input, just ignore it (don't update state)
-                  }}
+                        const value = e.target.value;
+                        // Only allow numbers and empty string
+                        if (value === "" || /^\d+$/.test(value)) {
+                          setFormData({
+                            ...formData,
+                            SpecialPrice: value === "" ? 0 : Number(value),
+                          });
+                        }
+                        // If invalid input, just ignore it (don't update state)
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                       placeholder="499.00"
                     />
@@ -2159,15 +2331,24 @@ const MenuManagementPage = () => {
                       <DragDropContext
                         onDragEnd={(result) => {
                           const { source, destination } = result;
-                          if (!destination || source.index === destination.index)
+                          if (
+                            !destination ||
+                            source.index === destination.index
+                          )
                             return;
 
                           const newPValue = Array.from(formData.PName);
-                          const [movedValue] = newPValue.splice(source.index, 1);
+                          const [movedValue] = newPValue.splice(
+                            source.index,
+                            1
+                          );
                           newPValue.splice(destination.index, 0, movedValue);
 
                           const newPPrice = Array.from(formData.PPrice);
-                          const [movedPrice] = newPPrice.splice(source.index, 1);
+                          const [movedPrice] = newPPrice.splice(
+                            source.index,
+                            1
+                          );
                           newPPrice.splice(destination.index, 0, movedPrice);
 
                           setFormData({
@@ -2194,10 +2375,11 @@ const MenuManagementPage = () => {
                                       <tr
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
-                                        className={`hover:bg-gray-50 ${snapshot.isDragging
-                                          ? "bg-gray-100 shadow-lg"
-                                          : ""
-                                          } border-b border-gray-200`}
+                                        className={`hover:bg-gray-50 ${
+                                          snapshot.isDragging
+                                            ? "bg-gray-100 shadow-lg"
+                                            : ""
+                                        } border-b border-gray-200`}
                                       >
                                         <td
                                           className="p-3 text-center cursor-grab w-12"
@@ -2213,7 +2395,9 @@ const MenuManagementPage = () => {
                                             type="text"
                                             value={opt}
                                             onChange={(e) => {
-                                              const updated = [...formData.PName];
+                                              const updated = [
+                                                ...formData.PName,
+                                              ];
                                               updated[idx] = e.target.value;
                                               setFormData({
                                                 ...formData,
@@ -2228,7 +2412,9 @@ const MenuManagementPage = () => {
                                             type="number"
                                             value={formData.PPrice[idx]}
                                             onChange={(e) => {
-                                              const updated = [...formData.PPrice];
+                                              const updated = [
+                                                ...formData.PPrice,
+                                              ];
                                               updated[idx] =
                                                 Number(e.target.value) || 0;
                                               setFormData({
@@ -2243,12 +2429,14 @@ const MenuManagementPage = () => {
                                           <button
                                             type="button"
                                             onClick={() => {
-                                              const updatedValues = formData.PName.filter(
-                                                (_, i) => i !== idx
-                                              );
-                                              const updatedPrices = formData.PPrice.filter(
-                                                (_, i) => i !== idx
-                                              );
+                                              const updatedValues =
+                                                formData.PName.filter(
+                                                  (_, i) => i !== idx
+                                                );
+                                              const updatedPrices =
+                                                formData.PPrice.filter(
+                                                  (_, i) => i !== idx
+                                                );
                                               setFormData({
                                                 ...formData,
                                                 PName: updatedValues,
@@ -2294,14 +2482,21 @@ const MenuManagementPage = () => {
                   {/* Mobile Card View for Price Tab */}
                   <div className="md:hidden space-y-4">
                     {formData.PName.map((opt, idx) => (
-                      <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
+                      <div
+                        key={idx}
+                        className="border border-gray-200 rounded-sm p-4 bg-white"
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <Grip size={18} className="text-gray-500" />
                           <button
                             type="button"
                             onClick={() => {
-                              const updatedValues = formData.PName.filter((_, i) => i !== idx);
-                              const updatedPrices = formData.PPrice.filter((_, i) => i !== idx);
+                              const updatedValues = formData.PName.filter(
+                                (_, i) => i !== idx
+                              );
+                              const updatedPrices = formData.PPrice.filter(
+                                (_, i) => i !== idx
+                              );
                               setFormData({
                                 ...formData,
                                 PName: updatedValues,
@@ -2315,7 +2510,9 @@ const MenuManagementPage = () => {
                         </div>
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Name
+                            </label>
                             <input
                               type="text"
                               value={opt}
@@ -2332,7 +2529,9 @@ const MenuManagementPage = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Price
+                            </label>
                             <input
                               type="number"
                               step="0.01"
@@ -2370,10 +2569,11 @@ const MenuManagementPage = () => {
                 type="button"
                 onClick={handleModalSubmit}
                 disabled={actionLoading || !isFormValid()}
-                className={`px-4 py-2 min-w-[120px] rounded-sm transition-colors text-white order-1 sm:order-2 ${actionLoading || !isFormValid()
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-black hover:bg-gray-700"
-                  }`}
+                className={`px-4 py-2 min-w-[120px] rounded-sm transition-colors text-white order-1 sm:order-2 ${
+                  actionLoading || !isFormValid()
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-black hover:bg-gray-700"
+                }`}
               >
                 {actionLoading ? (
                   <div className="flex items-center gap-2 justify-center">
@@ -2390,7 +2590,6 @@ const MenuManagementPage = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

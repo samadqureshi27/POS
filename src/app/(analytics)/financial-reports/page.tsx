@@ -1,11 +1,13 @@
 // app/analytics/page.tsx
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Search, ArrowLeft, Star, ChevronDown, Users, TrendingUp, DollarSign, ShoppingCart, Calendar, Filter } from "lucide-react";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useRouter } from 'next/navigation';
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { DateRange } from "react-date-range";
+import { format } from "date-fns";
 
 // Types
 interface CustomerItem {
@@ -176,36 +178,14 @@ const StarRating = ({ rating }: { rating: number }) => {
 const MetricCard = ({ 
   title, 
   value, 
-  icon: Icon, 
-  color = "blue",
   subtitle,
-  trend
 }: { 
   title: string; 
   value: string | number; 
-  icon: React.ComponentType<any>; 
-  color?: "blue" | "green" | "yellow" | "purple" | "red";
   subtitle?: string;
-  trend?: string;
 }) => {
-  const colorClasses = {
-    blue: "text-blue-500",
-    green: "text-green-500", 
-    yellow: "text-yellow-500",
-    purple: "text-purple-500",
-    red: "text-red-500"
-  };
-
   return (
     <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <Icon size={24} className={colorClasses[color]} />
-        {trend && (
-          <span className={`text-sm ${trend.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
-            {trend}
-          </span>
-        )}
-      </div>
       <div className="space-y-1">
         <p className="text-3xl font-bold">{value}</p>
         <p className="text-sm text-gray-500">{title}</p>
@@ -461,13 +441,129 @@ const AnalyticsDashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [timeFilter, setTimeFilter] = useState("This Month");
+
+  // Date/Period related states
+  const periods = ["Today", "Week", "Month", "Quarter", "Year", "Custom"];
+  const [selectedPeriod, setSelectedPeriod] = useState("Week");
+  const [lastUpdated, setLastUpdated] = useState<string>("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [customDateRange, setCustomDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
+
+  // Date Range state
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+  const [startDate, endDate] = dateRange;
+
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadDashboardData();
   }, []);
 
-  const loadDashboardData = async () => {
+  // Auto-fetch when range selected
+  useEffect(() => {
+    if (startDate && endDate) {
+      const startStr = startDate.toISOString().split("T")[0];
+      const endStr = endDate.toISOString().split("T")[0];
+      handleCustomDateRange(startStr, endStr);
+    }
+  }, [startDate, endDate]);
+
+  // Close calendar when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target as Node)
+      ) {
+        setShowDatePicker(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const getPeriodLabel = () => {
+    const today = new Date();
+
+    switch (selectedPeriod) {
+      case "Today":
+        return `Today, ${format(today, "dd MMMM yyyy")}`;
+
+      case "Yesterday": {
+        const y = new Date();
+        y.setDate(today.getDate() - 1);
+        return `Yesterday, ${format(y, "dd MMMM yyyy")}`;
+      }
+
+      case "Week": {
+        const start = new Date(today);
+        start.setDate(today.getDate() - today.getDay());
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        return `This week, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+      }
+
+      case "Month": {
+        const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        return `This month, ${format(start, "dd MMM")} - ${format(end, "dd MMM yyyy")}`;
+      }
+
+      case "Quarter": {
+        const currentMonth = today.getMonth();
+        const quarter = Math.floor(currentMonth / 3);
+        const start = new Date(today.getFullYear(), quarter * 3, 1);
+        const end = new Date(today.getFullYear(), quarter * 3 + 3, 0);
+        return `This quarter (Q${quarter + 1}), ${format(start, "dd MMM")} - ${format(
+          end,
+          "dd MMM yyyy"
+        )}`;
+      }
+
+      case "Year": {
+        const start = new Date(today.getFullYear(), 0, 1);
+        const end = new Date(today.getFullYear(), 11, 31);
+        return `This year, ${format(start, "dd MMM yyyy")} - ${format(end, "dd MMM yyyy")}`;
+      }
+
+      case "Custom": {
+        if (
+          customDateRange &&
+          customDateRange.length > 0 &&
+          customDateRange[0].startDate &&
+          customDateRange[0].endDate
+        ) {
+          return `${format(customDateRange[0].startDate, "dd MMM yyyy")} - ${format(
+            customDateRange[0].endDate,
+            "dd MMM yyyy"
+          )}`;
+        }
+        return "Custom range";
+      }
+
+      default:
+        return "";
+    }
+  };
+
+  const handleCustomDateRange = async (startDate: string, endDate: string) => {
+    setSelectedPeriod("Custom");
+    await loadCustomRangeData();
+  };
+
+  const loadDashboardData = async (period?: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -495,6 +591,41 @@ const AnalyticsDashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadCustomRangeData = async () => {
+    if (!customDateRange[0].startDate || !customDateRange[0].endDate) return;
+
+    const startDate = customDateRange[0].startDate.toISOString().split("T")[0];
+    const endDate = customDateRange[0].endDate.toISOString().split("T")[0];
+
+    try {
+      setLoading(true);
+      const response = await AnalyticsAPI.getAnalyticsData();
+      if (response.success) {
+        setAnalyticsData(response.data);
+      } else {
+        throw new Error(response.message || "Failed to fetch custom range data");
+      }
+    } catch (error) {
+      console.error("Error fetching custom range data:", error);
+      setError("Failed to load custom date range data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDisplayDate = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
+
+  const handlePeriodChange = async (period: string) => {
+    setSelectedPeriod(period);
+    setShowDatePicker(false);
+    await loadDashboardData(period);
   };
 
   const handleBackClick = () => {
@@ -557,36 +688,82 @@ const AnalyticsDashboard = () => {
   return (
     <div className="bg-gray-50 min-h-screen p-6 mt-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          
+      <div className="mb-8">
+        <div className="flex items-center gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-semibold">Analytics Dashboard</h1>
             <p className="text-gray-500 text-sm mt-1">Customer Analytics • Customer Reports • Financial Reports</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-4">
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger className="px-4 py-2 border border-gray-300 rounded-sm bg-white flex items-center gap-2 hover:bg-gray-50 focus:outline-none">
-              <Calendar size={16} />
-              {timeFilter}
-              <ChevronDown size={14} />
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content className="min-w-[180px] rounded-md bg-white shadow-md border p-1 outline-none" sideOffset={6}>
-                {["Today", "This Week", "This Month", "This Quarter", "This Year"].map((period) => (
-                  <DropdownMenu.Item 
-                    key={period}
-                    className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                    onClick={() => setTimeFilter(period)}
-                  >
-                    {period}
-                  </DropdownMenu.Item>
-                ))}
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+        {/* Time Period Buttons */}
+        <div className="flex mb-6 sm:mb-8 relative max-w-[88vw]">
+          <div className="flex overflow-x-auto pb-2 gap-2 w-full hide-scrollbar">
+            {periods.map((period) => (
+              <div key={period} className="relative flex-shrink-0">
+                <button
+                  onClick={() => {
+                    if (period === "Custom") {
+                      setSelectedPeriod("Custom");
+                      setShowDatePicker((prev) => !prev);
+                    } else {
+                      handlePeriodChange(period);
+                      setShowDatePicker(false);
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors border ${selectedPeriod === period
+                    ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
+                    : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
+                    }`}
+                >
+                  {period === "Custom" && <Calendar size={16} />}
+                  <span className="whitespace-nowrap">
+                    {period === "Custom" &&
+                      customDateRange?.[0]?.startDate &&
+                      customDateRange?.[0]?.endDate
+                      ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
+                      : period}
+                  </span>
+                </button>
+
+                {/* Calendar dropdown attached to Custom button */}
+                {period === "Custom" &&
+                  selectedPeriod === "Custom" &&
+                  showDatePicker && (
+                    <div
+                      ref={calendarRef}
+                      className="fixed z-50 mt-2 w-64 h-64 md:w-80 md:h-80 bg-white shadow-lg border border-gray-200 rounded-sm"
+                      style={{
+                        top: '120px', // Adjust based on your header height
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: 'min(320px, calc(100vw - 32px))', // Responsive width
+                        height: 'min(320px, calc(100vh - 200px))', // Responsive height
+                      }}
+                    >
+                      <DateRange
+                        ranges={customDateRange?.length ? customDateRange : [{
+                          startDate: new Date(),
+                          endDate: new Date(),
+                          key: "selection",
+                        }]}
+                        onChange={(ranges) => {
+                          if (ranges.selection) {
+                            setCustomDateRange([ranges.selection]);
+
+                            if (ranges.selection.startDate && ranges.selection.endDate) {
+                              setShowDatePicker(false);
+                            }
+                          }
+                        }}
+                        moveRangeOnFirstSelection={false}
+                        className="rounded-lg calendar-mobile-responsive"
+                      />
+                    </div>
+                  )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -595,33 +772,21 @@ const AnalyticsDashboard = () => {
         <MetricCard
           title="Total Customers"
           value={analyticsData.totalCustomers}
-          icon={Users}
-          color="blue"
-          trend="+12%"
           subtitle="Active customers"
         />
         <MetricCard
           title="Total Revenue"
           value={`PKR ${analyticsData.totalRevenue.toLocaleString()}`}
-          icon={DollarSign}
-          color="green"
-          trend="+8.5%"
           subtitle="All time revenue"
         />
         <MetricCard
           title="Total Orders"
           value={analyticsData.totalOrders}
-          icon={ShoppingCart}
-          color="purple"
-          trend="+15%"
           subtitle="All orders placed"
         />
         <MetricCard
           title="Avg Order Value"
           value={`PKR ${analyticsData.averageOrderValue}`}
-          icon={TrendingUp}
-          color="yellow"
-          trend="+3.2%"
           subtitle="Per order average"
         />
       </div>
@@ -631,28 +796,19 @@ const AnalyticsDashboard = () => {
         <MetricCard
           title="New Customers"
           value={analyticsData.newCustomersThisMonth}
-          icon={Users}
-          color="blue"
           subtitle="This month"
         />
         <MetricCard
           title="Monthly Revenue"
           value={`PKR ${analyticsData.monthlyRevenue.toLocaleString()}`}
-          icon={DollarSign}
-          color="green"
           subtitle="Current month"
         />
         <MetricCard
           title="Repeat Customers"
           value={analyticsData.repeatCustomers}
-          icon={Users}
-          color="purple"
           subtitle="Returning customers"
         />
         <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <Star size={24} className="text-yellow-500" />
-          </div>
           <div className="space-y-2">
             <p className="text-3xl font-bold">{analyticsData.customerSatisfaction}</p>
             <p className="text-sm text-gray-500">Customer Satisfaction</p>
@@ -683,7 +839,7 @@ const AnalyticsDashboard = () => {
           </div>
           <div className="p-6">
             <div className="space-y-4">
-              {topCustomers.map((customer, index) => (
+              {topCustomers.map((customer) => (
                 <div key={customer.Customer_ID} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-[#2c2c2c] rounded-full flex items-center justify-center text-white text-sm">
@@ -742,9 +898,9 @@ const AnalyticsDashboard = () => {
                     <td className="px-6 py-4 text-sm">{order.Order_ID}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                        order.Type === "Dine in" ? "text-yellow-600 bg-yellow-100" : 
-                        order.Type === "Takeaway" ? "text-green-600 bg-green-100" : 
-                        "text-blue-600 bg-blue-100"
+                        order.Type === "Dine in" ? "text-yellow-400 " : 
+                        order.Type === "Takeaway" ? "text-green-400 " : 
+                        "text-blue-400 "
                       }`}>
                         {order.Type}
                       </span>
@@ -752,8 +908,8 @@ const AnalyticsDashboard = () => {
                     <td className="px-6 py-4 text-sm font-medium">PKR {order.Total.toLocaleString()}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                        order.Status === "Completed" ? "text-green-600 bg-green-100" :
-                        order.Status === "Pending" ? "text-blue-600 bg-blue-100" :
+                        order.Status === "Completed" ? "text-green-400 " :
+                        order.Status === "Pending" ? "text-blue-400 " :
                         "text-red-600 bg-red-100"
                       }`}>
                         {order.Status}

@@ -1226,67 +1226,74 @@ const Dashboard = () => {
         </div>
 
         {/* Time Period Buttons */}
-        <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center relative">
-          {periods.map((period) => (
-            <div key={period} className="relative">
-              <button
-                onClick={() => {
-                  if (period === "Custom") {
-                    setSelectedPeriod("Custom");
-                    setShowDatePicker((prev) => !prev);
-                  } else {
-                    setSelectedPeriod(period);
-                    setShowDatePicker(false);
-                    handlePeriodChange(period);
-                  }
-                }}
-                disabled={loading}
-                className={`flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors disabled:opacity-50 ${
-                  selectedPeriod === period
-                    ? "bg-gray-800 text-white"
-                    : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-                }`}
-              >
-                {period === "Custom" && <Calendar size={16} />}
-                {period === "Custom" &&
-                customDateRange?.[0]?.startDate &&
-                customDateRange?.[0]?.endDate
-                  ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
-                  : period}
-              </button>
-
-              {/* Calendar dropdown attached to Custom button */}
-              {period === "Custom" &&
-                selectedPeriod === "Custom" &&
-                showDatePicker && (
-                  <div 
-                    ref={calendarRef}
-                    className="absolute z-50 mt-2 w-64 h-64 bg-white shadow-lg border border-gray-200 rounded-md"
-                  >
-                    <DateRange
-                      ranges={customDateRange?.length ? customDateRange : [{
-                        startDate: new Date(),
-                        endDate: new Date(),
-                        key: "selection",
-                      }]}
-                      onChange={(ranges) => {
-                        if (ranges.selection) {
-                          setCustomDateRange([ranges.selection]);
-
-                          if (ranges.selection.startDate && ranges.selection.endDate) {
-                            loadCustomRangeData();
+        <div className="flex mb-6 sm:mb-8 relative max-w-[88vw]">
+                <div className="flex overflow-x-auto pb-2 gap-2 w-full hide-scrollbar">
+                  {periods.map((period) => (
+                    <div key={period} className="relative flex-shrink-0">
+                      <button
+                        onClick={() => {
+                          if (period === "Custom") {
+                            setSelectedPeriod("Custom");
+                            setShowDatePicker((prev) => !prev);
+                          } else {
+                            handlePeriodChange(period);
                             setShowDatePicker(false);
                           }
-                        }
-                      }}
-                      moveRangeOnFirstSelection={false}
-                      className="rounded-lg"
-                    />
-                  </div>
-                )}
-            </div>
-          ))}
-        </div>
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors border ${selectedPeriod === period
+                          ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
+                          : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
+                          }`}
+                      >
+                        {period === "Custom" && <Calendar size={16} />}
+                        <span className="whitespace-nowrap">
+                          {period === "Custom" &&
+                            customDateRange?.[0]?.startDate &&
+                            customDateRange?.[0]?.endDate
+                            ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
+                            : period}
+                        </span>
+                      </button>
+        
+                      {/* Calendar dropdown attached to Custom button */}
+                      {period === "Custom" &&
+                        selectedPeriod === "Custom" &&
+                        showDatePicker && (
+                          <div
+                            ref={calendarRef}
+                            className="fixed z-50 mt-2 w-64 h-64 md:w-80 md:h-80 bg-white shadow-lg border border-gray-200 rounded-sm"
+                            style={{
+                              top: '120px', // Adjust based on your header height
+                              left: '50%',
+                              transform: 'translateX(-50%)',
+                              width: 'min(320px, calc(100vw - 32px))', // Responsive width
+                              height: 'min(320px, calc(100vh - 200px))', // Responsive height
+                            }}
+                          >
+                            <DateRange
+                              ranges={customDateRange?.length ? customDateRange : [{
+                                startDate: new Date(),
+                                endDate: new Date(),
+                                key: "selection",
+                              }]}
+                              onChange={(ranges) => {
+                                if (ranges.selection) {
+                                  setCustomDateRange([ranges.selection]);
+        
+                                  if (ranges.selection.startDate && ranges.selection.endDate) {
+                                    setShowDatePicker(false);
+                                  }
+                                }
+                              }}
+                              moveRangeOnFirstSelection={false}
+                              className="rounded-lg calendar-mobile-responsive"
+                            />
+                          </div>
+                        )}
+                    </div>
+                  ))}
+                </div>
+              </div>
 
         {/* Metrics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
@@ -1319,9 +1326,9 @@ const Dashboard = () => {
        
 
         {/* Customer Analytics Section */}
-        <div className="bg-white p-4 rounded-sm shadow-sm border border-gray-200 mb-6 sm:mb-8">
+        <div className="bg-white md:p-4 rounded-sm shadow-sm border border-gray-200 mb-6 sm:mb-8">
           <div className="w-full">
-            <p className="text-lg font-bold text-gray-500">
+            <p className="pt-5 pl-2 md:pt-0 md:pl-0 text-lg font-bold text-gray-500">
               {getPeriodLabel()}
             </p>
             <HorizontalSeparator margin="1rem 0 0 0" />
@@ -1331,39 +1338,43 @@ const Dashboard = () => {
             {/* Left side - Main chart area */}
             <div className="flex-1 min-w-0 w-[100%]">
               {/* Top metrics row */}
-              <div className="grid grid-cols-3 gap-6 mb-6">
-                {/* Total visits */}
-                <div className="border-r pt-4 pr-4 border-gray-300">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm text-gray-500">Total Revenue</p>
-                    <div className="flex items-center text-green-500">
-                      <span className="text-sm font-medium">+1,023</span>
-                      <TrendingUp size={12} className="ml-1" />
-                    </div>
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-900">1,731</h3>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+  {/* Total visits */}
+  <div className="border-b md:border-r md:border-b-0 p-4 border-gray-300">
+    <div className="flex items-center justify-between mb-2">
+      <p className=" text-sm text-gray-500">Total Revenue</p>
+      <div className="flex items-center text-green-500">
+        <span className="text-sm font-medium">+1,023</span>
+        <TrendingUp size={12} className="ml-1" />
+      </div>
+    </div>
+    <h3 className="text-3xl font-bold text-gray-900">1,731</h3>
+  </div>
 
-                {/* Repeat customers */}
-                <div className="border-r pt-4 pr-4 border-gray-300">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm text-gray-500">Total Expense</p>
-                    <div className="flex items-center text-green-500">
-                      <span className="text-sm font-medium">+125</span>
-                      <TrendingUp size={12} className="ml-1" />
-                    </div>
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-900">258</h3>
-                </div>
+  {/* Repeat customers */}
+  <div className="border-b md:border-r md:border-b-0 p-4 border-gray-300">
+    <div className="flex items-center justify-between mb-2">
+      <p className="text-sm text-gray-500">Total Expense</p>
+      <div className="flex items-center text-green-500">
+        <span className="text-sm font-medium">+125</span>
+        <TrendingUp size={12} className="ml-1" />
+      </div>
+    </div>
+    <h3 className="text-3xl font-bold text-gray-900">258</h3>
+  </div>
 
-                {/* Last period */}
-                <div>
-                  <p className="text-sm pt-4 pr-4 text-gray-500 mb-2">
-                    Total Orders
-                  </p>
-                  <h3 className="text-3xl font-bold text-gray-900">133</h3>
-                </div>
-              </div>
+  {/* Last period */}
+  <div className="border-b md:border-none p-4 border-gray-300">
+    <div className="flex items-center justify-between mb-2">
+      <p className="text-sm text-gray-500">Total Orders</p>
+      <div className="flex items-center text-green-500">
+        <span className="text-sm font-medium">+95</span>
+        <TrendingUp size={12} className="ml-1" />
+      </div>
+    </div>
+    <h3 className="text-3xl font-bold text-gray-900">98</h3>
+  </div>
+</div>
               
               {/* Chart */}
 <div className="w-[100%] min-w-0">
@@ -1487,7 +1498,7 @@ const Dashboard = () => {
             {/* Right side - Stats cards */}
             <div className="lg:w-80 flex-shrink-0 border-l border-gray-300 space-y-6">
               {/* Repeat customers card */}
-              <div className="p-4 border-b border-gray-300">
+              <div className="p-4 border-b border-t md:border-t-0 border-gray-300">
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-4xl pb-8 font-bold text-gray-900">
                     258
@@ -1553,69 +1564,77 @@ const Dashboard = () => {
               
             </div>
 
-            <div className="h-64 sm:h-80">
+            <div className="h-64 md:h-80 ">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={dashboardData.revenueData}
-                  margin={{ top: 10, right: 20, left: 10, bottom: 0 }}
-                >
-                  <XAxis
-                    dataKey="day"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: "#6B7280" }}
-                    tickFormatter={(value, index) => {
-                      const item = dashboardData.revenueData[index];
-                      return `${value}\n${item?.date}`;
-                    }}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: "#6B7280" }}
-                    tickFormatter={(value) =>
-                      value >= 1000 ? `${value / 1000}K` : value.toString()
-                    }
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#301bcbff"
-                    strokeWidth={2}
-                    dot={{ fill: "#3c1ae4ff", strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: "#8783dfff" }}
-                    connectNulls={false}
-                    isAnimationActive={true}
-                    animationDuration={1500}
-                    animationEasing="ease-in-out"
-                    animationBegin={0}
-                    strokeDasharray="0"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#fff",
-                      border: "1px solid #175be2ff",
-                      borderRadius: "8px",
-                      padding: "8px",
-                      fontSize: "12px",
-                    }}
-                    labelFormatter={(label, payload) => {
-                      const dataPoint = dashboardData.revenueData.find(
-                        (d) => d.day === label
-                      );
-                      return `${dataPoint?.day} (${dataPoint?.date})`;
-                    }}
-                    formatter={(value: number, name: string, props: any) => [
-                      `${value}`,
-                      "Revenue",
-                      `${props.payload?.orders || 0} orders`,
-                    ]}
-                    cursor={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+  <LineChart
+    data={dashboardData.revenueData}
+    margin={{ top: 10, right: 20, left: 10, bottom: 0 }}
+  >
+    <XAxis
+      dataKey="day"
+      axisLine={false}
+      tickLine={false}
+      tick={{ fontSize: 12, fill: "#6B7280" }}
+      interval={0}
+      angle={0}
+      textAnchor="middle"
+      height={60}
+       padding={{ left: 20, right: 20 }}
+      tickFormatter={(value) => {
+        // Shorten day names if needed
+        const dayMap = {
+          'Monday': 'Mon',
+          'Tuesday': 'Tue', 
+          'Wednesday': 'Wed',
+          'Thursday': 'Thu',
+          'Friday': 'Fri',
+          'Saturday': 'Sat',
+          'Sunday': 'Sun'
+        };
+        return dayMap[value] || value;
+      }}
+    />
+    
+    <Line
+      type="monotone"
+      dataKey="value"
+      stroke="#301bcbff"
+      strokeWidth={2}
+      dot={{ fill: "#3c1ae4ff", strokeWidth: 2, r: 4 }}
+      activeDot={{ r: 6, fill: "#8783dfff" }}
+      connectNulls={false}
+      isAnimationActive={true}
+      animationDuration={1500}
+      animationEasing="ease-in-out"
+      animationBegin={0}
+      strokeDasharray="0"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    
+    <Tooltip
+      contentStyle={{
+        backgroundColor: "#fff",
+        border: "1px solid #175be2ff",
+        borderRadius: "8px",
+        padding: "8px",
+        fontSize: "12px",
+      }}
+      labelFormatter={(label, payload) => {
+        const dataPoint = dashboardData.revenueData.find(
+          (d) => d.day === label
+        );
+        return `${dataPoint?.day} (${dataPoint?.date})`;
+      }}
+      formatter={(value, name, props) => [
+        `${value}`,
+        "Revenue",
+        `${props.payload?.orders || 0} orders`,
+      ]}
+      cursor={false}
+    />
+  </LineChart>
+</ResponsiveContainer>
             </div>
           </div>
 
