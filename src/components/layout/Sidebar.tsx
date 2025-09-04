@@ -32,7 +32,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar - Left side, vertical */}
-      <aside className="hidden md:block fixed left-0 top-0 h-screen bg-[#D1AB35] w-16 z-30">
+      <aside className="hidden md:block fixed left-0 top-0 h-screen bg-[#D1AB35] w-18 z-30">
         {/* Menu Items */}
         <nav className="h-full flex flex-col justify-center items-center gap-1 p-4">
           {menuItems.map((item, idx) => (
@@ -46,13 +46,11 @@ export default function Sidebar() {
               </span>
 
               {/* Desktop Tooltip */}
-              {/* 🔴 CHANGED: Added z-50 */}
               <span className="pointer-events-none absolute left-12 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-white px-2 py-1 text-xs text-[#454545] shadow-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition z-50">
                 {item.label}
               </span>
 
               {/* Desktop Tooltip arrow */}
-              {/* 🔴 CHANGED: Added z-50 */}
               <span
                 aria-hidden
                 className="pointer-events-none absolute left-11 top-1/2 -translate-y-1/2 h-0 w-0 border-y-4 border-y-transparent border-r-4 border-r-white opacity-0 group-hover:opacity-100 transition z-50"
