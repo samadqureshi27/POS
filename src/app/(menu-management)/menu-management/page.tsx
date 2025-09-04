@@ -26,6 +26,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { grey } from "@mui/material/colors";
 import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
+import ActionBar from "@/components/layout/UI/ActionBar";
 interface MenuItem {
   ID: number;
   Name: string;
@@ -840,6 +841,7 @@ const MenuManagementPage = () => {
       <h1 className="text-3xl font-semibold mt-14 mb-8">Menu Management</h1>
 
       {/* Action bar */}
+
       <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
           <button
@@ -883,6 +885,7 @@ const MenuManagementPage = () => {
           />
         </div>
       </div>
+
 
       {/* Table */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm responsive-customer-table">
@@ -952,9 +955,9 @@ const MenuManagementPage = () => {
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  <div className="flex items-center gap-2">
+                  <div className=" flex-col gap-1">
                     <DropdownMenu.Root modal={false}>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                         {categoryFilter || "Category"}
                         <ChevronDown
                           size={14}
@@ -993,9 +996,9 @@ const MenuManagementPage = () => {
                   <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-1">
                     <DropdownMenu.Root modal={false}>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                         {statusFilter || "Status"}
                         <ChevronDown
                           size={14}
@@ -1376,7 +1379,6 @@ const MenuManagementPage = () => {
                       />
                     </div>
                   </div>
-
                   {/* Description */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

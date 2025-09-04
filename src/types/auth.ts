@@ -66,8 +66,8 @@ export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<LoginResponse>;
-  pinLogin: (pin: string) => Promise<LoginResponse>;
+  login: (email: string, password: string, role?: 'admin') => Promise<LoginResponse>;
+  pinLogin: (pin: string, role?: string) => Promise<LoginResponse>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<boolean>;
   updateUser: (user: User) => void;

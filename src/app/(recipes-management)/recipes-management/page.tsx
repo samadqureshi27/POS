@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
+import ActionBar from "@/components/layout/UI/ActionBar";
 interface RecipeOption {
   ID: number;
   Name: string;
@@ -302,7 +303,7 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
+      className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${
         type === "success" ? "bg-green-400 text-white" : "bg-red-400 text-white"
       } ${
         isVisible && !isClosing
@@ -585,51 +586,16 @@ const RecipesManagementPage = () => {
       <h1 className="text-3xl font-semibold mt-14 mb-8">Recipes</h1>
 
       {/* Action bar: add, delete, search */}
-      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-        {/* Action Buttons */}
-        <div className="flex gap-3 h-[35px] w-full md:h-[40px] md:w-[250px]">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            disabled={selectedItems.length > 0}
-            className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors ${
-              selectedItems.length === 0
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            <Plus size={16} />
-            Add
-          </button>
-
-          <button
-            onClick={handleDeleteSelected}
-            disabled={!isSomeSelected || actionLoading}
-            className={`flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors ${
-              isSomeSelected && !actionLoading
-                ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            <Trash2 size={16} />
-            {actionLoading ? "Deleting..." : "Delete Selected"}
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-          />
-          <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-        </div>
-      </div>
+       <ActionBar
+        onAdd={() => setIsModalOpen(true)}
+        addDisabled={selectedItems.length > 0}
+        onDelete={handleDeleteSelected}
+        deleteDisabled={selectedItems.length === 0}
+        isDeleting={actionLoading}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search"
+      />
 
       {/* Table + filters */}
       <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm responsive-customer-table">
@@ -697,9 +663,9 @@ const RecipesManagementPage = () => {
                   <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
                 </th>
                 <th className="relative px-4 py-3 text-left">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-1">
                     <DropdownMenu.Root modal={false}>
-                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0">
+                      <DropdownMenu.Trigger className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer">
                         {statusFilter || "Status"}
                         <ChevronDown
                           size={14}
@@ -708,7 +674,7 @@ const RecipesManagementPage = () => {
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                          className="min-w-[240px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
+                          className="min-w-[240px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                           sideOffset={6}
                         >
                           <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
@@ -817,7 +783,7 @@ const RecipesManagementPage = () => {
                     data-label="Status"
                   >
                     <span
-                      className={`inline-block w-24 text-right  py-[2px] rounded-md text-xs font-medium  ${
+                      className={`inline-block w-24 text-right  py-[2px] rounded-sm text-xs font-medium  ${
                         item.Status === "Inactive"
                           ? "text-red-400 "
                           : "text-green-400 "
@@ -921,7 +887,7 @@ const RecipesManagementPage = () => {
                         }
                         // If invalid input, just ignore it (don't update state)
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                       placeholder="1"
                       min={1}
                       required

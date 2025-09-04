@@ -56,7 +56,7 @@ class AuthService {
   async adminLogin(
   email: string, 
   password: string, 
-  role: 'admin' | 'manager'   // default set here
+  role: 'admin' | 'manager' = 'admin'  // default set here
 ): Promise<LoginResponse> {
 
     try {
@@ -74,53 +74,73 @@ class AuthService {
         })
       });
       
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-      
-      const data: LoginResponse = await response.json();
-      console.log('Login response data:', data);
-      
-      if (data.success && data.user && data.tokens) {
-        this.setTokens(data.tokens.access, data.tokens.refresh);
-        this.setUser(data.user);
-        return { success: true, user: data.user };
-      } else {
-        return { success: false, errors: data.errors || data.message || 'Login failed' };
-      }
-    } catch (error: unknown) {
-      console.error('Admin login error:', error);
-      if (error instanceof Error) {
-        return { success: false, error: error.message };
-      }
-      return { success: false, error: 'Unknown network error' };
+      console.log('Admin login response status:', response.status);
+    const data: LoginResponse = await response.json();
+    console.log('Admin login response data:', data);
+    
+    if (data.success && data.user && data.tokens) {
+      this.setTokens(data.tokens.access, data.tokens.refresh);
+      this.setUser(data.user);
+      return { success: true, user: data.user };
+    } else {
+      return { 
+        success: false, 
+        errors: data.errors, 
+        error: data.error,
+        message: data.message 
+      };
     }
+  } catch (error: unknown) {
+    console.error('Admin login error:', error);
+    if (error instanceof Error) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: 'Unknown network error' };
   }
+}
 
   // PIN login for staff (no changes needed here)
-  async pinLogin(pin: string): Promise<LoginResponse> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/pin-login/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ pin })
-      });
-
-      const data: LoginResponse = await response.json();
-      
-      if (data.success && data.user && data.tokens) {
-        this.setTokens(data.tokens.access, data.tokens.refresh);
-        this.setUser(data.user);
-        return { success: true, user: data.user };
-      } else {
-        return { success: false, message: data.message };
-      }
-    } catch (error) {
-      console.error('PIN login error:', error);
-      return { success: false, error: 'Network error' };
+  async pinLogin(pin: string, role?: string): Promise<LoginResponse> {
+  try {
+    console.log('PIN Login attempt:', { pin: pin.replace(/./g, '*'), role });
+    
+    const requestBody: any = { pin };
+    
+    // Include role if provided (for manager login from role selection)
+    if (role) {
+      requestBody.role = role;
     }
+    
+    const response = await fetch(`${API_BASE_URL}/pin-login/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    console.log('PIN Login response status:', response.status);
+    const data: LoginResponse = await response.json();
+    console.log('PIN Login response data:', data);
+    
+    if (data.success && data.user && data.tokens) {
+      this.setTokens(data.tokens.access, data.tokens.refresh);
+      this.setUser(data.user);
+      return { success: true, user: data.user };
+    } else {
+      return { 
+        success: false, 
+        message: data.message,
+        error: data.error,
+        errors: data.errors
+      };
+    }
+  } catch (error) {
+    console.error('PIN login error:', error);
+    return { success: false, error: 'Network error' };
   }
+}
+
 
   // Rest of the methods remain the same...
   async createStaff(staffData: CreateStaffData): Promise<ApiResponse<User>> {
