@@ -62,7 +62,7 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
   return (
     <>
       {/* Main navbar */}
-      <header className="fixed top-0 z-50 w-full h-16">
+      <header className="fixed top-0 z-50 w-full h-18">
         <nav className="bg-[#161616] text-white w-full h-full">
           <div className="w-full px-3 sm:px-6 lg:px-8 h-full">
             <div className="flex h-full items-center justify-between">
@@ -70,9 +70,6 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
               <div className="flex items-center gap-2 flex-shrink-0">
                 <div className="flex items-center gap-2">
                   <img src="/Logos/TTT-logo.png" alt="TTT Logo" className="h-9 w-auto" />
-                  <span className="text-[10px] sm:text-xs font-semibold tracking-widest text-gray-300 whitespace-nowrap">
-                    TTT PLUG
-                  </span>
                 </div>
               </div>
 
