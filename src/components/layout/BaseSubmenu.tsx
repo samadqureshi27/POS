@@ -63,9 +63,7 @@ export default function BaseSubmenu({
           {showBackArrow && (
             <button
               onClick={handleBack}
-              className="text-white mb-1 cursor-pointer hidden md:flex mr-7 items-center justify-center
-                       hover:text-gray-300 transition-all duration-200 ease-in-out
-                       hover:scale-110 active:scale-95 transform"
+              className="text-white mb-1 cursor-pointer hidden md:flex mr-7 items-center justify-center hover:text-gray-300 transition-all duration-200 ease-in-out hover:scale-110 active:scale-95 transform"
               aria-label="Go back"
             >
               <ArrowLeft size={20} />
