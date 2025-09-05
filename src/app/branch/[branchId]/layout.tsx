@@ -10,22 +10,22 @@ export default function BranchLayout({ children }: { children: React.ReactNode }
   // Define main menu items
   const mainItems = [
     { label: "POS", href: `/branch/${branchId}/pos` },
-    { 
-      label: "Inventory", 
-      href: `/branch/${branchId}/inventory`,
+    {
+      label: "Inventory",
+      href: `/branch/${branchId}/inventory`, // Main button navigates here
       hasSubmenu: true,
       submenuItems: [
-        { label: "Inventory", href: `/branch/${branchId}/inventory` },
+        { label: "Inventory", href: `/branch/${branchId}/inventory` }, // This gets skipped by slice(1)
         { label: "Vendors", href: `/branch/${branchId}/inventory/vendors` },
         { label: "Reports", href: `/branch/${branchId}/inventory/reports` },
       ]
     },
-    { 
-      label: "Staff Management", 
-      href: `/branch/${branchId}/staff`,
+    {
+      label: "Staff Management",
+      href: `/branch/${branchId}/staff`, // Main button navigates here
       hasSubmenu: true,
       submenuItems: [
-        { label: "Employees", href: `/branch/${branchId}/staff` },
+        { label: "Employees", href: `/branch/${branchId}/staff` }, // This gets skipped by slice(1)
         { label: "Payroll", href: `/branch/${branchId}/staff/payroll` },
       ]
     },
