@@ -81,4 +81,4 @@ const OrderTypeChart: React.FC<OrderTypeChartProps> = ({ data, loading }) => {
       </div>
     </div>
   );
-};
+export default OrderTypeChart;
