@@ -12,9 +12,9 @@ import OrderTypeChart from "./_components/order-type-chart";
 import OrderTable from "./_components/order-table";
 
 // Import types and services
-import { OrderItem, OrderStats } from "../../../types/types";
-import { OrderAPI } from "./_components/order-API";
-import { useOrderFilters } from "./_components/use-order-filter";
+import { OrderItem, OrderStats } from "@/types/types";
+import { OrderAPI } from "@/components/auth/order-API";
+import { useOrderFilters } from "@/lib/hooks/use-order-filter";
 
 const OrderManagementPage = () => {
   const [items, setItems] = useState<OrderItem[]>([]);
