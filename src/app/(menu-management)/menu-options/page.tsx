@@ -3,7 +3,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import ActionBar from "@/components/layout/UI/ActionBar";
-import Toast from "./_components/toast";
+import {Toast} from "@/components/layout/UI/Toast";
 import MenuTable from "./_components/menu-table";
 import MenuModal from "./_components/menu-modal";
 import { MenuAPI } from "@/lib/utility/menu-options-API";
