@@ -2,13 +2,16 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
-import Toast from "./_components/toast";
+import {Toast} from "@/components/layout/UI/Toast";
 import MenuActionBar from "./_components/menu-actionbar";
 import MenuTable from "./_components/menu-table";
 import TabNavigation from "./_components/tab-menu";
 import ImageUpload from "./_components/image-upload";
 import Toggle from "./_components/toggle";
 import MenuAPI, { MenuItem } from "@/lib/utility/menu-API";
+import MealTab from "./_components/meal-tab";
+import SpecialsTab from "./_components/specials-tab";
+// import PriceTab from './components/price-table';
 
 // Constants
 const sizeOptions = ["Small", "Regular", "Large", "Extra Large"];
@@ -358,8 +361,10 @@ const MenuManagementPage = () => {
         setStatusFilter={handleStatusFilterChange}
         categories={categories}
       />
+      
 
       {/* Modal */}
+      
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-sm w-full max-w-lg h-[70vh] lg:max-w-2xl shadow-sm flex flex-col sm:mx-4">
