@@ -2,10 +2,10 @@
 
 import React from "react";
 import { useCategory } from '@/lib/hooks/use-category';
-import Toast from './_components/toast';
+import {Toast} from "@/components/layout/UI/Toast";
+import LoadingSpinner from "@/components/layout/UI/Loader";
 import CategoryTable from './_components/category-table';
 import CategoryModal from './_components/category-model';
-import LoadingSpinner from './_components/loading-spinner';
 import ActionBar from "@/components/layout/UI/ActionBar";
 
 const CategoriesPage = () => {

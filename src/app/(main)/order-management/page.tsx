@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import ActionBar from "@/components/layout/UI/ActionBar";
 
 // Import all our new components
-import Toast from "./_components/Toast";
+import {Toast} from "@/components/layout/UI/Toast";
 import PeriodSelector from "./_components/period-selector";
 import MostOrderedTable from "./_components/most-ordered-table";
 import LeastOrderedTable from "./_components/least-order-table";
