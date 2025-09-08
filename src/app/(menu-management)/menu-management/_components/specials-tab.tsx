@@ -1,43 +1,12 @@
-import React from "react";
-import ButtonPage from "@/components/layout/UI/button";
+"use client";
 
-interface MenuItem {
-  ID: number;
-  Name: string;
-  Price: number;
-  Category: string;
-  StockQty: string;
-  Status: "Active" | "Inactive";
-  status: ("Active" | "Inactive")[];
-  Description?: string;
-  MealType?: string;
-  Priority?: number;
-  MinimumQuantity?: number;
-  ShowOnMenu?: "Active" | "Inactive";
-  Featured?: "Active" | "Inactive";
-  StaffPick?: "Active" | "Inactive";
-  DisplayType?: string;
-  Displaycat?: string;
-  SpecialStartDate?: string;
-  SpecialEndDate?: string;
-  SpecialPrice?: number;
-  OptionValue?: string[];
-  OptionPrice?: number[];
-  MealValue?: string[];
-  MealPrice?: number[];
-  PName?: string[];
-  PPrice?: number[];
-  OverRide?: ("Active" | "Inactive")[];
-  ShowOnMain?: "Active" | "Inactive";
-  SubTBE?: "Active" | "Inactive";
-  Deal?: "Active" | "Inactive";
-  Special?: "Active" | "Inactive";
-}
+import React from "react";
+import Toggle from "./toggle";
 
 interface SpecialsTabProps {
-  formData: Omit<MenuItem, "ID">;
-  setFormData: React.Dispatch<React.SetStateAction<Omit<MenuItem, "ID">>>;
-  handleStatusChange: (field: keyof Omit<MenuItem, "ID">, isActive: boolean) => void;
+  formData: any;
+  setFormData: (data: any) => void;
+  handleStatusChange: (field: string, isActive: boolean) => void;
 }
 
 const SpecialsTab: React.FC<SpecialsTabProps> = ({ formData, setFormData, handleStatusChange }) => {
@@ -45,7 +14,7 @@ const SpecialsTab: React.FC<SpecialsTabProps> = ({ formData, setFormData, handle
     <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between">
         <label className="block text-sm font-medium text-gray-700">Special</label>
-        <ButtonPage
+        <Toggle
           checked={formData.Special === "Active"}
           onChange={(checked) => handleStatusChange("Special", checked)}
         />
