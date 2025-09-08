@@ -53,7 +53,7 @@ const BranchManagementPage = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner message="Loading Branches..." />;
   }
 
   return (

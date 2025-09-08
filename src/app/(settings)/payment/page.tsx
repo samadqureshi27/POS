@@ -36,6 +36,7 @@ const PaymentManagementPage = () => {
     handleSelectItem,
     openCreateModal,
     openEditModal,
+    closeModal, // ← Make sure this is destructured from the hook
     handleDeleteSelected,
     handleModalSubmit,
     updateFormData,
@@ -106,7 +107,7 @@ const PaymentManagementPage = () => {
         editingItem={editingItem}
         formData={formData}
         actionLoading={actionLoading}
-        onClose={() => {}}
+        onClose={closeModal} // ← Pass the actual close function
         onSubmit={handleModalSubmit}
         onFormDataChange={updateFormData}
         onStatusChange={handleStatusChange}

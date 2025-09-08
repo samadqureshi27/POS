@@ -8,7 +8,10 @@ import ActionBar from "@/components/layout/UI/ActionBar";
 import { Toast } from '@/components/layout/UI/Toast';
 import ReportsTable from "./_components/reportsTable";
 import LoadingSpinner from '@/components/layout/UI/Loader';
+import ImportExportControls from "@/components/layout/UI/import-export-btn";
 import { useReportsManagement } from "../../../../../lib/hooks/useReport";
+import { useImportExport } from "@/lib/hooks/import-export-hook";
+import { useToast } from "@/lib/hooks/toast";
 
 const ReportsPage = () => {
     const params = useParams();
@@ -22,17 +25,27 @@ const ReportsPage = () => {
         unitFilter,
         loading,
         statistics,
-        uniqueUnits,
-        // Toast
-        toast,
-        hideToast,
         // Actions
         setSearchTerm,
         setUnitFilter,
     } = useReportsManagement(branchId);
 
+    // Toast for export operations
+    const { toast, showToast, hideToast } = useToast();
+
+    // Export functionality only
+    const { handleExportWithConfig, isLoading } = useImportExport({
+        onExportSuccess: () => showToast("Inventory report exported successfully", "success"),
+        onExportError: (error) => showToast(error, "error"),
+    });
+
+    // Export functionality using predefined config
+    const handleExport = () => {
+        handleExportWithConfig(filteredItems, 'inventory', branchId);
+    };
+
     if (loading) {
-        return <LoadingSpinner message="Loading Inventory..." />;
+        return <LoadingSpinner message="Loading Inventory reports..." />;
     }
 
     if (!branchId) {
@@ -56,9 +69,22 @@ const ReportsPage = () => {
                 />
             )}
 
-            <h1 className="text-3xl font-semibold mb-8 mt-20">
-                Inventory Report - Branch #{branchId}
-            </h1>
+            {/* Header with Title and Export Controls */}
+            <div className="grid grid-cols-1 md:grid-cols-2 items-center max-w-[100vw] mb-8 mt-20">
+                <h1 className="text-3xl font-semibold">
+                    Inventory Report - Branch #{branchId}
+                </h1>
+
+                {/* Export Controls Only */}
+                <ImportExportControls
+                    onExport={handleExport}
+                    disabled={isLoading || filteredItems.length === 0}
+                    exportLabel={isLoading ? "Exporting..." : "Export Report"}
+                    showImport={false}
+                    showExport={true}
+                    className="mt-4 md:mt-0"
+                />
+            </div>
 
             {/* Summary cards */}
             <div className="grid grid-cols-1 max-w-[100vw] lg:grid-cols-2 gap-4 mb-8 lg:max-w-[50vw]">
@@ -78,7 +104,7 @@ const ReportsPage = () => {
             <ActionBar
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
-                searchPlaceholder="Search"
+                searchPlaceholder="Search inventory items..."
             />
 
             {/* Reports table */}
