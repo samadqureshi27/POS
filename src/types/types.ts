@@ -83,3 +83,19 @@ export interface ButtonPageProps {
   checked: boolean;
   onChange: (value: boolean) => void;
 }
+
+
+// types/restaurant.ts
+export interface RestaurantData {
+  name: string;
+  type: string;
+  contact: string;
+  email: string;
+  address: string;
+  description: string;
+  website: string;
+  openingTime: string;
+  closingTime: string;
+  logo: File | null;
+}
+
