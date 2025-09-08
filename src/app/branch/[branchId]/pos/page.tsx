@@ -48,7 +48,7 @@ const PosListPage = () => {
     } = usePosManagement(branchId);
 
     if (loading) {
-        return <LoadingSpinner />;
+        return <LoadingSpinner message="Loading POS..." />;
     }
 
     if (!branchId) {
