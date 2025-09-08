@@ -9,6 +9,7 @@ import TabNavigation from "./_components/tab-menu";
 import ImageUpload from "./_components/image-upload";
 import Toggle from "./_components/toggle";
 import MenuAPI, { MenuItem } from "@/lib/utility/menu-API";
+import PriceTab from "./_components/price-table";
 import MealTab from "./_components/meal-tab";
 import SpecialsTab from "./_components/specials-tab";
 // import PriceTab from './components/price-table';
@@ -362,6 +363,7 @@ const MenuManagementPage = () => {
         categories={categories}
       />
       
+      
 
       {/* Modal */}
       
@@ -667,6 +669,29 @@ const MenuManagementPage = () => {
                     ))}
                   </div>
                 </div>
+              )}
+
+              {activeTab === "Meal" && (
+                <MealTab
+                  formData={formData}
+                  setFormData={setFormData}
+                  handleStatusChange={handleStatusChange}
+                />
+              )}
+
+              {activeTab === "Specials" && (
+                <SpecialsTab
+                  formData={formData}
+                  setFormData={setFormData}
+                  handleStatusChange={handleStatusChange}
+                />
+              )}
+
+              {activeTab === "Price" && (
+                <PriceTab
+                  formData={formData}
+                  setFormData={setFormData}
+                />
               )}
             </div>
 

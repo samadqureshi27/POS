@@ -1,43 +1,12 @@
+"use client";
+
 import React from "react";
-import { Plus, Grip, X } from "lucide-react";
+import { Plus, X, Grip } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-interface MenuItem {
-  ID: number;
-  Name: string;
-  Price: number;
-  Category: string;
-  StockQty: string;
-  Status: "Active" | "Inactive";
-  status: ("Active" | "Inactive")[];
-  Description?: string;
-  MealType?: string;
-  Priority?: number;
-  MinimumQuantity?: number;
-  ShowOnMenu?: "Active" | "Inactive";
-  Featured?: "Active" | "Inactive";
-  StaffPick?: "Active" | "Inactive";
-  DisplayType?: string;
-  Displaycat?: string;
-  SpecialStartDate?: string;
-  SpecialEndDate?: string;
-  SpecialPrice?: number;
-  OptionValue?: string[];
-  OptionPrice?: number[];
-  MealValue?: string[];
-  MealPrice?: number[];
-  PName?: string[];
-  PPrice?: number[];
-  OverRide?: ("Active" | "Inactive")[];
-  ShowOnMain?: "Active" | "Inactive";
-  SubTBE?: "Active" | "Inactive";
-  Deal?: "Active" | "Inactive";
-  Special?: "Active" | "Inactive";
-}
-
 interface PriceTabProps {
-  formData: Omit<MenuItem, "ID">;
-  setFormData: React.Dispatch<React.SetStateAction<Omit<MenuItem, "ID">>>;
+  formData: any;
+  setFormData: (data: any) => void;
 }
 
 const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
@@ -97,7 +66,7 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
               {(provided) => (
                 <table className="w-full border-collapse">
                   <tbody ref={provided.innerRef} {...provided.droppableProps}>
-                    {(formData.PName || []).map((opt, idx) => (
+                    {(formData.PName || []).map((opt: string, idx: number) => (
                       <Draggable key={idx} draggableId={`p-${idx}`} index={idx}>
                         {(provided, snapshot) => (
                           <tr
@@ -148,10 +117,10 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
                                 type="button"
                                 onClick={() => {
                                   const updatedValues = (formData.PName || []).filter(
-                                    (_, i) => i !== idx
+                                    (_: any, i: number) => i !== idx
                                   );
                                   const updatedPrices = (formData.PPrice || []).filter(
-                                    (_, i) => i !== idx
+                                    (_: any, i: number) => i !== idx
                                   );
                                   setFormData({
                                     ...formData,
@@ -197,15 +166,19 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
 
       {/* Mobile Card View for Price Tab */}
       <div className="md:hidden space-y-4">
-        {(formData.PName || []).map((opt, idx) => (
+        {(formData.PName || []).map((opt: string, idx: number) => (
           <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
             <div className="flex items-center justify-between mb-3">
               <Grip size={18} className="text-gray-500" />
               <button
                 type="button"
                 onClick={() => {
-                  const updatedValues = (formData.PName || []).filter((_, i) => i !== idx);
-                  const updatedPrices = (formData.PPrice || []).filter((_, i) => i !== idx);
+                  const updatedValues = (formData.PName || []).filter(
+                    (_: any, i: number) => i !== idx
+                  );
+                  const updatedPrices = (formData.PPrice || []).filter(
+                    (_: any, i: number) => i !== idx
+                  );
                   setFormData({
                     ...formData,
                     PName: updatedValues,
@@ -238,20 +211,20 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
                 <input
-  type="number"
-  step="0.01"
-  value={(formData.PPrice || [])[idx] || 0}
-  onChange={(e) => {
-    const updated = [...(formData.PPrice || [])];
-    updated[idx] = Number(e.target.value) || 0;
-    setFormData({
-      ...formData,
-      PPrice: updated,
-    });
-  }}
-  className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-  placeholder="Enter price"
-/>
+                  type="number"
+                  step="0.01"
+                  value={(formData.PPrice || [])[idx] || 0}
+                  onChange={(e) => {
+                    const updated = [...(formData.PPrice || [])];
+                    updated[idx] = Number(e.target.value) || 0;
+                    setFormData({
+                      ...formData,
+                      PPrice: updated,
+                    });
+                  }}
+                  className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                  placeholder="0.00"
+                />
               </div>
             </div>
           </div>
