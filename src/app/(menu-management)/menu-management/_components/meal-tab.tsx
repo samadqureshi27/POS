@@ -1,46 +1,15 @@
+"use client";
+
 import React from "react";
-import { ChevronDown, Grip, X } from "lucide-react";
+import { ChevronDown, Plus, X, Grip } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ButtonPage from "@/components/layout/UI/button";
-
-interface MenuItem {
-  ID: number;
-  Name: string;
-  Price: number;
-  Category: string;
-  StockQty: string;
-  Status: "Active" | "Inactive";
-  status: ("Active" | "Inactive")[];
-  Description?: string;
-  MealType?: string;
-  Priority?: number;
-  MinimumQuantity?: number;
-  ShowOnMenu?: "Active" | "Inactive";
-  Featured?: "Active" | "Inactive";
-  StaffPick?: "Active" | "Inactive";
-  DisplayType?: string;
-  Displaycat?: string;
-  SpecialStartDate?: string;
-  SpecialEndDate?: string;
-  SpecialPrice?: number;
-  OptionValue?: string[];
-  OptionPrice?: number[];
-  MealValue?: string[];
-  MealPrice?: number[];
-  PName?: string[];
-  PPrice?: number[];
-  OverRide?: ("Active" | "Inactive")[];
-  ShowOnMain?: "Active" | "Inactive";
-  SubTBE?: "Active" | "Inactive";
-  Deal?: "Active" | "Inactive";
-  Special?: "Active" | "Inactive";
-}
+import Toggle from "./toggle";
 
 interface MealTabProps {
-  formData: Omit<MenuItem, "ID">;
-  setFormData: React.Dispatch<React.SetStateAction<Omit<MenuItem, "ID">>>;
-  handleStatusChange: (field: keyof Omit<MenuItem, "ID">, isActive: boolean) => void;
+  formData: any;
+  setFormData: (data: any) => void;
+  handleStatusChange: (field: string, isActive: boolean) => void;
 }
 
 const sizeOptionss = ["Cheese", "Pepperoni", "Olives", "Onions", "Bacon", "Pineapple"];
@@ -86,8 +55,10 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
         </DropdownMenu.Root>
 
         <div className="flex flex-col items-center gap-2">
-          <label className="block text-sm font-medium text-gray-700">Deal?</label>
-          <ButtonPage
+          <label className="block text-sm font-medium text-gray-700">
+            Deal?
+          </label>
+          <Toggle
             checked={formData.Deal === "Active"}
             onChange={(checked) => handleStatusChange("Deal", checked)}
           />
@@ -136,7 +107,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
               {(provided) => (
                 <table className="w-full border-collapse">
                   <tbody ref={provided.innerRef} {...provided.droppableProps}>
-                    {(formData.MealValue || []).map((opt, idx) => (
+                    {(formData.MealValue || []).map((opt: string, idx: number) => (
                       <Draggable key={idx} draggableId={`meal-${idx}`} index={idx}>
                         {(provided, snapshot) => (
                           <tr
@@ -186,7 +157,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                               />
                             </td>
                             <td className="p-3 text-center">
-                              <ButtonPage
+                              <Toggle
                                 checked={formData.OverRide?.[idx] === "Active"}
                                 onChange={(checked) => {
                                   const updated = [...(formData.OverRide || [])];
@@ -199,7 +170,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                               />
                             </td>
                             <td className="p-3 text-center">
-                              <ButtonPage
+                              <Toggle
                                 checked={formData.status?.[idx] === "Active"}
                                 onChange={(checked) => {
                                   const updated = [...(formData.status || [])];
@@ -216,10 +187,10 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                                 type="button"
                                 onClick={() => {
                                   const updatedValues = (formData.MealValue || []).filter(
-                                    (_, i) => i !== idx
+                                    (_: any, i: number) => i !== idx
                                   );
                                   const updatedPrices = (formData.MealPrice || []).filter(
-                                    (_, i) => i !== idx
+                                    (_: any, i: number) => i !== idx
                                   );
                                   setFormData({
                                     ...formData,
@@ -247,15 +218,19 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
 
       {/* Mobile Card View for Meal Tab */}
       <div className="lg:hidden space-y-4">
-        {(formData.MealValue || []).map((opt, idx) => (
+        {(formData.MealValue || []).map((opt: string, idx: number) => (
           <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
             <div className="flex items-center justify-between mb-3">
               <Grip size={18} className="text-gray-500" />
               <button
                 type="button"
                 onClick={() => {
-                  const updatedValues = (formData.MealValue || []).filter((_, i) => i !== idx);
-                  const updatedPrices = (formData.MealPrice || []).filter((_, i) => i !== idx);
+                  const updatedValues = (formData.MealValue || []).filter(
+                    (_: any, i: number) => i !== idx
+                  );
+                  const updatedPrices = (formData.MealPrice || []).filter(
+                    (_: any, i: number) => i !== idx
+                  );
                   setFormData({
                     ...formData,
                     MealValue: updatedValues,
@@ -305,7 +280,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
               </div>
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-medium text-gray-700">Override</label>
-                <ButtonPage
+                <Toggle
                   checked={formData.OverRide?.[idx] === "Active"}
                   onChange={(checked) => {
                     const updated = [...(formData.OverRide || [])];
@@ -319,7 +294,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
               </div>
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-medium text-gray-700">Status</label>
-                <ButtonPage
+                <Toggle
                   checked={formData.status?.[idx] === "Active"}
                   onChange={(checked) => {
                     const updated = [...(formData.status || [])];

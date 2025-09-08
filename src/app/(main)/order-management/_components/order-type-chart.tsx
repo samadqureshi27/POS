@@ -1,4 +1,5 @@
 // _components/OrderStats/OrderTypeChart.tsx
+// "use client";
 import React from 'react';
 import {
   RadialBarChart,
@@ -81,4 +82,6 @@ const OrderTypeChart: React.FC<OrderTypeChartProps> = ({ data, loading }) => {
       </div>
     </div>
   );
+};
+
 export default OrderTypeChart;
