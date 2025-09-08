@@ -2,7 +2,24 @@ import React from "react";
 import { ChevronDown, Grip, X } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import MenuAPI, { RecipeOption, Ingredient } from "@/lib/utility/recipe-API";
+
+interface RecipeOption {
+  ID: number;
+  Name: string;
+  Status: "Active" | "Inactive";
+  Description: string;
+  OptionValue: string[];
+  OptionPrice: number[];
+  IngredientValue: string[];
+  IngredientPrice: number[];
+  Priority: number;
+}
+
+interface Ingredient {
+  ID: number;
+  Name: string;
+  Unit: string;
+}
 
 interface RecipeIngredientsTabProps {
   formData: Omit<RecipeOption, "ID">;

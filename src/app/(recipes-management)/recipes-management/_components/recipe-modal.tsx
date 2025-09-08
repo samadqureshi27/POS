@@ -1,8 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { X, Save } from "lucide-react";
-import MenuAPI, { RecipeOption, Ingredient } from "@/lib/utility/recipe-API";
 import RecipeInfoTab from "./recipe-info-tab";
-import RecipeIngredientsTab from "./recipe-info-tab";
+import RecipeIngredientsTab from "./recipe-ingredient";
+
+interface RecipeOption {
+  ID: number;
+  Name: string;
+  Status: "Active" | "Inactive";
+  Description: string;
+  OptionValue: string[];
+  OptionPrice: number[];
+  IngredientValue: string[];
+  IngredientPrice: number[];
+  Priority: number;
+}
+
+interface Ingredient {
+  ID: number;
+  Name: string;
+  Unit: string;
+}
 
 interface RecipeModalProps {
   isOpen: boolean;
@@ -11,6 +28,7 @@ interface RecipeModalProps {
   onClose: () => void;
   onSubmit: (data: Omit<RecipeOption, "ID">) => void;
   actionLoading: boolean;
+  showToast: (message: string, type: "success" | "error") => void;
 }
 
 const RecipeModal: React.FC<RecipeModalProps> = ({
@@ -20,6 +38,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
   onClose,
   onSubmit,
   actionLoading,
+  showToast,
 }) => {
   const [activeTab, setActiveTab] = useState("Recipe Info");
   const [formData, setFormData] = useState<Omit<RecipeOption, "ID">>({
@@ -87,6 +106,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
 
   const handleSubmit = () => {
     if (!formData.Name.trim()) {
+      showToast("Please enter a recipe name", "error");
       return;
     }
     onSubmit(formData);
