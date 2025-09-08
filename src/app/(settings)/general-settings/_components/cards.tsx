@@ -3,12 +3,10 @@ import { GeneralSettings } from '../../../../types/types';
 import { OPTIONS } from '../../../../lib/utility/dropDown-settings';
 import SettingsDropdown from './Dropdown';
 import ButtonPage from "@/components/layout/UI/button";
-
 interface SettingsCardsProps {
     settings: GeneralSettings;
     onSettingChange: (key: keyof GeneralSettings, value: any) => void;
 }
-
 const SettingsCards: React.FC<SettingsCardsProps> = ({ settings, onSettingChange }) => {
     return (
         <div className="grid w-full grid-cols-1 lg:grid-cols-3 gap-8">
@@ -287,49 +285,6 @@ const SettingsCards: React.FC<SettingsCardsProps> = ({ settings, onSettingChange
                         <p className="text-xs text-gray-500 mt-1">
                             Auto logout after inactivity
                         </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Notifications & Alerts Card */}
-            <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[450px]">
-                <div className="flex items-center gap-2 mb-8">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <h2 className="text-xl font-semibold">Notifications & Alerts</h2>
-                </div>
-
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500">
-                                Enable Notifications
-                            </label>
-                            <p className="text-xs text-gray-500">
-                                Show system alerts and updates
-                            </p>
-                        </div>
-                        <ButtonPage
-                            checked={settings.enableNotifications}
-                            onChange={(isActive) => onSettingChange("enableNotifications", isActive)}
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500">
-                                Enable Sound Effects
-                            </label>
-                            <p className="text-xs text-gray-500">
-                                Play sounds for transactions and alerts
-                            </p>
-                        </div>
-                        <ButtonPage
-                            checked={settings.enableSounds}
-                            onChange={(isActive) => onSettingChange("enableSounds", isActive)}
-                        />
                     </div>
                 </div>
             </div>
