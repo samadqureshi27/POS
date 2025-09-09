@@ -1,5 +1,5 @@
 // utils/customer-api.ts
-import { CustomerItem, OrderItem, ApiResponse } from '../types/customer';
+import { CustomerItem, OrderItem, ApiResponse } from '@/types/customerProfile';
 
 export class CustomerAPI {
     private static delay = (ms: number) =>

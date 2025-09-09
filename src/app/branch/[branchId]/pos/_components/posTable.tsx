@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
-import { PosTableProps } from "@/../types/pos";
+import { PosTableProps } from "@/types/pos";
 
 const PosTable: React.FC<PosTableProps> = ({
     posItems,
