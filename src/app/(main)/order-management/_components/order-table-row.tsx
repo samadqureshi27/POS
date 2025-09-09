@@ -1,7 +1,7 @@
 // _components/OrderTable/OrderTableRow.tsx
 import React from 'react';
 import ResponsiveDetailButton from "@/components/layout/UI/ResponsiveDetailButton";
-import { OrderItem } from '../../../../types/types';
+import { OrderItem } from '@/types/types';
 
 interface OrderTableRowProps {
   item: OrderItem;

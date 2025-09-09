@@ -1,8 +1,8 @@
 // hooks/useRestaurantProfile.ts
 import { useState, useEffect, useCallback } from 'react';
 import { RestaurantData } from '../../types/types';
-import { RestaurantAPI } from '../utility/restaurantApi';
-import { validateRestaurantForm } from '../../lib/utility/validation';
+import { RestaurantAPI } from '../util/restaurantApi';
+import { validateRestaurantForm } from '../util/validation';
 import { Toast } from '@/components/layout/UI/Toast';
 import { useToast } from '../hooks/toast';
 

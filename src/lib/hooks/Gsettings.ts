@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { GeneralSettings } from "../../types/types";
-import { SettingsAPI } from "../utility/GsettingsAPI";
+import { SettingsAPI } from "../util/GsettingsAPI";
 
 interface UseSettingsReturn {
   settings: GeneralSettings | null;
