@@ -3,7 +3,7 @@ import React from 'react';
 import { Image } from 'lucide-react';
 import { LogoUpload } from './LogoUpload';
 import { OperatingHours } from './OperatingHours';
-import { RestaurantData } from '../../../../types/types';
+import { RestaurantData } from '@/types';
 
 interface LogoHoursCardProps {
     formData: RestaurantData;

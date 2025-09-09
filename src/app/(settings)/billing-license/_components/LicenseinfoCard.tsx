@@ -1,6 +1,6 @@
 import React from "react";
 import { Key, Calendar } from "lucide-react";
-import { LicenseInfo } from '../../../../types/billing';
+import { LicenseInfo } from '@/types/billing';
 import { PlanIcon } from './PlanIcon';
 import { StatusBadge } from './StatusBatch';
 

@@ -1,6 +1,6 @@
 // hooks/useImportExport.ts
 import { useState } from 'react';
-import { exportToCSV, exportToJSON, ExportConfig, EXPORT_CONFIGS } from '../utility/export-utils';
+import { exportToCSV, exportToJSON, ExportConfig, EXPORT_CONFIGS } from '../util/export-utils';
 
 export interface ImportExportOptions {
     onImportSuccess?: (data: any[]) => void;

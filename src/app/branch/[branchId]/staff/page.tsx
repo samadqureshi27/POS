@@ -7,7 +7,7 @@ import ActionBar from "@/components/layout/UI/ActionBar";
 import StatCard from "@/components/layout/UI/SummaryCard";
 import StaffTable from "./_components/staffTable";
 import StaffModal from "./_components/staffModal";
-import {Toast} from "../../../../components/layout/UI/Toast";
+import {Toast} from "@/components/layout/UI/Toast";
 import { useStaff } from "@/lib/hooks/useSatffManagement";
 import { useStaffModal } from "@/lib/hooks/useStaffModal";
 import { useStaffFiltering } from "@/lib/hooks/useSatffFiltering";

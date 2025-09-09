@@ -193,7 +193,7 @@ export const navigationConfig: NavigationItem[] = [
 ]
 
 // -------------------------
-// Utility Functions
+// util Functions
 // -------------------------
 
 // Match route with dynamic segments like /branch/[branchId]/pos

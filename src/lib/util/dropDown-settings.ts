@@ -1,4 +1,4 @@
-import { GeneralSettings, DropdownOption } from "../../types/types";
+import { GeneralSettings, DropdownOption } from "../../types";
 
 export const DEFAULT_SETTINGS: GeneralSettings = {
   currency: "PKR",
@@ -17,6 +17,11 @@ export const DEFAULT_SETTINGS: GeneralSettings = {
   sessionTimeout: 60,
   enableNotifications: true,
   enableSounds: true,
+  orderTimerEnabled: true,
+  greenThresholdMinutes: 5,   // Green from 0-5 minutes
+  yellowThresholdMinutes: 10, // Yellow from 5-10 minutes
+  redThresholdMinutes: 15,    // Red after 10+ minutes
+  timerResetOnComplete: true,
 };
 
 export const OPTIONS = {

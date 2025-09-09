@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { VendorAPI } from "../utility/vendorAPI";
+import { VendorAPI } from "../util/vendorAPI";
 import { useSelection } from "./Selection";
 import { useToast } from './toast';
 import { useVendorModal } from "./vendorModal";

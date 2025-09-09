@@ -2,7 +2,7 @@
 import React from 'react';
 import { ChevronDown } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { OrderItem } from '@/types/types';
+import { OrderItem } from '@/types';
 import OrderTableRow from './order-table-row';
 
 interface OrderTableProps {

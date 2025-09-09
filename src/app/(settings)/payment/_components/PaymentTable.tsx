@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
-import { PaymentTableProps } from "../../../../types/payment";
+import { PaymentTableProps } from "@/types/payment";
 
 const PaymentTable: React.FC<PaymentTableProps> = ({
     paymentMethods,

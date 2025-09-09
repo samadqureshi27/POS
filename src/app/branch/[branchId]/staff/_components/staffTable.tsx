@@ -4,7 +4,7 @@ import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
 import { StaffItem } from "@/types/staffManagement";
-import { formatStaffId } from "@/lib/utility/Staff-formatters";
+import { formatStaffId } from "@/lib/util/Staff-formatters";
 
 interface StaffTableProps {
     staffItems: StaffItem[];

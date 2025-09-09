@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useParams } from "next/navigation";
-import { useInventoryManagement } from "../../../../lib/hooks/inventoryManagement";
+import { useInventoryManagement } from "@/lib/hooks/inventoryManagement";
 import { Toast } from "@/components/layout/UI/Toast";
 import ActionBar from "@/components/layout/UI/ActionBar";
 import LoadingSpinner from "@/components/layout/UI/Loader";
