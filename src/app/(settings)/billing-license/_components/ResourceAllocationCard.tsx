@@ -1,6 +1,6 @@
 import React from "react";
 import { Building, Monitor, Smartphone } from "lucide-react";
-import { LicenseInfo } from '../../../../types/billing';
+import { LicenseInfo } from '@/types/billing';
 
 interface ResourcesAllocationCardProps {
     licenseInfo: LicenseInfo;

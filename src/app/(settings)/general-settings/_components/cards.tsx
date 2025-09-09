@@ -1,5 +1,5 @@
 import React from "react";
-import { GeneralSettings } from '../../../../types/types';
+import { GeneralSettings } from '@/types';
 import CurrencyPricingCard from './CurrencyPricingCard';
 import RegionalSettingsCard from './RegionalSettingsCard';
 import ReceiptSettingsCard from './ReceiptSettingsCard';

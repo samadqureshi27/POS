@@ -1,4 +1,4 @@
-import { GeneralSettings, DropdownOption } from "../../types/types";
+import { GeneralSettings, DropdownOption } from "../../types";
 
 export const DEFAULT_SETTINGS: GeneralSettings = {
   currency: "PKR",

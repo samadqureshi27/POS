@@ -4,7 +4,7 @@ import { Store } from 'lucide-react';
 import { SimpleInput } from './SimpleInput';
 import { SimpleTextarea } from './SimpleTextarea';
 import { RestaurantDropdown } from './RestaurantDropdown';
-import { RestaurantData } from '../../../../types/types';
+import { RestaurantData } from '@/types';
 
 interface BasicInfoCardProps {
     formData: RestaurantData;

@@ -8,7 +8,7 @@ import CustomerSummaryCards from "./_components/customerSummaryCards";
 import CustomerTable from "./_components/customerTable";
 import ImportExportControls from "@/components/layout/UI/import-export-btn";
 import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/hooks/useCustomerDetails";
-import { exportCustomersToCSV } from "@/lib/utility/Customer-Details-utils";
+import { exportCustomersToCSV } from "@/lib/util/Customer-Details-utils";
 import { useToast } from "@/lib/hooks/toast";
 import LoadingSpinner from "@/components/layout/UI/Loader";
 

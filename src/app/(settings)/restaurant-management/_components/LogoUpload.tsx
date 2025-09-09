@@ -1,7 +1,7 @@
 // components/LogoUpload.tsx
 import React from 'react';
 import { Upload, Camera, Trash2 } from 'lucide-react';
-import { useFileUpload } from '../../../../lib/hooks/useFileUpload';
+import { useFileUpload } from '@/lib/hooks/useFileUpload';
 
 interface LogoUploadProps {
     previewUrl: string | null;

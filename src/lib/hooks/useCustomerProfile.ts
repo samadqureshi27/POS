@@ -1,7 +1,7 @@
 // hooks/useCustomerProfile.ts
 import { useState, useEffect, useMemo } from 'react';
 import { CustomerItem, OrderItem } from '@/types/customerProfile';
-import { CustomerAPI } from '../utility/customerProfile-API';
+import { CustomerAPI } from '../util/customerProfile-API';
 
 export const useCustomerProfile = (customerId: number | null) => {
     const [customer, setCustomer] = useState<CustomerItem | null>(null);

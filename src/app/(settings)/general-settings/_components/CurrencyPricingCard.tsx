@@ -1,6 +1,6 @@
 import React from "react";
-import { GeneralSettings } from '../../../../types/types';
-import { OPTIONS } from '../../../../lib/utility/dropDown-settings';
+import { GeneralSettings } from '@/types';
+import { OPTIONS } from '@/lib/util/dropDown-settings';
 import SettingsDropdown from './Dropdown';
 
 interface CurrencyPricingCardProps {

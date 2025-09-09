@@ -1,5 +1,5 @@
 import React from "react";
-import { GeneralSettings } from '../../../../types/types';
+import { GeneralSettings } from '@/types';
 import ButtonPage from "@/components/layout/UI/button";
 
 interface SecurityAccessCardProps {

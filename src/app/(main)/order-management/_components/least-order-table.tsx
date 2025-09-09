@@ -1,6 +1,6 @@
 // _components/OrderStats/LeastOrderedTable.tsx
 import React from 'react';
-import { OrderItem } from '@/types/types';
+import { OrderItem } from '@/types';
 
 interface LeastOrderedTableProps {
   data: OrderItem[];
