@@ -8,9 +8,9 @@ import StatCard from "@/components/layout/UI/SummaryCard";
 import StaffTable from "./_components/staffTable";
 import StaffModal from "./_components/staffModal";
 import {Toast} from "../../../../components/layout/UI/Toast";
-import { useStaff } from "@/lib/hooks/useSatffManagement";
-import { useStaffModal } from "@/lib/hooks/useStaffModal";
-import { useStaffFiltering } from "@/lib/hooks/useSatffFiltering";
+import { useStaff } from "@/lib/hooks/UseSatffManagement";
+import { useStaffModal } from "@/lib/hooks/UseStaffModal";
+import { useStaffFiltering } from "@/lib/hooks/UseSatffFiltering";
 import { useSelection } from "@/lib/hooks/Selection";
 import LoadingSpinner from '@/components/layout/UI/Loader';
 const EmployeeRecordsPage = () => {

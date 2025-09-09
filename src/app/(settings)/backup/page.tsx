@@ -2,9 +2,9 @@
 import React from "react";
 
 // Hooks
-import { useToast } from '../../../lib/hooks/toast';
-import { useModal } from '../../../lib/hooks/useBackupModal';
-import { useBackup } from '../../../lib/hooks/useBackup';
+import { useToast } from '../../../lib/hooks/Toast';
+import { useModal } from '../../../lib/hooks/UseBackupModal';
+import { useBackup } from '../../../lib/hooks/UseBackup';
 
 // Components
 import { BackupModal } from './_components/BackupModal';

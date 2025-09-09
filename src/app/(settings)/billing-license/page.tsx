@@ -5,9 +5,9 @@ import React from "react";
 import { LicenseInfo, ApiResponse, ToastState } from '../../../types/billing';
 
 // Hooks
-import { useToast } from '../../../lib/hooks/toast'
+import { useToast } from '../../../lib/hooks/Toast'
 import { Toast } from '../../../components/layout/UI/Toast';
-import { useLicense } from '../../../lib/hooks/useLicense';
+import { useLicense } from '../../../lib/hooks/UseLicense';
 
 // Components
 import LoadingSpinner from '../../../components/layout/UI/Loader';

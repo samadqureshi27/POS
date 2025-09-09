@@ -11,10 +11,10 @@ import { StaffTable } from "./components/PayrollStaffTable";
 import ActionBar from "@/components/layout/UI/ActionBar";
 
 // Hooks
-import { useDateFilter } from "@/lib/hooks/useDateFilter";
-import { useStaffData } from "@/lib/hooks/usePayrollStaffData";
+import { useDateFilter } from "@/lib/hooks/UseDateFilter";
+import { useStaffData } from "@/lib/hooks/UsePayrollStaffData";
 import { useFilters } from "@/lib/hooks/PayrollFilter";
-import { useToast } from "@/lib/hooks/toast";
+import { useToast } from "@/lib/hooks/Toast";
 
 const StaffManagementPage = () => {
   // For demo purposes, let's set a default branch ID since we can't access real routing

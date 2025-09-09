@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { VendorAPI } from "../utility/vendorAPI";
+import { VendorAPI } from "../util/VendorAPI";
 import { useSelection } from "./Selection";
-import { useToast } from './toast';
-import { useVendorModal } from "./vendorModal";
+import { useToast } from './Toast';
+import { useVendorModal } from "./VendorModal";
 import { VendorItem, VendorFormData } from "../../types/vendors";
 
 export const useVendorManagement = (branchId: number) => {

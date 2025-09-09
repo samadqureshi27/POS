@@ -6,7 +6,7 @@ import ActionBar from "@/components/layout/UI/ActionBar";
 import {Toast} from "@/components/layout/UI/Toast";
 import MenuTable from "./_components/menu-table";
 import MenuModal from "./_components/menu-modal";
-import { MenuAPI } from "@/lib/util/menu-options-API";
+import { MenuAPI } from "@/lib/util/MenuOptionsAPI";
 import { MenuItemOptions } from "@/types/interfaces";
 
 const CategoryPage = () => {

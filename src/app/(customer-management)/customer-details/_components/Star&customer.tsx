@@ -4,7 +4,7 @@
 import React from 'react';
 import { AlertCircle, CheckCircle, X, Star } from 'lucide-react';
 import { ToastState } from '@/types/customer-details';
-import { getInitials } from '@/lib/utility/Customer-Details-utils';
+import { getInitials } from '@/lib/util/CustomerDetailsUtils';
 
 // Toast Component
 export const Toast = ({

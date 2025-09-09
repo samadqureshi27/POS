@@ -6,7 +6,7 @@ import RecipeTable from "./_components/recipe-table";
 import RecipeModal from "./_components/recipe-modal";
 import {Toast} from "@/components/layout/UI/Toast";
 
-import MenuAPI, { RecipeOption, Ingredient } from "@/lib/util/recipe-API";
+import MenuAPI, { RecipeOption, Ingredient } from "@/lib/util/RecipeAPI";
 
 const RecipesManagementPage = () => {
   const [RecipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);

@@ -1,10 +1,10 @@
 // hooks/useRestaurantProfile.ts
 import { useState, useEffect, useCallback } from 'react';
 import { RestaurantData } from '../../types/types';
-import { RestaurantAPI } from '../util/restaurantApi';
-import { validateRestaurantForm } from '../util/validation';
+import { RestaurantAPI } from '../util/RestaurantApi';
+import { validateRestaurantForm } from '../util/Validation';
 import { Toast } from '@/components/layout/UI/Toast';
-import { useToast } from '../hooks/toast';
+import { useToast } from './Toast';
 
 export const useRestaurantProfile = () => {
     const [formData, setFormData] = useState<RestaurantData>({

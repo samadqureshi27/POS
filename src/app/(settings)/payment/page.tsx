@@ -6,7 +6,7 @@ import { Toast } from '../../../components/layout/UI/Toast'
 import PaymentModal from "./_components/PaymentModal";
 import PaymentTable from "./_components/PaymentTable";;
 import LoadingSpinner from '../../../components/layout/UI/Loader';
-import { usePaymentManagement } from "../../../lib/hooks/usePaymentManagement";
+import { usePaymentManagement } from "../../../lib/hooks/UsePaymentManagement";
 
 const PaymentManagementPage = () => {
   const {

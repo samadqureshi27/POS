@@ -7,9 +7,9 @@ import { Toast } from "@/components/layout/UI/Toast";
 import CustomerSummaryCards from "./_components/customerSummaryCards";
 import CustomerTable from "./_components/customerTable";
 import ImportExportControls from "@/components/layout/UI/import-export-btn";
-import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/hooks/useCustomerDetails";
-import { exportCustomersToCSV } from "@/lib/utility/Customer-Details-utils";
-import { useToast } from "@/lib/hooks/toast";
+import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/hooks/UseCustomerDetails";
+import { exportCustomersToCSV } from "@/lib/util/CustomerDetailsUtils";
+import { useToast } from "@/lib/hooks/Toast";
 import LoadingSpinner from "@/components/layout/UI/Loader";
 
 const CustomerManagementPage = () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useCategory } from '@/lib/hooks/use-category';
+import { useCategory } from '@/lib/hooks/UseCategory';
 import {Toast} from "@/components/layout/UI/Toast";
 import LoadingSpinner from "@/components/layout/UI/Loader";
 import CategoryTable from './_components/category-table';

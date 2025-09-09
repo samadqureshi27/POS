@@ -1,5 +1,5 @@
 import { GeneralSettings, ApiResponse } from "../../types/types";
-import { DEFAULT_SETTINGS } from "./dropDown-settings";
+import { DEFAULT_SETTINGS } from "./DropDownSettings";
 
 // API class following the same pattern as MenuAPI
 export class SettingsAPI {

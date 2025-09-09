@@ -3,7 +3,7 @@ import { Save, ChevronDown } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ButtonPage from "@/components/layout/UI/button";
 import { StaffFormData } from "@/types/staffManagement";
-import { formatCNIC } from "@/lib/utility/Staff-formatters";
+import { formatCNIC } from "@/lib/util/StaffFormatters";
 
 interface StaffModalProps {
     isOpen: boolean;

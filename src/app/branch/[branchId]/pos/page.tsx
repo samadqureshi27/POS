@@ -9,7 +9,7 @@ import { Toast } from '../../../../components/layout/UI/Toast';
 import PosModal from "./_components/posModal";
 import PosTable from "./_components/posTable";
 import LoadingSpinner from '../../../../components/layout/UI/Loader';
-import { usePosManagement } from "../../../../lib/hooks/usePosManagement";
+import { usePosManagement } from "../../../../lib/hooks/UsePosManagement";
 
 const PosListPage = () => {
     const params = useParams();
