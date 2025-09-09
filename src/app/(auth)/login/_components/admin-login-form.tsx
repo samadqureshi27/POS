@@ -53,9 +53,9 @@ const AdminLoginForm: React.FC = () => {
   if (phase !== "adminLogin") return null;
 
   return (
-    <div className="absolute right-0 top-0 h-full z-50">
+    <div className="absolute right-0 top-0 h-full z-1">
       <div
-        className={`h-full bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-16 py-20 shadow-lg ml-16 mt-16 transition-transform duration-1000 ease-out ${
+        className={`absolute bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-16 py-20 z-10 transition-transform duration-1000 ease-out ${
           showLoginContainer
             ? "transform translate-y-0"
             : "transform translate-y-full"
@@ -66,7 +66,7 @@ const AdminLoginForm: React.FC = () => {
           marginLeft: "-50px",
         }}
       >
-        <div className="mb-12 text-center -mt-8">
+        <div className="mb-12 text-center -mt-16">
           <p className="text-gray-500 text-sm mb-3 tracking-widest font-medium">
             WELCOME BACK
           </p>

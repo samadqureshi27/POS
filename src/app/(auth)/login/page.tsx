@@ -13,7 +13,7 @@ import ManagerLoginForm from "./_components/manager-login-form";
 import ManagerForgotPinOverlay from "./_components/manager-forgot-pin";
 
 const LoginPageContent: React.FC = () => {
-  const { phase, setHoverSide } = useLoginContext();
+  const { phase, setHoverSide, showLoginContainer, showManagerContainer } = useLoginContext();
   const containerRef = React.useRef<HTMLDivElement | null>(null);
 
   return (
@@ -45,7 +45,7 @@ const LoginPageContent: React.FC = () => {
         <div className="absolute right-0 top-0 h-full z-50">
           <div
             className={`h-full bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-16 py-20 shadow-lg mr-16 mt-16 transition-transform duration-1000 ease-out relative ${
-              phase === "adminLogin" ? "transform translate-y-0" : "transform translate-y-full"
+              showLoginContainer ? "transform translate-y-0" : "transform translate-y-full"
             }`}
             style={{
               willChange: "transform",
@@ -66,7 +66,7 @@ const LoginPageContent: React.FC = () => {
         <div className="absolute left-0 top-0 h-full z-50">
           <div
             className={`h-full bg-white rounded-tr-3xl rounded-tl-3xl flex flex-col justify-center px-16 py-20 shadow-lg ml-16 mt-16 transition-transform duration-1000 ease-out relative ${
-              phase === "managerLogin" ? "transform translate-y-0" : "transform translate-y-full"
+              showManagerContainer ? "transform translate-y-0" : "transform translate-y-full"
             }`}
             style={{
               willChange: "transform",
