@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PosAPI } from "../utility/posAPI";
+import { PosAPI } from "../util/posAPI";
 import { useSelection } from "./Selection";
 import { useToast } from './toast';
 import { usePosModal } from "../hooks/posModal";
