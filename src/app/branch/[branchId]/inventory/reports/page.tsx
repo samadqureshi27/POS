@@ -9,13 +9,9 @@ import { Toast } from '@/components/layout/UI/Toast';
 import ReportsTable from "./_components/reportsTable";
 import LoadingSpinner from '@/components/layout/UI/Loader';
 import ImportExportControls from "@/components/layout/UI/import-export-btn";
-<<<<<<< HEAD
-import { useReportsManagement } from "@/lib/hooks/useReport";
-=======
 
 import { useReportsManagement } from "@/lib/hooks/useReport";
 
->>>>>>> d5477aaeeb1620873ecddcec590ac562f9219ade
 import { useImportExport } from "@/lib/hooks/import-export-hook";
 import { useToast } from "@/lib/hooks/toast";
 
