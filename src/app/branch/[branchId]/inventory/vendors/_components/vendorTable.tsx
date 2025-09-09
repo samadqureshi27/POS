@@ -4,7 +4,7 @@
 import React from "react";
 import Checkbox from "@mui/material/Checkbox";
 import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
-import { VendorItem, VendorTableProps } from "@/../../types/vendors";
+import { VendorItem, VendorTableProps } from "@/types/vendors";
 const VendorTable: React.FC<VendorTableProps> = ({
     vendorItems,
     selectedItems,
