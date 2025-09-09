@@ -4,7 +4,7 @@
 import React from "react";
 import { X, Save } from "lucide-react";
 import ButtonPage from "@/components/layout/UI/button";
-import { BranchModalProps } from "../../../types/branch";
+import { BranchModalProps } from "@/types/branch";
 
 const BranchModal: React.FC<BranchModalProps> = ({
     isOpen,

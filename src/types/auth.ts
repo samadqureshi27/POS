@@ -205,7 +205,7 @@ export interface ValidationErrors {
   [field: string]: string[];
 }
 
-// Utility Types
+// util Types
 export type StaffRole = Extract<UserRole, 'manager' | 'cashier' | 'waiter'>;
 export type AdminRole = Extract<UserRole, 'superadmin' | 'admin'>;
 

@@ -99,7 +99,7 @@ class MockDatabase {
 export class MockApiService {
   private static db = MockDatabase.getInstance();
 
-  // Utility method to simulate network delay
+  // util method to simulate network delay
   private static delay = (ms: number): Promise<void> => 
     new Promise(resolve => setTimeout(resolve, ms));
 
@@ -433,7 +433,7 @@ export class MockApiService {
   }
 }
 
-// Utility functions for easy migration to real API
+// util functions for easy migration to real API
 export const createApiService = (baseUrl: string) => {
   return {
     adminLogin: (email: string, password: string) => 
