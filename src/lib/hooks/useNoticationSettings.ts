@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { NotificationSettings } from "../../types/notification";
-import { NotificationsAPI } from "../utility/notifications-api";
+import { NotificationsAPI } from "../util/notifications-api";
 
 export const useNotificationSettings = (
     onToast: (message: string, type: "success" | "error") => void

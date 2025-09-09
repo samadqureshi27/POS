@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PaymentAPI } from "../../lib/utility/paymentAPI";
+import { PaymentAPI } from "../util/paymentAPI";
 import { useSelection } from "../../lib/hooks/Selection";
 import { useToast } from '../../lib/hooks/toast';
 import { usePaymentModal } from "../../lib/hooks/PaymentModal";

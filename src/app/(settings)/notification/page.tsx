@@ -6,7 +6,7 @@ import { useNotificationSettings } from "../../../lib/hooks/useNoticationSetting
 import LoadingSpinner from '@/components/layout/UI/Loader';
 import  { NotificationCard } from "./_components/NotificationCard";
 import { QuietHoursSettings } from "./_components/QuietHoursSettings";
-import { NOTIFICATION_SECTIONS } from "../../../lib/utility/notificationOptions";
+import { NOTIFICATION_SECTIONS } from "../../../lib/util/notificationOptions";
 import ActionButtons from '@/components/layout/UI/Setting-buttons';
 
 const NotificationSettingsPage = () => {
