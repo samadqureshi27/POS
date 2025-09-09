@@ -130,7 +130,6 @@ export const useBranchManagement = () => {
     const handleModalSubmit = () => {
         if (
             !formData.Branch_Name.trim() ||
-            !formData["Contact-Info"].trim() ||
             !formData.Address.trim()
         ) {
             showToast("Please fill all required fields", "error");

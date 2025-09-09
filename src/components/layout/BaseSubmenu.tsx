@@ -57,7 +57,7 @@ export default function BaseSubmenu({
   };
 
   return (
-    <div className="fixed top-16 left-0 right-0 z-[50] overflow-x-auto w-full bg-[#2E2E2E] shadow-md">
+    <div className="fixed top-16 left-0 right-0 z-[50] w-full bg-[#2E2E2E] shadow-md">
       <div className={`w-full px-3 sm:px-6 ${showBackArrow ? 'lg:px-4' : 'lg:px-22.5'}`}>
         <div className="flex items-center">
           {showBackArrow && (
@@ -70,7 +70,7 @@ export default function BaseSubmenu({
             </button>
           )}
           
-          <nav className={`flex flex-wrap items-center py-3 ${showBackArrow ? 'md:ml-4' : ''}`}>
+          <nav className={`flex items-center py-3 ${showBackArrow ? 'md:ml-4' : ''} overflow-x-auto scrollbar-hide`}>
             {items.map((item, idx) => {
               let isActive = false;
               if (item.hasSubmenu && item.submenuItems) {
@@ -83,7 +83,7 @@ export default function BaseSubmenu({
               const hasActiveSubmenu = item.hasSubmenu && isParentActive;
               
               return (
-                <div key={idx} className="flex items-center">
+                <div key={idx} className="flex items-center flex-shrink-0">
                   {/* Left separator - shows only when this item has an active submenu */}
                   {hasActiveSubmenu && (
                     <div className="h-8 w-px bg-[#83838a] mr-3 animate-in fade-in duration-300" />
@@ -127,7 +127,7 @@ export default function BaseSubmenu({
                                   border border-[#83838a] px-4 py-2 rounded text-sm font-medium 
                                   transition-all duration-200 ease-in-out whitespace-nowrap ml-3
                                   transform hover:scale-[1.02] active:scale-[0.98]
-                                  animate-in fade-in zoom-in-95 duration-200
+                                  animate-in fade-in zoom-in-95 duration-200 flex-shrink-0
                                   ${isSubActive
                                     ? 'bg-[#F6F6F6] text-gray-800 shadow-lg border-gray-300'
                                     : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#161616] hover:border-[#a0a0a0] hover:shadow-md'
@@ -172,6 +172,15 @@ export default function BaseSubmenu({
         .animate-fadeIn {
           opacity: 0;
           animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>
