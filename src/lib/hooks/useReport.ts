@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { ReportsAPI } from "../utility/reportApi";
 import { useToast } from './toast';
+import { useImportExport } from './import-export-hook';
 import { ReportItem } from "../../types/reports";
 
 export const useReportsManagement = (branchId: string) => {
@@ -11,6 +12,30 @@ export const useReportsManagement = (branchId: string) => {
 
     // Custom hooks
     const { toast, toastVisible, showToast, hideToast } = useToast();
+
+    // Import/Export functionality
+    const { 
+        handleExportWithConfig, 
+        handleImport, 
+        isLoading: importExportLoading 
+    } = useImportExport({
+        onExportSuccess: () => showToast("Inventory report exported successfully", "success"),
+        onExportError: (error) => showToast(error, "error"),
+        onImportSuccess: (data) => {
+            // You can add logic here to process imported data
+            showToast("Inventory data imported successfully", "success");
+        },
+        onImportError: (error) => showToast(error, "error"),
+        validateImportData: (data) => {
+            if (data.length === 0) return { isValid: false, error: "File is empty" };
+            const requiredFields = ['Name', 'Unit', 'InitialStock', 'Total_Value'];
+            const hasRequiredFields = requiredFields.some(field => data[0].hasOwnProperty(field));
+            if (!hasRequiredFields) {
+                return { isValid: false, error: "Invalid file format. Missing required inventory columns." };
+            }
+            return { isValid: true };
+        }
+    });
 
     // Load report items
     const loadReportItems = async () => {
@@ -94,6 +119,11 @@ export const useReportsManagement = (branchId: string) => {
         uniqueUnits: Array.from(new Set(reportItems.map((i) => i.Unit)))
     };
 
+    // Export functionality using predefined config
+    const handleExport = () => {
+        handleExportWithConfig(filteredItems, 'inventory', branchId);
+    };
+
     // Load data on mount
     useEffect(() => {
         if (branchId) {
@@ -114,6 +144,11 @@ export const useReportsManagement = (branchId: string) => {
         toast,
         toastVisible,
         hideToast,
+
+        // Import/Export
+        handleExport,
+        handleImport,
+        importExportLoading,
 
         // Actions
         setSearchTerm,

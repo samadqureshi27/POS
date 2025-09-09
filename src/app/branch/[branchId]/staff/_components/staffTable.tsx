@@ -305,8 +305,8 @@ const StaffTable: React.FC<StaffTableProps> = ({
                                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                                         <span
                                             className={`inline-block w-20 text-right lg:text-center py-[2px] rounded-sm text-xs font-medium 
-                      ${item.Status === "Active" ? "text-green-400 border-green-600" : ""}
-                      ${item.Status === "Inactive" ? "text-red-400 border-red-600" : ""}`}
+                                        ${item.Status === "Active" ? "text-green-400 border-green-600" : ""}
+                                        ${item.Status === "Inactive" ? "text-red-400 border-red-600" : ""}`}
                                         >
                                             {item.Status}
                                         </span>

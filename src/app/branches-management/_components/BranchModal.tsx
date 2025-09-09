@@ -125,16 +125,14 @@ const BranchModal: React.FC<BranchModalProps> = ({
                         onClick={onSubmit}
                         disabled={
                             !formData.Branch_Name.trim() ||
-                            !formData["Contact-Info"].trim() ||
                             !formData.Address.trim() ||
                             actionLoading
                         }
                         className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${!formData.Branch_Name.trim() ||
-                                !formData["Contact-Info"].trim() ||
-                                !formData.Address.trim() ||
-                                actionLoading
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-[#2C2C2C] text-white hover:bg-gray-700"
+                            !formData.Address.trim() ||
+                            actionLoading
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-[#2C2C2C] text-white hover:bg-gray-700"
                             }`}
                     >
                         {actionLoading ? (
