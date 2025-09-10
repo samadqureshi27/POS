@@ -5,7 +5,7 @@ import React from "react";
 import { LicenseInfo, ApiResponse, ToastState } from '@/types/billing';
 
 // Hooks
-import { useToast } from '@/lib/hooks/Toast'
+import { useToast } from '@/lib/hooks';
 import { Toast } from '@/components/layout/UI/Toast';
 import { useLicense } from '@/lib/hooks/useLicense';
 

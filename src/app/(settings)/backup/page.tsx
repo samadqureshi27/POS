@@ -2,8 +2,8 @@
 import React from "react";
 
 // Hooks
-import { useToast } from '@/lib/hooks/Toast';
-import { useModal } from '@/lib/hooks/UseBackupModal';
+import { useToast } from '@/lib/hooks';
+import { useModal } from '@/lib/hooks';
 import { useBackup } from '@/lib/hooks/useBackup';
 
 // Components

@@ -2,7 +2,7 @@
 import React from "react";
 
 // Hooks
-import { useToast } from '@/lib/hooks/Toast';
+import { useToast } from '@/lib/hooks';
 import { useSettings } from '@/lib/hooks/Gsettings';
 
 // Components

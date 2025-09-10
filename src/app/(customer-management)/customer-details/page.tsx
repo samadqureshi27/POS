@@ -9,7 +9,7 @@ import CustomerTable from "./_components/customerTable";
 import ImportExportControls from "@/components/layout/UI/import-export-btn";
 import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/hooks/useCustomerDetails";
 import { exportCustomersToCSV } from "@/lib/util/CustomerDetailsUtils";
-import { useToast } from "@/lib/hooks/Toast";
+import { useToast } from "@/lib/hooks";
 import LoadingSpinner from "@/components/layout/UI/Loader";
 
 const CustomerManagementPage = () => {
