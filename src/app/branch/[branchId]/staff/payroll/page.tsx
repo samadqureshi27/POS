@@ -11,8 +11,8 @@ import { StaffTable } from "./components/PayrollStaffTable";
 import ActionBar from "@/components/layout/UI/ActionBar";
 
 // Hooks
-import { useDateFilter } from "@/lib/hooks/UseDateFilter";
-import { useStaffData } from "@/lib/hooks/UsePayrollStaffData";
+import { useDateFilter } from "@/lib/hooks/useDateFilter";
+import { useStaffData } from "@/lib/hooks/usePayrollStaffData";
 import { useFilters } from "@/lib/hooks/PayrollFilter";
 import { useToast } from "@/lib/hooks/Toast";
 

@@ -9,17 +9,9 @@ import { Toast } from '@/components/layout/UI/Toast';
 import ReportsTable from "./_components/reportsTable";
 import LoadingSpinner from '@/components/layout/UI/Loader';
 import ImportExportControls from "@/components/layout/UI/import-export-btn";
-<<<<<<< HEAD
-import { useReportsManagement } from "../../../../../lib/hooks/UseReport";
+import { useReportsManagement } from "@/lib/hooks/useReport";
 import { useImportExport } from "@/lib/hooks/ImportExportHook";
 import { useToast } from "@/lib/hooks/Toast";
-=======
-
-import { useReportsManagement } from "@/lib/hooks/useReport";
-
-import { useImportExport } from "@/lib/hooks/import-export-hook";
-import { useToast } from "@/lib/hooks/toast";
->>>>>>> fa4c0c4c5551bd77636fd1d5b27ca4fad7662fa6
 
 const ReportsPage = () => {
     const params = useParams();

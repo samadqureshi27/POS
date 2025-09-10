@@ -1,5 +1,5 @@
 // utils/paymentUtils.ts
-import { PaymentMethod } from "../../types/payment";
+import { PaymentMethod } from "@/types/payment";
 
 export const calculatePaymentStats = (paymentMethods: PaymentMethod[]) => {
     const activeMethodsCount = paymentMethods.filter(m => m.Status === "Active").length;

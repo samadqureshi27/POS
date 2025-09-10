@@ -1,4 +1,4 @@
-import { LicenseInfo, ApiResponse } from "../../types/billing";
+import { LicenseInfo, ApiResponse } from "@/types/billing";
 
 // Mock API
 export class LicenseAPI {

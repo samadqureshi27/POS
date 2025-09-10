@@ -2,8 +2,8 @@
 import React from "react";
 
 // Hooks
-import { useToast } from '../../../lib/hooks/Toast';
-import { useSettings } from '../../../lib/hooks/Gsettings';
+import { useToast } from '@/lib/hooks/Toast';
+import { useSettings } from '@/lib/hooks/Gsettings';
 
 // Components
 import { Toast } from '@/components/layout/UI/Toast';

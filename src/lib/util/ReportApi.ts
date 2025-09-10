@@ -1,4 +1,4 @@
-import { ReportItem, ApiResponse } from "../../types/reports";
+import { ReportItem, ApiResponse } from "@/types/reports";
 
 export class ReportsAPI {
     private static delay = (ms: number) =>

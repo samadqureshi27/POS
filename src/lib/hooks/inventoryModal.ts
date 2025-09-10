@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { InventoryItem, InventoryModalFormData } from "../../types/inventory";
+import { InventoryItem, InventoryModalFormData } from "@/types/inventory";
 import { calculateStatus } from "../util/InventoryAPI";
 
 export const useInventoryModal = (branchId: number) => {

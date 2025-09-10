@@ -1,6 +1,6 @@
 // utils/validation.ts
 
-import { RestaurantData } from '../../types';
+import { RestaurantData } from '@/types';
 
 
 export const validateRestaurantForm = (formData: RestaurantData) => {

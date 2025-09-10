@@ -2,14 +2,14 @@
 import React from "react";
 
 // Hooks
-import { useToast } from '../../../lib/hooks/Toast';
-import { useModal } from '../../../lib/hooks/UseBackupModal';
-import { useBackup } from '../../../lib/hooks/UseBackup';
+import { useToast } from '@/lib/hooks/Toast';
+import { useModal } from '@/lib/hooks/UseBackupModal';
+import { useBackup } from '@/lib/hooks/useBackup';
 
 // Components
 import { BackupModal } from './_components/BackupModal';
-import { Toast } from '../../../components/layout/UI/Toast';
-import LoadingSpinner from '../../../components/layout/UI/Loader';
+import { Toast } from '@/components/layout/UI/Toast';
+import LoadingSpinner from '@/components/layout/UI/Loader';
 import { BackupPageHeader } from './_components/BackupPageHeader';
 import { BackupSettingsCard } from './_components/BackupSettingsCard';
 import { BackupHistoryCard } from './_components/BackupHistoruCards';

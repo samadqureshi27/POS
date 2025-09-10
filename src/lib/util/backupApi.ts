@@ -2,7 +2,7 @@ import {
     BackupSettings,
     BackupHistoryItem,
     ApiResponse,
-} from "../../types/Backup";
+} from "@/types/Backup";
 
 // Mock API
 export class BackupAPI {

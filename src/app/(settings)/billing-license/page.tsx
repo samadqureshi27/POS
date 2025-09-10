@@ -2,15 +2,15 @@
 import React from "react";
 
 // Types
-import { LicenseInfo, ApiResponse, ToastState } from '../../../types/billing';
+import { LicenseInfo, ApiResponse, ToastState } from '@/types/billing';
 
 // Hooks
-import { useToast } from '../../../lib/hooks/Toast'
-import { Toast } from '../../../components/layout/UI/Toast';
-import { useLicense } from '../../../lib/hooks/UseLicense';
+import { useToast } from '@/lib/hooks/Toast'
+import { Toast } from '@/components/layout/UI/Toast';
+import { useLicense } from '@/lib/hooks/useLicense';
 
 // Components
-import LoadingSpinner from '../../../components/layout/UI/Loader';
+import LoadingSpinner from '@/components/layout/UI/Loader';
 import { PageHeader } from './_components/PageHeader'
 import { LicenseInfoCard } from './_components/LicenseinfoCard'
 import { ResourcesAllocationCard } from './_components/ResourceAllocationCard'

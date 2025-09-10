@@ -1,4 +1,4 @@
-import { VendorItem, ApiResponse } from "../../types/vendors";
+import { VendorItem, ApiResponse } from "@/types/vendors";
 
 export class VendorAPI {
     private static delay = (ms: number) =>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { BackupSettings, BackupHistoryItem } from "../../types/Backup";
-import { BackupAPI } from "../util/BackupApi";
+import { BackupSettings, BackupHistoryItem } from "@/types/Backup";
+import { BackupAPI } from "../util/backupApi";
 
 interface UseBackupProps {
     showToast: (message: string, type: "success" | "error") => void;

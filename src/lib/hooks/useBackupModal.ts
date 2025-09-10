@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ModalState } from "../../types/Backup";
+import { ModalState } from "@/types/Backup";
 
 export const useModal = () => {
     const [modal, setModal] = useState<ModalState>({

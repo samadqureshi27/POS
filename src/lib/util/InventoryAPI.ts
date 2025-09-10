@@ -1,4 +1,4 @@
-import { InventoryItem, ApiResponse } from "../../types/inventory";
+import { InventoryItem, ApiResponse } from "@/types/inventory";
 
 // Function to calculate status based on threshold
 export const calculateStatus = (

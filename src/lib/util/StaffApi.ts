@@ -1,4 +1,4 @@
-import { StaffItem, BranchInfo, ApiResponse } from "../../types/staffManagement";
+import { StaffItem, BranchInfo, ApiResponse } from "@/types/staffManagement";
 
 // Mock API with Branch Integration
 export class StaffAPI {

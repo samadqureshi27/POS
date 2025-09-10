@@ -1,12 +1,12 @@
 "use client";
 import React from "react";
 import { Toast } from '@/components/layout/UI/Toast';
-import { useToast } from '../../../lib/hooks/Toast';
-import { useNotificationSettings } from "../../../lib/hooks/UseNoticationSettings";
+import { useToast } from '@/lib/hooks/Toast';
+import { useNotificationSettings } from "@/lib/hooks/useNoticationSettings";
 import LoadingSpinner from '@/components/layout/UI/Loader';
 import  { NotificationCard } from "./_components/NotificationCard";
 import { QuietHoursSettings } from "./_components/QuietHoursSettings";
-import { NOTIFICATION_SECTIONS } from "../../../lib/util/NotificationOptions";
+import { NOTIFICATION_SECTIONS } from "@/lib/util/notificationOptions";
 import ActionButtons from '@/components/layout/UI/Setting-buttons';
 
 const NotificationSettingsPage = () => {

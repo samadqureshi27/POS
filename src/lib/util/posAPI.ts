@@ -1,4 +1,4 @@
-import { PosItem, ApiResponse } from "../../types/pos";
+import { PosItem, ApiResponse } from "@/types/pos";
 
 export class PosAPI {
     private static delay = (ms: number) =>

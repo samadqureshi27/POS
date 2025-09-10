@@ -1,4 +1,4 @@
-import { NotificationSettings, ApiResponse } from "../../types/notification";
+import { NotificationSettings, ApiResponse } from "@/types/notification";
 
 export class NotificationsAPI {
   private static delay = (ms: number) =>

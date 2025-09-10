@@ -1,6 +1,6 @@
 // _components/OrderAPI.ts
 
-import { OrderItem, ApiResponse, OrderStats } from '../../types';
+import { OrderItem, ApiResponse, OrderStats } from '@/types';
 
 
 export class OrderAPI {

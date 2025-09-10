@@ -3,12 +3,8 @@
 
 import React from 'react';
 import { AlertCircle, CheckCircle, X, Star } from 'lucide-react';
-<<<<<<< HEAD
 import { ToastState } from '@/types/customer-details';
 import { getInitials } from '@/lib/util/CustomerDetailsUtils';
-=======
-import { getInitials } from '@/lib/util/Customer-Details-utils';
->>>>>>> fa4c0c4c5551bd77636fd1d5b27ca4fad7662fa6
 
 // Toast Component
 // Profile Picture Component

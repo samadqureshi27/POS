@@ -1,5 +1,5 @@
 // utils/vendorUtils.ts
-import { VendorItem, VendorItemWithUsage } from "../../types/vendors";
+import { VendorItem, VendorItemWithUsage } from "@/types/vendors";
 
 export const generateUsageData = (items: VendorItem[]): VendorItemWithUsage[] => {
     return items.map((item) => {

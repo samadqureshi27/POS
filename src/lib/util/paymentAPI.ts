@@ -1,4 +1,4 @@
-import { PaymentMethod, ApiResponse } from '../../types/payment';
+import { PaymentMethod, ApiResponse } from '@/types/payment';
 
 export class PaymentAPI {
     private static delay = (ms: number) =>

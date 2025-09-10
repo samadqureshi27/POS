@@ -1,7 +1,7 @@
 
 // lib/util/branchAPI.ts
 
-import { BranchItem, ApiResponse } from "../../types/branch";
+import { BranchItem, ApiResponse } from "@/types/branch";
 
 export class BranchAPI {
     private static delay = (ms: number) =>

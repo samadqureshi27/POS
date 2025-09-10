@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { StaffItem, StaffFormData } from "../../types/staffManagement";
+import { StaffItem, StaffFormData } from "@/types/staffManagement";
 
 export const useStaffModal = (branchId: string) => {
     const [editingItem, setEditingItem] = useState<StaffItem | null>(null);

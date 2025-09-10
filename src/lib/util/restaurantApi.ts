@@ -1,6 +1,6 @@
 // utils/restaurantApi.ts
 
-import { RestaurantData, ApiResponse } from "../../types";
+import { RestaurantData, ApiResponse } from "@/types";
 
 
 export class RestaurantAPI {
