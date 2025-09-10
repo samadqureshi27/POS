@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { InventoryAPI, calculateStatus } from "../util/InventoryAPI";
 import { useSelection } from "./Selection";
 import { useToast } from './Toast';
-import { useInventoryModal } from "./InventoryModal";
+import { useInventoryModal } from "./inventoryModal";
 import { InventoryItem } from "../../types/inventory";
 
 export const useInventoryManagement = (branchId: number) => {
