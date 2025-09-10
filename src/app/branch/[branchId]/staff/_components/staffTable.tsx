@@ -126,7 +126,7 @@ const StaffTable: React.FC<StaffTableProps> = ({
                                         <DropdownMenu.Content
                                             className="min-w-[120px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                                             sideOffset={6}
-                                            onOpenAutoFocus={(e) => e.preventDefault()}
+                                            // onOpenAutoFocus={(e) => e.preventDefault()}
                                             onCloseAutoFocus={(e) => e.preventDefault()}
                                             style={{ zIndex: 1000 }}
                                         >
@@ -168,7 +168,7 @@ const StaffTable: React.FC<StaffTableProps> = ({
                                         <DropdownMenu.Content
                                             className="min-w-[120px] rounded-sm bg-white shadow-md border-none p-1 relative outline-none"
                                             sideOffset={6}
-                                            onOpenAutoFocus={(e) => e.preventDefault()}
+                                            // onOpenAutoFocus={(e) => e.preventDefault()}
                                             onCloseAutoFocus={(e) => e.preventDefault()}
                                             style={{ zIndex: 1000 }}
                                         >

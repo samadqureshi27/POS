@@ -22,7 +22,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
                 <table className="min-w-full divide-y divide-gray-200 table-fixed">
                     <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
                         <tr>
-                            <th className="relative px-4 py-3 py-6 text-left w-40">
+                            <th className="relative px-4 py-3 text-left w-40">
                                 Name
                             </th>
                             <th className="relative px-4 py-3 text-left w-36">

@@ -9,7 +9,7 @@ import { Toast } from '@/components/layout/UI/Toast';
 import VendorModal from "./_components/vendorModal";
 import VendorTable from "./_components/vendorTable";
 import LoadingSpinner from '@/components/layout/UI/Loader';
-import { useVendorManagement } from "@/lib/hooks/UseVendors";
+import { useVendorManagement } from "@/lib/hooks/useVendors"; 
 
 const VendorsPage = () => {
   const params = useParams();

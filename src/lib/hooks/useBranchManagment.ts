@@ -111,7 +111,7 @@ export const useBranchManagement = () => {
         if (selectedItems.length === 0) return;
         try {
             setActionLoading(true);
-            const response = await BranchAPI.bulkDeleteBranchItems(selectedItems);
+            const response = await BranchAPI.bulkDeleteBranchItems(selectedItems as number[]);
             if (response.success) {
                 // Refresh from API (IDs already re-assigned there)
                 const updated = await BranchAPI.getBranchItems();

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { VendorAPI } from "../util/VendorAPI";
 import { useSelection } from "./Selection";
 import { useToast } from './Toast';
+import { useVendorModal } from "./vendorModal";
 import { VendorItem, VendorFormData } from "@/types/vendors";
 
 export const useVendorManagement = (branchId: number) => {
