@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CategoryItem, CategoryFormData } from '@/types/category';
+import { CategoryItem, CategoryFormData } from '@/lib/types/category';
 import { MenuAPI } from '@/lib/util/CategoryAPI';
 
 export const useCategory = () => {

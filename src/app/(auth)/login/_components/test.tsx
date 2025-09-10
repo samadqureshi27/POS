@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { User, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Button from "@/components/layout/UI/RoleButton";
-import Input from "@/components/layout/UI/Input";
-import ErrorMessage from "@/components/layout/UI/ErrorMessage";
+import Button from "@/components/layout/ui/RoleButton";
+import Input from "@/components/layout/ui/Input";
+import ErrorMessage from "@/components/layout/ui/error-message";
 import authService from "@/lib/authService";
 import {
   validateAdminLoginForm,

@@ -1,4 +1,4 @@
-import { StaffItem, ApiResponse } from '@/types/payroll';
+import { StaffItem, ApiResponse } from '@/lib/types/payroll';
 
 // Mock API - Updated to filter by branch
 export class StaffAPI {

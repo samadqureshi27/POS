@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { BackupSettings, BackupHistoryItem } from "@/types/Backup";
+import { BackupSettings, BackupHistoryItem } from "@/lib/types/Backup";
 import { BackupAPI } from "../util/backupApi";
 
 interface UseBackupProps {

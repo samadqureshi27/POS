@@ -4,7 +4,7 @@ import { BranchAPI } from "../util/BranchApi";
 import { useSelection } from "./Selection";
 import { useToast } from './Toast';
 import { useBranchModal } from "./BranchModal";
-import { BranchItem } from "@/types/branch";
+import { BranchItem } from "@/lib/types/branch";
 
 export const useBranchManagement = () => {
     const [branchItems, setBranchItems] = useState<BranchItem[]>([]);

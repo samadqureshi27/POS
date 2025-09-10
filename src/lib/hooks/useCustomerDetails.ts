@@ -1,6 +1,6 @@
 // hooks/useCustomers.ts
 import { useState, useEffect, useMemo } from 'react';
-import { CustomerItem, ToastState, CustomerSummaryData } from '@/types/customer-details';
+import { CustomerItem, ToastState, CustomerSummaryData } from '@/lib/types/customer-details';
 import { CustomerAPI } from '../util/CustomerDetailsAPI';
 import { filterCustomers, calculateCustomerSummary } from '../util/CustomerDetailsUtils';
 

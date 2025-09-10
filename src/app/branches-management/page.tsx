@@ -3,12 +3,12 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import StatCard from "@/components/layout/UI/SummaryCard";
-import ActionBar from "@/components/layout/UI/ActionBar";
-import { Toast } from '@/components/layout/UI/Toast';
+import StatCard from "@/components/layout/ui/SummaryCard";
+import ActionBar from "@/components/layout/ui/ActionBar";
+import { Toast } from '@/components/layout/ui/Toast';
 import BranchModal from "./_components/BranchModal";
 import BranchTable from "./_components/BranchTable";
-import LoadingSpinner from '@/components/layout/UI/Loader';
+import LoadingSpinner from '@/components/layout/ui/Loader';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 
 const BranchManagementPage = () => {

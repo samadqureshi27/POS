@@ -3,12 +3,12 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import StatCard from "@/components/layout/UI/SummaryCard";
-import ActionBar from "@/components/layout/UI/ActionBar";
-import { Toast } from '@/components/layout/UI/Toast';
+import StatCard from "@/components/layout/ui/SummaryCard";
+import ActionBar from "@/components/layout/ui/ActionBar";
+import { Toast } from '@/components/layout/ui/Toast';
 import ReportsTable from "./_components/reportsTable";
-import LoadingSpinner from '@/components/layout/UI/Loader';
-import ImportExportControls from "@/components/layout/UI/import-export-btn";
+import LoadingSpinner from '@/components/layout/ui/Loader';
+import ImportExportControls from "@/components/layout/ui/import-export-btn";
 import { useReportsManagement } from "@/lib/hooks/useReport";
 import { useImportExport } from "@/lib/hooks/ImportExportHook";
 import { useToast } from "@/lib/hooks/Toast";

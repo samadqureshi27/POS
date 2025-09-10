@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { StaffItem } from "@/types/staffManagement";
+import { StaffItem } from "@/lib/types/staffManagement";
 
 export const useStaffFiltering = (staffItems: StaffItem[]) => {
     const [searchInput, setSearchInput] = useState("");

@@ -1,6 +1,6 @@
 // lib/hooks/BranchModal.ts
 import { useState, useEffect } from "react";
-import { BranchItem, BranchModalFormData } from "@/types/branch";
+import { BranchItem, BranchModalFormData } from "@/lib/types/branch";
 
 export const useBranchModal = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

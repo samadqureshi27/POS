@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
-import {Toast} from "@/components/layout/UI/Toast";
+import {Toast} from "@/components/layout/ui/Toast";
 import MenuActionBar from "./_components/menu-actionbar";
 import MenuTable from "./_components/menu-table";
 import TabNavigation from "./_components/tab-menu";

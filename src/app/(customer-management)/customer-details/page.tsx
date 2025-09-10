@@ -2,15 +2,15 @@
 "use client";
 import React from "react";
 import { useRouter } from 'next/navigation';
-import ActionBar from "@/components/layout/UI/ActionBar";
-import { Toast } from "@/components/layout/UI/Toast";
+import ActionBar from "@/components/layout/ui/action-bar";
+import { Toast } from "@/components/layout/ui/Toast";
 import CustomerSummaryCards from "./_components/customerSummaryCards";
 import CustomerTable from "./_components/customerTable";
-import ImportExportControls from "@/components/layout/UI/import-export-btn";
+import ImportExportControls from "@/components/layout/ui/import-export-btn";
 import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/hooks/useCustomerDetails";
 import { exportCustomersToCSV } from "@/lib/util/CustomerDetailsUtils";
 import { useToast } from "@/lib/hooks";
-import LoadingSpinner from "@/components/layout/UI/Loader";
+import LoadingSpinner from "@/components/layout/ui/Loader";
 
 const CustomerManagementPage = () => {
   const router = useRouter();

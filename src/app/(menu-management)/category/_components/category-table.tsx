@@ -4,8 +4,8 @@ import React from "react";
 import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
-import { CategoryItem } from '@/types/category';
+import ResponsiveEditButton from "@/components/layout/ui/ResponsiveEditButton";
+import { CategoryItem } from '@/lib/types/category';
 
 interface CategoryTableProps {
   filteredItems: CategoryItem[];

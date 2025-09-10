@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { X, Save, ImageIcon } from "lucide-react";
-import ButtonPage from "@/components/layout/UI/button";
-import { CategoryItem, CategoryFormData } from '@/types/category';
+import ButtonPage from "@/components/layout/ui/button";
+import { CategoryItem, CategoryFormData } from '@/lib/types/category';
 
 interface CategoryModalProps {
   isOpen: boolean;

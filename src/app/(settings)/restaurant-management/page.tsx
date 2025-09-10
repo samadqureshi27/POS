@@ -1,9 +1,9 @@
 // pages/RestaurantProfilePage.tsx
 "use client";
 import React from "react";
-import LoadingSpinner from '@/components/layout/UI/Loader';
-import ActionButtons from '@/components/layout/UI/Setting-buttons';
-import { Toast } from '@/components/layout/UI/Toast';
+import LoadingSpinner from '@/components/layout/ui/Loader';
+import ActionButtons from '@/components/layout/ui/Setting-buttons';
+import { Toast } from '@/components/layout/ui/Toast';
 import { useToast } from '@/lib/hooks/Toast';
 import { useRestaurantProfile } from '@/lib/hooks/useRestaurantProfile';
 import { BasicInfoCard } from './_components/BasicInfoCard';

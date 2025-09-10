@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { NotificationSettings } from "@/types/notification";
+import { NotificationSettings } from "@/lib/types/notification";
 import { NotificationsAPI } from "../util/NotificationsAPI";
 
 export const useNotificationSettings = (

@@ -1,5 +1,5 @@
 import React from "react";
-import ButtonPage from "@/components/layout/UI/button";
+import ButtonPage from "@/components/layout/ui/button";
 import { RecipeOption } from "@/lib/util/RecipeAPI";
 
 interface RecipeInfoTabProps {

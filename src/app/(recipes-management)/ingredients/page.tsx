@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import ActionBar from "@/components/layout/UI/ActionBar";
-import {Toast} from "@/components/layout/UI/Toast";
-import LoadingSpinner from "@/components/layout/UI/Loader";
+import ActionBar from "@/components/layout/ui/ActionBar";
+import {Toast} from "@/components/layout/ui/Toast";
+import LoadingSpinner from "@/components/layout/ui/Loader";
 import IngredientsTable from "./_components/ingredients-table";
 import IngredientsModal from "./_components/ingredients-modal";
 

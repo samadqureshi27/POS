@@ -3,7 +3,7 @@
 import React from "react";
 import { DateRange } from "react-date-range";
 import { Calendar } from "lucide-react";
-import { DateFilterProps } from "@/types/payroll";
+import { DateFilterProps } from "@/lib/types/payroll";
 
 import "react-date-range/dist/styles.css"; // main css
 import "react-date-range/dist/theme/default.css"; // theme css

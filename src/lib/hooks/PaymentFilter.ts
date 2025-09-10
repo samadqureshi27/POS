@@ -1,6 +1,6 @@
 // hooks/usePaymentFilters.ts
 import { useState, useMemo } from "react";
-import { PaymentMethod } from "@/types/payment";
+import { PaymentMethod } from "@/lib/types/payment";
 
 export const usePaymentFilters = (paymentMethods: PaymentMethod[]) => {
     const [searchTerm, setSearchTerm] = useState("");

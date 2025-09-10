@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { StaffItem, DateFilterHook, FiltersHook } from '@/types/payroll';
+import { StaffItem, DateFilterHook, FiltersHook } from '@/lib/types/payroll';
 
 export const useFilters = (
     staffItems: StaffItem[],

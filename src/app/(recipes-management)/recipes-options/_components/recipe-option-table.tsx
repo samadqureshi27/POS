@@ -1,6 +1,6 @@
 import React from "react";
 import CustomCheckbox from "./custom-checkbox";
-import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
+import ResponsiveEditButton from "@/components/layout/ui/ResponsiveEditButton";
 
 interface RecipeOption {
   ID: number;

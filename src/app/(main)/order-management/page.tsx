@@ -1,10 +1,10 @@
 // page.tsx - Refactored Main Component
 "use client";
 import React, { useState, useEffect } from "react";
-import ActionBar from "@/components/layout/UI/ActionBar";
+import ActionBar from "@/components/layout/ui/ActionBar";
 
 // Import all our new components
-import {Toast} from "@/components/layout/UI/Toast";
+import {Toast} from "@/components/layout/ui/Toast";
 import PeriodSelector from "./_components/period-selector";
 import MostOrderedTable from "./_components/most-ordered-table";
 import LeastOrderedTable from "./_components/least-order-table";
@@ -13,7 +13,7 @@ import OrderTable from "./_components/order-table";
 
 // Import types and services
 
-import { OrderItem, OrderStats } from "@/types";
+import { OrderItem, OrderStats } from "@/lib/types";
 import { OrderAPI } from "@/components/auth/order-API";
 import { useOrderFilters } from "@/lib/hooks/UseOrderFilter";
 

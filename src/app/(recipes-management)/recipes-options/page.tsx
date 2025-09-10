@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import ActionBar from "@/components/layout/UI/ActionBar";
+import ActionBar from "@/components/layout/ui/ActionBar";
 import { MenuAPI, RecipeOption } from "@/lib/util/RecipeOptionAPI";
-import {Toast} from "@/components/layout/UI/Toast";
-import LoadingSpinner from "@/components/layout/UI/Loader";
+import {Toast} from "@/components/layout/ui/Toast";
+import LoadingSpinner from "@/components/layout/ui/Loader";
 import RecipeModal from "./_components/recipe-option-modal";
 import RecipeTable from "./_components/recipe-option-table";
 

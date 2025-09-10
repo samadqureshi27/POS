@@ -2,9 +2,9 @@
 "use client";
 import React from "react";
 import { User, Lock } from "lucide-react";
-import Button from "@/components/layout/UI/RoleButton";
-import Input from "@/components/layout/UI/Input";
-import ErrorMessage from "@/components/layout/UI/ErrorMessage";
+import Button from "@/components/layout/ui/RoleButton";
+import Input from "@/components/layout/ui/Input";
+import ErrorMessage from "@/components/layout/ui/error-message";
 import { useLoginContext } from "./login-context";
 import { validateAdminLoginForm } from "@/lib/validations";
 

@@ -1,5 +1,5 @@
 // utils/customerUtils.ts
-import { CustomerItem, CustomerSummaryData } from '@/types/customer-details';
+import { CustomerItem, CustomerSummaryData } from '@/lib/types/customer-details';
 
 export const filterCustomers = (customers: CustomerItem[], searchTerm: string): CustomerItem[] => {
     const s = searchTerm.toLowerCase();

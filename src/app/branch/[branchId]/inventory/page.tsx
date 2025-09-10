@@ -2,10 +2,10 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { useInventoryManagement } from "@/lib/hooks/InventoryManagement";
-import { Toast } from "@/components/layout/UI/Toast";
-import ActionBar from "@/components/layout/UI/ActionBar";
-import LoadingSpinner from "@/components/layout/UI/Loader";
-import StatCard from "@/components/layout/UI/SummaryCard";
+import { Toast } from "@/components/layout/ui/Toast";
+import ActionBar from "@/components/layout/ui/ActionBar";
+import LoadingSpinner from "@/components/layout/ui/Loader";
+import StatCard from "@/components/layout/ui/SummaryCard";
 import InventoryModal from "./_components/inventoryModal";
 import InventoryTable from "./_components/inventoryTable";
 const InventoryManagementPage = () => {

@@ -3,16 +3,16 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import ActionBar from "@/components/layout/UI/ActionBar";
-import StatCard from "@/components/layout/UI/SummaryCard";
+import ActionBar from "@/components/layout/ui/ActionBar";
+import StatCard from "@/components/layout/ui/SummaryCard";
 import StaffTable from "./_components/staffTable";
 import StaffModal from "./_components/staffModal";
-import {Toast} from "@/components/layout/UI/Toast";
+import {Toast} from "@/components/layout/ui/Toast";
 import { useStaff } from "@/lib/hooks/useSatffManagement";
 import { useStaffModal } from "@/lib/hooks/useStaffModal";
 import { useStaffFiltering } from "@/lib/hooks/useSatffFiltering";
 import { useSelection } from "@/lib/hooks/Selection";
-import LoadingSpinner from '@/components/layout/UI/Loader';
+import LoadingSpinner from '@/components/layout/ui/Loader';
 const EmployeeRecordsPage = () => {
   const params = useParams();
   const branchId = params?.branchId as string;

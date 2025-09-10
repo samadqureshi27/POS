@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import DetailsForm from './detail-form';
 import OptionValuesForm from './option-value-form';
-import { MenuItemOptions } from '@/types/interfaces';
+import { MenuItemOptions } from '@/lib/types/interfaces';
 
 interface MenuModalProps {
   isOpen: boolean;

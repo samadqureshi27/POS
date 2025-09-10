@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PaymentMethod, ModalFormData } from "@/types/payment";
+import { PaymentMethod, ModalFormData } from "@/lib/types/payment";
 
 export const usePaymentModal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

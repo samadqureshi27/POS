@@ -8,8 +8,8 @@ import { useBackup } from '@/lib/hooks/useBackup';
 
 // Components
 import { BackupModal } from './_components/BackupModal';
-import { Toast } from '@/components/layout/UI/Toast';
-import LoadingSpinner from '@/components/layout/UI/Loader';
+import { Toast } from '@/components/layout/ui/Toast';
+import LoadingSpinner from '@/components/layout/ui/Loader';
 import { BackupPageHeader } from './_components/BackupPageHeader';
 import { BackupSettingsCard } from './_components/BackupSettingsCard';
 import { BackupHistoryCard } from './_components/BackupHistoruCards';

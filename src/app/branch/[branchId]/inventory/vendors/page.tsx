@@ -3,12 +3,12 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import StatCard from "@/components/layout/UI/SummaryCard";
-import ActionBar from "@/components/layout/UI/ActionBar";
-import { Toast } from '@/components/layout/UI/Toast';
+import StatCard from "@/components/layout/ui/SummaryCard";
+import ActionBar from "@/components/layout/ui/ActionBar";
+import { Toast } from '@/components/layout/ui/Toast';
 import VendorModal from "./_components/vendorModal";
 import VendorTable from "./_components/vendorTable";
-import LoadingSpinner from '@/components/layout/UI/Loader';
+import LoadingSpinner from '@/components/layout/ui/Loader';
 import { useVendorManagement } from "@/lib/hooks/useVendors"; 
 
 const VendorsPage = () => {
