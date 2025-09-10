@@ -13,7 +13,7 @@ import OrderTable from "./_components/order-table";
 
 // Import types and services
 
-import { OrderItem, OrderStats } from "@/types/types";
+import { OrderItem, OrderStats } from "@/types";
 import { OrderAPI } from "@/components/auth/order-API";
 import { useOrderFilters } from "@/lib/hooks/UseOrderFilter";
 

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { X, Save } from "lucide-react";
-import { VendorModalProps } from "../../../../../../types/vendors";
+import { VendorModalProps } from "@/types/vendors";
 
 const VendorModal: React.FC<VendorModalProps> = ({
     isOpen,

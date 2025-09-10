@@ -3,13 +3,18 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import StatCard from "../../../../components/layout/UI/SummaryCard";
+import StatCard from "@/components/layout/UI/SummaryCard";
 import ActionBar from "@/components/layout/UI/ActionBar";
-import { Toast } from '../../../../components/layout/UI/Toast';
+import { Toast } from '@/components/layout/UI/Toast';
 import PosModal from "./_components/posModal";
 import PosTable from "./_components/posTable";
+<<<<<<< HEAD
 import LoadingSpinner from '../../../../components/layout/UI/Loader';
 import { usePosManagement } from "../../../../lib/hooks/UsePosManagement";
+=======
+import LoadingSpinner from '@/components/layout/UI/Loader';
+import { usePosManagement } from "@/lib/hooks/usePosManagement";
+>>>>>>> fa4c0c4c5551bd77636fd1d5b27ca4fad7662fa6
 
 const PosListPage = () => {
     const params = useParams();

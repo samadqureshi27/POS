@@ -58,7 +58,7 @@ export default function BaseSubmenu({
 
   return (
     <div className="fixed top-16 left-0 right-0 z-[50] w-full bg-[#2E2E2E] shadow-md">
-      <div className={`w-full px-3 sm:px-6 ${showBackArrow ? 'lg:px-4' : 'lg:px-22.5'}`}>
+      <div className={`w-full px-2 sm:px-5 ${showBackArrow ? 'lg:px-4' : 'lg:px-22.5'}`}>
         <div className="flex items-center">
           {showBackArrow && (
             <button
@@ -70,7 +70,7 @@ export default function BaseSubmenu({
             </button>
           )}
           
-          <nav className={`flex items-center py-3 ${showBackArrow ? 'md:ml-4' : ''} overflow-x-auto scrollbar-hide`}>
+          <nav className={`flex items-center py-3 px-1 ${showBackArrow ? 'md:ml-4' : ''} overflow-x-auto scrollbar-hide`}>
             {items.map((item, idx) => {
               let isActive = false;
               if (item.hasSubmenu && item.submenuItems) {
@@ -116,7 +116,7 @@ export default function BaseSubmenu({
                           }
                         `}
                       >
-                        <div className={`flex items-center ml-3 ${isParentActive ? 'animate-in slide-in-from-left-3 fade-in duration-300' : ''}`}>
+                        <div className={`flex items-center px-1  ${isParentActive ? 'animate-in slide-in-from-left-3 fade-in duration-300' : ''}`}>
                           {item.submenuItems.slice(1).map((subItem, subIndex) => {
                             const isSubActive = pathname === subItem.href || subItem.isActive;
                             return (

@@ -3,7 +3,7 @@ import React from 'react';
 import { Phone } from 'lucide-react';
 import { SimpleInput } from './SimpleInput';
 import { SimpleTextarea } from './SimpleTextarea';
-import { RestaurantData } from '../../../../types/types';
+import { RestaurantData } from '@/types';
 
 interface ContactInfoCardProps {
     formData: RestaurantData;

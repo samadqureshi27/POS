@@ -1,6 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { StaffItem, BranchInfo, Toast } from "../../types/staffManagement";
+<<<<<<< HEAD
 import { StaffAPI } from "../util/StaffApi";
+=======
+import { StaffAPI } from "../util/staffApi";
+>>>>>>> fa4c0c4c5551bd77636fd1d5b27ca4fad7662fa6
 
 export const useStaff = (branchId: string) => {
     const [staffItems, setStaffItems] = useState<StaffItem[]>([]);

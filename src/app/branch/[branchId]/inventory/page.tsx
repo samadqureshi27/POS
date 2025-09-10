@@ -1,7 +1,11 @@
 "use client";
 import React from "react";
 import { useParams } from "next/navigation";
+<<<<<<< HEAD
 import { useInventoryManagement } from "../../../../lib/hooks/InventoryManagement";
+=======
+import { useInventoryManagement } from "@/lib/hooks/inventoryManagement";
+>>>>>>> fa4c0c4c5551bd77636fd1d5b27ca4fad7662fa6
 import { Toast } from "@/components/layout/UI/Toast";
 import ActionBar from "@/components/layout/UI/ActionBar";
 import LoadingSpinner from "@/components/layout/UI/Loader";

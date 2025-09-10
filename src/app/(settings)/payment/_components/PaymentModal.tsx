@@ -3,7 +3,7 @@ import React from "react";
 import { ChevronDown, X, Save } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ButtonPage from "@/components/layout/UI/button";
-import { PaymentMethod, ModalFormData } from "../../../../types/payment";
+import { PaymentMethod, ModalFormData } from "@/types/payment";
 
 interface PaymentModalProps {
   isOpen: boolean;

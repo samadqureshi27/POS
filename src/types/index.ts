@@ -58,8 +58,15 @@ export interface GeneralSettings {
   sessionTimeout: number;
   enableNotifications: boolean;
   enableSounds: boolean;
+  
+  
+  // New Order Timer Settings
+  orderTimerEnabled: boolean;
+  greenThresholdMinutes: number;
+  yellowThresholdMinutes: number;
+  redThresholdMinutes: number;
+  timerResetOnComplete: boolean;
 }
-
 export interface ToastProps {
   message: string;
   type: "success" | "error";

@@ -1,8 +1,8 @@
 import React from "react";
 import { Settings } from "lucide-react";
-import { BackupSettings } from '../../../../types/Backup';
+import { BackupSettings } from '@/types/Backup';
 import { SettingsDropdown } from './BackupSettingsDropdown';
-import ButtonPage from "../../../../components/layout/UI/button";
+import ButtonPage from "@/components/layout/UI/button";
 
 interface BackupSettingsCardProps {
     settings: BackupSettings;

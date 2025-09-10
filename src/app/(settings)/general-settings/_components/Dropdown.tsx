@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
-import { DropdownProps } from '../../../../types/types';
+import { DropdownProps } from '@/types';
 
 const SettingsDropdown = React.memo<DropdownProps>(
   ({ value, options, onValueChange, placeholder }) => {

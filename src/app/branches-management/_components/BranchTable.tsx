@@ -6,7 +6,7 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
-import { BranchTableProps } from "../../../types/branch";
+import { BranchTableProps } from "@/types/branch";
 
 const BranchTable: React.FC<BranchTableProps> = ({
     branchItems,

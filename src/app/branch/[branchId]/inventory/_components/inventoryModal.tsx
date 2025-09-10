@@ -3,8 +3,7 @@
 import React, { useEffect } from "react";
 import { X, Save, ChevronDown } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { InventoryItem, InventoryModalFormData } from "../../../../../types/inventory";
-
+import { InventoryItem, InventoryModalFormData } from "@/types/inventory";
 interface InventoryModalProps {
     isOpen: boolean;
     editingItem: InventoryItem | null;

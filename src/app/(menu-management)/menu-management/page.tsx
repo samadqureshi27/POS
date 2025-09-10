@@ -68,7 +68,7 @@ const MenuManagementPage = () => {
     Special: "Inactive",
   });
 
-  // Utility functions
+  // util functions
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);

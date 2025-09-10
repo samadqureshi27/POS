@@ -2,7 +2,7 @@ import React from 'react';
 import { LucideIcon } from 'lucide-react';
 
 
-import { NotificationSettings } from '../../../../types/notification';
+import { NotificationSettings } from '@/types/notification';
 import ButtonPage from '@/components/layout/UI/button';
 
 
