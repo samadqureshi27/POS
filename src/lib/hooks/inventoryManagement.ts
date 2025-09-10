@@ -67,7 +67,7 @@ export const useInventoryManagement = (branchId: number) => {
     });
 
     // Create item
-    const handleCreateItem = async (itemData: Omit<InventoryItem, "ID" | "BranchID">) => {
+    const handleCreateItem = async (itemData: Omit<InventoryItem, "ID">) => {
         try {
             setActionLoading(true);
             const response = await InventoryAPI.createInventoryItem(itemData, branchId);
@@ -143,6 +143,7 @@ export const useInventoryManagement = (branchId: number) => {
                 formData.InitialStock + formData.AddedStock,
                 formData.Threshold
             ),
+            BranchID: branchId,
         };
         
         if (editingItem) {
@@ -158,14 +159,28 @@ export const useInventoryManagement = (branchId: number) => {
         usageCount: Math.floor(Math.random() * 100),
     }));
 
+    const defaultItem: InventoryItem & { usageCount: number } = {
+        ID: 0,
+        Name: "",
+        Unit: "",
+        Status: "Low",
+        InitialStock: 0,
+        AddedStock: 0,
+        UpdatedStock: 0,
+        Threshold: 0,
+        supplier: "",
+        BranchID: branchId,
+        usageCount: 0,
+    };
+
     const mostUsedItem = itemsWithUsage.reduce(
         (max, item) => (item.usageCount > max.usageCount ? item : max),
-        itemsWithUsage[0] || { usageCount: 0 }
+        itemsWithUsage[0] || defaultItem
     );
 
     const leastUsedItem = itemsWithUsage.reduce(
         (min, item) => (item.usageCount < min.usageCount ? item : min),
-        itemsWithUsage[0] || { usageCount: 0 }
+        itemsWithUsage[0] || defaultItem
     );
 
     const statistics = {
