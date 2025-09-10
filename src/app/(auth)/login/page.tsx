@@ -1,6 +1,6 @@
 // pages/LoginPage.tsx (Main Component)
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { LoginProvider, useLoginContext } from "./_components/login-context";
 import BackgroundLayer from "./_components/background-layer";
 import RoleLabels from "./_components/role-labels";
@@ -16,7 +16,7 @@ const LoginPageContent: React.FC = () => {
 
   const { phase, setHoverSide, showLoginContainer, showManagerContainer } = useLoginContext();
 
-
+ const containerRef = useRef<HTMLDivElement>(null);
   return (
     <div
       ref={containerRef}
