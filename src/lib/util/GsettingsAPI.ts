@@ -1,7 +1,10 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { GeneralSettings, ApiResponse } from "../../types/types";
 import { DEFAULT_SETTINGS } from "./DropDownSettings";
 =======
+=======
+>>>>>>> beb55c08b4ee4124d0d39b19090ca285e4f3d4f5
 
 import { GeneralSettings, ApiResponse } from "../../types";
 

@@ -1,10 +1,13 @@
 // hooks/useRestaurantProfile.ts
 import { useState, useEffect, useCallback } from 'react';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { RestaurantData } from '../../types/types';
 import { RestaurantAPI } from '../util/RestaurantApi';
 import { validateRestaurantForm } from '../util/Validation';
 =======
+=======
+>>>>>>> beb55c08b4ee4124d0d39b19090ca285e4f3d4f5
 
 import { RestaurantData } from '../../types';
 

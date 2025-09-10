@@ -3,12 +3,18 @@ import React from 'react';
 import { Clock } from 'lucide-react';
 import { SimpleInput } from './SimpleInput';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { getOperatingStatus } from '../../../../lib/util/TimeUtils';
 =======
 
 import { getOperatingStatus } from '@/lib/util/timeUtils';
 
 >>>>>>> fa4c0c4c5551bd77636fd1d5b27ca4fad7662fa6
+=======
+
+import { getOperatingStatus } from '@/lib/util/timeUtils';
+
+>>>>>>> beb55c08b4ee4124d0d39b19090ca285e4f3d4f5
 
 interface OperatingHoursProps {
     openingTime: string;

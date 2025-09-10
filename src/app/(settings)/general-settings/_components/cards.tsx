@@ -1,10 +1,13 @@
 import React from "react";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { GeneralSettings } from '../../../../types/types';
 import { OPTIONS } from '../../../../lib/util/DropDownSettings';
 import SettingsDropdown from './Dropdown';
 import ButtonPage from "@/components/layout/UI/button";
 =======
+=======
+>>>>>>> beb55c08b4ee4124d0d39b19090ca285e4f3d4f5
 
 import { GeneralSettings } from '@/types';
 import CurrencyPricingCard from './CurrencyPricingCard';
