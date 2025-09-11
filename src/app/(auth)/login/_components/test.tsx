@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/layout/ui/role-button";
 import Input from "@/components/layout/ui/Input";
 import ErrorMessage from "@/components/layout/ui/error-message";
-import authService from "@/lib/authService";
+import authService from "@/lib/auth-service";
 import {
   validateAdminLoginForm,
   validateManagerPinForm,

@@ -3,7 +3,7 @@
 import React from "react";
 import { User, Lock } from "lucide-react";
 import Button from "@/components/layout/ui/role-button";
-import Input from "@/components/layout/ui/Input";
+import Input from "@/components/layout/ui/input";
 import ErrorMessage from "@/components/layout/ui/error-message";
 import { useLoginContext } from "./login-context";
 import { validateAdminLoginForm } from "@/lib/validations";

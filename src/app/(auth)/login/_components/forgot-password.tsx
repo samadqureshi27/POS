@@ -3,7 +3,7 @@
 import React from "react";
 import { User } from "lucide-react";
 import Button from "@/components/layout/ui/role-button";
-import Input from "@/components/layout/ui/Input";
+import Input from "@/components/layout/ui/input";
 import { useLoginContext } from "./login-context";
 import { validateForgotPasswordForm } from "@/lib/validations";
 
