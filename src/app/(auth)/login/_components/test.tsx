@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { User, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Button from "@/components/layout/ui/RoleButton";
+import Button from "@/components/layout/ui/role-button";
 import Input from "@/components/layout/ui/Input";
 import ErrorMessage from "@/components/layout/ui/error-message";
 import authService from "@/lib/authService";

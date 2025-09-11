@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 import { Lock } from "lucide-react";
-import Button from "@/components/layout/ui/RoleButton";
+import Button from "@/components/layout/ui/role-button";
 import Input from "@/components/layout/ui/Input";
 import { useLoginContext } from "./login-context";
 import { validateResetPasswordForm } from "@/lib/validations";

@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 import { Lock } from "lucide-react";
-import Button from "@/components/layout/ui/RoleButton";
+import Button from "@/components/layout/ui/role-button";
 import { useLoginContext } from "./login-context";
 
 const ManagerForgotPinOverlay: React.FC = () => {
