@@ -1,8 +1,8 @@
 // components/OrdersTable.tsx
 import React from 'react';
-import { OrderItem } from '@/lib/types/customerProfile';
-import { FilterDropdown } from '@/components/layout/ui/FilterDropdown';
-import ResponsiveDetailButton from "@/components/layout/ui/ResponsiveDetailButton";
+import { OrderItem } from '@/lib/types/customer-profile';
+import { FilterDropdown } from '@/components/layout/ui/filter-dropdown';
+import ResponsiveDetailButton from "@/components/layout/ui/responsive-detail-button";
 
 interface OrdersTableProps {
     orders: OrderItem[];

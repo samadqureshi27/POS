@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { PosAPI } from "../util/posAPI";
+import { PosAPI } from "../util/pos-api";
 import { useSelection } from "./Selection";
-import { useToast } from './Toast';
-import { usePosModal } from "./PosModal";
+import { useToast } from './toast';
+import { usePosModal } from "./posModal";
 import { PosItem } from "@/lib/types/pos";
 
 export const usePosManagement = (branchId: string) => {

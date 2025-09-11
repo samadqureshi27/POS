@@ -1,4 +1,4 @@
 // src/lib/hooks/index.ts
-export { useToast } from './Toast';
-export type { ToastState } from './Toast';
-export { useModal } from './UseBackupModal';
+export { useToast } from './toast';
+export type { ToastState } from './toast';
+export { useModal } from './useBackupModal';

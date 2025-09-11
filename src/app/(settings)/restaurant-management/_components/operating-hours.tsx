@@ -1,8 +1,8 @@
 // components/OperatingHours.tsx
 import React from 'react';
 import { Clock } from 'lucide-react';
-import { SimpleInput } from './SimpleInput';
-import { getOperatingStatus } from '@/lib/util/timeUtils';
+import { SimpleInput } from './simple-input';
+import { getOperatingStatus } from '@/lib/util/time-utils';
 interface OperatingHoursProps {
     openingTime: string;
     closingTime: string;

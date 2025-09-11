@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import Navbar from './MainNavbar';
+import Navbar from './main-navbar';
 import Sidebar from './Sidebar';
 import { useNavigation } from '@/lib/hooks/UseNavigation';
 

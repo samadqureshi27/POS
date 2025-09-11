@@ -1,8 +1,8 @@
 // components/OrderHistorySection.tsx
 import React from 'react';
-import { OrderItem } from '@/lib/types/customerProfile';
-import { OrdersTable } from './ordersTable';
-import ActionBar from "@/components/layout/ui/ActionBar";
+import { OrderItem } from '@/lib/types/customer-profile';
+import { OrdersTable } from './orders-table';
+import ActionBar from "@/components/layout/ui/action-bar";
 
 interface OrderHistorySectionProps {
     orders: OrderItem[];

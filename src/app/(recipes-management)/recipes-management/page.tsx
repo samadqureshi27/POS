@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import ActionBar from "@/components/layout/ui/ActionBar";
+import ActionBar from "@/components/layout/ui/action-bar";
 import RecipeTable from "./_components/recipe-table";
 import RecipeModal from "./_components/recipe-modal";
-import {Toast} from "@/components/layout/ui/Toast";
+import {Toast} from "@/components/layout/ui/toast";
 
-import MenuAPI, { RecipeOption, Ingredient } from "@/lib/util/RecipeAPI";
+import MenuAPI, { RecipeOption, Ingredient } from "@/lib/util/recipe-api";
 
 const RecipesManagementPage = () => {
   const [RecipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);

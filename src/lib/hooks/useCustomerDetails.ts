@@ -1,8 +1,8 @@
 // hooks/useCustomers.ts
 import { useState, useEffect, useMemo } from 'react';
 import { CustomerItem, ToastState, CustomerSummaryData } from '@/lib/types/customer-details';
-import { CustomerAPI } from '../util/CustomerDetailsAPI';
-import { filterCustomers, calculateCustomerSummary } from '../util/CustomerDetailsUtils';
+import { CustomerAPI } from '@/lib/util/customer-details-API';
+import { filterCustomers, calculateCustomerSummary } from '../util/customer-details-utils';
 
 export const useCustomers = () => {
     const [customerItems, setCustomerItems] = useState<CustomerItem[]>([]);

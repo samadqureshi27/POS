@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CategoryItem, CategoryFormData } from '@/lib/types/category';
-import { MenuAPI } from '@/lib/util/CategoryAPI';
+import { MenuAPI } from '@/lib/util/category-api';
 
 export const useCategory = () => {
   const [categoryItems, setCategoryItems] = useState<CategoryItem[]>([]);

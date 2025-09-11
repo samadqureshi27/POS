@@ -3,12 +3,12 @@
 import React from "react";
 import LoadingSpinner from '@/components/layout/ui/Loader';
 import ActionButtons from '@/components/layout/ui/Setting-buttons';
-import { Toast } from '@/components/layout/ui/Toast';
-import { useToast } from '@/lib/hooks/Toast';
+import { Toast } from '@/components/layout/ui/toast';
+import { useToast } from '@/lib/hooks/toast';
 import { useRestaurantProfile } from '@/lib/hooks/useRestaurantProfile';
-import { BasicInfoCard } from './_components/BasicInfoCard';
-import { ContactInfoCard } from './_components/ContactInfoCard';
-import { LogoHoursCard } from './_components/LogoHoursCard';
+import { BasicInfoCard } from './_components/basic-info-card';
+import { ContactInfoCard } from './_components/contact-info-card';
+import { LogoHoursCard } from './_components/logo-hours-card';
 
 const RestaurantProfilePage = () => {
   const {

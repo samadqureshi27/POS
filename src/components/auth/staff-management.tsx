@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { User, CreateStaffData, UserRole } from '@/lib/types/auth';
-import authService from '@/lib/authService';
+import authService from '@/lib/auth-service';
 import { useAuth } from '@/lib/hooks/useAuth';
 
 interface StaffManagementProps {

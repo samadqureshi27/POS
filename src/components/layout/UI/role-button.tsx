@@ -1,6 +1,6 @@
 "use client";
 import React, { ReactNode } from 'react';
-import LoadingSpinner from './LoadingSpinner';
+import LoadingSpinner from './Loader';
 
 interface ButtonProps {
   children: ReactNode;

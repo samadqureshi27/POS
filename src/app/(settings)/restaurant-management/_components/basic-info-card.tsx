@@ -1,9 +1,9 @@
 // components/BasicInfoCard.tsx
 import React from 'react';
 import { Store } from 'lucide-react';
-import { SimpleInput } from './SimpleInput';
-import { SimpleTextarea } from './SimpleTextarea';
-import { RestaurantDropdown } from './RestaurantDropdown';
+import { SimpleInput } from './simple-input';
+import { SimpleTextarea } from './simple-textarea';
+import { RestaurantDropdown } from './restaurant-dropdown';
 import { RestaurantData } from '@/lib/types';
 
 interface BasicInfoCardProps {

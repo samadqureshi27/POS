@@ -8,11 +8,11 @@ import { useCustomerId } from '@/lib/hooks/useCustomerID';
 import { useCustomerProfile } from '@/lib/hooks/useCustomerProfile';
 import { useOrderFilters } from '@/lib/hooks/CutomerOrderFilter';
 // Components
-import  {LoadingSpinner } from './_components/LoadingSpinner';
-import { ErrorMessage } from './_components/ErrorMessage';
-import { CustomerProfileHeader } from './_components/CustomerProfileHeader';
-import { CustomerMetricsSection } from './_components/customersMetricSection';
-import { OrderHistorySection } from './_components/orderHistorySection';
+import  {LoadingSpinner } from './_components/loading-spinner';
+import { ErrorMessage } from './_components/error-message';
+import { CustomerProfileHeader } from './_components/customer-profile-header';
+import { CustomerMetricsSection } from './_components/customers-metric-section';
+import { OrderHistorySection } from './_components/order-history-section';
 
 const CustomerProfilePage = () => {
   const router = useRouter();

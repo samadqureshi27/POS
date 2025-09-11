@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ChevronDown } from "lucide-react";
-import { DropdownOption } from '@/lib/types/Backup';
+import { DropdownOption } from '@/lib/types/backup';
 
 interface DropdownProps {
     value: string;

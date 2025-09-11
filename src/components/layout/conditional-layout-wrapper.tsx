@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import DashboardWrapper from './DashboardWrapper'
+import DashboardWrapper from './dashboard-wrapper'
 
 export function ConditionalLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

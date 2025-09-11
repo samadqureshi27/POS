@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { OrderAPI } from '@/lib/util/OrderAPI';
 
-import { OrderItem, DateRangeType } from '@/types';
+import { OrderItem, DateRangeType } from '@/lib/types';
 
 
 export const useOrderFilters = (items: OrderItem[]) => {

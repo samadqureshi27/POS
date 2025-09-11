@@ -3,11 +3,11 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import ActionBar from "@/components/layout/ui/ActionBar";
-import StatCard from "@/components/layout/ui/SummaryCard";
-import StaffTable from "./_components/staffTable";
+import ActionBar from "@/components/layout/ui/action-bar";
+import StatCard from "@/components/layout/ui/summary-card";
+import StaffTable from "./_components/staff-table";
 import StaffModal from "./_components/staffModal";
-import {Toast} from "@/components/layout/ui/Toast";
+import {Toast} from "@/components/layout/ui/toast";
 import { useStaff } from "@/lib/hooks/useSatffManagement";
 import { useStaffModal } from "@/lib/hooks/useStaffModal";
 import { useStaffFiltering } from "@/lib/hooks/useSatffFiltering";

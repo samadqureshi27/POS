@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { StatCardProps } from "../../../lib/types/payment";
+import { StatCardProps } from "@/lib/types/payment";
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle }) => {
     return (

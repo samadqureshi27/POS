@@ -3,15 +3,15 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import StatCard from "@/components/layout/ui/SummaryCard";
-import ActionBar from "@/components/layout/ui/ActionBar";
-import { Toast } from '@/components/layout/ui/Toast';
-import ReportsTable from "./_components/reportsTable";
+import StatCard from "@/components/layout/ui/summary-card";
+import ActionBar from "@/components/layout/ui/action-bar";
+import { Toast } from '@/components/layout/ui/toast';
+import ReportsTable from "./_components/reports-table";
 import LoadingSpinner from '@/components/layout/ui/Loader';
 import ImportExportControls from "@/components/layout/ui/import-export-btn";
 import { useReportsManagement } from "@/lib/hooks/useReport";
 import { useImportExport } from "@/lib/hooks/ImportExportHook";
-import { useToast } from "@/lib/hooks/Toast";
+import { useToast } from "@/lib/hooks/toast";
 
 const ReportsPage = () => {
     const params = useParams();

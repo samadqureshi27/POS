@@ -1,6 +1,6 @@
 // hooks/useOrderFilters.ts
 import { useState, useMemo } from 'react';
-import { OrderItem } from '@/lib/types/customerProfile';
+import { OrderItem } from '@/lib/types/customer-profile';
 import { useParams } from 'next/navigation';
 
 export const useOrderFilters = (orders: OrderItem[]) => {

@@ -1,8 +1,8 @@
 import React from "react";
 import { Key, Calendar } from "lucide-react";
 import { LicenseInfo } from '@/lib/types/billing';
-import { PlanIcon } from './PlanIcon';
-import { StatusBadge } from './StatusBatch';
+import { PlanIcon } from './plan-icon';
+import { StatusBadge } from './status-batch';
 
 interface LicenseInfoCardProps {
     licenseInfo: LicenseInfo;

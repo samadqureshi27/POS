@@ -1,6 +1,6 @@
 // _components/OrderTable/OrderTableRow.tsx
 import React from 'react';
-import ResponsiveDetailButton from "@/components/layout/ui/ResponsiveDetailButton";
+import ResponsiveDetailButton from "@/components/layout/ui/responsive-detail-button";
 
 import { OrderItem } from '@/lib/types';
 

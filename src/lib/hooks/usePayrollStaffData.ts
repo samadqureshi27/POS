@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { StaffItem, StaffSummaryData, StaffDataHook } from '@/lib/types/payroll';
-import { StaffAPI } from '../util/StaffPayrollAPI';
+import { StaffAPI } from '../util/staff-payroll-API';
 
 export const useStaffData = (branchId: string | null): StaffDataHook => {
     const [staffItems, setStaffItems] = useState<StaffItem[]>([]);

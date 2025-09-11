@@ -5,16 +5,16 @@ import { AlertCircle } from "lucide-react";
 
 // Components
 import { DateFilter } from "@/components/layout/ui/Date-Filter";
-import { Toast } from "@/components/layout/ui/Toast";
-import StatCard from "@/components/layout/ui/SummaryCard";
-import { StaffTable } from "./components/PayrollStaffTable";
-import ActionBar from "@/components/layout/ui/ActionBar";
+import { Toast } from "@/components/layout/ui/toast";
+import StatCard from "@/components/layout/ui/summary-card";
+import { StaffTable } from "./components/payroll-staff-table";
+import ActionBar from "@/components/layout/ui/action-bar";
 
 // Hooks
 import { useDateFilter } from "@/lib/hooks/useDateFilter";
 import { useStaffData } from "@/lib/hooks/usePayrollStaffData";
 import { useFilters } from "@/lib/hooks/PayrollFilter";
-import { useToast } from "@/lib/hooks/Toast";
+import { useToast } from "@/lib/hooks/toast";
 
 const StaffManagementPage = () => {
   // For demo purposes, let's set a default branch ID since we can't access real routing

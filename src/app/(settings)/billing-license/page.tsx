@@ -6,15 +6,15 @@ import { LicenseInfo, ApiResponse, ToastState } from '@/lib/types/billing';
 
 // Hooks
 import { useToast } from '@/lib/hooks';
-import { Toast } from '@/components/layout/ui/Toast';
+import { Toast } from '@/components/layout/ui/toast';
 import { useLicense } from '@/lib/hooks/useLicense';
 
 // Components
 import LoadingSpinner from '@/components/layout/ui/Loader';
-import { PageHeader } from './_components/PageHeader'
-import { LicenseInfoCard } from './_components/LicenseinfoCard'
-import { ResourcesAllocationCard } from './_components/ResourceAllocationCard'
-import { UpdateLicenseCard } from './_components/UpdateLicenseCard';
+import { PageHeader } from './_components/page-header'
+import { LicenseInfoCard } from './_components/license-info-card';
+import { ResourcesAllocationCard } from './_components/resource-allocation-card';
+import { UpdateLicenseCard } from './_components/update-license-card';
 
 const BillingLicensePage = () => {
   const { toast, toastVisible, showToast, hideToast } = useToast();

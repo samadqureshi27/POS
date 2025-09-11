@@ -3,7 +3,7 @@ import React from "react";
 import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ResponsiveEditButton from "@/components/layout/ui/ResponsiveEditButton";
+import ResponsiveEditButton from "@/components/layout/ui/responsive-edit-button";
 import { PaymentTableProps } from "@/lib/types/payment";
 
 const PaymentTable: React.FC<PaymentTableProps> = ({

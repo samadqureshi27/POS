@@ -1,6 +1,6 @@
 import React from "react";
 import { History, Database, RefreshCw, Download, Trash2 } from "lucide-react";
-import { BackupHistoryItem } from '@/lib/types/Backup';
+import { BackupHistoryItem } from '@/lib/types/backup';
 
 interface BackupHistoryCardProps {
     backupHistory: BackupHistoryItem[];

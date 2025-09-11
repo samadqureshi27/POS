@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { InventoryTableProps } from "@/lib/types/inventory";
-import ResponsiveEditButton from "@/components/layout/ui/ResponsiveEditButton";
+import ResponsiveEditButton from "@/components/layout/ui/responsive-edit-button";
 
 const InventoryTable: React.FC<InventoryTableProps> = ({
     inventoryItems,

@@ -1,6 +1,6 @@
 import React from "react";
 import ButtonPage from "@/components/layout/ui/button";
-import { RecipeOption } from "@/lib/util/RecipeAPI";
+import { RecipeOption } from "@/lib/util/recipe-api";
 
 interface RecipeInfoTabProps {
   formData: Omit<RecipeOption, "ID">;

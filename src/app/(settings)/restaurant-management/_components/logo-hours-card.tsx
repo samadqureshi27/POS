@@ -1,8 +1,8 @@
 // components/LogoHoursCard.tsx
 import React from 'react';
 import { Image } from 'lucide-react';
-import { LogoUpload } from './LogoUpload';
-import { OperatingHours } from './OperatingHours';
+import { LogoUpload } from './logo-upload';
+import { OperatingHours } from './operating-hours';
 import { RestaurantData } from '@/lib/types';
 
 interface LogoHoursCardProps {

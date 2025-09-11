@@ -3,7 +3,7 @@
 
 import React from "react";
 import Checkbox from "@mui/material/Checkbox";
-import ResponsiveEditButton from "@/components/layout/ui/ResponsiveEditButton";
+import ResponsiveEditButton from "@/components/layout/ui/responsive-detail-button";
 import { VendorItem, VendorTableProps } from "@/lib/types/vendors";
 const VendorTable: React.FC<VendorTableProps> = ({
     vendorItems,

@@ -1,10 +1,10 @@
 import React from "react";
 import { GeneralSettings } from '@/lib/types';
-import CurrencyPricingCard from './CurrencyPricingCard';
-import RegionalSettingsCard from './RegionalSettingsCard';
-import ReceiptSettingsCard from './ReceiptSettingsCard';
-import SecurityAccessCard from './SecurityAccessCard';
-import OrderTimerCard from './OrderTimerCard';
+import CurrencyPricingCard from './currency-pricing-card';
+import RegionalSettingsCard from './regional-settings-card';
+import ReceiptSettingsCard from './receipt-settings-card';
+import SecurityAccessCard from './security-access-card';
+import OrderTimerCard from './order-timer-card';
 
 interface SettingsCardsProps {
     settings: GeneralSettings;

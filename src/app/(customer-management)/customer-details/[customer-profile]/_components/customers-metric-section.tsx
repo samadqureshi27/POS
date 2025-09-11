@@ -1,10 +1,10 @@
 // components/CustomerMetricsSection.tsx
 import React from 'react';
-import { CustomerItem, OrderItem } from '@/lib/types/customerProfile';
-import { CustomerProfileCard } from './CustomerProfileCard';
-import { CustomerFeedbackCard } from './CustomerFeedbackCard';
-import { MetricCard } from './metricCard';
-import { OrderChart } from './orderChart';
+import { CustomerItem, OrderItem } from '@/lib/types/customer-profile';
+import { CustomerProfileCard } from './customer-profile-card';
+import { CustomerFeedbackCard } from './customer-feedback-card';
+import { MetricCard } from './metric-card';
+import { OrderChart } from './order-chart';
 
 interface CustomerMetricsSectionProps {
     customer: CustomerItem;

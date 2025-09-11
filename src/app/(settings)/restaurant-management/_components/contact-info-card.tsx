@@ -1,8 +1,8 @@
 // components/ContactInfoCard.tsx
 import React from 'react';
 import { Phone } from 'lucide-react';
-import { SimpleInput } from './SimpleInput';
-import { SimpleTextarea } from './SimpleTextarea';
+import { SimpleInput } from './simple-input';
+import { SimpleTextarea } from './simple-textarea';
 import { RestaurantData } from '@/lib/types';
 
 interface ContactInfoCardProps {

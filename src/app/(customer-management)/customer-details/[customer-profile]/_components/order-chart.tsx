@@ -9,7 +9,7 @@ import {
     CartesianGrid,
     Tooltip,
 } from "recharts";
-import { OrderItem } from '@/lib/types/customerProfile';
+import { OrderItem } from '@/lib/types/customer-profile';
 
 interface OrderChartProps {
     orders: OrderItem[];

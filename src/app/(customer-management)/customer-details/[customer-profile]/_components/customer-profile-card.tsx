@@ -1,8 +1,8 @@
 // components/CustomerProfileCard.tsx
 import React from 'react';
-import { CustomerItem } from '@/lib/types/customerProfile';
-import { ProfilePicture } from './ProfilePicture';
-import { StarRating } from './StarRating';
+import { CustomerItem } from '@/lib/types/customer-profile';
+import { ProfilePicture } from './profile-picture';
+import { StarRating } from './star-rating';
 
 interface CustomerProfileCardProps {
     customer: CustomerItem;

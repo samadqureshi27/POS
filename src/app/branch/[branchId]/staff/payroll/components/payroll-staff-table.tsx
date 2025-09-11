@@ -4,7 +4,7 @@ import React from "react";
 import { ChevronDown } from "lucide-react";
 import { StaffTableProps } from "@/lib/types/payroll";
 import { Dropdown } from "./dropdown";
-import ResponsiveDetailButton from "@/components/layout/ui/ResponsiveDetailButton";
+import ResponsiveDetailButton from "@/components/layout/ui/responsive-detail-button";
 
 export const StaffTable: React.FC<StaffTableProps> = ({
     filteredItems,

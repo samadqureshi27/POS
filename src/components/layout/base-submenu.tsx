@@ -127,7 +127,7 @@ export default function BaseSubmenu({
                                   border border-[#83838a] px-4 py-2 rounded text-sm font-medium 
                                   transition-all duration-200 ease-in-out whitespace-nowrap ml-3
                                   transform hover:scale-[1.02] active:scale-[0.98]
-                                  animate-in fade-in zoom-in-95 duration-200 flex-shrink-0
+                                  animate-in fade-in zoom-in-95 flex-shrink-0
                                   ${isSubActive
                                     ? 'bg-[#F6F6F6] text-gray-800 shadow-lg border-gray-300'
                                     : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#161616] hover:border-[#a0a0a0] hover:shadow-md'

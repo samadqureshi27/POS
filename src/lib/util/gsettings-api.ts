@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from "./DropDownSettings";
+import { DEFAULT_SETTINGS } from "./drop-down-settings";
 
 import { GeneralSettings, ApiResponse } from "@/lib/types";
 

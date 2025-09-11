@@ -3,12 +3,12 @@
 import React from "react";
 import { useRouter } from 'next/navigation';
 import ActionBar from "@/components/layout/ui/action-bar";
-import { Toast } from "@/components/layout/ui/Toast";
-import CustomerSummaryCards from "./_components/customerSummaryCards";
-import CustomerTable from "./_components/customerTable";
+import { Toast } from "@/components/layout/ui/toast";
+import CustomerSummaryCards from "./_components/customer-summary-cards";
+import CustomerTable from "./_components/customer-table";
 import ImportExportControls from "@/components/layout/ui/import-export-btn";
 import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/hooks/useCustomerDetails";
-import { exportCustomersToCSV } from "@/lib/util/CustomerDetailsUtils";
+import { exportCustomersToCSV } from "@/lib/util/customer-details-utils";
 import { useToast } from "@/lib/hooks";
 import LoadingSpinner from "@/components/layout/ui/Loader";
 

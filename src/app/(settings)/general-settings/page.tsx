@@ -6,7 +6,7 @@ import { useToast } from '@/lib/hooks';
 import { useSettings } from '@/lib/hooks/Gsettings';
 
 // Components
-import { Toast } from '@/components/layout/ui/Toast';
+import { Toast } from '@/components/layout/ui/toast';
 import ActionButtons from '@/components/layout/ui/Setting-buttons';
 import SettingsCards from './_components/cards';
 import LoadingSpinner from '@/components/layout/ui/Loader';

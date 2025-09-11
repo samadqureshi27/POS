@@ -42,7 +42,7 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
                                         <DropdownMenu.Content
                                             className="min-w-[200px] rounded-md bg-white shadow-md border-none p-1 relative outline-none"
                                             sideOffset={6}
-                                            onOpenAutoFocus={(e) => e.preventDefault()}
+                                            // onOpenAutoFocus={(e) => e.preventDefault()}
                                             onCloseAutoFocus={(e) => e.preventDefault()}
                                             style={{ zIndex: 1000 }}
                                         >

@@ -1,6 +1,6 @@
 import React from "react";
 import { GeneralSettings } from '@/lib/types';
-import { OPTIONS } from '@/lib/util/DropDownSettings';
+import { OPTIONS } from '@/lib/util/drop-down-settings';
 import SettingsDropdown from './Dropdown';
 
 interface RegionalSettingsCardProps {

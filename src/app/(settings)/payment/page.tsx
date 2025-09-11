@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
-import StatCard from "@/components/layout/ui/SummaryCard";
-import ActionBar from "@/components/layout/ui/ActionBar";
-import { Toast } from '@/components/layout/ui/Toast'
-import PaymentModal from "./_components/PaymentModal";
-import PaymentTable from "./_components/PaymentTable";;
+import StatCard from "@/components/layout/ui/summary-card";
+import ActionBar from "@/components/layout/ui/action-bar";
+import { Toast } from '@/components/layout/ui/toast'
+import PaymentModal from "./_components/payment-modal";
+import PaymentTable from "./_components/payment-table";;
 import LoadingSpinner from '@/components/layout/ui/Loader';
 import { usePaymentManagement } from "@/lib/hooks/usePaymentManagement";
 
