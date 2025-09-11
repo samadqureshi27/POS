@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { PaymentAPI } from "../util/payment-api";
-import { useSelection } from "./Selection";
+import { useSelection } from "./selection";
 import { useToast } from './toast';
-import { usePaymentModal } from "./PaymentModal";
+import { usePaymentModal } from "./paymentModal";
 import { PaymentMethod } from "@/lib/types/payment";
 
 export const usePaymentManagement = () => {

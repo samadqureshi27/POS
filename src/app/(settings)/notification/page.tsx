@@ -2,12 +2,12 @@
 import React from "react";
 import { Toast } from '@/components/layout/ui/toast';
 import { useToast } from '@/lib/hooks/toast';
-import { useNotificationSettings } from "@/lib/hooks/useNoticationSettings";
-import LoadingSpinner from '@/components/layout/ui/Loader';
+import { useNotificationSettings } from "@/lib/hooks/useNotificationSettings";
+import LoadingSpinner from '@/components/layout/ui/loader';
 import  { NotificationCard } from "./_components/notification-card";
 import { QuietHoursSettings } from "./_components/quiet-hours-settings";
 import { NOTIFICATION_SECTIONS } from "@/lib/util/notification-options";
-import ActionButtons from '@/components/layout/ui/Setting-buttons';
+import ActionButtons from '@/components/layout/ui/setting-buttons';
 
 const NotificationSettingsPage = () => {
   const { toast, toastVisible, showToast, hideToast } = useToast();

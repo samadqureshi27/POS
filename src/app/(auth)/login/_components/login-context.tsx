@@ -2,7 +2,7 @@
 "use client";
 import React, { createContext, useContext, useState } from "react";
 import { useRouter } from "next/navigation";
-import authService from "@/lib/authService";
+import authService from "@/lib/auth-service";
 import {
   validateAdminLoginForm,
   validateManagerPinForm,

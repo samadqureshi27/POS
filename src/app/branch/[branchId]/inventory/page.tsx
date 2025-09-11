@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { useInventoryManagement } from "@/lib/hooks/inventoryManagement";
 import { Toast } from "@/components/layout/ui/toast";
 import ActionBar from "@/components/layout/ui/action-bar";
-import LoadingSpinner from "@/components/layout/ui/Loader";
+import LoadingSpinner from "@/components/layout/ui/loader";
 import StatCard from "@/components/layout/ui/summary-card";
 import InventoryModal from "./_components/inventory-modal";
 import InventoryTable from "./_components/inventory-table";

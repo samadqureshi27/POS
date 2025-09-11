@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { PosAPI } from "../util/pos-api";
-import { useSelection } from "./Selection";
+import { useSelection } from "./selection";
 import { useToast } from './toast';
 import { usePosModal } from "./posModal";
 import { PosItem } from "@/lib/types/pos";

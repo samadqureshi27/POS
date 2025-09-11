@@ -4,7 +4,7 @@
 import React from 'react';
 import Navbar from './main-navbar';
 import Sidebar from './Sidebar';
-import { useNavigation } from '@/lib/hooks/UseNavigation';
+import { useNavigation } from '@/lib/hooks/useNavigation';
 
 type DashboardWrapperProps = {
   children: React.ReactNode;

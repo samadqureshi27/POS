@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { InventoryAPI, calculateStatus } from "../util/InventoryAPI";
-
-import { useSelection } from "./Selection";
+import { InventoryAPI, calculateStatus } from "../util/inventory-api";
+import { useSelection } from "./selection";
 import { useToast } from './toast';
 import { useInventoryModal } from "./inventoryModal";
 import { InventoryItem } from "@/lib/types/inventory";

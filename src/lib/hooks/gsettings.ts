@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 
 import { GeneralSettings } from "@/lib/types";
 
-import { SettingsAPI } from "../util/GsettingsAPI";
+import { SettingsAPI } from "../util/gsettings-api";
 
 interface UseSettingsReturn {
   settings: GeneralSettings | null;

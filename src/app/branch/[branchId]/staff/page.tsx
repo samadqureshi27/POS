@@ -11,8 +11,8 @@ import {Toast} from "@/components/layout/ui/toast";
 import { useStaff } from "@/lib/hooks/useSatffManagement";
 import { useStaffModal } from "@/lib/hooks/useStaffModal";
 import { useStaffFiltering } from "@/lib/hooks/useSatffFiltering";
-import { useSelection } from "@/lib/hooks/Selection";
-import LoadingSpinner from '@/components/layout/ui/Loader';
+import { useSelection } from "@/lib/hooks/selection";
+import LoadingSpinner from '@/components/layout/ui/loader';
 const EmployeeRecordsPage = () => {
   const params = useParams();
   const branchId = params?.branchId as string;

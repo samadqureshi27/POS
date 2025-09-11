@@ -15,7 +15,7 @@ import OrderTable from "./_components/order-table";
 
 import { OrderItem, OrderStats } from "@/lib/types";
 import { OrderAPI } from "@/components/auth/order-API";
-import { useOrderFilters } from "@/lib/hooks/UseOrderFilter";
+import { useOrderFilters } from "@/lib/hooks/useOrderFilter";
 
 const OrderManagementPage = () => {
   const [items, setItems] = useState<OrderItem[]>([]);

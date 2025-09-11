@@ -1,7 +1,7 @@
 // hooks/useCustomers.ts
 import { useState, useEffect, useMemo } from 'react';
 import { CustomerItem, ToastState, CustomerSummaryData } from '@/lib/types/customer-details';
-import { CustomerAPI } from '@/lib/util/customer-details-API';
+import { CustomerAPI } from '../util/customer-details-api';
 import { filterCustomers, calculateCustomerSummary } from '../util/customer-details-utils';
 
 export const useCustomers = () => {

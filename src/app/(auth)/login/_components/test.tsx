@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { User, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/layout/ui/role-button";
-import Input from "@/components/layout/ui/Input";
+import Input from "@/components/layout/ui/input";
 import ErrorMessage from "@/components/layout/ui/error-message";
 import authService from "@/lib/auth-service";
 import {

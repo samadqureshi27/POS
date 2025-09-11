@@ -8,7 +8,7 @@ import ActionBar from "@/components/layout/ui/action-bar";
 import { Toast } from '@/components/layout/ui/toast';
 import BranchModal from "./_components/branch-modal";
 import BranchTable from "./_components/branch-table";
-import LoadingSpinner from '@/components/layout/ui/Loader';
+import LoadingSpinner from '@/components/layout/ui/loader';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 
 const BranchManagementPage = () => {

@@ -10,7 +10,7 @@ import ImportExportControls from "@/components/layout/ui/import-export-btn";
 import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/hooks/useCustomerDetails";
 import { exportCustomersToCSV } from "@/lib/util/customer-details-utils";
 import { useToast } from "@/lib/hooks";
-import LoadingSpinner from "@/components/layout/ui/Loader";
+import LoadingSpinner from "@/components/layout/ui/loader";
 
 const CustomerManagementPage = () => {
   const router = useRouter();

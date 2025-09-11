@@ -1,9 +1,9 @@
 // lib/hooks/useBranchManagement.ts
 import { useState, useEffect, useMemo } from "react";
 import { BranchAPI } from "../util/branch-api";
-import { useSelection } from "./Selection";
+import { useSelection } from "./selection";
 import { useToast } from './toast';
-import { useBranchModal } from "./BranchModal";
+import { useBranchModal } from "./branchModal";
 import { BranchItem } from "@/lib/types/branch";
 
 export const useBranchManagement = () => {

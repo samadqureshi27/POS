@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { useCustomerId } from '@/lib/hooks/useCustomerID';
 import { useCustomerProfile } from '@/lib/hooks/useCustomerProfile';
-import { useOrderFilters } from '@/lib/hooks/CutomerOrderFilter';
+import { useOrderFilters } from '@/lib/hooks/cutomerOrderFilter';
 // Components
 import  {LoadingSpinner } from './_components/loading-spinner';
 import { ErrorMessage } from './_components/error-message';

@@ -9,7 +9,7 @@ import { useBackup } from '@/lib/hooks/useBackup';
 // Components
 import { BackupModal } from './_components/backup-modal';
 import { Toast } from '@/components/layout/ui/toast';
-import LoadingSpinner from '@/components/layout/ui/Loader';
+import LoadingSpinner from '@/components/layout/ui/loader';
 import { BackupPageHeader } from './_components/backup-page-header';
 import { BackupSettingsCard } from './_components/backup-settings-card';
 import { BackupHistoryCard } from './_components/backup-history-cards';

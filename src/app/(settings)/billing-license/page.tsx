@@ -10,7 +10,7 @@ import { Toast } from '@/components/layout/ui/toast';
 import { useLicense } from '@/lib/hooks/useLicense';
 
 // Components
-import LoadingSpinner from '@/components/layout/ui/Loader';
+import LoadingSpinner from '@/components/layout/ui/loader';
 import { PageHeader } from './_components/page-header'
 import { LicenseInfoCard } from './_components/license-info-card';
 import { ResourcesAllocationCard } from './_components/resource-allocation-card';

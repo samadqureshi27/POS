@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import ActionBar from "@/components/layout/ui/action-bar";
 import {Toast} from "@/components/layout/ui/toast";
-import LoadingSpinner from "@/components/layout/ui/Loader";
+import LoadingSpinner from "@/components/layout/ui/loader";
 import IngredientsTable from "./_components/ingredients-table";
 import IngredientsModal from "./_components/ingredients-modal";
 

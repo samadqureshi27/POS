@@ -1,6 +1,6 @@
 "use client";
 import React, { ReactNode } from 'react';
-import LoadingSpinner from './Loader';
+import LoadingSpinner from './loader';
 
 interface ButtonProps {
   children: ReactNode;
@@ -60,7 +60,7 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled || isLoading}
       className={`${baseClasses} ${variants[variant]} ${variant === 'login' ? loginSize : sizes[size]} ${className}`}
     >
-      {isLoading && <LoadingSpinner size="sm" className="mr-2" />}
+      {isLoading && <LoadingSpinner />}
       <span className="relative z-10">{children}</span>
     </button>
   );

@@ -3,13 +3,13 @@ import React from "react";
 
 // Hooks
 import { useToast } from '@/lib/hooks';
-import { useSettings } from '@/lib/hooks/Gsettings';
+import { useSettings } from '@/lib/hooks/gsettings';
 
 // Components
 import { Toast } from '@/components/layout/ui/toast';
-import ActionButtons from '@/components/layout/ui/Setting-buttons';
+import ActionButtons from '@/components/layout/ui/setting-buttons';
 import SettingsCards from './_components/cards';
-import LoadingSpinner from '@/components/layout/ui/Loader';
+import LoadingSpinner from '@/components/layout/ui/loader';
 // Loading Spinner Component
 
 

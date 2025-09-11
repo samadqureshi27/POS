@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import ActionBar from "@/components/layout/ui/action-bar";
 import { MenuAPI, RecipeOption } from "@/lib/util/recipe-option-api";
 import {Toast} from "@/components/layout/ui/toast";
-import LoadingSpinner from "@/components/layout/ui/Loader";
+import LoadingSpinner from "@/components/layout/ui/loader";
 import RecipeModal from "./_components/recipe-option-modal";
 import RecipeTable from "./_components/recipe-option-table";
 

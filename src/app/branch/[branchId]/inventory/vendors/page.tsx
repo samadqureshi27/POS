@@ -8,7 +8,7 @@ import ActionBar from "@/components/layout/ui/action-bar";
 import { Toast } from '@/components/layout/ui/toast';
 import VendorModal from "./_components/vendor-modal";
 import VendorTable from "./_components/vendor-table";
-import LoadingSpinner from '@/components/layout/ui/Loader';
+import LoadingSpinner from '@/components/layout/ui/loader';
 import { useVendorManagement } from "@/lib/hooks/useVendors"; 
 
 const VendorsPage = () => {
