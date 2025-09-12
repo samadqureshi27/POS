@@ -3,16 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { X, Save, ImageIcon } from "lucide-react";
 import ButtonPage from "@/components/layout/ui/button";
-import { CategoryItem, CategoryFormData } from '@/lib/types/category';
-
-interface CategoryModalProps {
-  isOpen: boolean;
-  editingItem: CategoryItem | null;
-  actionLoading: boolean;
-  onClose: () => void;
-  onCreate: (data: CategoryFormData) => void;
-  onUpdate: (data: CategoryFormData) => void;
-}
+import { CategoryItem, CategoryFormData, CategoryModalProps } from '@/lib/types/category';
 
 const CategoryModal: React.FC<CategoryModalProps> = ({
   isOpen,
@@ -290,13 +281,12 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
               !formData.Description.trim() ||
               actionLoading
             }
-            className={`px-6 py-2 rounded-sm transition-colors flex items-center gap-2 ${
-              !formData.Name.trim() ||
-              !formData.Description.trim() ||
-              actionLoading
+            className={`px-6 py-2 rounded-sm transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
+                !formData.Description.trim() ||
+                actionLoading
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-            }`}
+              }`}
           >
             {actionLoading ? (
               <>

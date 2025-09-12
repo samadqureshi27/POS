@@ -1,18 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
-
-interface FilterOption {
-  value: string;
-  label: string;
-  className?: string;
-}
-
-interface FilterDropdownProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: FilterOption[];
-}
+import {FilterOption,FilterDropdownProps } from "@/lib/types/menum"; 
 
 const FilterDropdown: React.FC<FilterDropdownProps> = ({ 
   label, 

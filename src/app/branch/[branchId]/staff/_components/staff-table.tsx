@@ -6,6 +6,7 @@ import ResponsiveEditButton from "@/components/layout/ui/responsive-detail-butto
 import { StaffItem } from "@/lib/types/staff-management";
 import { formatStaffId } from "@/lib/util/Staff-formatters";
 
+import CustomCheckbox from "@/components/layout/ui/custom-checkbox";
 interface StaffTableProps {
     staffItems: StaffItem[];
     filteredItems: StaffItem[];
@@ -44,52 +45,9 @@ const StaffTable: React.FC<StaffTableProps> = ({
                     <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
                         <tr>
                             <th className="px-6 py-6 text-left w-[2.5px]">
-                                <Checkbox
+                                <CustomCheckbox
                                     checked={isAllSelected}
-                                    onChange={(e) => onSelectAll(e.target.checked)}
-                                    disableRipple
-                                    sx={{
-                                        transform: "scale(1.5)",
-                                        p: 0,
-                                    }}
-                                    icon={
-                                        <svg width="20" height="20" viewBox="0 0 24 24">
-                                            <rect
-                                                x="3"
-                                                y="3"
-                                                width="18"
-                                                height="18"
-                                                rx="3"
-                                                ry="3"
-                                                fill="#e0e0e0"
-                                                stroke="#d1d1d1"
-                                                strokeWidth="2"
-                                            />
-                                        </svg>
-                                    }
-                                    checkedIcon={
-                                        <svg width="20" height="20" viewBox="0 0 24 24">
-                                            <rect
-                                                x="3"
-                                                y="3"
-                                                width="18"
-                                                height="18"
-                                                rx="3"
-                                                ry="3"
-                                                fill="#e0e0e0"
-                                                stroke="#2C2C2C"
-                                                strokeWidth="2"
-                                            />
-                                            <path
-                                                d="M9 12.5l2 2 4-4.5"
-                                                fill="none"
-                                                stroke="#2C2C2C"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
-                                    }
+                                    onChange={onSelectAll}
                                 />
                             </th>
                             <th className="relative px-4 py-3 text-left">
@@ -235,54 +193,9 @@ const StaffTable: React.FC<StaffTableProps> = ({
                                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                                 >
                                     <td className="px-6 py-8 whitespace-nowrap card-checkbox-cell">
-                                        <Checkbox
-                                            checked={selectedItems.includes(item.Staff_ID)}
-                                            onChange={(e) =>
-                                                onSelectItem(item.Staff_ID, e.target.checked)
-                                            }
-                                            disableRipple
-                                            sx={{
-                                                p: 0,
-                                                transform: "scale(1.5)",
-                                            }}
-                                            icon={
-                                                <svg width="20" height="20" viewBox="0 0 24 24">
-                                                    <rect
-                                                        x="3"
-                                                        y="3"
-                                                        width="18"
-                                                        height="18"
-                                                        rx="3"
-                                                        ry="3"
-                                                        fill="#e0e0e0"
-                                                        stroke="#d1d1d1"
-                                                        strokeWidth="2"
-                                                    />
-                                                </svg>
-                                            }
-                                            checkedIcon={
-                                                <svg width="20" height="20" viewBox="0 0 24 24">
-                                                    <rect
-                                                        x="3"
-                                                        y="3"
-                                                        width="18"
-                                                        height="18"
-                                                        rx="3"
-                                                        ry="3"
-                                                        fill="#e0e0e0"
-                                                        stroke="#2C2C2C"
-                                                        strokeWidth="2"
-                                                    />
-                                                    <path
-                                                        d="M9 12.5l2 2 4-4.5"
-                                                        fill="none"
-                                                        stroke="#2C2C2C"
-                                                        strokeWidth="2"
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                    />
-                                                </svg>
-                                            }
+                                        <CustomCheckbox
+                                            checked={selectedItems.includes(item.ID)}
+                                            onChange={(checked) => onSelectItem(item.ID, checked)}
                                         />
                                     </td>
                                     <td className="px-4 py-4 whitespace-nowrap" data-label="Staff ID">
@@ -328,8 +241,8 @@ const StaffTable: React.FC<StaffTableProps> = ({
                                             item.Access_Code ? (
                                             <span
                                                 className={`px-2 py-1 rounded text-xs font-mono ${item.Role === "Cashier"
-                                                        ? "bg-blue-100 text-blue-400"
-                                                        : "bg-purple-100 text-purple-400"
+                                                    ? "bg-blue-100 text-blue-400"
+                                                    : "bg-purple-100 text-purple-400"
                                                     }`}
                                             >
                                                 {item.Access_Code}

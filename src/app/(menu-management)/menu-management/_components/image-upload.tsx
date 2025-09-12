@@ -1,11 +1,7 @@
 import React from "react";
 import { X, ImageIcon } from "lucide-react";
+import {ImageUploadProps} from "@/lib/types/menum";
 
-interface ImageUploadProps {
-  preview: string | null;
-  setPreview: (preview: string | null) => void;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-}
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ 
   preview, 

@@ -4,11 +4,7 @@ import React from "react";
 import { Plus, X, Grip } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-interface PriceTabProps {
-  formData: any;
-  setFormData: (data: any) => void;
-}
-
+import {PriceTabProps} from "@/lib/types/menum";
 const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
   return (
     <div className="max-w-4xl mx-auto">

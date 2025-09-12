@@ -127,14 +127,14 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar - Left side, vertical */}
-      <aside className="hidden md:block fixed left-0 top-0 h-screen bg-[#D1AB35] w-18 z-30">
+      <aside className="hidden md:block fixed left-0 top-0 h-screen bg-[#D1AB35] w-16 z-30">
         {/* Menu Items */}
         <nav className="h-full flex flex-col justify-center items-center gap-1 p-4">
           {menuItems.map((item, idx) => (
             <Link
               key={idx}
               href={item.link}
-              className={`group relative flex items-center justify-center p-2 rounded hover:bg-[#454545] transition-all ${isItemActive(item) ? 'bg-[#454545]' : ''
+              className={`group relative flex items-center justify-center p-2.5 rounded hover:bg-[#454545] transition-all ${isItemActive(item) ? 'bg-[#454545]' : ''
                 }`}
             >
               <span className={`transition ${isItemActive(item)

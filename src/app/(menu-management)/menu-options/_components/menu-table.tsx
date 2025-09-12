@@ -4,19 +4,8 @@ import { ChevronDown } from 'lucide-react';
 import Checkbox from '@mui/material/Checkbox';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import ResponsiveEditButton from '@/components/layout/ui/responsive-edit-button';
-import { MenuItemOptions } from '@/lib/types/interfaces';
-
-interface MenuTableProps {
-  filteredItems: MenuItemOptions[];
-  selectedItems: number[];
-  searchTerm: string;
-  DisplayFilter: "" | "Radio" | "Select" | "Checkbox";
-  isAllSelected: boolean;
-  onSelectAll: (checked: boolean) => void;
-  onSelectItem: (itemId: number, checked: boolean) => void;
-  onEditItem: (item: MenuItemOptions) => void;
-  onDisplayFilterChange: (filter: "" | "Radio" | "Select" | "Checkbox") => void;
-}
+import { MenuItemOptions, MenuTableProps } from '@/lib/types/menuItemOptions';
+import CustomCheckbox from "@/components/layout/ui/custom-checkbox";
 
 const MenuTable: React.FC<MenuTableProps> = ({
   filteredItems,
@@ -36,52 +25,9 @@ const MenuTable: React.FC<MenuTableProps> = ({
           <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
             <tr>
               <th className="px-6 py-6 text-left w-[2.5px]">
-                <Checkbox
+                <CustomCheckbox
                   checked={isAllSelected}
-                  onChange={(e) => onSelectAll(e.target.checked)}
-                  disableRipple
-                  sx={{
-                    transform: "scale(1.5)",
-                    p: 0,
-                  }}
-                  icon={
-                    <svg width="20" height="20" viewBox="0 0 24 24">
-                      <rect
-                        x="3"
-                        y="3"
-                        width="18"
-                        height="18"
-                        rx="3"
-                        ry="3"
-                        fill="#e0e0e0"
-                        stroke="#d1d1d1"
-                        strokeWidth="2"
-                      />
-                    </svg>
-                  }
-                  checkedIcon={
-                    <svg width="20" height="20" viewBox="0 0 24 24">
-                      <rect
-                        x="3"
-                        y="3"
-                        width="18"
-                        height="18"
-                        rx="3"
-                        ry="3"
-                        fill="#e0e0e0"
-                        stroke="#2C2C2C"
-                        strokeWidth="2"
-                      />
-                      <path
-                        d="M9 12.5l2 2 4-4.5"
-                        fill="none"
-                        stroke="#2C2C2C"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  }
+                  onChange={onSelectAll}
                 />
               </th>
               <th className="relative px-4 py-3 text-left">
@@ -170,52 +116,9 @@ const MenuTable: React.FC<MenuTableProps> = ({
                   className="bg-white hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-6 py-8 cursor-pointer whitespace-nowrap card-checkbox-cell">
-                    <Checkbox
+                    <CustomCheckbox
                       checked={selectedItems.includes(item.ID)}
-                      onChange={(e) => onSelectItem(item.ID, e.target.checked)}
-                      disableRipple
-                      sx={{
-                        p: 0,
-                        transform: "scale(1.5)",
-                      }}
-                      icon={
-                        <svg width="20" height="20" viewBox="0 0 24 24">
-                          <rect
-                            x="3"
-                            y="3"
-                            width="18"
-                            height="18"
-                            rx="3"
-                            ry="3"
-                            fill="#e0e0e0"
-                            stroke="#d1d1d1"
-                            strokeWidth="2"
-                          />
-                        </svg>
-                      }
-                      checkedIcon={
-                        <svg width="20" height="20" viewBox="0 0 24 24">
-                          <rect
-                            x="3"
-                            y="3"
-                            width="18"
-                            height="18"
-                            rx="3"
-                            ry="3"
-                            fill="#e0e0e0"
-                            stroke="#2C2C2C"
-                            strokeWidth="2"
-                          />
-                          <path
-                            d="M9 12.5l2 2 4-4.5"
-                            fill="none"
-                            stroke="#2C2C2C"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      }
+                      onChange={(checked) => onSelectItem(item.ID, checked)}
                     />
                   </td>
 
@@ -255,9 +158,9 @@ const MenuTable: React.FC<MenuTableProps> = ({
                     {item.Priority}
                   </td>
 
-                  <td 
-                    className="px-4 py-4 whitespace-nowrap card-actions-cell" 
-                    data-label="Actions" 
+                  <td
+                    className="px-4 py-4 whitespace-nowrap card-actions-cell"
+                    data-label="Actions"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ResponsiveEditButton

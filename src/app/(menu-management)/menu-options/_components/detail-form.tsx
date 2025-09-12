@@ -2,12 +2,9 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { MenuItemOptions } from '@/lib/types/interfaces';
+import { MenuItemOptions,DetailsFormProps } from '@/lib/types/menuItemOptions';
 
-interface DetailsFormProps {
-  formData: Omit<MenuItemOptions, "ID">;
-  onFormDataChange: (data: Omit<MenuItemOptions, "ID">) => void;
-}
+
 
 const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange }) => {
   return (
