@@ -7,12 +7,7 @@ import {
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd";
-import { MenuItemOptions } from '@/lib/types/interfaces';
-
-interface OptionValuesFormProps {
-  formData: Omit<MenuItemOptions, "ID">;
-  onFormDataChange: (data: Omit<MenuItemOptions, "ID">) => void;
-}
+import { MenuItemOptions,OptionValuesFormProps } from '@/lib/types/menuItemOptions';
 
 const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDataChange }) => {
   const addOptionPair = () => {

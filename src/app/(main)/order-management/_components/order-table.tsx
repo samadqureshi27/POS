@@ -34,7 +34,6 @@ const OrderTable: React.FC<OrderTableProps> = ({
             <tr>
               <th className="relative px-4 py-3 text-left">
                 Order#
-                <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
               </th>
               <th className="relative px-4 py-3 text-left">
                 Name

@@ -1,5 +1,5 @@
 // utils/MenuAPI.ts
-import { MenuItemOptions, ApiResponse } from '@/lib/types/interfaces';
+import { MenuItemOptions, ApiResponse } from '@/lib/types/menuItemOptions';
 
 export class MenuAPI {
   private static delay = (ms: number) =>

@@ -1,14 +1,9 @@
 import React from "react";
 import { MenuItem } from "@/lib/util/menu1-api";
 
+import {OptionsTabProps} from "@/lib/types/menum";
 import { X } from "lucide-react";
 const sizeOptions = ["Small", "Regular", "Large", "Extra Large"];
-
-interface OptionsTabProps {
-    formData: Omit<MenuItem, "ID">;
-    updateFormData: (updates: Partial<Omit<MenuItem, "ID">>) => void;
-    handleFormFieldChange: (field: keyof Omit<MenuItem, "ID">, value: any) => void;
-}
 
 const OptionsTab: React.FC<OptionsTabProps> = ({
     formData,

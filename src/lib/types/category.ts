@@ -21,7 +21,7 @@ export interface ToastProps {
   onClose: () => void;
 }
 
-export interface CategoryFormData extends Omit<CategoryItem, "ID"> {}
+export interface CategoryFormData extends Omit<CategoryItem, "ID"> { }
 
 export interface CategoryPageState {
   categoryItems: CategoryItem[];
@@ -38,4 +38,26 @@ export interface CategoryPageState {
   statusFilter: "" | "Active" | "Inactive";
   formData: CategoryFormData;
   preview: string | null;
+}
+
+export interface CategoryModalProps {
+  isOpen: boolean;
+  editingItem: CategoryItem | null;
+  actionLoading: boolean;
+  onClose: () => void;
+  onCreate: (data: CategoryFormData) => void;
+  onUpdate: (data: CategoryFormData) => void;
+}
+
+
+export interface CategoryTableProps {
+  filteredItems: CategoryItem[];
+  selectedItems: number[];
+  statusFilter: "" | "Active" | "Inactive";
+  searchTerm: string;
+  isAllSelected: boolean;
+  onSelectAll: (checked: boolean) => void;
+  onSelectItem: (itemId: number, checked: boolean) => void;
+  onStatusFilterChange: (status: "" | "Active" | "Inactive") => void;
+  onEdit: (item: CategoryItem) => void;
 }

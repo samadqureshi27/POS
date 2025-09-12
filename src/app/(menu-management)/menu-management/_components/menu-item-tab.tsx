@@ -1,17 +1,7 @@
 import React from "react";
 import ImageUpload from "./image-upload";
 import ButtonPage from "@/components/layout/ui/button";
-import { MenuItem } from "@/lib/util/menu1-api";
-
-interface MenuItemTabProps {
-    formData: Omit<MenuItem, "ID">;
-    updateFormData: (updates: Partial<Omit<MenuItem, "ID">>) => void;
-    handleFormFieldChange: (field: keyof Omit<MenuItem, "ID">, value: any) => void;
-    handleStatusChange: (field: keyof Omit<MenuItem, "ID">, isActive: boolean) => void;
-    preview: string | null;
-    setPreview: (preview: string | null) => void;
-    fileInputRef: React.RefObject<HTMLInputElement>;
-}
+import {MenuItemTabProps,MenuItem} from "@/lib/types/menum";
 
 const MenuItemTab: React.FC<MenuItemTabProps> = ({
     formData,

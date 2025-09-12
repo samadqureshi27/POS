@@ -41,7 +41,7 @@ const CategoriesPage = () => {
     selectedItems.length === filteredItems.length && filteredItems.length > 0;
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner message="Category Loading..."/>;
   }
 
   return (

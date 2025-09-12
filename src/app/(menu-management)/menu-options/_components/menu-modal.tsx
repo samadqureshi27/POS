@@ -2,17 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import DetailsForm from './detail-form';
 import OptionValuesForm from './option-value-form';
-import { MenuItemOptions } from '@/lib/types/interfaces';
-
-interface MenuModalProps {
-  isOpen: boolean;
-  editingItem: MenuItemOptions | null;
-  formData: Omit<MenuItemOptions, "ID">;
-  onFormDataChange: (data: Omit<MenuItemOptions, "ID">) => void;
-  onSubmit: () => void;
-  onClose: () => void;
-  isFormValid: () => boolean;
-}
+import { MenuItemOptions,MenuModalProps } from '@/lib/types/menuItemOptions';
 
 const MenuModal: React.FC<MenuModalProps> = ({
   isOpen,

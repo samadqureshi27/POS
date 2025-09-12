@@ -6,11 +6,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ButtonPage from "@/components/layout/ui/button";
 
-interface MealTabProps {
-  formData: any;
-  setFormData: (data: any) => void;
-  handleStatusChange: (field: string, isActive: boolean) => void;
-}
+import {MealTabProps} from "@/lib/types/menum";
 
 const sizeOptionss = ["Cheese", "Pepperoni", "Olives", "Onions", "Bacon", "Pineapple"];
 
