@@ -49,7 +49,7 @@ export default function Sidebar() {
       icon: <DollarSign className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Financial Reports',
       link: '/financial-reports',
-      group:'analytics'
+      group: 'analytics'
     },
     {
       icon: <User className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
@@ -73,27 +73,25 @@ export default function Sidebar() {
 
   // Function to check if current path should make this menu item active
   const isItemActive = (item: any) => {
-    // Debug logging
-    console.log('Checking item:', item.label, 'with group:', item.group);
-    console.log('Current pathname:', pathname);
+    // Special case for dashboard/home - should be active when path is exactly /dashboard or /
+    if (item.link === '/dashboard') {
+      return pathname === '/dashboard' || pathname === '/';
+    }
 
     // First check if current path matches exactly
     if (pathname === item.link) {
-      console.log('Exact match found for:', item.label);
       return true;
     }
 
     // Find the current navigation item from your config
     const currentNavItem = findNavigationItem(pathname);
-    console.log('Current nav item found:', currentNavItem);
 
     if (!currentNavItem) {
-      console.log('No navigation item found for path:', pathname);
       return false;
     }
 
     // Special handling for different groups
-    
+
     if (item.group === 'pos') {
       return currentNavItem.group === 'pos';
     }
@@ -136,7 +134,7 @@ export default function Sidebar() {
             <Link
               key={idx}
               href={item.link}
-              className={`group relative flex items-center justify-center p-1 rounded hover:bg-[#454545] transition-all ${isItemActive(item) ? 'bg-[#454545]' : ''
+              className={`group relative flex items-center justify-center p-2 rounded hover:bg-[#454545] transition-all ${isItemActive(item) ? 'bg-[#454545]' : ''
                 }`}
             >
               <span className={`transition ${isItemActive(item)
