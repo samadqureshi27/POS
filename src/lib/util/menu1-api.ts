@@ -1,40 +1,5 @@
-export interface MenuItem {
-  ID: number;
-  Name: string;
-  Price: number;
-  Category: string;
-  StockQty: string;
-  Status: "Active" | "Inactive";
-  Description?: string;
-  MealType?: string;
-  Priority?: number;
-  MinimumQuantity?: number;
-  ShowOnMenu?: "Active" | "Inactive";
-  Featured?: "Active" | "Inactive";
-  StaffPick?: "Active" | "Inactive";
-  DisplayType?: string;
-  Displaycat?: string;
-  SpecialStartDate?: string;
-  SpecialEndDate?: string;
-  SpecialPrice?: number;
-  OptionValue?: string[];
-  OptionPrice?: number[];
-  MealValue?: string[];
-  MealPrice?: number[];
-  PName?: string[];
-  PPrice?: number[];
-  OverRide?: ("Active" | "Inactive")[];
-  ShowOnMain?: "Active" | "Inactive";
-  SubTBE?: "Active" | "Inactive";
-  Deal?: "Active" | "Inactive";
-  Special?: "Active" | "Inactive";
-}
 
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  success: boolean;
-}
+import { MenuItem, ApiResponse } from "@/lib/types/menum";
 
 class MenuAPI {
   private static delay = (ms: number) =>

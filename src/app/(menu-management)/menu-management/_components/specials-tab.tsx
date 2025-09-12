@@ -1,14 +1,8 @@
 "use client";
 
 import React from "react";
-import Toggle from "./toggle";
 import ButtonPage from "@/components/layout/ui/button";
-
-interface SpecialsTabProps {
-  formData: any;
-  setFormData: (data: any) => void;
-  handleStatusChange: (field: string, isActive: boolean) => void;
-}
+import {SpecialsTabProps} from "@/lib/types/menum";
 
 const SpecialsTab: React.FC<SpecialsTabProps> = ({ formData, setFormData, handleStatusChange }) => {
   return (

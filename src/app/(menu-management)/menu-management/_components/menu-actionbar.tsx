@@ -1,14 +1,8 @@
 import React from "react";
 import { Plus, Trash2, Search } from "lucide-react";
 
-interface MenuActionBarProps {
-  selectedItems: number[];
-  onAddClick: () => void;
-  onDeleteClick: () => void;
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
-  actionLoading: boolean;
-}
+import {MenuActionBarProps} from "@/lib/types/menum";
+
 
 const MenuActionBar: React.FC<MenuActionBarProps> = ({
   selectedItems,

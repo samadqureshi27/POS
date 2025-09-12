@@ -1,30 +1,9 @@
 import React from "react";
 import { Edit } from "lucide-react";
-import CustomCheckbox from "./custom-checkbox";
 import FilterDropdown from "./filter-dropdown";
+import CustomCheckbox from "@/components/layout/ui/custom-checkbox"; // Import the new component
 
-interface MenuItem {
-  ID: number;
-  Name: string;
-  Price: number;
-  Category: string;
-  StockQty: string;
-  Status: "Active" | "Inactive";
-}
-
-interface MenuTableProps {
-  filteredItems: MenuItem[];
-  selectedItems: number[];
-  isAllSelected: boolean;
-  onSelectAll: (checked: boolean) => void;
-  onSelectItem: (itemId: number, checked: boolean) => void;
-  onEditItem: (item: MenuItem) => void;
-  categoryFilter: string;
-  setCategoryFilter: (value: string) => void;
-  statusFilter: string;
-  setStatusFilter: (value: string) => void;
-  categories: string[];
-}
+import {MenuItem,MenuTableProps} from "@/lib/types/menum";
 
 const MenuTable: React.FC<MenuTableProps> = ({
   filteredItems,
@@ -132,11 +111,10 @@ const MenuTable: React.FC<MenuTableProps> = ({
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                   <span
-                    className={`inline-block w-24 text-right py-[2px] rounded-sm text-xs font-medium ${
-                      item.Status === "Inactive"
-                        ? "text-red-400"
-                        : "text-green-400"
-                    }`}
+                    className={`inline-block w-24 text-right py-[2px] rounded-sm text-xs font-medium ${item.Status === "Inactive"
+                      ? "text-red-400"
+                      : "text-green-400"
+                      }`}
                   >
                     {item.Status}
                   </span>

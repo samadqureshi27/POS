@@ -7,25 +7,8 @@ import OptionsTab from "./options-tab";
 import MealTab from "./meal-tab";
 import SpecialsTab from "./specials-tab";
 import PriceTab from "./price-table";
-import { MenuItem } from "@/lib/util/menu1-api";
 
-interface MenuModalProps {
-    isOpen: boolean;
-    editingItem: MenuItem | null;
-    activeTab: string;
-    setActiveTab: (tab: string) => void;
-    formData: Omit<MenuItem, "ID">;
-    onClose: () => void;
-    onSubmit: () => void;
-    actionLoading: boolean;
-    isFormValid: boolean;
-    preview: string | null;
-    setPreview: (preview: string | null) => void;
-    fileInputRef: React.RefObject<HTMLInputElement>;
-    updateFormData: (updates: Partial<Omit<MenuItem, "ID">>) => void;
-    handleFormFieldChange: (field: keyof Omit<MenuItem, "ID">, value: any) => void;
-    handleStatusChange: (field: keyof Omit<MenuItem, "ID">, isActive: boolean) => void;
-}
+import {MenuModalProps,MenuItem} from "@/lib/types/menum";
 
 const MenuModal: React.FC<MenuModalProps> = ({
     isOpen,

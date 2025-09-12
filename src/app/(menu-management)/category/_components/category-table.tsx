@@ -5,19 +5,8 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ResponsiveEditButton from "@/components/layout/ui/responsive-edit-button";
-import { CategoryItem } from '@/lib/types/category';
-
-interface CategoryTableProps {
-  filteredItems: CategoryItem[];
-  selectedItems: number[];
-  statusFilter: "" | "Active" | "Inactive";
-  searchTerm: string;
-  isAllSelected: boolean;
-  onSelectAll: (checked: boolean) => void;
-  onSelectItem: (itemId: number, checked: boolean) => void;
-  onStatusFilterChange: (status: "" | "Active" | "Inactive") => void;
-  onEdit: (item: CategoryItem) => void;
-}
+import { CategoryItem,CategoryTableProps } from '@/lib/types/category';
+import CustomCheckbox from "@/components/layout/ui/custom-checkbox";
 
 const CategoryTable: React.FC<CategoryTableProps> = ({
   filteredItems,
@@ -37,52 +26,10 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
           <thead className="bg-white border-b text-gray-500 rounded-sm border-gray-200 py-50 sticky top-0 z-10">
             <tr>
               <th className="px-6 py-6 text-left w-[2.5px]">
-                <Checkbox
+
+                <CustomCheckbox
                   checked={isAllSelected}
-                  onChange={(e) => onSelectAll(e.target.checked)}
-                  disableRipple
-                  sx={{
-                    transform: "scale(1.5)",
-                    p: 0,
-                  }}
-                  icon={
-                    <svg width="20" height="20" viewBox="0 0 24 24">
-                      <rect
-                        x="3"
-                        y="3"
-                        width="18"
-                        height="18"
-                        rx="3"
-                        ry="3"
-                        fill="#e0e0e0"
-                        stroke="#d1d1d1"
-                        strokeWidth="2"
-                      />
-                    </svg>
-                  }
-                  checkedIcon={
-                    <svg width="20" height="20" viewBox="0 0 24 24">
-                      <rect
-                        x="3"
-                        y="3"
-                        width="18"
-                        height="18"
-                        rx="3"
-                        ry="3"
-                        fill="#e0e0e0"
-                        stroke="#2C2C2C"
-                        strokeWidth="2"
-                      />
-                      <path
-                        d="M9 12.5l2 2 4-4.5"
-                        fill="none"
-                        stroke="#2C2C2C"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  }
+                  onChange={onSelectAll}
                 />
               </th>
               <th className="relative px-4 py-3 text-left">
@@ -91,7 +38,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
               </th>
               <th className="relative px-4 py-3 text-left">
                 Name
-                <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
+                <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
               </th>
               <th className="relative px-4 py-3 text-left">
                 <div className="flex flex-col gap-1">
@@ -167,52 +114,9 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
               filteredItems.map((item) => (
                 <tr key={item.ID} className="bg-white hover:bg-gray-50">
                   <td className="px-6 py-8 card-checkbox-cell">
-                    <Checkbox
+                    <CustomCheckbox
                       checked={selectedItems.includes(item.ID)}
-                      onChange={(e) => onSelectItem(item.ID, e.target.checked)}
-                      disableRipple
-                      sx={{
-                        p: 0,
-                        transform: "scale(1.5)",
-                      }}
-                      icon={
-                        <svg width="20" height="20" viewBox="0 0 24 24">
-                          <rect
-                            x="3"
-                            y="3"
-                            width="18"
-                            height="18"
-                            rx="3"
-                            ry="3"
-                            fill="#e0e0e0"
-                            stroke="#d1d1d1"
-                            strokeWidth="2"
-                          />
-                        </svg>
-                      }
-                      checkedIcon={
-                        <svg width="20" height="20" viewBox="0 0 24 24">
-                          <rect
-                            x="3"
-                            y="3"
-                            width="18"
-                            height="18"
-                            rx="3"
-                            ry="3"
-                            fill="#e0e0e0"
-                            stroke="#2C2C2C"
-                            strokeWidth="2"
-                          />
-                          <path
-                            d="M9 12.5l2 2 4-4.5"
-                            fill="none"
-                            stroke="#2C2C2C"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      }
+                      onChange={(checked) => onSelectItem(item.ID, checked)}
                     />
                   </td>
                   <td

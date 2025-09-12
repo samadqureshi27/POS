@@ -1,12 +1,6 @@
 import React from "react";
 
-interface TabNavigationProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  formData: {
-    Displaycat?: string;
-  };
-}
+import {TabNavigationProps} from "@/lib/types/menum";
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ 
   activeTab, 
