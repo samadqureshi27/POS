@@ -2,12 +2,12 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { useInventoryManagement } from "@/lib/hooks/inventoryManagement";
-import { Toast } from "@/components/layout/UI/Toast";
-import ActionBar from "@/components/layout/UI/ActionBar";
-import LoadingSpinner from "@/components/layout/UI/Loader";
-import StatCard from "@/components/layout/UI/SummaryCard";
-import InventoryModal from "./_components/inventoryModal";
-import InventoryTable from "./_components/inventoryTable";
+import { Toast } from "@/components/layout/ui/toast";
+import ActionBar from "@/components/layout/ui/action-bar";
+import LoadingSpinner from "@/components/layout/ui/loader";
+import StatCard from "@/components/layout/ui/summary-card";
+import InventoryModal from "./_components/inventory-modal";
+import InventoryTable from "./_components/inventory-table";
 const InventoryManagementPage = () => {
   const params = useParams();
   const branchId = parseInt(params?.branchId as string) || 1;

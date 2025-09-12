@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { DateRange, DateFilterHook } from '@/types/payroll';
+import { DateRange, DateFilterHook } from '@/lib/types/payroll';
 
 export const useDateFilter = (defaultPeriod: string = "Week"): DateFilterHook => {
     const periods = ["Today", "Week", "Month", "Quarter", "Year", "Custom"];

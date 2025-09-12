@@ -1,7 +1,7 @@
 // components/login/ManagerLoginForm.tsx
 "use client";
 import React from "react";
-import ErrorMessage from "@/components/layout/UI/ErrorMessage";
+import ErrorMessage from "@/components/layout/ui/error-message";
 import { useLoginContext } from "./login-context";
 import { validateManagerPinForm } from "@/lib/validations";
 

@@ -2,12 +2,12 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import ActionBar from "@/components/layout/UI/ActionBar";
-import {Toast} from "@/components/layout/UI/Toast";
+import ActionBar from "@/components/layout/ui/action-bar";
+import {Toast} from "@/components/layout/ui/toast";
 import MenuTable from "./_components/menu-table";
 import MenuModal from "./_components/menu-modal";
-import { MenuAPI } from "@/lib/util/menu-options-API";
-import { MenuItemOptions } from "@/types/interfaces";
+import { MenuAPI } from "@/lib/util/menu-options-api";
+import { MenuItemOptions } from "@/lib/types/interfaces";
 
 const CategoryPage = () => {
   const [MenuItemOptionss, setMenuItemOptionss] = useState<MenuItemOptions[]>([]);

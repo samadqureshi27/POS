@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { PaymentAPI } from "../util/paymentAPI";
-import { useSelection } from "../../lib/hooks/Selection";
-import { useToast } from '../../lib/hooks/toast';
-import { usePaymentModal } from "../../lib/hooks/PaymentModal";
-import { PaymentMethod } from "../../types/payment";
+import { PaymentAPI } from "../util/payment-api";
+import { useSelection } from "./selection";
+import { useToast } from './toast';
+import { usePaymentModal } from "./paymentModal";
+import { PaymentMethod } from "@/lib/types/payment";
 
 export const usePaymentManagement = () => {
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -115,7 +115,7 @@ export const usePaymentManagement = () => {
         if (selectedItems.length === 0) return;
         try {
             setActionLoading(true);
-            const response = await PaymentAPI.bulkDeletePaymentMethod(selectedItems);
+            const response = await PaymentAPI.bulkDeletePaymentMethod(selectedItems as number[]);
             if (response.success) {
                 setPaymentMethods((prev) => {
                     const remaining = prev.filter((i) => !selectedItems.includes(i.ID));

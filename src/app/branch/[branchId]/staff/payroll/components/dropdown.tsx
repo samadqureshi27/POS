@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { DropdownProps } from "@/types/payroll";
+import { DropdownProps } from "@/lib/types/payroll";
 
 // Simple Dropdown Component (replacing Radix UI)
 export const Dropdown: React.FC<DropdownProps> = ({ trigger, children, isOpen, onOpenChange }) => {

@@ -4,16 +4,16 @@ import React, { useState } from "react";
 import { AlertCircle } from "lucide-react";
 
 // Components
-import { DateFilter } from "@/components/layout/UI/Date-Filter";
-import { Toast } from "@/components/layout/UI/Toast";
-import StatCard from "@/components/layout/UI/SummaryCard";
-import { StaffTable } from "./components/PayrollStaffTable";
-import ActionBar from "@/components/layout/UI/ActionBar";
+import { DateFilter } from "@/components/layout/ui/date-filter";
+import { Toast } from "@/components/layout/ui/toast";
+import StatCard from "@/components/layout/ui/summary-card";
+import { StaffTable } from "./components/payroll-staff-table";
+import ActionBar from "@/components/layout/ui/action-bar";
 
 // Hooks
 import { useDateFilter } from "@/lib/hooks/useDateFilter";
 import { useStaffData } from "@/lib/hooks/usePayrollStaffData";
-import { useFilters } from "@/lib/hooks/PayrollFilter";
+import { useFilters } from "@/lib/hooks/payrollFilter";
 import { useToast } from "@/lib/hooks/toast";
 
 const StaffManagementPage = () => {

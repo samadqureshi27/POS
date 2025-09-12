@@ -1,6 +1,7 @@
 // _components/OrderStats/MostOrderedTable.tsx
 import React from 'react';
-import { OrderItem } from '@/types';
+
+import { OrderItem } from '@/lib/types';
 
 interface MostOrderedTableProps {
   data: OrderItem[];

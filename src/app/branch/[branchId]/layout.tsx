@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, usePathname } from "next/navigation";
-import BaseSubmenu from "@/components/layout/BaseSubmenu";
+import BaseSubmenu from "@/components/layout/base-submenu";
 
 export default function BranchLayout({ children }: { children: React.ReactNode }) {
   const { branchId } = useParams();

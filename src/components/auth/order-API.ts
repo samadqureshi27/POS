@@ -1,5 +1,5 @@
 // _components/OrderAPI.ts
-import { OrderItem, ApiResponse, OrderStats } from '../../types';
+import { OrderItem, ApiResponse, OrderStats } from '@/lib/types';
 
 export class OrderAPI {
   private static delay = (ms: number) =>

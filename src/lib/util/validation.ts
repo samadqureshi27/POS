@@ -1,5 +1,7 @@
 // utils/validation.ts
-import { RestaurantData } from '../../types';
+
+import { RestaurantData } from '@/lib/types';
+
 
 export const validateRestaurantForm = (formData: RestaurantData) => {
     const requiredFields = ["name", "type", "contact", "email", "address"];

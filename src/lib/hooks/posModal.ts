@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PosItem, PosModalFormData } from "../../types/pos";
+import { PosItem, PosModalFormData } from "@/lib/types/pos";
 
 export const usePosModal = (branchId: string) => {
     const [isModalOpen, setIsModalOpen] = useState(false);

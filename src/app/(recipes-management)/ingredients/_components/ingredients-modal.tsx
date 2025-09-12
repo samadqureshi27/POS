@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Save } from 'lucide-react';
-import ButtonPage from "@/components/layout/UI/button";
+import ButtonPage from "@/components/layout/ui/button";
 
 interface InventoryItem {
   ID: string;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { LicenseInfo } from '../../types/billing';
-import { LicenseAPI } from '../util/license-API';
+import { LicenseInfo } from '@/lib/types/billing';
+import { LicenseAPI } from '../util/license-api';
 
 interface UseLicenseProps {
     showToast: (message: string, type: "success" | "error") => void;

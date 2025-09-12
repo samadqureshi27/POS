@@ -1,14 +1,14 @@
 // pages/RestaurantProfilePage.tsx
 "use client";
 import React from "react";
-import LoadingSpinner from '@/components/layout/UI/Loader';
-import ActionButtons from '@/components/layout/UI/Setting-buttons';
-import { Toast } from '@/components/layout/UI/Toast';
-import { useToast } from '../../../lib/hooks/toast';
-import { useRestaurantProfile } from '../../../lib/hooks/useRestaurantProfile';
-import { BasicInfoCard } from './_components/BasicInfoCard';
-import { ContactInfoCard } from './_components/ContactInfoCard';
-import { LogoHoursCard } from './_components/LogoHoursCard';
+import LoadingSpinner from '@/components/layout/ui/loader';
+import ActionButtons from '@/components/layout/ui/setting-buttons';
+import { Toast } from '@/components/layout/ui/toast';
+import { useToast } from '@/lib/hooks/toast';
+import { useRestaurantProfile } from '@/lib/hooks/useRestaurantProfile';
+import { BasicInfoCard } from './_components/basic-info-card';
+import { ContactInfoCard } from './_components/contact-info-card';
+import { LogoHoursCard } from './_components/logo-hours-card';
 
 const RestaurantProfilePage = () => {
   const {

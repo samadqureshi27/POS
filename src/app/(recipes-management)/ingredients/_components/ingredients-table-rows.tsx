@@ -1,6 +1,6 @@
 import React from 'react';
 import Checkbox from "@mui/material/Checkbox";
-import ResponsiveEditButton from "@/components/layout/UI/ResponsiveEditButton";
+import ResponsiveEditButton from "@/components/layout/ui/responsive-edit-button";
 
 interface InventoryItem {
   ID: string;

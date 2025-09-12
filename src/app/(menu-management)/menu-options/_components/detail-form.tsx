@@ -2,7 +2,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { MenuItemOptions } from '@/types/interfaces';
+import { MenuItemOptions } from '@/lib/types/interfaces';
 
 interface DetailsFormProps {
   formData: Omit<MenuItemOptions, "ID">;

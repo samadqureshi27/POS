@@ -1,10 +1,10 @@
 // lib/hooks/useBranchManagement.ts
 import { useState, useEffect, useMemo } from "react";
-import { BranchAPI } from "../util/BranchApi";
-import { useSelection } from "../../lib/hooks/Selection";
+import { BranchAPI } from "../util/branch-api";
+import { useSelection } from "./selection";
 import { useToast } from './toast';
-import { useBranchModal } from "./BranchModal";
-import { BranchItem } from "../../types/branch";
+import { useBranchModal } from "./branchModal";
+import { BranchItem } from "@/lib/types/branch";
 
 export const useBranchManagement = () => {
     const [branchItems, setBranchItems] = useState<BranchItem[]>([]);
@@ -111,7 +111,7 @@ export const useBranchManagement = () => {
         if (selectedItems.length === 0) return;
         try {
             setActionLoading(true);
-            const response = await BranchAPI.bulkDeleteBranchItems(selectedItems);
+            const response = await BranchAPI.bulkDeleteBranchItems(selectedItems as number[]);
             if (response.success) {
                 // Refresh from API (IDs already re-assigned there)
                 const updated = await BranchAPI.getBranchItems();

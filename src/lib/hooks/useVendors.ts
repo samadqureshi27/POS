@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { VendorAPI } from "../util/vendorAPI";
-import { useSelection } from "./Selection";
+import { VendorAPI } from "../util/vendor-api";
+import { useSelection } from "./selection";
 import { useToast } from './toast';
 import { useVendorModal } from "./vendorModal";
-import { VendorItem, VendorFormData } from "../../types/vendors";
+import { VendorItem, VendorFormData } from "@/lib/types/vendors";
 
 export const useVendorManagement = (branchId: number) => {
     const [vendorItems, setVendorItems] = useState<VendorItem[]>([]);

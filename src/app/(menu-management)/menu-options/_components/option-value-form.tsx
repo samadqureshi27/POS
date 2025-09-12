@@ -7,7 +7,7 @@ import {
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd";
-import { MenuItemOptions } from '@/types/interfaces';
+import { MenuItemOptions } from '@/lib/types/interfaces';
 
 interface OptionValuesFormProps {
   formData: Omit<MenuItemOptions, "ID">;

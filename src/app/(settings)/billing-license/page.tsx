@@ -2,19 +2,19 @@
 import React from "react";
 
 // Types
-import { LicenseInfo, ApiResponse, ToastState } from '../../../types/billing';
+import { LicenseInfo, ApiResponse, ToastState } from '@/lib/types/billing';
 
 // Hooks
-import { useToast } from '../../../lib/hooks/toast'
-import { Toast } from '../../../components/layout/UI/Toast';
-import { useLicense } from '../../../lib/hooks/useLicense';
+import { useToast } from '@/lib/hooks';
+import { Toast } from '@/components/layout/ui/toast';
+import { useLicense } from '@/lib/hooks/useLicense';
 
 // Components
-import LoadingSpinner from '../../../components/layout/UI/Loader';
-import { PageHeader } from './_components/PageHeader'
-import { LicenseInfoCard } from './_components/LicenseinfoCard'
-import { ResourcesAllocationCard } from './_components/ResourceAllocationCard'
-import { UpdateLicenseCard } from './_components/UpdateLicenseCard';
+import LoadingSpinner from '@/components/layout/ui/loader';
+import { PageHeader } from './_components/page-header'
+import { LicenseInfoCard } from './_components/license-info-card';
+import { ResourcesAllocationCard } from './_components/resource-allocation-card';
+import { UpdateLicenseCard } from './_components/update-license-card';
 
 const BillingLicensePage = () => {
   const { toast, toastVisible, showToast, hideToast } = useToast();

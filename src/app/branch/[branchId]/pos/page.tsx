@@ -3,12 +3,12 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import StatCard from "@/components/layout/UI/SummaryCard";
-import ActionBar from "@/components/layout/UI/ActionBar";
-import { Toast } from '@/components/layout/UI/Toast';
-import PosModal from "./_components/posModal";
-import PosTable from "./_components/posTable";
-import LoadingSpinner from '@/components/layout/UI/Loader';
+import StatCard from "@/components/layout/ui/summary-card";
+import ActionBar from "@/components/layout/ui/action-bar";
+import { Toast } from '@/components/layout/ui/toast';
+import PosModal from "./_components/pos-modal";
+import PosTable from "./_components/pos-table";
+import LoadingSpinner from '@/components/layout/ui/loader';
 import { usePosManagement } from "@/lib/hooks/usePosManagement";
 
 const PosListPage = () => {

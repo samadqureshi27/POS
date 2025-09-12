@@ -2,14 +2,14 @@
 import React from "react";
 
 // Hooks
-import { useToast } from '../../../lib/hooks/toast';
-import { useSettings } from '../../../lib/hooks/Gsettings';
+import { useToast } from '@/lib/hooks';
+import { useSettings } from '@/lib/hooks/gsettings';
 
 // Components
-import { Toast } from '@/components/layout/UI/Toast';
-import ActionButtons from '@/components/layout/UI/Setting-buttons';
+import { Toast } from '@/components/layout/ui/toast';
+import ActionButtons from '@/components/layout/ui/setting-buttons';
 import SettingsCards from './_components/cards';
-import LoadingSpinner from '@/components/layout/UI/Loader';
+import LoadingSpinner from '@/components/layout/ui/loader';
 // Loading Spinner Component
 
 

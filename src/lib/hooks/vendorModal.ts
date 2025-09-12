@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { VendorItem, VendorFormData } from "../../types/vendors";
+import { VendorItem, VendorFormData } from "@/lib/types/vendors";
 
 export const useVendorModal = (branchId: number) => {
     const [isModalOpen, setIsModalOpen] = useState(false);

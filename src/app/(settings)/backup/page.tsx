@@ -2,17 +2,17 @@
 import React from "react";
 
 // Hooks
-import { useToast } from '../../../lib/hooks/toast';
-import { useModal } from '../../../lib/hooks/useBackupModal';
-import { useBackup } from '../../../lib/hooks/useBackup';
+import { useToast } from '@/lib/hooks';
+import { useModal } from '@/lib/hooks';
+import { useBackup } from '@/lib/hooks/useBackup';
 
 // Components
-import { BackupModal } from './_components/BackupModal';
-import { Toast } from '../../../components/layout/UI/Toast';
-import LoadingSpinner from '../../../components/layout/UI/Loader';
-import { BackupPageHeader } from './_components/BackupPageHeader';
-import { BackupSettingsCard } from './_components/BackupSettingsCard';
-import { BackupHistoryCard } from './_components/BackupHistoruCards';
+import { BackupModal } from './_components/backup-modal';
+import { Toast } from '@/components/layout/ui/toast';
+import LoadingSpinner from '@/components/layout/ui/loader';
+import { BackupPageHeader } from './_components/backup-page-header';
+import { BackupSettingsCard } from './_components/backup-settings-card';
+import { BackupHistoryCard } from './_components/backup-history-cards';
 
 const BackupRecoveryPage = () => {
   // Custom hooks
