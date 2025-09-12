@@ -23,40 +23,40 @@ export const navigationConfig: NavigationItem[] = [
   {
     name: "Restaurant Management",
     href: "/restaurant-management",
-    group: "main",
+    group: "settings",
   },
   {
     name: "Order Management",
     href: "/order-management",
-    group: "main",
+    group: "order",
   },
   {
     name: "Branches Management",
     href: "/branches-management",
-    group: "main",
+    group: "branch",
     children: [
       {
         name: "POS",
         href: "/branch/[branchId]/pos",
-        group: "pos",
+        group: "branch",
         dynamic: true,
       },
       {
         name: "Inventory",
         href: "/branch/[branchId]/inventory",
-        group: "pos",
+        group: "branch",
         dynamic: true,
         children: [
           {
             name: "Vendors",
             href: "/branch/[branchId]/inventory/vendors",
-            group: "pos",
+            group: "branch",
             dynamic: true,
           },
           {
             name: "Reports",
             href: "/branch/[branchId]/inventory/reports",
-            group: "pos",
+            group: "branch",
             dynamic: true,
           },
         ],
@@ -64,75 +64,53 @@ export const navigationConfig: NavigationItem[] = [
       {
         name: "Staff",
         href: "/branch/[branchId]/staff",
-        group: "pos",
+        group: "branch",
         dynamic: true,
         children: [
           {
             name: "Payroll",
             href: "/branch/[branchId]/staff/payroll",
-            group: "pos",
+            group: "branch",
             dynamic: true,
           },
         ],
       },
     ],
   },
-  {
-    name: "Customer Profile",
-    href: "/customer-profile",
-    group: "main",
-  },
 
-  // --- POS ---
-  
   {
     name: "Menu Management",
     href: "/menu-management",
-    group: "pos",
+    group: "menu",
   },
   {
     name: "Options",
     href: "/options",
-    group: "pos",
-  },
+    group: "menu"
+  }
+  ,
   {
     name: "Category",
     href: "/category",
-    group: "pos",
+    group: "menu",
   },
-  
+
   {
     name: "Recipes Management",
     href: "/recipes-management",
-    group: "pos",
+    group: "recipes",
   },
   {
     name: "Ingredients",
     href: "/ingredients",
-    group: "pos",
-  },
-
-  // --- ANALYTICS ---
-  {
-    name: "Analytics",
-    href: "/analytics",
-    group: "analytics",
+    group: "recipes",
   },
   {
     name: "Financial Report",
-    href: "/financial-report",
-    group: "analytics",
+    href: "/financial-reports",
+    group:"analytics"
   },
-  {
-    name: "Customer Analytics",
-    href: "/customer-analytics",
-    group: "analytics",
-  },
-  {
-    name: "Customer Reports",
-    href: "/customer-reports",
-    group: "analytics",
-  },
+
 
   // --- CUSTOMER MANAGEMENT ---
   {

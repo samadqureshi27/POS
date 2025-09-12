@@ -8,9 +8,8 @@ import { useRouter } from 'next/navigation';
 import { AnalyticsData } from '@/lib/types/analytics';
 
 // Components
-import ErrorMessage from "@/components/layout/ui/error-message";
 import { StarRating } from '@/components/layout/ui/StarRating';
-import LoadingSpinner from '@/components/layout/ui/loading-spinner';
+import LoadingSpinner from '@/components/layout/ui/loader';
 import { MetricCard } from './_components/MetricCard';
 import { CustomerGrowthChart } from './_components/CustomerGrowthChart';
 import { RevenueTrendsChart } from './_components/RevenueTrendsChart';
@@ -125,15 +124,6 @@ const AnalyticsDashboard = () => {
     return <LoadingSpinner message="Loading Analytics Dashboard..." />;
   }
 
-  if (error || !analyticsData) {
-    return (
-      <ErrorMessage 
-        message={error || "Failed to load analytics data"}
-        showBackButton
-        onBack={handleBackClick}
-      />
-    );
-  }
 
   return (
     <div className="bg-gray-50 min-h-screen p-6 mt-4">
