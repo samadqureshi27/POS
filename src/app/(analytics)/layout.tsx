@@ -7,7 +7,7 @@ export default function AnalyticsLayout({
 }) {
   return (
     <>
-      <main className="p-6">
+      <main className="">
         {children}
       </main>
     </>
