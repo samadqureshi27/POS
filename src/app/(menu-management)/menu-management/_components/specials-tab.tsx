@@ -2,6 +2,7 @@
 
 import React from "react";
 import Toggle from "./toggle";
+import ButtonPage from "@/components/layout/ui/button";
 
 interface SpecialsTabProps {
   formData: any;
@@ -14,7 +15,7 @@ const SpecialsTab: React.FC<SpecialsTabProps> = ({ formData, setFormData, handle
     <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between">
         <label className="block text-sm font-medium text-gray-700">Special</label>
-        <Toggle
+        <ButtonPage
           checked={formData.Special === "Active"}
           onChange={(checked) => handleStatusChange("Special", checked)}
         />

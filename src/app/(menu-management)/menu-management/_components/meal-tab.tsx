@@ -4,7 +4,7 @@ import React from "react";
 import { ChevronDown, Plus, X, Grip } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import Toggle from "./toggle";
+import ButtonPage from "@/components/layout/ui/button";
 
 interface MealTabProps {
   formData: any;
@@ -58,7 +58,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
           <label className="block text-sm font-medium text-gray-700">
             Deal?
           </label>
-          <Toggle
+          <ButtonPage
             checked={formData.Deal === "Active"}
             onChange={(checked) => handleStatusChange("Deal", checked)}
           />
@@ -157,7 +157,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                               />
                             </td>
                             <td className="p-3 text-center">
-                              <Toggle
+                              <ButtonPage
                                 checked={formData.OverRide?.[idx] === "Active"}
                                 onChange={(checked) => {
                                   const updated = [...(formData.OverRide || [])];
@@ -170,7 +170,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                               />
                             </td>
                             <td className="p-3 text-center">
-                              <Toggle
+                              <ButtonPage
                                 checked={formData.status?.[idx] === "Active"}
                                 onChange={(checked) => {
                                   const updated = [...(formData.status || [])];
@@ -280,7 +280,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
               </div>
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-medium text-gray-700">Override</label>
-                <Toggle
+                <ButtonPage
                   checked={formData.OverRide?.[idx] === "Active"}
                   onChange={(checked) => {
                     const updated = [...(formData.OverRide || [])];
@@ -294,7 +294,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
               </div>
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-medium text-gray-700">Status</label>
-                <Toggle
+                <ButtonPage
                   checked={formData.status?.[idx] === "Active"}
                   onChange={(checked) => {
                     const updated = [...(formData.status || [])];
