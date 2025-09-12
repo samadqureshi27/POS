@@ -1,5 +1,5 @@
 // hooks/useDashboard.ts
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { AnalyticsData, CustomerItem, OrderItem } from '@/lib/types/analytics';
 import { AnalyticsAPI } from '@/lib/util/AnalyticsApi';
 
@@ -27,10 +27,12 @@ export const useDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
+  // Ref to prevent initial infinite loop
+  const isInitialized = useRef(false);
   const [startDate, endDate] = dateRange;
 
-  // Load dashboard data with optional loading control
-  const loadDashboardData = async (period?: string, showLoading = true) => {
+  // FIXED: Memoized load dashboard data function
+  const loadDashboardData = useCallback(async (period?: string, showLoading = true) => {
     try {
       if (showLoading) {
         setLoading(true);
@@ -38,6 +40,8 @@ export const useDashboard = () => {
       setError(null);
       
       const currentPeriod = period || selectedPeriod;
+      
+      console.log('Loading dashboard data for period:', currentPeriod);
       
       const [analyticsResponse, customersResponse, ordersResponse] = await Promise.all([
         AnalyticsAPI.getAnalyticsData(currentPeriod),
@@ -64,12 +68,14 @@ export const useDashboard = () => {
         setLoading(false);
       }
     }
-  };
+  }, [selectedPeriod]); // Only depend on selectedPeriod
 
-  // Load custom range data
-  const loadCustomRangeData = async (startDate: string, endDate: string) => {
+  // FIXED: Memoized load custom range data
+  const loadCustomRangeData = useCallback(async (startDate: string, endDate: string) => {
     try {
       setLoading(true);
+      console.log('Loading custom range data:', startDate, 'to', endDate);
+      
       const response = await AnalyticsAPI.getCustomDateRangeData(startDate, endDate);
       if (response.success) {
         setAnalyticsData(response.data);
@@ -82,40 +88,52 @@ export const useDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // No dependencies needed
 
-  // Handle period change WITHOUT loading animation
-  const handlePeriodChange = async (period: string) => {
+  // FIXED: Memoized period change handler
+  const handlePeriodChange = useCallback(async (period: string) => {
+    console.log('Period changed to:', period);
     setSelectedPeriod(period);
     setShowDatePicker(false);
     if (period !== "Custom") {
       // Pass false to skip loading animation for period changes
       await loadDashboardData(period, false);
     }
-  };
+  }, [loadDashboardData]);
 
-  // Handle custom date range WITH loading animation
-  const handleCustomDateRange = (startDate: string, endDate: string) => {
+  // FIXED: Memoized custom date range handler
+  const handleCustomDateRange = useCallback((startDate: string, endDate: string) => {
+    console.log('Custom date range selected:', startDate, 'to', endDate);
     setSelectedPeriod("Custom");
     loadCustomRangeData(startDate, endDate);
     return { startDate, endDate };
-  };
+  }, [loadCustomRangeData]);
 
-  // Auto-fetch when range selected
+  // FIXED: Remove the problematic useEffect that caused infinite loop
+  // This was causing the infinite loop because it re-triggered on every date change
+  /*
   useEffect(() => {
     if (startDate && endDate) {
       const startStr = startDate.toISOString().split("T")[0];
       const endStr = endDate.toISOString().split("T")[0];
       handleCustomDateRange(startStr, endStr);
     }
-  }, [startDate, endDate]);
+  }, [startDate, endDate]); // This was the main culprit
+  */
 
-  // Initial data load
+  // FIXED: Initial data load - only run once
   useEffect(() => {
-    loadDashboardData();
-  }, []);
+    if (!isInitialized.current) {
+      console.log('Initializing dashboard...');
+      isInitialized.current = true;
+      loadDashboardData().catch(error => {
+        console.error('Initial load failed:', error);
+        setError('Failed to initialize dashboard');
+      });
+    }
+  }, []); // Empty dependency array
 
-  // Computed values
+  // Computed values - these are fine
   const topCustomers = useMemo(() => {
     return customers
       .sort((a, b) => b.Total_Orders - a.Total_Orders)
@@ -146,6 +164,11 @@ export const useDashboard = () => {
 
     return filtered;
   }, [recentOrders, searchTerm, statusFilter]);
+
+  // FIXED: Memoized refetch function
+  const refetch = useCallback(() => {
+    return loadDashboardData(selectedPeriod);
+  }, [loadDashboardData, selectedPeriod]);
 
   return {
     // Analytics data
@@ -182,6 +205,6 @@ export const useDashboard = () => {
     loadCustomRangeData,
     handlePeriodChange,
     handleCustomDateRange,
-    refetch: () => loadDashboardData(selectedPeriod)
+    refetch
   };
 };

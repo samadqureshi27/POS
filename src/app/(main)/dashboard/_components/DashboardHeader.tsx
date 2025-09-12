@@ -19,23 +19,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       Dashboard
     </h1>
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-      {lastUpdated && (
-        <p className="text-sm text-gray-500">
-          Last updated: {new Date(lastUpdated).toLocaleTimeString()}
-        </p>
-      )}
-      <button
-        onClick={onRefresh}
-        disabled={refreshing}
-        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-          refreshing
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "bg-gray-800 text-white hover:bg-gray-700"
-        }`}
-      >
-        <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
-        {refreshing ? "Refreshing..." : "Refresh"}
-      </button>
+      
+      
     </div>
   </div>
 );

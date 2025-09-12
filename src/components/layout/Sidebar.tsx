@@ -1,8 +1,8 @@
-// Fixed Sidebar.tsx
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Home,
   ShoppingCart,
@@ -14,20 +14,117 @@ import {
   Package2,
   AlignJustify,
 } from 'lucide-react';
+import { navigationConfig, findNavigationItem, type NavigationItem } from '@/lib/navigation';
+import { group } from 'console';
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   const menuItems = [
-    { icon: <Home className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Home', link: '/' },
-    { icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Menu Management', link: '/menu-management' },
-    { icon: <Package2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Recipe Management', link: '/recipes-management' },
-    
-    { icon: <Building2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Branch Management', link: '/branches-management' },
-    { icon: <DollarSign className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Financial Reports', link: '/financial-reports' },
-    
-    { icon: <User className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Customer Management', link: '/customer-details' },
-    { icon: <ShoppingCart className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Order Management', link: '/order-management' },
-    { icon: <Settings className="h-6 w-6 md:h-7 md:w-7 stroke-[1.5]" />, label: 'Settings', link: '/general-settings' },
+    {
+      icon: <Home className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Home',
+      link: '/dashboard',
+      group: 'main'
+    },
+    {
+      icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Menu Management',
+      link: '/menu-management',
+      group: 'menu' // This will match menu-related routes
+    },
+    {
+      icon: <Package2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Recipe Management',
+      link: '/recipes-management',
+      group: 'recipes'
+    },
+    {
+      icon: <Building2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Branch Management',
+      link: '/branches-management',
+      group: 'branch'
+    },
+    {
+      icon: <DollarSign className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Financial Reports',
+      link: '/financial-reports',
+      group:'analytics'
+    },
+    {
+      icon: <User className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Customer Management',
+      link: '/customer-details',
+      group: 'customer-management'
+    },
+    {
+      icon: <ShoppingCart className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Order Management',
+      link: '/order-management',
+      group: 'order'
+    },
+    {
+      icon: <Settings className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Settings',
+      link: '/general-settings',
+      group: 'settings'
+    },
   ];
+
+  // Function to check if current path should make this menu item active
+  const isItemActive = (item: any) => {
+    // Debug logging
+    console.log('Checking item:', item.label, 'with group:', item.group);
+    console.log('Current pathname:', pathname);
+
+    // First check if current path matches exactly
+    if (pathname === item.link) {
+      console.log('Exact match found for:', item.label);
+      return true;
+    }
+
+    // Find the current navigation item from your config
+    const currentNavItem = findNavigationItem(pathname);
+    console.log('Current nav item found:', currentNavItem);
+
+    if (!currentNavItem) {
+      console.log('No navigation item found for path:', pathname);
+      return false;
+    }
+
+    // Special handling for different groups
+    
+    if (item.group === 'pos') {
+      return currentNavItem.group === 'pos';
+    }
+    if (item.group === 'analytics') {
+      return currentNavItem.group === 'analytics';
+    }
+    if (item.group === 'menu') {
+      return currentNavItem.group === 'menu';
+    }
+
+    if (item.group === 'recipes') {
+      return currentNavItem.group === 'recipes';
+    }
+    if (item.group === 'customer-management') {
+      return currentNavItem.group === 'customer-management';
+    }
+
+    if (item.group === 'settings') {
+      return currentNavItem.group === 'settings';
+    }
+
+    if (item.group === 'main') {
+      return currentNavItem.group === 'main';
+    }
+
+    if (item.group === 'branch') {
+      return currentNavItem.group === 'branch';
+    }
+
+    return false;
+  };
 
   return (
     <>
@@ -39,9 +136,13 @@ export default function Sidebar() {
             <Link
               key={idx}
               href={item.link}
-              className="group relative flex items-center justify-center p-1 rounded hover:bg-[#454545]  focus:bg-[#454545] transition-all"
+              className={`group relative flex items-center justify-center p-1 rounded hover:bg-[#454545] transition-all ${isItemActive(item) ? 'bg-[#454545]' : ''
+                }`}
             >
-              <span className="text-black group-hover:text-white transition group-focus:text-white">
+              <span className={`transition ${isItemActive(item)
+                ? 'text-white'
+                : 'text-black group-hover:text-white'
+                }`}>
                 {item.icon}
               </span>
 
@@ -62,18 +163,19 @@ export default function Sidebar() {
 
       {/* Mobile Sidebar - Bottom of screen, horizontal */}
       <aside className="md:hidden fixed bottom-0 left-0 right-0 bg-[#D1AB35] h-16 z-50 border-t border-black/10">
-    
         <div className="h-full overflow-x-auto">
-          {/* 🔴 CHANGED: Added style minWidth and removed min-w-max class */}
           <nav className="h-full flex flex-row items-center gap-2 px-2" style={{ minWidth: 'max-content' }}>
             {menuItems.map((item, idx) => (
               <Link
                 key={idx}
                 href={item.link}
-                // 🔴 CHANGED: Added flex-shrink-0
-                className="flex items-center justify-center p-2 rounded hover:bg-[#2e2e2e] transition min-w-12 h-12 flex-shrink-0"
+                className={`flex items-center justify-center p-2 rounded hover:bg-[#2e2e2e] transition min-w-12 h-12 flex-shrink-0 ${isItemActive(item) ? 'bg-[#2e2e2e]' : ''
+                  }`}
               >
-                <span className="text-black hover:text-white transition">
+                <span className={`transition ${isItemActive(item)
+                  ? 'text-white'
+                  : 'text-black hover:text-white'
+                  }`}>
                   {item.icon}
                 </span>
               </Link>
