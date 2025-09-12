@@ -1,7 +1,7 @@
 // app/analytics/page.tsx
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 
 // Types
@@ -22,7 +22,6 @@ import { PeriodSelector } from './_components/PeriodSelector';
 
 // Hooks
 import { useDashboard } from '@/lib/hooks/useAnalytics';
-import { AnalyticsAPI } from "@/lib/util/AnalyticsApi";
 
 const AnalyticsDashboard = () => {
   const router = useRouter();
@@ -36,7 +35,6 @@ const AnalyticsDashboard = () => {
     loading,
     error,
     setError,
-    setLoading,
     
     // Date range
     selectedPeriod,
@@ -58,36 +56,45 @@ const AnalyticsDashboard = () => {
     refetch
   } = useDashboard();
 
-  // Load initial data
-  useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
-  // Handle period changes (without loading animation for period buttons)
-  const handlePeriodChangeWithData = async (period: string) => {
+  // Add debug logging
+  console.log('Analytics Dashboard render - Loading:', loading);
+
+  // Simplified useEffect - the hook now handles initialization
+  useEffect(() => {
+    console.log('Analytics Dashboard mounted');
+  }, []); // Just for debugging
+
+  // Memoize period change handler to prevent recreating on every render
+  const handlePeriodChangeWithData = useCallback(async (period: string) => {
     try {
+      console.log('Changing period to:', period);
       setSelectedPeriod(period);
       setShowDatePicker(false);
-      // Load data without showing loading spinner for period changes
-      await loadDashboardData(period, false); // Pass false to skip loading animation
+      await loadDashboardData(period, false);
     } catch (error) {
       console.error("Error changing period:", error);
       setError("Failed to load data for selected period");
     }
-  };
+  }, [setSelectedPeriod, setShowDatePicker, loadDashboardData, setError]);
 
-  // Handle custom date range
-  const handleCustomDateRangeWithData = async (startDate: string, endDate: string) => {
+  // Memoize custom date range handler
+  const handleCustomDateRangeWithData = useCallback(async (startDate: string, endDate: string) => {
     try {
+      console.log('Custom date range:', startDate, 'to', endDate);
+      const startDateObj = new Date(startDate);
+      const endDateObj = new Date(endDate);
+      
       const { startDate: start, endDate: end } = handleCustomDateRange(startDate, endDate);
-      await loadCustomRangeData(start, end);
+      await loadCustomRangeData(startDateObj, endDateObj);
     } catch (error) {
       console.error("Error handling custom date range:", error);
       setError("Failed to load custom date range data");
     }
-  };
+  }, [handleCustomDateRange, setError]);
 
-  const loadCustomRangeData = async (startDate?: Date, endDate?: Date) => {
+  const loadCustomRangeData = useCallback(async (startDate?: Date, endDate?: Date) => {
     if (!customDateRange?.[0]?.startDate || !customDateRange?.[0]?.endDate) {
       console.warn("Custom date range not properly set");
       return;
@@ -100,13 +107,12 @@ const AnalyticsDashboard = () => {
     const endDateStr = end.toISOString().split("T")[0];
 
     try {
-      // Use the hook's handleCustomDateRange which handles loading state
       handleCustomDateRange(startDateStr, endDateStr);
     } catch (error) {
       console.error("Error fetching custom range data:", error);
       setError("Failed to load custom date range data");
     }
-  };
+  }, [customDateRange, handleCustomDateRange, setError]);
 
   const formatDisplayDate = (date: Date) => {
     if (!date) return '';
@@ -116,14 +122,37 @@ const AnalyticsDashboard = () => {
     return `${day}.${month}.${year}`;
   };
 
-  const handleBackClick = () => {
+  const handleBackClick = useCallback(() => {
     router.push('/');
-  };
+  }, [router]);
+
+  // Add error boundary for debugging
+  if (error) {
+    return (
+      <div className="bg-gray-50 min-h-screen p-6 mt-4 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-300">
+          <h2 className="text-xl font-semibold text-red-600 mb-4">Error Loading Dashboard</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return <LoadingSpinner message="Loading Analytics Dashboard..." />;
   }
 
+  // Add null check for analyticsData
+  if (!analyticsData) {
+    console.log('Analytics data not loaded yet');
+    return <LoadingSpinner message="Preparing dashboard..." />;
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen p-6 mt-4">
@@ -151,7 +180,7 @@ const AnalyticsDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <MetricCard
           title="Total Customers"
-          value={analyticsData.totalCustomers}
+          value={analyticsData.totalCustomers || 0}
           subtitle="Active customers"
         />
         <MetricCard
@@ -161,7 +190,7 @@ const AnalyticsDashboard = () => {
         />
         <MetricCard
           title="Total Orders"
-          value={analyticsData.totalOrders}
+          value={analyticsData.totalOrders || 0}
           subtitle="All orders placed"
         />
         <MetricCard
@@ -175,7 +204,7 @@ const AnalyticsDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <MetricCard
           title="New Customers"
-          value={analyticsData.newCustomersThisMonth}
+          value={analyticsData.newCustomersThisMonth || 0}
           subtitle="This month"
         />
         <MetricCard
@@ -185,7 +214,7 @@ const AnalyticsDashboard = () => {
         />
         <MetricCard
           title="Repeat Customers"
-          value={analyticsData.repeatCustomers}
+          value={analyticsData.repeatCustomers || 0}
           subtitle="Returning customers"
         />
         <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm">
@@ -211,9 +240,9 @@ const AnalyticsDashboard = () => {
 
       {/* Data Tables Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TopCustomersTable customers={topCustomers} />
+        <TopCustomersTable customers={topCustomers || []} />
         <RecentOrdersTable
-          orders={filteredOrders}
+          orders={filteredOrders || []}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           maxRows={8}

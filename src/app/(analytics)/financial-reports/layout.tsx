@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export default function AnalyticsLayout({
@@ -12,4 +13,5 @@ export default function AnalyticsLayout({
       </main>
     </>
   );
+
 }
