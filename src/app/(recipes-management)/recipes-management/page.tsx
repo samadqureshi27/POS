@@ -1,200 +1,90 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ActionBar from "@/components/layout/ui/action-bar";
+import { Toast } from "@/components/layout/ui/toast";
+import LoadingSpinner from "@/components/layout/ui/loader";
 import RecipeTable from "./_components/recipe-table";
 import RecipeModal from "./_components/recipe-modal";
-import {Toast} from "@/components/layout/ui/toast";
-
-import MenuAPI, { RecipeOption, Ingredient } from "@/lib/util/recipe-api";
+import { useRecipeData } from "@/lib/hooks/useRecipeData";
 
 const RecipesManagementPage = () => {
-  const [RecipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
-  const [actionLoading, setActionLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editingItem, setEditingItem] = useState<RecipeOption | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const {
+    // Data
+    filteredItems,
+    ingredients,
+    selectedItems,
+    loading,
+    actionLoading,
+    toast,
 
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+    // Filter states
+    searchTerm,
+    statusFilter,
 
-  useEffect(() => {
-    loadRecipeOptions();
-    loadIngredients();
-  }, []);
+    // Modal states
+    isModalOpen,
+    editingItem,
 
-  const loadIngredients = async () => {
-    try {
-      const response = await MenuAPI.getIngredients();
-      if (response.success) {
-        setIngredients(response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching ingredients:", error);
-    }
-  };
+    // Computed values
+    isAllSelected,
+    recipeStats,
 
-  const loadRecipeOptions = async () => {
-    try {
-      setLoading(true);
-      const response = await MenuAPI.getRecipeOption();
-      if (response.success) {
-        setRecipeOptions(response.data);
-      } else {
-        throw new Error(response.message || "Failed to fetch category items");
-      }
-    } catch (error) {
-      console.error("Error fetching category items:", error);
-      showToast("Failed to load category items", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // CRUD operations
+    deleteRecipes,
 
-  const filteredItems = RecipeOptions.filter((item) => {
-    const matchesSearch = item.Name.toLowerCase().includes(
-      searchTerm.toLowerCase()
-    );
-    const matchesStatus = statusFilter === "" || item.Status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+    // Selection handlers
+    handleSelectItem,
+    handleSelectAll,
 
-  const handleCreateItem = async (itemData: Omit<RecipeOption, "ID">) => {
-    try {
-      setActionLoading(true);
-      const response = await MenuAPI.createRecipeOption(itemData);
-      if (response.success) {
-        setRecipeOptions((prevItems) => [...prevItems, response.data]);
-        setIsModalOpen(false);
-        setSearchTerm("");
-        showToast(response.message || "Item created successfully", "success");
-      }
-    } catch (error) {
-      console.error("Error creating item:", error);
-      showToast("Failed to create menu item", "error");
-    } finally {
-      setActionLoading(false);
-    }
-  };
+    // Modal handlers
+    openAddModal,
+    openEditModal,
+    closeModal,
+    handleModalSubmit,
 
-  const handleUpdateItem = async (itemData: Omit<RecipeOption, "ID">) => {
-    if (!editingItem) return;
-    try {
-      setActionLoading(true);
-      const response = await MenuAPI.updateRecipeOption(
-        editingItem.ID,
-        itemData
-      );
-      if (response.success) {
-        setRecipeOptions(
-          RecipeOptions.map((item) =>
-            item.ID === editingItem.ID ? response.data : item
-          )
-        );
-        setIsModalOpen(false);
-        setEditingItem(null);
-        showToast(response.message || "Item updated successfully", "success");
-      }
-    } catch (error) {
-      showToast("Failed to update menu item", "error");
-    } finally {
-      setActionLoading(false);
-    }
-  };
+    // Filter handlers
+    updateSearchTerm,
+    updateStatusFilter,
 
-  const handleDeleteSelected = async () => {
-    if (selectedItems.length === 0) return;
-    try {
-      setActionLoading(true);
-      const response = await MenuAPI.bulkDeleteRecipeOption(selectedItems);
-      if (response.success) {
-        setRecipeOptions((prev) => {
-          const remaining = prev.filter((i) => !selectedItems.includes(i.ID));
-          return remaining.map((it, idx) => ({ ...it, ID: idx + 1 }));
-        });
-        setSelectedItems([]);
-        showToast(response.message || "Items deleted successfully", "success");
-      }
-    } catch (error) {
-      showToast("Failed to delete menu items", "error");
-    } finally {
-      setActionLoading(false);
-    }
-  };
+    // Utility functions
+    showToast,
 
-  const handleSelectAll = (checked: boolean) => {
-    setSelectedItems(checked ? filteredItems.map((item) => item.ID) : []);
-  };
+    // Toast handler
+    dismissToast,
+  } = useRecipeData();
 
-  const handleSelectItem = (itemId: number, checked: boolean) => {
-    setSelectedItems(
-      checked
-        ? [...selectedItems, itemId]
-        : selectedItems.filter((id) => id !== itemId)
-    );
-  };
-
-  const handleModalSubmit = (data: Omit<RecipeOption, "ID">) => {
-    if (editingItem) {
-      handleUpdateItem(data);
-    } else {
-      handleCreateItem(data);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingItem(null);
-  };
-
-  const handleEditItem = (item: RecipeOption) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
-  };
-
+  // Show loading spinner during initial load
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Recipe Management...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
     <div className="bg-gray-50 min-w-full h-full overflow-y-auto thin-scroll">
+      {/* Toast Notifications */}
       {toast && (
         <Toast
           message={toast.message}
           type={toast.type}
-          onClose={() => setToast(null)}
+          onClose={dismissToast}
         />
       )}
 
-      <h1 className="text-3xl font-semibold mt-14 mb-8">Recipes</h1>
+      {/* Page Header */}
+      <header className="mb-8">
+        <h1 className="text-3xl font-semibold mt-14 mb-2">Recipes</h1>
+        
+      </header>
 
-      {/* Action bar: add, delete, search */}
+      {/* Action Bar - Add, Delete, Search */}
       <ActionBar
-        onAdd={() => setIsModalOpen(true)}
+        onAdd={openAddModal}
         addDisabled={selectedItems.length > 0}
-        onDelete={handleDeleteSelected}
+        onDelete={deleteRecipes}
         deleteDisabled={selectedItems.length === 0}
         isDeleting={actionLoading}
         searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search"
+        onSearchChange={updateSearchTerm}
+        searchPlaceholder="Search recipes..."
       />
 
       {/* Recipe Table */}
@@ -204,8 +94,8 @@ const RecipesManagementPage = () => {
         statusFilter={statusFilter}
         onSelectAll={handleSelectAll}
         onSelectItem={handleSelectItem}
-        onStatusFilterChange={setStatusFilter}
-        onEditItem={handleEditItem}
+        onStatusFilterChange={updateStatusFilter}
+        onEditItem={openEditModal}
       />
 
       {/* Recipe Modal */}
@@ -213,7 +103,7 @@ const RecipesManagementPage = () => {
         isOpen={isModalOpen}
         editingItem={editingItem}
         ingredients={ingredients}
-        onClose={handleCloseModal}
+        onClose={closeModal}
         onSubmit={handleModalSubmit}
         actionLoading={actionLoading}
         showToast={showToast}

@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ResponsiveEditButton from "@/components/layout/ui/responsive-edit-button";
-import { RecipeOption } from "@/lib/util/recipe-api";
+import { RecipeOption } from "@/lib/util/recipeApi";
 
 interface RecipeTableProps {
   items: RecipeOption[];
