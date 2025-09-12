@@ -2,7 +2,7 @@
 
 // Dashboard.tsx - Main Dashboard Component
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -17,8 +17,8 @@ import { getPeriodLabel } from "@/lib/util/Dashboradutils";
 
 // Components
 import { Toast } from "@/components/layout/ui/toast";
-import  LoadingSpinner  from "@/components/layout/ui/loading-spinner";
-import   ErrorDisplay  from "@/components/layout/ui/error-message";
+import LoadingSpinner from "@/components/layout/ui/loader";
+import ErrorDisplay from "@/components/layout/ui/error-message";
 import { DashboardHeader } from "./_components/DashboardHeader";
 import { PeriodSelector } from "./_components/PeriodSelector";
 import { MetricsCards } from "./_components/MetricsCards";
@@ -49,11 +49,19 @@ const Dashboard = () => {
 
   const periods = ["Today", "Week", "Month", "Quarter", "Year", "Custom"];
   const calendarRef = useRef<HTMLDivElement>(null);
+  const isInitialized = useRef(false);
 
-  // Load dashboard data
-  const loadDashboardData = async (period: string) => {
+  // Add debug logging
+  console.log('Dashboard render - Loading:', loading);
+
+  // Modified load dashboard data function with optional loading parameter
+  const loadDashboardData = useCallback(async (period: string, showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
+      console.log('Loading dashboard data for period:', period);
+      
       const data = await dashboardAPI.getDashboardData(period);
       setDashboardData(data);
       setLastUpdated(new Date().toISOString());
@@ -61,18 +69,22 @@ const Dashboard = () => {
       console.error("Error fetching dashboard data:", error);
       showToast("Failed to load dashboard data", "error");
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
 
-  const showToast = (message: string, type: "success" | "error" | "info") => {
+  const showToast = useCallback((message: string, type: "success" | "error" | "info") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
-  };
+  }, []);
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
+      console.log('Refreshing dashboard data for period:', selectedPeriod);
+      
       const data = await dashboardAPI.refreshDashboardData(selectedPeriod);
       setDashboardData(data);
       setLastUpdated(new Date().toISOString());
@@ -82,17 +94,26 @@ const Dashboard = () => {
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [selectedPeriod, showToast]);
 
-  const handlePeriodChange = async (period: string) => {
-    setSelectedPeriod(period);
-    setShowDatePicker(false);
-    await loadDashboardData(period);
-  };
+  // Modified period change handler - no loading animation for period changes
+  const handlePeriodChange = useCallback(async (period: string) => {
+    try {
+      console.log('Period changed to:', period);
+      setSelectedPeriod(period);
+      setShowDatePicker(false);
+      
+      // Load data without showing loading spinner for period changes
+      await loadDashboardData(period, false); // Pass false to skip loading animation
+    } catch (error) {
+      console.error("Error changing period:", error);
+      showToast("Failed to load data for selected period", "error");
+    }
+  }, [loadDashboardData, showToast]);
 
-  const getPeriodLabelWithCustomRange = () => {
+  const getPeriodLabelWithCustomRange = useCallback(() => {
     return getPeriodLabel(selectedPeriod, customDateRange);
-  };
+  }, [selectedPeriod, customDateRange]);
 
   // Click outside handler for calendar
   useEffect(() => {
@@ -108,10 +129,17 @@ const Dashboard = () => {
     };
   }, []);
 
-  // Initial data load
+  // Initial data load - only run once
   useEffect(() => {
-    loadDashboardData(selectedPeriod);
-  }, []);
+    if (!isInitialized.current) {
+      console.log('Initializing dashboard...');
+      isInitialized.current = true;
+      loadDashboardData(selectedPeriod).catch(error => {
+        console.error('Initial dashboard load failed:', error);
+        showToast('Failed to initialize dashboard', 'error');
+      });
+    }
+  }, []); // Empty dependency array - only run once
 
   if (loading) {
     return <LoadingSpinner message="Loading Dashboard..." />;
