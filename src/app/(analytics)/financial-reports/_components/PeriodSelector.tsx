@@ -2,9 +2,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
 import { DateRange } from "react-date-range";
-import { format } from 'date-fns';
-import { PeriodType } from '@/lib/types/analytics';
-
 import "react-date-range/dist/styles.css"; // main css
 import "react-date-range/dist/theme/default.css"; // theme css
 

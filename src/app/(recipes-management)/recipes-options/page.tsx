@@ -4,9 +4,9 @@
 "use client";
 
 import React from "react";
-import ActionBar from "@/components/layout/ui/action-bar";
-import { Toast } from "@/components/layout/ui/toast";
-import LoadingSpinner from "@/components/layout/ui/loader";
+import ActionBar from "@/components/ui/action-bar";
+import { Toast } from "@/components/ui/toast";
+import LoadingSpinner from "@/components/ui/loader";
 import RecipeModal from "./_components/recipe-option-modal";
 import RecipeTable from "./_components/recipe-option-table";
 import { useRecipeOptions } from "@/lib/hooks/useRecipeOptions";

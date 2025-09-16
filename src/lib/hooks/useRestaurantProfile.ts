@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { RestaurantData } from '@/lib/types';
 import { RestaurantAPI } from '../util/restaurant-api';
 import { validateRestaurantForm } from '../util/validation';
-import { Toast } from '@/components/layout/ui/toast';
 import { useToast } from './toast';
 
 export const useRestaurantProfile = () => {

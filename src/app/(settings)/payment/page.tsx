@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import StatCard from "@/components/layout/ui/summary-card";
-import ActionBar from "@/components/layout/ui/action-bar";
-import { Toast } from '@/components/layout/ui/toast'
+import StatCard from "@/components/ui/summary-card";
+import ActionBar from "@/components/ui/action-bar";
+import { Toast } from '@/components/ui/toast'
 import PaymentModal from "./_components/payment-modal";
 import PaymentTable from "./_components/payment-table";;
-import LoadingSpinner from '@/components/layout/ui/loader';
+import LoadingSpinner from '@/components/ui/loader';
 import { usePaymentManagement } from "@/lib/hooks/usePaymentManagement";
 
 const PaymentManagementPage = () => {
@@ -90,7 +90,7 @@ const PaymentManagementPage = () => {
       <PaymentTable
         paymentMethods={filteredItems}
         filteredItems={filteredItems}
-        selectedItems={selectedItems}
+        selectedItems={selectedItems.filter((id): id is number => typeof id === "number")}
         statusFilter={statusFilter}
         taxTypeFilter={taxTypeFilter}
         onStatusFilterChange={setStatusFilter}

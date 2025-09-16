@@ -3,7 +3,6 @@
 
 import React from 'react';
 import { AlertCircle, CheckCircle, X, Star } from 'lucide-react';
-import { ToastState } from '@/lib/types/customer-details';
 import { getInitials } from '@/lib/util/customer-details-utils';
 
 // Toast Component

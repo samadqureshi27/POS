@@ -5,9 +5,9 @@ import React from "react";
 import { ChevronDown } from "lucide-react";
 import Checkbox from "@mui/material/Checkbox";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ResponsiveEditButton from "@/components/layout/ui/responsive-edit-button";
+import ResponsiveEditButton from "@/components/ui/responsive-edit-button";
 import { BranchTableProps } from "@/lib/types/branch";
-import CustomCheckbox from "@/components/layout/ui/custom-checkbox";
+import CustomCheckbox from "@/components/ui/custom-checkbox";
 const BranchTable: React.FC<BranchTableProps> = ({
     branchItems,
     filteredItems,
