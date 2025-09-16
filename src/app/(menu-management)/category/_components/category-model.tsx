@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { X, Save, ImageIcon } from "lucide-react";
-import ButtonPage from "@/components/layout/ui/button";
+import ButtonPage from "@/components/ui/button";
 import { CategoryItem, CategoryFormData, CategoryModalProps } from '@/lib/types/category';
 
 const CategoryModal: React.FC<CategoryModalProps> = ({

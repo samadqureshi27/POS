@@ -1,15 +1,10 @@
 // app/analytics/page.tsx
 "use client";
-
 import React, { useEffect, useRef, useCallback } from "react";
 import { useRouter } from 'next/navigation';
-
-// Types
-import { AnalyticsData } from '@/lib/types/analytics';
-
 // Components
-import { StarRating } from '@/components/layout/ui/StarRating';
-import LoadingSpinner from '@/components/layout/ui/loader';
+import { StarRating } from '@/components/ui/StarRating';
+import LoadingSpinner from '@/components/ui/loader';
 import { MetricCard } from './_components/MetricCard';
 import { CustomerGrowthChart } from './_components/CustomerGrowthChart';
 import { RevenueTrendsChart } from './_components/RevenueTrendsChart';
@@ -19,7 +14,6 @@ import { CustomerSegmentsChart } from './_components/CustomerSegmentsChart';
 import { TopCustomersTable } from './_components/TopCustomersTable';
 import { RecentOrdersTable } from './_components/RecentOrdersTable';
 import { PeriodSelector } from './_components/PeriodSelector';
-
 // Hooks
 import { useDashboard } from '@/lib/hooks/useAnalytics';
 
@@ -172,7 +166,6 @@ const AnalyticsDashboard = () => {
           setShowDatePicker={setShowDatePicker}
           customDateRange={customDateRange}
           setCustomDateRange={setCustomDateRange}
-          onCustomDateRange={handleCustomDateRangeWithData}
         />
       </div>
 

@@ -102,11 +102,18 @@ export class StaffAPI {
     // Get branch info by ID
     static async getBranchInfo(branchId: string): Promise<ApiResponse<BranchInfo>> {
         await this.delay(500);
-        const filteredData = this.mockData.filter(item => item.Branch_ID_fk === branchId);
+        // Mock branch info data
+        const branchInfo: BranchInfo = {
+            "Branch-ID": Number(branchId),
+            Branch_Name: `Branch ${branchId}`,
+            Status: "Active",
+            "Contact-Info": "0300-0000000",
+            Address: `Address for branch ${branchId}`,
+        };
 
         return {
             success: true,
-            data: filteredData,
+            data: branchInfo,
             message: "Branch info fetched successfully",
         };
     }

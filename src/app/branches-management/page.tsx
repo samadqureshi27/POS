@@ -3,12 +3,12 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import StatCard from "@/components/layout/ui/summary-card";
-import ActionBar from "@/components/layout/ui/action-bar";
-import { Toast } from '@/components/layout/ui/toast';
+import StatCard from "@/components/ui/summary-card";
+import ActionBar from "@/components/ui/action-bar";
+import { Toast } from '@/components/ui/toast';
 import BranchModal from "./_components/branch-modal";
 import BranchTable from "./_components/branch-table";
-import LoadingSpinner from '@/components/layout/ui/loader';
+import LoadingSpinner from '@/components/ui/loader';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 
 const BranchManagementPage = () => {
@@ -98,7 +98,7 @@ const BranchManagementPage = () => {
       <BranchTable
         branchItems={branchItems}
         filteredItems={filteredItems}
-        selectedItems={selectedItems}
+        selectedItems={selectedItems.filter((item): item is number => typeof item === "number")}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
         onSelectAll={(checked) => handleSelectAll(checked, filteredItems)}

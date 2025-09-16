@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import ButtonPage from "@/components/layout/ui/button";
+import ButtonPage from "@/components/ui/button";
 import {SpecialsTabProps} from "@/lib/types/menum";
 
 const SpecialsTab: React.FC<SpecialsTabProps> = ({ formData, setFormData, handleStatusChange }) => {

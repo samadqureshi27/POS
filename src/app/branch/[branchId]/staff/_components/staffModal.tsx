@@ -1,7 +1,7 @@
 import React from "react";
 import { Save, ChevronDown } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ButtonPage from "@/components/layout/ui/button";
+import ButtonPage from "@/components/ui/button";
 import { StaffFormData } from "@/lib/types/staff-management";
 import { formatCNIC } from "@/lib/util/Staff-formatters";
 

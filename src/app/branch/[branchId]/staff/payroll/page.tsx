@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import { AlertCircle } from "lucide-react";
 
 // Components
-import { DateFilter } from "@/components/layout/ui/date-filter";
-import { Toast } from "@/components/layout/ui/toast";
-import StatCard from "@/components/layout/ui/summary-card";
+import { DateFilter } from "@/components/ui/date-filter";
+import { Toast } from "@/components/ui/toast";
+import StatCard from "@/components/ui/summary-card";
 import { StaffTable } from "./components/payroll-staff-table";
-import ActionBar from "@/components/layout/ui/action-bar";
+import ActionBar from "@/components/ui/action-bar";
 
 // Hooks
 import { useDateFilter } from "@/lib/hooks/useDateFilter";

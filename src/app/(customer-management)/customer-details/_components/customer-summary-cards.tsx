@@ -2,7 +2,7 @@
 "use client";
 
 import React from 'react';
-import StatCard from '@/components/layout/ui/summary-card';
+import StatCard from '@/components/ui/summary-card';
 import { ProfilePicture, StarRating, LargeStarRating } from './rating';
 import { CustomerSummaryData } from '@/lib/types/customer-details';
 

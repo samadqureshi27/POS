@@ -37,9 +37,10 @@ export const CustomerSegmentsChart: React.FC<CustomerSegmentsChartProps> = ({ se
             <Legend 
               verticalAlign="bottom" 
               height={36}
-              formatter={(value, entry) => (
-                `${entry.payload.segment}: ${entry.payload.customers}`
-              )}
+              formatter={(value, entry) => {
+                const payload = entry.payload as { segment: string; customers: number };
+                return `${payload.segment}: ${payload.customers}`;
+              }}
             />
           </PieChart>
         </ResponsiveContainer>

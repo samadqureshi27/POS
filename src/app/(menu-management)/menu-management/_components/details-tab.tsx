@@ -1,5 +1,5 @@
 import React from "react";
-import ButtonPage from "@/components/layout/ui/button";
+import ButtonPage from "@/components/ui/button";
 const mealTimeOptions = ["Morning", "Afternoon", "Evening"];
 import { DetailsTabProps,MenuItem } from "@/lib/types/menum";   // Correct - named import
 

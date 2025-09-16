@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { X, Save } from "lucide-react";
-import ButtonPage from "@/components/layout/ui/button";
+import ButtonPage from "@/components/ui/button";
 import { PosItem, PosModalFormData } from "@/lib/types/pos";
 interface PosModalProps {
     isOpen: boolean;
