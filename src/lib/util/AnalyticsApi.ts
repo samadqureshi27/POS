@@ -1,6 +1,5 @@
 // services/analyticsAPI.ts
-
-import { CustomerItem, ApiResponse, OrderItem, AnalyticsData, PeriodType, ChartDataPoint, GrowthDataPoint, OrderTypeData, ComparisonData, SegmentData } from '@/types/analytics';
+import { CustomerItem, ApiResponse, OrderItem, AnalyticsData, PeriodType, ChartDataPoint, GrowthDataPoint, OrderTypeData, ComparisonData, SegmentData } from '@/lib/types/analytics';
 
 export const mockCustomers: CustomerItem[] = [
   {

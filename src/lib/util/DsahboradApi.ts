@@ -1,6 +1,6 @@
 // src/lib/utility/Dsahboradapi.ts
 
-import { DashboardData } from '@/types/Dtypes';
+import { DashboardData } from '@/lib/types/Dtypes';
 
 // ---------------------------------------------
 // Helper: generate customer analytics
@@ -20,6 +20,7 @@ const generateCustomerAnalytics = (visitData: any[], lastPeriod: number) => {
     visitGrowth: Math.round(((totalVisits - lastPeriod) / lastPeriod) * 100),
     repeatGrowth: Math.round(((repeatCustomers - lastPeriod / 2) / (lastPeriod / 2)) * 100),
     newCustomerGrowth: Math.round(((newCustomers - lastPeriod / 3) / (lastPeriod / 3)) * 100),
+    referralGrowth: Math.round(((referrals - lastPeriod / 4) / (lastPeriod / 4)) * 100),
   };
 };
 
@@ -81,6 +82,7 @@ const generateCustomRangeData = (startDate: Date, endDate: Date): DashboardData 
 // ---------------------------------------------
 export const mockData: Record<string, DashboardData> = {
   Today: {
+    period: "Today",
     metrics: {
       grossRevenue: 2100,
       avgOrderValue: 220,
@@ -105,6 +107,7 @@ export const mockData: Record<string, DashboardData> = {
     customerAnalytics: generateCustomerAnalytics([{ visits: 60, repeat: 20, referrals: 10 }], 50),
   },
   Week: {
+    period: "Week",
     metrics: {
       grossRevenue: 14509,
       avgOrderValue: 204,
@@ -149,6 +152,7 @@ export const mockData: Record<string, DashboardData> = {
     ], 1200),
   },
   Month: {
+    period: "Month",
     metrics: {
       grossRevenue: 60200,
       avgOrderValue: 240,
@@ -186,6 +190,7 @@ export const mockData: Record<string, DashboardData> = {
     ),
   },
   Quarter: {
+    period: "Quarter",
     metrics: {
       grossRevenue: 180000,
       avgOrderValue: 260,
@@ -223,6 +228,7 @@ export const mockData: Record<string, DashboardData> = {
     ),
   },
   Year: {
+    period: "Year",
     metrics: {
       grossRevenue: 750000,
       avgOrderValue: 280,

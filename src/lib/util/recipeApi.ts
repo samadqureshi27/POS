@@ -406,8 +406,8 @@ export class RecipeApiService {
   }
 }
 
-// Create default instance that matches the original MenuAPI interface
-const MenuAPI = {
+// Create default instance that matches the original RecipeAPI interface
+const RecipeAPI = {
   getRecipeOption: () => RecipeApiService.getInstance().getRecipeOption(),
   createRecipeOption: (recipe: RecipePayload) => 
     RecipeApiService.getInstance().createRecipeOption(recipe),
@@ -418,4 +418,4 @@ const MenuAPI = {
   getIngredients: () => RecipeApiService.getInstance().getIngredients(),
 };
 
-export default MenuAPI;
+export default RecipeAPI;

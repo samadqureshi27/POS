@@ -1,13 +1,13 @@
 "use client";
 import React from "react";
-import { Toast } from '@/components/layout/ui/toast';
+import { Toast } from '@/components/ui/toast';
 import { useToast } from '@/lib/hooks/toast';
 import { useNotificationSettings } from "@/lib/hooks/useNotificationSettings";
-import LoadingSpinner from '@/components/layout/ui/loader';
+import LoadingSpinner from '@/components/ui/loader';
 import  { NotificationCard } from "./_components/notification-card";
 import { QuietHoursSettings } from "./_components/quiet-hours-settings";
 import { NOTIFICATION_SECTIONS } from "@/lib/util/notification-options";
-import ActionButtons from '@/components/layout/ui/setting-buttons';
+import ActionButtons from '@/components/ui/setting-buttons';
 
 const NotificationSettingsPage = () => {
   const { toast, toastVisible, showToast, hideToast } = useToast();

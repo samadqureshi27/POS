@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { Toast } from "@/components/layout/ui/toast";
+import { Toast } from "@/components/ui/toast";
 import { useMenuManagement } from "@/lib/hooks/useMenuManagement";
 import MenuActionBar from "./_components/menu-actionbar";
 import MenuTable from "./_components/menu-table";
 import MenuModal from "./_components/MenuModal";
-import LoadingSpinner from "@/components/layout/ui/loader";
+import LoadingSpinner from "@/components/ui/loader";
 
 const MenuManagementPage = () => {
   const {

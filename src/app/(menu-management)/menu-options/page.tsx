@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import ActionBar from "@/components/layout/ui/action-bar";
-import {Toast} from "@/components/layout/ui/toast";
+import ActionBar from "@/components/ui/action-bar";
+import {Toast} from "@/components/ui/toast";
 import MenuTable from "./_components/menu-table";
 import MenuModal from "./_components/menu-modal";
-import LoadingSpinner from "@/components/layout/ui/loader";
+import LoadingSpinner from "@/components/ui/loader";
 import { useMenuOptions } from "@/lib/hooks/useMenuOptions"; // Adjust path as needed
 
 const CategoryPage = () => {

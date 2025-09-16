@@ -1,5 +1,5 @@
 import React from 'react';
-import MenuSubmenu from '@/components/layout/submenus/menu-submenu';
+import MenuSubmenu from '@/components/submenus/menu-submenu';
 
 
 export default function MenuLayout({

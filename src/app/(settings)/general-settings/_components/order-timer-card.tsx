@@ -1,6 +1,6 @@
 import React from "react";
 import { GeneralSettings } from '@/lib/types';
-import ButtonPage from "@/components/layout/ui/button";
+import ButtonPage from "@/components/ui/button";
 
 interface OrderTimerCardProps {
     settings: GeneralSettings;

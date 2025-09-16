@@ -16,15 +16,16 @@ import { dashboardAPI } from "@/lib/util/DsahboradApi";
 import { getPeriodLabel } from "@/lib/util/Dashboradutils";
 
 // Components
-import { Toast } from "@/components/layout/ui/toast";
-import LoadingSpinner from "@/components/layout/ui/loader";
-import ErrorDisplay from "@/components/layout/ui/error-message";
+import { Toast } from "@/components/ui/toast";
+import LoadingSpinner from "@/components/ui/loader";
+import ErrorDisplay from "@/components/ui/error-message";
 import { DashboardHeader } from "./_components/DashboardHeader";
 import { PeriodSelector } from "./_components/PeriodSelector";
 import { MetricsCards } from "./_components/MetricsCards";
 import { CustomerAnalytics } from "./_components/CustomerAnalytics";
 import { RevenueTrendChart } from "./_components/RevenueTrendChart";
 import { BestSellingItemsChart } from "./_components/BestSellingItemsChart";
+import ErrorMessage from "@/components/ui/error-message";
 
 // Main Dashboard Component
 const Dashboard = () => {
@@ -147,9 +148,9 @@ const Dashboard = () => {
 
   if (!dashboardData) {
     return (
-      <ErrorDisplay 
-        onRetry={() => loadDashboardData(selectedPeriod)} 
-        selectedPeriod={selectedPeriod} 
+      <ErrorMessage
+        message="Failed to load dashboard data"
+        onDismiss={() => setDashboardData(null)}
       />
     );
   }
@@ -173,13 +174,13 @@ const Dashboard = () => {
 
         <PeriodSelector
           selectedPeriod={selectedPeriod}
-          periods={periods}
+          // periods={periods}
           onPeriodChange={handlePeriodChange}
           customDateRange={customDateRange}
           setCustomDateRange={setCustomDateRange}
           showDatePicker={showDatePicker}
           setShowDatePicker={setShowDatePicker}
-          calendarRef={calendarRef}
+          // calendarRef={calendarRef}
         />
 
         <MetricsCards metrics={dashboardData.metrics} />

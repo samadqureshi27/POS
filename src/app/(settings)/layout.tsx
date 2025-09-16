@@ -1,5 +1,5 @@
 import React from 'react';
-import SettingsSubmenu from '@/components/layout/submenus/settings-submenu';
+import SettingsSubmenu from '@/components/submenus/settings-submenu';
 
 
 export default function SettingsLayout({

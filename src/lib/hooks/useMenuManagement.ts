@@ -1,6 +1,39 @@
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/lib/hooks";
-import MenuAPI, { MenuItem } from "@/lib/util/menu1-api";
+import MenuAPI from "@/lib/util/menu1-api";
+
+// Define MenuItem interface
+interface MenuItem {
+  ID: number;
+  Name: string;
+  Price: number;
+  Category: string;
+  StockQty: string;
+  Status: "Active" | "Inactive";
+  Description?: string;
+  MealType?: string;
+  Priority?: number;
+  MinimumQuantity?: number;
+  ShowOnMenu?: "Active" | "Inactive";
+  Featured?: "Active" | "Inactive";
+  StaffPick?: "Active" | "Inactive";
+  ShowOnMain?: "Active" | "Inactive";
+  Deal?: "Active" | "Inactive";
+  Special?: "Active" | "Inactive";
+  SubTBE?: "Active" | "Inactive";
+  DisplayType?: string;
+  Displaycat?: string;
+  SpecialStartDate?: string;
+  SpecialEndDate?: string;
+  SpecialPrice?: number;
+  OverRide?: any[];
+  OptionValue?: string[];
+  OptionPrice?: number[];
+  MealValue?: string[];
+  MealPrice?: number[];
+  PName?: string[];
+  PPrice?: number[];
+}
 
 export const useMenuManagement = () => {
   // State management
