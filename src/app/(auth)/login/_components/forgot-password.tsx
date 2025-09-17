@@ -2,8 +2,9 @@
 "use client";
 import React from "react";
 import { User } from "lucide-react";
-import Button from "@/components/ui/role-button";
-import Input from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useLoginContext } from "./login-context";
 import { validateForgotPasswordForm } from "@/lib/validations";
 
@@ -70,44 +71,47 @@ const ForgotPasswordOverlay: React.FC = () => {
       </div>
 
       <div className="space-y-4 sm:space-y-5">
-        <Input
-          label=""
-          type="email"
-          value={resetEmail}
-          onChange={(e) => {
-            setResetEmail(e.target.value);
-            setResetEmailError("");
-          }}
-          placeholder="EMAIL OR NUMBER"
-          icon={<User size={18} className="text-gray-400" />}
-          error={resetEmailError}
-          disabled={isLoading}
-          className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-xl py-3 sm:py-4"
-        />
+        <div className="relative">
+          <Input
+            type="email"
+            value={resetEmail}
+            onChange={(e) => {
+              setResetEmail(e.target.value);
+              setResetEmailError("");
+            }}
+            placeholder="EMAIL OR NUMBER"
+            disabled={isLoading}
+            className="placeholder-gray-400 text-sm tracking-wide rounded-xl py-3 sm:py-4 pl-12"
+          />
+          <User size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          {resetEmailError && (
+            <p className="text-red-500 text-sm mt-1">{resetEmailError}</p>
+          )}
+        </div>
 
         <div className="pt-3 sm:pt-4">
           <Button
             type="button"
-            variant="primary"
             size="lg"
             className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
             isLoading={isLoading}
             disabled={isLoading}
             onClick={handleResetPassword}
           >
-            RESET
+            {isLoading ? "RESETTING..." : "RESET"}
           </Button>
         </div>
 
         <div className="text-center pt-2 sm:pt-3">
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={handleBackToLogin}
-            className="text-gray-500 text-sm hover:text-gray-700 transition-colors duration-200"
+            className="text-gray-500 text-sm hover:text-gray-700"
             disabled={isLoading}
           >
             Back to login
-          </button>
+          </Button>
         </div>
       </div>
     </div>

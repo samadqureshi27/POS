@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import DashboardWrapper from "@/components/dashboard-wrapper";
 import { ConditionalLayoutWrapper } from '@/components/conditional-layout-wrapper';
+import { ThemeProvider } from "next-themes";
 
 
 const geistSans = Geist({
@@ -42,11 +43,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={geistSans.variable}>
-        <ConditionalLayoutWrapper>
-          {children}
-        </ConditionalLayoutWrapper>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <ConditionalLayoutWrapper>
+            {children}
+          </ConditionalLayoutWrapper>
+        </ThemeProvider>
       </body>
     </html>
   )

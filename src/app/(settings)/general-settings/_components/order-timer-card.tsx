@@ -1,6 +1,8 @@
 import React from "react";
 import { GeneralSettings } from '@/lib/types';
-import ButtonPage from "@/components/ui/button";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from "@/components/ui/switch";
 
 interface OrderTimerCardProps {
     settings: GeneralSettings;
@@ -21,35 +23,34 @@ const OrderTimerCard: React.FC<OrderTimerCardProps> = ({ settings, onSettingChan
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <label className="block text-sm font-medium text-gray-500">
+                        <Label className="text-sm font-medium text-gray-500">
                             Enable Order Timer
-                        </label>
+                        </Label>
                         <p className="text-xs text-gray-500">
                             Show color-coded timer on orders
                         </p>
                     </div>
-                    <ButtonPage
+                    <Switch
                         checked={settings.orderTimerEnabled}
-                        onChange={(isActive) => onSettingChange("orderTimerEnabled", isActive)}
+                        onCheckedChange={(isActive) => onSettingChange("orderTimerEnabled", isActive)}
                     />
                 </div>
 
                 {settings.orderTimerEnabled && (
                     <>
                         <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-2">
+                            <Label className="text-sm font-medium text-gray-500">
                                 <span className="inline-flex items-center gap-2">
                                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
                                     Green Phase (minutes)
                                 </span>
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 type="number"
                                 min="1"
                                 max="60"
                                 value={settings.greenThresholdMinutes}
                                 onChange={(e) => onSettingChange("greenThresholdMinutes", parseInt(e.target.value))}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                                 placeholder="Minutes for green status"
                             />
                             <p className="text-xs text-gray-500 mt-1">
@@ -58,19 +59,18 @@ const OrderTimerCard: React.FC<OrderTimerCardProps> = ({ settings, onSettingChan
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-2">
+                            <Label className="text-sm font-medium text-gray-500">
                                 <span className="inline-flex items-center gap-2">
                                     <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                                     Yellow Phase (minutes)
                                 </span>
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 type="number"
                                 min={settings.greenThresholdMinutes + 1}
                                 max="120"
                                 value={settings.yellowThresholdMinutes}
                                 onChange={(e) => onSettingChange("yellowThresholdMinutes", parseInt(e.target.value))}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                                 placeholder="Minutes for yellow status"
                             />
                             <p className="text-xs text-gray-500 mt-1">
@@ -79,19 +79,18 @@ const OrderTimerCard: React.FC<OrderTimerCardProps> = ({ settings, onSettingChan
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-2">
+                            <Label className="text-sm font-medium text-gray-500">
                                 <span className="inline-flex items-center gap-2">
                                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
                                     Red Phase (starts at minutes)
                                 </span>
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 type="number"
                                 min={settings.yellowThresholdMinutes + 1}
                                 max="180"
                                 value={settings.redThresholdMinutes}
                                 onChange={(e) => onSettingChange("redThresholdMinutes", parseInt(e.target.value))}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                                 placeholder="Minutes when red starts"
                             />
                             <p className="text-xs text-gray-500 mt-1">
@@ -101,16 +100,16 @@ const OrderTimerCard: React.FC<OrderTimerCardProps> = ({ settings, onSettingChan
 
                         <div className="flex items-center justify-between">
                             <div>
-                                <label className="block text-sm font-medium text-gray-500">
+                                <Label className="text-sm font-medium text-gray-500">
                                     Reset Timer on Complete
-                                </label>
+                                </Label>
                                 <p className="text-xs text-gray-500">
                                     Auto reset when order is completed
                                 </p>
                             </div>
-                            <ButtonPage
+                            <Switch
                                 checked={settings.timerResetOnComplete}
-                                onChange={(isActive) => onSettingChange("timerResetOnComplete", isActive)}
+                                onCheckedChange={(isActive) => onSettingChange("timerResetOnComplete", isActive)}
                             />
                         </div>
                     </>

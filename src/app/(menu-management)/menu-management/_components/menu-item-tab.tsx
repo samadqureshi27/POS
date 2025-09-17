@@ -1,6 +1,9 @@
 import React from "react";
 import ImageUpload from "./image-upload";
-import ButtonPage from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {MenuItemTabProps,MenuItem} from "@/lib/types/menum";
 
 const MenuItemTab: React.FC<MenuItemTabProps> = ({
@@ -15,14 +18,13 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
     return (
         <div className="space-y-6 max-w-2xl mx-auto">
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                     Menu Item Name
                 </label>
-                <input
+                <Input
                     type="text"
                     value={formData.Name}
                     onChange={(e) => handleFormFieldChange("Name", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                     placeholder="Sweet / Spicy Sausage Wrap"
                     required
                 />
@@ -30,47 +32,47 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                         Category
                     </label>
-                    <input
+                    <Input
                         type="text"
                         value={formData.Category}
                         onChange={(e) => handleFormFieldChange("Category", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                         placeholder="Enter category"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                         Display Type
                     </label>
-                    <select
+                    <Select
                         value={formData.Displaycat}
-                        onChange={(e) => handleFormFieldChange("Displaycat", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                        onValueChange={(value) => handleFormFieldChange("Displaycat", value)}
                     >
-                        <option value="Var">Var</option>
-                        <option value="Qty">Qty</option>
-                        <option value="Weight">Weight</option>
-                    </select>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select display type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Var">Var</SelectItem>
+                            <SelectItem value="Qty">Qty</SelectItem>
+                            <SelectItem value="Weight">Weight</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                     Price
                 </label>
-                <input
+                <Input
                     type="number"
                     value={formData.Price || ""}
                     disabled={formData.Displaycat === "Var"}
                     onChange={(e) => handleFormFieldChange("Price", Number(e.target.value) || 0)}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] ${formData.Displaycat === "Var"
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : ""
-                        }`}
+                    className={formData.Displaycat === "Var" ? "bg-muted text-muted-foreground cursor-not-allowed" : ""}
                     placeholder="0.00"
                 />
             </div>
@@ -82,25 +84,24 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
             />
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                     Description
                 </label>
-                <textarea
+                <Textarea
                     value={formData.Description}
                     onChange={(e) => handleFormFieldChange("Description", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                     rows={3}
                     placeholder="Enter description"
                 />
             </div>
 
             <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-foreground">
                     Status
                 </label>
-                <ButtonPage
+                <Switch
                     checked={formData.Status === "Active"}
-                    onChange={(checked) => handleStatusChange("Status", checked)}
+                    onCheckedChange={(checked) => handleStatusChange("Status", checked)}
                 />
             </div>
         </div>

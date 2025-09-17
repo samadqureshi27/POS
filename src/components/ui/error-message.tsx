@@ -1,6 +1,8 @@
 "use client";
 import React from 'react';
 import { AlertCircle, X } from 'lucide-react';
+import { Alert, AlertDescription } from './alert';
+import { cn } from '@/lib/utils';
 
 interface ErrorMessageProps {
   message: string;
@@ -14,21 +16,20 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`
-      flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg
-      text-red-800 ${className}
-    `}>
-      <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
-      <span className="flex-1 text-sm font-medium">{message}</span>
+    <Alert variant="destructive" className={cn("flex items-center gap-3", className)}>
+      <AlertCircle size={20} className="flex-shrink-0" />
+      <AlertDescription className="flex-1 text-sm font-medium">
+        {message}
+      </AlertDescription>
       {onDismiss && (
         <button
           onClick={onDismiss}
-          className="text-red-400 hover:text-red-600 transition-colors"
+          className="text-destructive/60 hover:text-destructive transition-colors ml-auto"
         >
           <X size={16} />
         </button>
       )}
-    </div>
+    </Alert>
   );
 };
 

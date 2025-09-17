@@ -3,6 +3,10 @@ import React from "react";
 
 import {OptionsTabProps} from "@/lib/types/menum";
 import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 const sizeOptions = ["Small", "Regular", "Large", "Extra Large"];
 
 const OptionsTab: React.FC<OptionsTabProps> = ({
@@ -42,26 +46,23 @@ const OptionsTab: React.FC<OptionsTabProps> = ({
 
     return (
         <div className="max-w-4xl mx-auto">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label className="text-sm font-medium text-gray-700 mb-1">
                 Menu Item Option
-            </label>
+            </Label>
 
             <div className="flex items-center gap-2 mb-4">
-                <select
-                    onChange={(e) => {
-                        const size = e.target.value;
-                        handleAddOption(size);
-                        e.target.value = "";
-                    }}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                >
-                    <option value="">Add New Size Option</option>
-                    {sizeOptions.map((size) => (
-                        <option key={size} value={size}>
-                            {size}
-                        </option>
-                    ))}
-                </select>
+                <Select onValueChange={(value) => handleAddOption(value)}>
+                    <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Add New Size Option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {sizeOptions.map((size) => (
+                            <SelectItem key={size} value={size}>
+                                {size}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
 
             <div className="space-y-4">
@@ -71,29 +72,31 @@ const OptionsTab: React.FC<OptionsTabProps> = ({
                         className="border border-gray-200 rounded-sm p-4 bg-white flex justify-between items-center"
                     >
                         <div className="flex gap-4 flex-1">
-                            <input
+                            <Input
                                 type="text"
                                 value={opt}
                                 onChange={(e) => handleUpdateOptionValue(idx, e.target.value)}
-                                className="flex-1 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                                className="flex-1"
                                 placeholder="Size name"
                             />
-                            <input
+                            <Input
                                 type="number"
                                 step="0.01"
                                 value={formData.OptionPrice?.[idx] || 0}
                                 onChange={(e) => handleUpdateOptionPrice(idx, Number(e.target.value))}
-                                className="w-24 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+                                className="w-24"
                                 placeholder="0.00"
                             />
                         </div>
-                        <button
+                        <Button
                             type="button"
+                            variant="outline"
+                            size="sm"
                             onClick={() => handleRemoveOption(idx)}
-                            className="text-black border-2 px-2 py-1 rounded hover:text-gray-700 ml-2"
+                            className="text-black border-2 px-2 py-1 rounded hover:text-gray-700 ml-2 h-auto w-auto"
                         >
                             <X size={20} />
-                        </button>
+                        </Button>
                     </div>
                 ))}
             </div>

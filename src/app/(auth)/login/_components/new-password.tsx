@@ -2,8 +2,9 @@
 "use client";
 import React from "react";
 import { Lock } from "lucide-react";
-import Button from "@/components/ui/role-button";
-import Input from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useLoginContext } from "./login-context";
 import { validateResetPasswordForm } from "@/lib/validations";
 
@@ -108,11 +109,11 @@ const NewPasswordOverlay: React.FC = () => {
 
       <div className="space-y-4 sm:space-y-5">
         <div>
-          <label className="block text-gray-700 text-sm font-medium mb-2">
+          <Label htmlFor="newPassword" className="text-sm font-medium text-gray-700">
             Password
-          </label>
+          </Label>
           <Input
-            label=""
+            id="newPassword"
             type="password"
             value={newPassword}
             onChange={(e) => {
@@ -123,19 +124,20 @@ const NewPasswordOverlay: React.FC = () => {
               }));
             }}
             placeholder="Enter your new password"
-            icon={<Lock size={18} className="text-gray-400" />}
-            error={validationErrors.newPassword}
             disabled={isLoading}
             className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-xl py-3 sm:py-4"
           />
+          {validationErrors.newPassword && (
+            <p className="text-red-500 text-xs mt-1">{validationErrors.newPassword}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-gray-700 text-sm font-medium mb-2">
+          <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
             Confirm Password
-          </label>
+          </Label>
           <Input
-            label=""
+            id="confirmPassword"
             type="password"
             value={confirmPassword}
             onChange={(e) => {
@@ -146,17 +148,18 @@ const NewPasswordOverlay: React.FC = () => {
               }));
             }}
             placeholder="Re-enter password"
-            icon={<Lock size={18} className="text-gray-400" />}
-            error={validationErrors.confirmPassword}
             disabled={isLoading}
             className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-xl py-3 sm:py-4"
           />
+          {validationErrors.confirmPassword && (
+            <p className="text-red-500 text-xs mt-1">{validationErrors.confirmPassword}</p>
+          )}
         </div>
 
         <div className="pt-3 sm:pt-4">
           <Button
             type="button"
-            variant="primary"
+            variant="default"
             size="lg"
             className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
             isLoading={isLoading}

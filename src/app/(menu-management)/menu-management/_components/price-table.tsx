@@ -5,6 +5,9 @@ import { Plus, X, Grip } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 import {PriceTabProps} from "@/lib/types/menum";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
   return (
     <div className="max-w-4xl mx-auto">
@@ -15,8 +18,10 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
             <thead>
               <tr>
                 <th className="w-12 p-2 text-center text-sm font-medium text-gray-700">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() =>
                       setFormData({
                         ...formData,
@@ -27,7 +32,7 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
                     className="w-8 h-8 flex items-center justify-center text-black rounded-sm hover:bg-gray-200 transition-colors"
                   >
                     <Plus size={18} />
-                  </button>
+                  </Button>
                 </th>
                 <th className="p-3 text-left text-sm font-medium text-gray-700">Name</th>
                 <th className="w-32 p-3 text-center text-sm font-medium text-gray-700">Price</th>
@@ -79,7 +84,7 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
                               <Grip size={18} className="text-gray-500 mx-auto" />
                             </td>
                             <td className="p-3">
-                              <input
+                              <Input
                                 type="text"
                                 value={opt}
                                 onChange={(e) => {
@@ -90,11 +95,11 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
                                     PName: updated,
                                   });
                                 }}
-                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                                className="text-sm"
                               />
                             </td>
                             <td className="p-3 text-center">
-                              <input
+                              <Input
                                 type="number"
                                 value={(formData.PPrice || [])[idx] || 0}
                                 onChange={(e) => {
@@ -105,12 +110,14 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
                                     PPrice: updated,
                                   });
                                 }}
-                                className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm text-center"
+                                className="w-20 text-sm text-center"
                               />
                             </td>
                             <td className="p-3 text-center w-12">
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => {
                                   const updatedValues = (formData.PName || []).filter(
                                     (_: any, i: number) => i !== idx
@@ -124,10 +131,10 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
                                     PPrice: updatedPrices,
                                   });
                                 }}
-                                className="text-black px-2 py-1 rounded hover:text-gray-700"
+                                className="text-black px-2 py-1 rounded hover:text-gray-700 h-auto w-auto"
                               >
                                 <X size={20} />
-                              </button>
+                              </Button>
                             </td>
                           </tr>
                         )}

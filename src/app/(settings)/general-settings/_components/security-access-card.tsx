@@ -1,6 +1,8 @@
 import React from "react";
 import { GeneralSettings } from '@/lib/types';
-import ButtonPage from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface SecurityAccessCardProps {
     settings: GeneralSettings;
@@ -20,45 +22,44 @@ const SecurityAccessCard: React.FC<SecurityAccessCardProps> = ({ settings, onSet
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <label className="block text-sm font-medium text-gray-500">
+                        <Label className="text-sm font-medium text-gray-500">
                             Manager Approval for Refunds
-                        </label>
+                        </Label>
                         <p className="text-xs text-gray-500">
                             Require manager password for refunds
                         </p>
                     </div>
-                    <ButtonPage
+                    <Switch
                         checked={settings.requireManagerForRefunds}
-                        onChange={(isActive) => onSettingChange("requireManagerForRefunds", isActive)}
+                        onCheckedChange={(isActive) => onSettingChange("requireManagerForRefunds", isActive)}
                     />
                 </div>
 
                 <div className="flex items-center justify-between">
                     <div>
-                        <label className="block text-sm font-medium text-gray-500">
+                        <Label className="text-sm font-medium text-gray-500">
                             Manager Approval for Discounts
-                        </label>
+                        </Label>
                         <p className="text-xs text-gray-500">
                             Require manager password for discounts
                         </p>
                     </div>
-                    <ButtonPage
+                    <Switch
                         checked={settings.requireManagerForDiscounts}
-                        onChange={(isActive) => onSettingChange("requireManagerForDiscounts", isActive)}
+                        onCheckedChange={(isActive) => onSettingChange("requireManagerForDiscounts", isActive)}
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">
+                    <Label className="text-sm font-medium text-gray-500 mb-2">
                         Session Timeout (minutes)
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         type="number"
                         min="5"
                         max="240"
                         value={settings.sessionTimeout}
                         onChange={(e) => onSettingChange("sessionTimeout", parseInt(e.target.value))}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                         placeholder="Enter timeout in minutes"
                     />
                     <p className="text-xs text-gray-500 mt-1">

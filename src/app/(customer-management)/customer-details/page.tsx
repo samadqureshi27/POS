@@ -11,6 +11,8 @@ import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/ho
 import { exportCustomersToCSV } from "@/lib/util/customer-details-utils";
 import { useToast } from "@/lib/hooks";
 import LoadingSpinner from "@/components/ui/loader";
+import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
+import { Toaster } from "@/components/ui/sonner";
 
 const CustomerManagementPage = () => {
   const router = useRouter();
@@ -37,21 +39,15 @@ const CustomerManagementPage = () => {
 
 
   if (loading) {
-    return <LoadingSpinner message="Loading Customer Details..." />;
+    return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={4} showImportExport={true} />;
   }
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 items-center max-w-[100vw] mb-8 mt-2">
-        <h1 className="text-3xl font-semibold">Loyal Customers</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Loyal Customers</h1>
 
         {/* Import/Export Controls */}
         <ImportExportControls

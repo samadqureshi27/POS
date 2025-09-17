@@ -1,8 +1,11 @@
 import React from "react";
 import { Settings } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { BackupSettings } from '@/lib/types/backup';
 import { SettingsDropdown } from './backup-settings-dropdown';
-import ButtonPage from "@/components/ui/button";
 
 interface BackupSettingsCardProps {
     settings: BackupSettings;
@@ -29,23 +32,23 @@ export const BackupSettingsCard: React.FC<BackupSettingsCardProps> = ({
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <Label className="text-sm font-medium">
                             Automatic Backups
-                        </label>
-                        <p className="text-xs text-gray-500">Enable scheduled backups</p>
+                        </Label>
+                        <p className="text-xs text-muted-foreground">Enable scheduled backups</p>
                     </div>
-                    <ButtonPage
+                    <Switch
                         checked={settings.autoBackupEnabled}
-                        onChange={(isActive) => handleSettingChange("autoBackupEnabled", isActive)}
+                        onCheckedChange={(isActive) => handleSettingChange("autoBackupEnabled", isActive)}
                     />
                 </div>
 
                 {settings.autoBackupEnabled && (
                     <>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <Label className="text-sm font-medium">
                                 Backup Frequency
-                            </label>
+                            </Label>
                             <SettingsDropdown
                                 value={settings.backupFrequency}
                                 options={frequencyOptions}
@@ -55,28 +58,26 @@ export const BackupSettingsCard: React.FC<BackupSettingsCardProps> = ({
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <Label className="text-sm font-medium">
                                 Backup Time
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 type="time"
                                 value={settings.backupTime}
                                 onChange={(e) => handleSettingChange("backupTime", e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <Label className="text-sm font-medium">
                                 Retention Period (days)
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 type="number"
                                 min="1"
                                 max="365"
                                 value={settings.retentionPeriod}
                                 onChange={(e) => handleSettingChange("retentionPeriod", parseInt(e.target.value))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                             />
                         </div>
                     </>
@@ -85,59 +86,53 @@ export const BackupSettingsCard: React.FC<BackupSettingsCardProps> = ({
                 <div className="pt-4 border-t border-gray-200">
                     <h3 className="text-sm font-medium text-gray-700 mb-3">Data to Include</h3>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="includeMenuData"
                                 checked={settings.includeMenuData}
-                                onChange={(e) => handleSettingChange("includeMenuData", e.target.checked)}
-                                className="mr-2 text-black"
+                                onCheckedChange={(checked) => handleSettingChange("includeMenuData", checked)}
                             />
-                            <label className="text-sm">Menu Data</label>
+                            <Label htmlFor="includeMenuData" className="text-sm">Menu Data</Label>
                         </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="includeOrderHistory"
                                 checked={settings.includeOrderHistory}
-                                onChange={(e) => handleSettingChange("includeOrderHistory", e.target.checked)}
-                                className="mr-2 text-black"
+                                onCheckedChange={(checked) => handleSettingChange("includeOrderHistory", checked)}
                             />
-                            <label className="text-sm">Order History</label>
+                            <Label htmlFor="includeOrderHistory" className="text-sm">Order History</Label>
                         </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="includeCustomerData"
                                 checked={settings.includeCustomerData}
-                                onChange={(e) => handleSettingChange("includeCustomerData", e.target.checked)}
-                                className="mr-2 text-black"
+                                onCheckedChange={(checked) => handleSettingChange("includeCustomerData", checked)}
                             />
-                            <label className="text-sm">Customer Data</label>
+                            <Label htmlFor="includeCustomerData" className="text-sm">Customer Data</Label>
                         </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="includeEmployeeData"
                                 checked={settings.includeEmployeeData}
-                                onChange={(e) => handleSettingChange("includeEmployeeData", e.target.checked)}
-                                className="mr-2 text-black"
+                                onCheckedChange={(checked) => handleSettingChange("includeEmployeeData", checked)}
                             />
-                            <label className="text-sm">Employee Data</label>
+                            <Label htmlFor="includeEmployeeData" className="text-sm">Employee Data</Label>
                         </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="includeSettings"
                                 checked={settings.includeSettings}
-                                onChange={(e) => handleSettingChange("includeSettings", e.target.checked)}
-                                className="mr-2 text-black"
+                                onCheckedChange={(checked) => handleSettingChange("includeSettings", checked)}
                             />
-                            <label className="text-sm">System Settings</label>
+                            <Label htmlFor="includeSettings" className="text-sm">System Settings</Label>
                         </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="includeFinancialData"
                                 checked={settings.includeFinancialData}
-                                onChange={(e) => handleSettingChange("includeFinancialData", e.target.checked)}
-                                className="mr-2 text-black"
+                                onCheckedChange={(checked) => handleSettingChange("includeFinancialData", checked)}
                             />
-                            <label className="text-sm">Financial Data</label>
+                            <Label htmlFor="includeFinancialData" className="text-sm">Financial Data</Label>
                         </div>
                     </div>
                 </div>

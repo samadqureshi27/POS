@@ -4,15 +4,16 @@ import React from "react";
 import { LineChart, Line, XAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { RevenueData } from "@/lib/types/Dtypes";
 import { getDayAbbreviation } from "@/lib/util/Dashboradutils";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 interface RevenueTrendChartProps {
   revenueData: RevenueData[];
 }
 
 export const RevenueTrendChart: React.FC<RevenueTrendChartProps> = ({ revenueData }) => (
-  <div className="border border-gray-200 lg:col-span-2 bg-white p-4 sm:p-6 rounded-sm shadow-sm">
+  <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm lg:col-span-2">
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-      <h2 className="text-lg font-semibold text-gray-900">Revenue trend</h2>
+      <h2 className="text-lg font-semibold tracking-tight">Revenue trend</h2>
     </div>
 
     <div className="h-64 md:h-80">
