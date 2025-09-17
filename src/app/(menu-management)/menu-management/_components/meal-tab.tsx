@@ -1,10 +1,13 @@
 "use client";
 
 import React from "react";
-import { ChevronDown, Plus, X, Grip } from "lucide-react";
+import { Plus, X, Grip } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ButtonPage from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 import {MealTabProps} from "@/lib/types/menum";
 
@@ -13,50 +16,39 @@ const sizeOptionss = ["Cheese", "Pepperoni", "Olives", "Onions", "Bacon", "Pinea
 const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusChange }) => {
   return (
     <div className="max-w-4xl mx-auto">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <Label className="text-sm font-medium">
         Menu Item Option
-      </label>
+      </Label>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger className="w-full sm:flex-1 flex items-center justify-between px-4 py-2 text-black rounded-sm hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
-            <span className="text-sm">Add New Option</span>
-            <ChevronDown size={16} className="text-gray-500" />
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              className="w-full min-w-[300px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none max-h-60 overflow-y-auto z-100"
-              sideOffset={6}
-            >
-              <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-              {sizeOptionss.map((size, i) => (
-                <DropdownMenu.Item
-                  key={i}
-                  className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none"
-                  onClick={() => {
-                    if (!formData.MealValue?.includes(size)) {
-                      setFormData({
-                        ...formData,
-                        MealValue: [...(formData.MealValue || []), size],
-                        MealPrice: [...(formData.MealPrice || []), 0],
-                      });
-                    }
-                  }}
-                >
-                  {size}
-                </DropdownMenu.Item>
-              ))}
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+        <Select onValueChange={(value) => {
+          if (!formData.MealValue?.includes(value)) {
+            setFormData({
+              ...formData,
+              MealValue: [...(formData.MealValue || []), value],
+              MealPrice: [...(formData.MealPrice || []), 0],
+            });
+          }
+        }}>
+          <SelectTrigger className="w-full sm:flex-1">
+            <SelectValue placeholder="Add New Option" />
+          </SelectTrigger>
+          <SelectContent className="max-h-60">
+            {sizeOptionss.map((size, i) => (
+              <SelectItem key={i} value={size}>
+                {size}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <div className="flex flex-col items-center gap-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <Label className="text-sm font-medium">
             Deal?
-          </label>
-          <ButtonPage
+          </Label>
+          <Switch
             checked={formData.Deal === "Active"}
-            onChange={(checked) => handleStatusChange("Deal", checked)}
+            onCheckedChange={(checked) => handleStatusChange("Deal", checked)}
           />
         </div>
       </div>
@@ -120,7 +112,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                               <Grip size={18} className="text-gray-500 mx-auto" />
                             </td>
                             <td className="p-3">
-                              <input
+                              <Input
                                 type="text"
                                 value={opt}
                                 onChange={(e) => {
@@ -131,12 +123,11 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                                     MealValue: updated,
                                   });
                                 }}
-                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                                 placeholder="Size name"
                               />
                             </td>
                             <td className="p-3 text-center">
-                              <input
+                              <Input
                                 type="number"
                                 step="0.01"
                                 value={formData.MealPrice?.[idx] || 0}
@@ -148,14 +139,14 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                                     MealPrice: updated,
                                   });
                                 }}
-                                className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center mx-auto"
+                                className="w-20 text-center mx-auto"
                                 placeholder="0.00"
                               />
                             </td>
                             <td className="p-3 text-center">
-                              <ButtonPage
+                              <Switch
                                 checked={formData.OverRide?.[idx] === "Active"}
-                                onChange={(checked) => {
+                                onCheckedChange={(checked) => {
                                   const updated = [...(formData.OverRide || [])];
                                   updated[idx] = checked ? "Active" : "Inactive";
                                   setFormData({
@@ -166,9 +157,9 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                               />
                             </td>
                             <td className="p-3 text-center">
-                              <ButtonPage
+                              <Switch
                                 checked={formData.status?.[idx] === "Active"}
-                                onChange={(checked) => {
+                                onCheckedChange={(checked) => {
                                   const updated = [...(formData.status || [])];
                                   updated[idx] = checked ? "Active" : "Inactive";
                                   setFormData({
@@ -179,8 +170,10 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                               />
                             </td>
                             <td className="p-3 text-center w-12">
-                              <button
+                              <Button
                                 type="button"
+                                variant="outline"
+                                size="icon"
                                 onClick={() => {
                                   const updatedValues = (formData.MealValue || []).filter(
                                     (_: any, i: number) => i !== idx
@@ -194,10 +187,10 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                                     MealPrice: updatedPrices,
                                   });
                                 }}
-                                className="text-black border-2 px-2 py-1 rounded hover:text-gray-700"
+                                className="text-black hover:text-gray-700 h-8 w-8"
                               >
                                 <X size={20} />
-                              </button>
+                              </Button>
                             </td>
                           </tr>
                         )}
@@ -218,8 +211,10 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
           <div key={idx} className="border border-gray-200 rounded-sm p-4 bg-white">
             <div className="flex items-center justify-between mb-3">
               <Grip size={18} className="text-gray-500" />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => {
                   const updatedValues = (formData.MealValue || []).filter(
                     (_: any, i: number) => i !== idx
@@ -233,15 +228,15 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                     MealPrice: updatedPrices,
                   });
                 }}
-                className="text-red-500 hover:text-red-700"
+                className="text-red-500 hover:text-red-700 h-8 w-8"
               >
                 <X size={20} />
-              </button>
+              </Button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
-                <input
+                <Label className="text-xs font-medium text-gray-700">Name</Label>
+                <Input
                   type="text"
                   value={opt}
                   onChange={(e) => {
@@ -252,13 +247,12 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                       MealValue: updated,
                     });
                   }}
-                  className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   placeholder="Size name"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Price</label>
-                <input
+                <Label className="text-xs font-medium text-gray-700">Price</Label>
+                <Input
                   type="number"
                   step="0.01"
                   value={formData.MealPrice?.[idx] || 0}
@@ -270,15 +264,14 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                       MealPrice: updated,
                     });
                   }}
-                  className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
                   placeholder="0.00"
                 />
               </div>
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-medium text-gray-700">Override</label>
-                <ButtonPage
+                <Label className="text-xs font-medium text-gray-700">Override</Label>
+                <Switch
                   checked={formData.OverRide?.[idx] === "Active"}
-                  onChange={(checked) => {
+                  onCheckedChange={(checked) => {
                     const updated = [...(formData.OverRide || [])];
                     updated[idx] = checked ? "Active" : "Inactive";
                     setFormData({
@@ -289,10 +282,10 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                 />
               </div>
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-medium text-gray-700">Status</label>
-                <ButtonPage
+                <Label className="text-xs font-medium text-gray-700">Status</Label>
+                <Switch
                   checked={formData.status?.[idx] === "Active"}
-                  onChange={(checked) => {
+                  onCheckedChange={(checked) => {
                     const updated = [...(formData.status || [])];
                     updated[idx] = checked ? "Active" : "Inactive";
                     setFormData({

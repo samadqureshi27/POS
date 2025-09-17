@@ -1,5 +1,6 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import TabNavigation from "./tab-menu";
 import MenuItemTab from "./menu-item-tab";
 import DetailsTab from "./details-tab";
@@ -27,11 +28,9 @@ const MenuModal: React.FC<MenuModalProps> = ({
     handleFormFieldChange,
     handleStatusChange,
 }) => {
-    if (!isOpen) return null;
-
     return (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-sm w-full max-w-lg h-[70vh] lg:max-w-2xl shadow-sm flex flex-col sm:mx-4">
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="w-full max-w-lg h-[70vh] lg:max-w-2xl flex flex-col">
                 <ModalHeader
                     editingItem={editingItem}
                     activeTab={activeTab}
@@ -57,8 +56,8 @@ const MenuModal: React.FC<MenuModalProps> = ({
                     actionLoading={actionLoading}
                     isFormValid={isFormValid}
                 />
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

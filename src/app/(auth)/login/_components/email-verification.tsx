@@ -1,8 +1,9 @@
 // components/login/EmailVerificationOverlay.tsx
 "use client";
 import React from "react";
-import { User } from "lucide-react";
-import Button from "@/components/ui/role-button";
+import { User, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useLoginContext } from "./login-context";
 
 const EmailVerificationOverlay: React.FC = () => {
@@ -69,23 +70,15 @@ const EmailVerificationOverlay: React.FC = () => {
     >
       <div className="mb-8 sm:mb-12 text-center -mt-6 sm:-mt-8">
         <div className="mb-4 sm:mb-6 flex items-center justify-center relative">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleBackToForgotPassword}
-            className="absolute left-0 w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute left-0 w-6 h-6 sm:w-8 sm:h-8 text-gray-400 hover:text-gray-600"
             disabled={isLoading}
           >
-            <svg
-              width="16"
-              height="16"
-              className="sm:w-5 sm:h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-          </button>
+            <ArrowLeft size={16} className="sm:w-5 sm:h-5" />
+          </Button>
           <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center">
             <User size={20} className="sm:size-6 text-gray-600" />
           </div>
@@ -110,14 +103,14 @@ const EmailVerificationOverlay: React.FC = () => {
       <div className="space-y-5 sm:space-y-6">
         <div className="flex justify-center gap-2 sm:gap-3 px-4 sm:px-0">
           {otpCode.map((digit, index) => (
-            <input
+            <Input
               key={index}
               id={`otp-${index}`}
               type="text"
               maxLength={1}
               value={digit}
               onChange={(e) => handleOtpChange(index, e.target.value)}
-              className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold border border-gray-300 rounded-lg focus:border-gray-400 focus:ring-2 focus:ring-orange-100 focus:outline-none transition-colors"
+              className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold rounded-lg"
               style={{
                 backgroundColor: digit ? "#fff5f0" : "white",
                 borderColor: digit ? "#fb923c" : "#d1d5db",
@@ -129,13 +122,9 @@ const EmailVerificationOverlay: React.FC = () => {
 
         <div className="pt-3 sm:pt-4">
           <Button
-            type="button"
-            variant="primary"
-            size="lg"
-            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
-            isLoading={isLoading}
-            disabled={isLoading || otpCode.join("").length !== 5}
             onClick={handleVerifyOtp}
+            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
+            disabled={isLoading || otpCode.join("").length !== 5}
           >
             VERIFY & PROCEED
           </Button>
@@ -144,14 +133,15 @@ const EmailVerificationOverlay: React.FC = () => {
         <div className="text-center pt-2 sm:pt-3">
           <p className="text-gray-500 text-sm">
             Haven't got the email yet?{" "}
-            <button
+            <Button
               type="button"
+              variant="link"
               onClick={handleResendEmail}
-              className="text-gray-500 hover:text-orange-600 transition-colors duration-200 underline font-medium"
+              className="text-gray-500 hover:text-orange-600 underline font-medium p-0 h-auto"
               disabled={isLoading}
             >
               Resend email
-            </button>
+            </Button>
           </p>
         </div>
       </div>

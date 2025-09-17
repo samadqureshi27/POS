@@ -1,6 +1,9 @@
 import React from "react";
 import { GeneralSettings } from '@/lib/types';
-import ButtonPage from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ReceiptSettingsCardProps {
     settings: GeneralSettings;
@@ -22,44 +25,42 @@ const ReceiptSettingsCard: React.FC<ReceiptSettingsCardProps> = ({ settings, onS
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <label className="block text-sm font-medium text-gray-500">
+                        <Label className="text-sm font-medium text-gray-500">
                             Auto Print Receipts
-                        </label>
+                        </Label>
                         <p className="text-xs text-gray-500">
                             Print receipt after each sale
                         </p>
                     </div>
-                    <ButtonPage
+                    <Switch
                         checked={settings.autoPrintReceipts}
-                        onChange={(isActive) => onSettingChange("autoPrintReceipts", isActive)}
+                        onCheckedChange={(isActive) => onSettingChange("autoPrintReceipts", isActive)}
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">
+                    <Label className="text-sm font-medium text-gray-500 mb-2">
                         Receipt Copies
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         type="number"
                         min="1"
                         max="5"
                         value={settings.receiptCopies}
                         onChange={(e) => onSettingChange("receiptCopies", parseInt(e.target.value))}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                         placeholder="Enter number of copies"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">
+                    <Label className="text-sm font-medium text-gray-500 mb-2">
                         Receipt Footer Message
-                    </label>
-                    <textarea
+                    </Label>
+                    <Textarea
                         value={settings.receiptFooter}
                         onChange={(e) => onSettingChange("receiptFooter", e.target.value)}
                         rows={3}
                         placeholder="Enter thank you message..."
-                        className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                     />
                 </div>
             </div>

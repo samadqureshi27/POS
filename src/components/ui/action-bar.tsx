@@ -1,5 +1,7 @@
 import React from 'react';
 import { Plus, Trash2, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ActionBarProps {
   // Add button props
@@ -71,22 +73,22 @@ const ActionBar: React.FC<ActionBarProps> = ({
   // Determine if we should show action buttons section
   const showActionButtons = customActions || onAdd || onDelete;
 
-  // Button style helpers - preserving your original design
+  // Button style helpers - preserving your original design with shadcn improvements
   const getAddButtonStyle = (disabled: boolean, customClass?: string) => {
-    const baseStyle = "flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors";
+    const baseStyle = "flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-md transition-colors font-medium";
     const statusStyle = disabled
-      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-      : "bg-[#2C2C2C] text-white hover:bg-gray-700";
-    
+      ? "bg-muted text-muted-foreground cursor-not-allowed"
+      : "bg-primary text-primary-foreground hover:bg-primary/90";
+
     return `${baseStyle} ${statusStyle} ${customClass || ''}`;
   };
 
   const getDeleteButtonStyle = (disabled: boolean, loading?: boolean, customClass?: string) => {
-    const baseStyle = "flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors";
+    const baseStyle = "flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-md transition-colors font-medium";
     const statusStyle = (disabled || loading)
-      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-      : "bg-[#2C2C2C] text-white hover:bg-gray-700";
-    
+      ? "bg-muted text-muted-foreground cursor-not-allowed"
+      : "bg-destructive text-destructive-foreground hover:bg-destructive/90";
+
     return `${baseStyle} ${statusStyle} ${customClass || ''}`;
   };
 
@@ -113,7 +115,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
                   {addLabel}
                 </button>
               )}
-              
+
               {onDelete && (
                 <button
                   onClick={onDelete}
@@ -132,15 +134,15 @@ const ActionBar: React.FC<ActionBarProps> = ({
       {/* Search Bar */}
       {showSearch && onSearchChange && (
         <div className={`relative flex-1 min-w-[200px] ${searchClassName}`}>
-          <input
+          <Input
             type="text"
             placeholder={searchPlaceholder}
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full h-[35px] pr-10 md:h-[40px]"
           />
           <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
             size={16}
           />
         </div>

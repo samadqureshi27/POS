@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 import { Lock } from "lucide-react";
-import Button from "@/components/ui/role-button";
+import { Button } from "@/components/ui/button";
 import { useLoginContext } from "./login-context";
 
 const ManagerForgotPinOverlay: React.FC = () => {
@@ -59,7 +59,7 @@ const ManagerForgotPinOverlay: React.FC = () => {
         <div className="pt-3 sm:pt-4">
           <Button
             type="button"
-            variant="primary"
+            variant="default"
             size="lg"
             className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
             onClick={handleBackToManagerLogin}

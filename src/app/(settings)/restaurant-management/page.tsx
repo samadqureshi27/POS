@@ -5,6 +5,8 @@ import LoadingSpinner from '@/components/ui/loader';
 import ActionButtons from '@/components/ui/setting-buttons';
 import { Toast } from '@/components/ui/toast';
 import { useToast } from '@/lib/hooks/toast';
+import { SimplePageSkeleton } from '@/app/(main)/dashboard/_components/SimplePageSkeleton';
+import { Toaster } from '@/components/ui/sonner';
 import { useRestaurantProfile } from '@/lib/hooks/useRestaurantProfile';
 import { BasicInfoCard } from './_components/basic-info-card';
 import { ContactInfoCard } from './_components/contact-info-card';
@@ -28,18 +30,12 @@ const RestaurantProfilePage = () => {
   const { toast, toastVisible, hideToast } = useToast();
 
   if (loading) {
-    return <LoadingSpinner message="Loading Restaurant Profile..." />;
+    return <SimplePageSkeleton showHeader={true} contentRows={8} />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50 w-full">
-      {toast && toastVisible && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <div className="flex-1 justify-center items-center w-full px-6">
         <div className="mt-20">

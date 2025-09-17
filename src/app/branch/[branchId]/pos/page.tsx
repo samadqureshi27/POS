@@ -9,6 +9,8 @@ import { Toast } from '@/components/ui/toast';
 import PosModal from "./_components/pos-modal";
 import PosTable from "./_components/pos-table";
 import LoadingSpinner from '@/components/ui/loader';
+import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
+import { Toaster } from "@/components/ui/sonner";
 import { usePosManagement } from "@/lib/hooks/usePosManagement";
 
 const PosListPage = () => {
@@ -48,15 +50,15 @@ const PosListPage = () => {
     } = usePosManagement(branchId);
 
     if (loading) {
-        return <LoadingSpinner message="Loading POS..." />;
+        return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
     }
 
     if (!branchId) {
         return (
             <div className="flex justify-center items-center min-h-screen bg-gray-50">
                 <div className="text-center">
-                    <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                    <p className="text-gray-600">Branch ID not found in URL parameters</p>
+                    <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+                    <p className="text-muted-foreground">Branch ID not found in URL parameters</p>
                 </div>
             </div>
         );
@@ -64,15 +66,9 @@ const PosListPage = () => {
 
     return (
         <div className="px-4 bg-gray-50 min-h-screen">
-            {toast && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={hideToast}
-                />
-            )}
+            <Toaster position="top-right" />
 
-            <h1 className="text-3xl font-semibold mb-8 mt-20">
+            <h1 className="text-3xl font-semibold tracking-tight mb-8 mt-20">
                 POS Systems - Branch #{branchId}
             </h1>
 

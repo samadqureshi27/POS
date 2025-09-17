@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { X, Save, ChevronDown } from "lucide-react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { X, Save } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { InventoryItem, InventoryModalFormData } from "@/lib/types/inventory";
 interface InventoryModalProps {
     isOpen: boolean;
@@ -37,30 +41,27 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
         };
     }, [isOpen]);
 
-    if (!isOpen) return null;
-
     return (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 px-4">
-            <div className="bg-white rounded-sm p-4 sm:p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4 sm:mb-6">
-                    <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+                <DialogHeader>
+                    <DialogTitle className="text-xl sm:text-2xl font-semibold">
                         {editingItem ? "Edit Inventory Item" : `Add New Inventory Item - Branch #${branchId}`}
-                    </h2>
-                </div>
+                    </DialogTitle>
+                </DialogHeader>
 
                 {/* Scrollable Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 flex-1 overflow-y-auto pr-1 pl-1">
                     {/* Item Name */}
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Item Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
+                        <Label htmlFor="itemName" className="text-sm font-medium">
+                            Item Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            id="itemName"
                             type="text"
                             value={formData.Name}
                             onChange={(e) => onFormDataChange({ Name: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                             placeholder="Enter item name"
                             required
                         />
@@ -68,14 +69,14 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
 
                     {/* Supplier */}
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Supplier <span className="text-red-500">*</span>
-                        </label>
-                        <input
+                        <Label htmlFor="supplier" className="text-sm font-medium">
+                            Supplier <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            id="supplier"
                             type="text"
                             value={formData.supplier}
                             onChange={(e) => onFormDataChange({ supplier: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                             placeholder="Enter supplier name"
                             required
                         />
@@ -83,64 +84,37 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
 
                     {/* Unit */}
                     <div className="sm:col-span-2 md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Label htmlFor="unit" className="text-sm font-medium">
                             Unit Measurement
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <DropdownMenu.Root>
-                                <DropdownMenu.Trigger className="px-3 py-2 w-full rounded-sm text-sm bg-white border border-gray-300 outline-none flex items-center justify-between hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
-                                    {formData.Unit || "Select Unit"}
-                                    <ChevronDown size={16} className="text-gray-500" />
-                                </DropdownMenu.Trigger>
-
-                                <DropdownMenu.Portal>
-                                    <DropdownMenu.Content
-                                        className="min-w-[240px] rounded-sm bg-white shadow-md border border-gray-200 p-1 relative outline-none z-100"
-                                        sideOffset={6}
-                                    >
-                                        <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3 z-100" />
-
-                                        <DropdownMenu.Item
-                                            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                                            onClick={() => onFormDataChange({ Unit: "" })}
-                                        >
-                                            Select Unit
-                                        </DropdownMenu.Item>
-
-                                        {[
-                                            "Kilograms (Kg's)",
-                                            "Grams (g)",
-                                            "Liters",
-                                            "Milliliters (ml)",
-                                            "Pieces",
-                                            "Boxes",
-                                            "Bottles",
-                                            "Cans",
-                                            "Packs"
-                                        ].map(unit => (
-                                            <DropdownMenu.Item
-                                                key={unit}
-                                                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded outline-none"
-                                                onClick={() => onFormDataChange({ Unit: unit })}
-                                            >
-                                                {unit}
-                                            </DropdownMenu.Item>
-                                        ))}
-                                    </DropdownMenu.Content>
-                                </DropdownMenu.Portal>
-                            </DropdownMenu.Root>
-                        </div>
+                        </Label>
+                        <Select value={formData.Unit} onValueChange={(value) => onFormDataChange({ Unit: value })}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Unit" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Kilograms (Kg's)">Kilograms (Kg's)</SelectItem>
+                                <SelectItem value="Grams (g)">Grams (g)</SelectItem>
+                                <SelectItem value="Liters">Liters</SelectItem>
+                                <SelectItem value="Milliliters (ml)">Milliliters (ml)</SelectItem>
+                                <SelectItem value="Pieces">Pieces</SelectItem>
+                                <SelectItem value="Boxes">Boxes</SelectItem>
+                                <SelectItem value="Bottles">Bottles</SelectItem>
+                                <SelectItem value="Cans">Cans</SelectItem>
+                                <SelectItem value="Packs">Packs</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {/* Threshold */}
                     <div className="sm:col-span-2 md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Label htmlFor="threshold" className="text-sm font-medium">
                             Low Stock Threshold
-                            <span className="text-xs text-gray-500 ml-1">
+                            <span className="text-xs text-muted-foreground ml-1">
                                 (Alert when below)
                             </span>
-                        </label>
-                        <input
+                        </Label>
+                        <Input
+                            id="threshold"
                             type="text"
                             value={formData.Threshold || ''}
                             onChange={(e) => {
@@ -151,7 +125,6 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
                                     });
                                 }
                             }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                             placeholder="0"
                             min="0"
                         />
@@ -159,13 +132,14 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
 
                     {/* Initial Stock */}
                     <div className="sm:col-span-1 md:col-span-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Label htmlFor="initialStock" className="text-sm font-medium">
                             Initial Stock
-                            <span className="text-xs text-gray-500 ml-1">
+                            <span className="text-xs text-muted-foreground ml-1">
                                 (Starting quantity)
                             </span>
-                        </label>
-                        <input
+                        </Label>
+                        <Input
+                            id="initialStock"
                             type="text"
                             value={formData.InitialStock || ''}
                             onChange={(e) => {
@@ -176,7 +150,6 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
                                     });
                                 }
                             }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                             placeholder="0"
                             min="0"
                         />
@@ -184,13 +157,14 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
 
                     {/* Added Stock */}
                     <div className="sm:col-span-1 md:col-span-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Label htmlFor="addedStock" className="text-sm font-medium">
                             Additional Stock
-                            <span className="text-xs text-gray-500 ml-1">
+                            <span className="text-xs text-muted-foreground ml-1">
                                 (Stock to add)
                             </span>
-                        </label>
-                        <input
+                        </Label>
+                        <Input
+                            id="addedStock"
                             type="text"
                             value={formData.AddedStock || ''}
                             onChange={(e) => {
@@ -201,7 +175,6 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
                                     });
                                 }
                             }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                             placeholder="0"
                             min="0"
                         />
@@ -209,9 +182,9 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
 
                     {/* Current Stock Display */}
                     <div className="col-span-1 sm:col-span-2 md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Label className="text-sm font-medium">
                             Total Current Stock
-                        </label>
+                        </Label>
                         <div className="w-full px-3 py-2 border border-gray-200 rounded-sm bg-gray-50 text-gray-600">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                 <span className="font-medium text-lg">
@@ -229,12 +202,12 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
                     {/* Stock Status Indicator */}
                     {(formData.InitialStock || 0) + (formData.AddedStock || 0) > 0 && (
                         <div className="col-span-1 sm:col-span-2 md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <Label className="text-sm font-medium">
                                 Stock Status
-                                <span className="text-xs text-gray-500 ml-1">
+                                <span className="text-xs text-muted-foreground ml-1">
                                     (Auto-calculated based on threshold)
                                 </span>
-                            </label>
+                            </Label>
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-sm border bg-gray-50">
                                 <div className="flex items-center gap-3">
                                     <div
@@ -267,23 +240,21 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
 
                 {/* Fixed Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
-                    <button
+                    <Button
                         type="button"
+                        variant="outline"
                         onClick={onClose}
                         disabled={actionLoading}
-                        className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full sm:w-auto"
                     >
                         <X size={16} />
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="button"
                         onClick={onSubmit}
                         disabled={!formData.Name.trim() || !formData.supplier.trim() || actionLoading}
-                        className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${!formData.Name.trim() || !formData.supplier.trim() || actionLoading
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                            }`}
+                        className="w-full sm:w-auto"
                     >
                         {actionLoading ? (
                             <>
@@ -296,10 +267,10 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
                                 {editingItem ? "Update Item" : "Add Item"}
                             </>
                         )}
-                    </button>
+                    </Button>
                 </div>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 
