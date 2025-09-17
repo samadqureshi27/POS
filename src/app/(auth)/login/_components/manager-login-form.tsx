@@ -141,6 +141,7 @@ const ManagerLoginForm: React.FC = () => {
               key={num}
               type="button"
               variant="secondary"
+
               className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
               onClick={() => handleKeypadInput(num.toString())}
               disabled={
@@ -154,6 +155,7 @@ const ManagerLoginForm: React.FC = () => {
           <Button
             type="button"
             variant="secondary"
+
             className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
             onClick={() => handleKeypadInput("0")}
             disabled={isLoading || pinCode.every((digit) => digit !== "")}

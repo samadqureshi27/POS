@@ -94,6 +94,7 @@ const ForgotPasswordOverlay: React.FC = () => {
             type="button"
             size="lg"
             className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
+            isLoading={isLoading}
             disabled={isLoading}
             onClick={handleResetPassword}
           >
