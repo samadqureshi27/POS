@@ -1,5 +1,7 @@
 "use client";
 import React, { useRef } from 'react';
+import { Input } from './input';
+import { cn } from '@/lib/utils';
 
 interface PinInputProps {
   value: string;
@@ -70,9 +72,9 @@ const PinInput: React.FC<PinInputProps> = ({
 
   return (
     <div>
-      <div className={`flex gap-3 justify-center ${className}`}>
+      <div className={cn("flex gap-3 justify-center", className)}>
         {digits.map((digit, index) => (
-          <input
+          <Input
             key={index}
             ref={(el) => {
               inputRefs.current[index] = el;
@@ -86,22 +88,16 @@ const PinInput: React.FC<PinInputProps> = ({
             onKeyDown={(e) => handleKeyDown(index, e)}
             onPaste={handlePaste}
             disabled={disabled}
-            className={`
-              w-14 h-14 text-center text-2xl font-bold border-2 rounded-lg
-              focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent
-              transition-all duration-200
-              ${error 
-                ? 'border-red-300 bg-red-50' 
-                : 'border-gray-300 bg-white hover:border-gray-400'
-              }
-              ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-            `}
+            className={cn(
+              "w-14 h-14 text-center text-2xl font-bold",
+              error && "border-destructive focus-visible:ring-destructive/20"
+            )}
           />
         ))}
       </div>
       
       {error && (
-        <p className="text-sm text-red-600 mt-1">
+        <p className="text-sm text-destructive mt-1">
           {typeof error === 'string' ? error : 'Invalid input'}
         </p>
       )}

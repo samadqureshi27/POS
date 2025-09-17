@@ -1,5 +1,7 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { CheckCircle, AlertCircle, AlertTriangle, Info, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface ToastProps {
     message: string;
@@ -40,26 +42,29 @@ export const Toast = React.memo<ToastProps>(({ message, type, onClose }) => {
     const getBackgroundColor = () => {
         switch (type) {
             case 'success':
-                return "bg-green-400 text-white";
+                return "bg-green-500 text-white";
             case 'error':
-                return "bg-red-400 text-white";
+                return "bg-destructive text-destructive-foreground";
             case 'warning':
-                return "bg-yellow-400 text-white";
+                return "bg-yellow-500 text-white";
             case 'info':
-                return "bg-blue-400 text-white";
+                return "bg-primary text-primary-foreground";
             default:
-                return "bg-blue-400 text-white";
+                return "bg-primary text-primary-foreground";
         }
     };
 
     return (
         <div
-            className={`fixed top-4 right-4 px-4 py-3 rounded-sm shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform ${getBackgroundColor()} ${isVisible && !isClosing
+            className={cn(
+                "fixed top-4 right-4 px-4 py-3 rounded-md shadow-lg z-50 flex items-center gap-2 transition-all duration-300 ease-out transform",
+                getBackgroundColor(),
+                isVisible && !isClosing
                     ? "translate-x-0 opacity-100"
                     : isClosing
                         ? "translate-x-full opacity-0"
                         : "translate-x-full opacity-0"
-                }`}
+            )}
         >
             {getIcon()}
             <span>{message}</span>

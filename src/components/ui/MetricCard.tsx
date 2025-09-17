@@ -1,5 +1,7 @@
+"use client";
 // components/ui/MetricCard.tsx
 import React from 'react';
+import { Card, CardContent } from './card';
 import { StarRating } from './StarRating';
 
 interface MetricCardProps {
@@ -18,13 +20,13 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   starRating = 0
 }) => {
   return (
-    <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm">
-      <div className="space-y-1">
+    <Card className="p-6">
+      <CardContent className="space-y-1 p-0">
         <p className="text-3xl font-bold">{value}</p>
-        <p className="text-sm text-gray-500">{title}</p>
-        {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
+        <p className="text-sm text-muted-foreground">{title}</p>
+        {subtitle && <p className="text-xs text-muted-foreground/70">{subtitle}</p>}
         {showStarRating && <StarRating rating={Math.floor(starRating)} />}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

@@ -6,8 +6,7 @@ import { useMenuManagement } from "@/lib/hooks/useMenuManagement";
 import MenuActionBar from "./_components/menu-actionbar";
 import MenuTable from "./_components/menu-table";
 import MenuModal from "./_components/MenuModal";
-import LoadingSpinner from "@/components/ui/loader";
-import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
+import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import { Toaster } from "@/components/ui/sonner";
 
 const MenuManagementPage = () => {
@@ -58,11 +57,11 @@ const MenuManagementPage = () => {
 
   // Loading state
   if (loading) {
-    return <ManagementPageSkeleton showSummaryCards={false} showActionBar={true} />;
+    return <GlobalSkeleton type="management" showSummaryCards={false} showActionBar={true} />;
   }
 
   return (
-    <div className="bg-gray-50 min-w-full h-full overflow-y-hidden">
+    <div className="bg-background min-w-full h-full overflow-y-hidden">
       <Toaster position="top-right" />
 
       <h1 className="text-3xl font-semibold tracking-tight mt-14 mb-8">Menu Management</h1>

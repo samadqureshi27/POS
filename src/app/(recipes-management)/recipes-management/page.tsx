@@ -2,9 +2,9 @@
 import React from "react";
 import ActionBar from "@/components/ui/action-bar";
 import { Toast } from "@/components/ui/toast";
-import LoadingSpinner from "@/components/ui/loader";
 import RecipeTable from "./_components/recipe-table";
 import RecipeModal from "./_components/recipe-modal";
+import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
 import { useRecipeData } from "@/lib/hooks/useRecipeData";
 
 const RecipesManagementPage = () => {
@@ -53,9 +53,9 @@ const RecipesManagementPage = () => {
     dismissToast,
   } = useRecipeData();
 
-  // Show loading spinner during initial load
+  // Show skeleton loading during initial load
   if (loading) {
-    return <LoadingSpinner />;
+    return <ManagementPageSkeleton showSummaryCards={false} showActionBar={true} />;
   }
 
   return (

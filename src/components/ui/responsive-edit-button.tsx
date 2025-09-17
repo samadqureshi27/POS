@@ -1,5 +1,8 @@
+"use client";
 import React from 'react';
 import { Edit } from 'lucide-react';
+import { Button } from './button';
+import { cn } from '@/lib/utils';
 
 interface ResponsiveEditButtonProps {
   onClick: (e: React.MouseEvent) => void;
@@ -15,28 +18,33 @@ const ResponsiveEditButton: React.FC<ResponsiveEditButtonProps> = ({
   return (
     <>
       {/* Desktop Edit Icon - Hidden on mobile */}
-      <button
+      <Button
         onClick={onClick}
         disabled={disabled}
-        className={`desktop-edit-icon cursor-pointer text-gray-600 hover:text-gray-800 p-1 ${className} ${
-          disabled ? 'opacity-50' : ''
-        }`}
+        variant="ghost"
+        size="icon"
+        className={cn(
+          "desktop-edit-icon text-muted-foreground hover:text-foreground",
+          className
+        )}
         title="Edit"
       >
         <Edit size={16} />
-      </button>
+      </Button>
 
       {/* Mobile Edit Button - Hidden on desktop */}
-      <button
+      <Button
         onClick={onClick}
         disabled={disabled}
-        className={`mobile-edit-button w-full bg-[#2C2C2C] text-white hover:bg-gray-700 px-4 py-2 rounded-sm transition-colors flex cursor-pointer items-center justify-center gap-2 mt-3 ${className} ${
-          disabled ? 'opacity-50  bg-gray-400' : ''
-        }`}
+        variant="default"
+        className={cn(
+          "mobile-edit-button w-full flex items-center justify-center gap-2 mt-3",
+          className
+        )}
       >
         <Edit size={16} />
         Edit
-      </button>
+      </Button>
     </>
   );
 };

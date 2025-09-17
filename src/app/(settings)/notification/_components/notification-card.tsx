@@ -3,7 +3,7 @@ import { LucideIcon } from 'lucide-react';
 
 
 import { NotificationSettings } from '@/lib/types/notification';
-import ButtonPage from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 
@@ -48,9 +48,9 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                                 <p className="text-xs text-gray-500 mt-1">{option.description}</p>
                             )}
                         </div>
-                        <ButtonPage
+                        <Switch
                             checked={settings[option.key] as boolean}
-                            onChange={(isActive) => onSettingChange(option.key, isActive)}
+                            onCheckedChange={(isActive) => onSettingChange(option.key, isActive)}
                         />
                     </div>
                 ))}

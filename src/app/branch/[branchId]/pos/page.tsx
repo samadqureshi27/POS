@@ -55,7 +55,7 @@ const PosListPage = () => {
 
     if (!branchId) {
         return (
-            <div className="flex justify-center items-center min-h-screen bg-gray-50">
+            <div className="flex justify-center items-center min-h-screen bg-background">
                 <div className="text-center">
                     <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
                     <p className="text-muted-foreground">Branch ID not found in URL parameters</p>
@@ -65,7 +65,7 @@ const PosListPage = () => {
     }
 
     return (
-        <div className="px-4 bg-gray-50 min-h-screen">
+        <div className="px-4 bg-background min-h-screen">
             <Toaster position="top-right" />
 
             <h1 className="text-3xl font-semibold tracking-tight mb-8 mt-20">
@@ -124,5 +124,6 @@ const PosListPage = () => {
         </div>
     );
 };
+
 
 export default PosListPage;

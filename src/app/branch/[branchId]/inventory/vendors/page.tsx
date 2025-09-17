@@ -8,7 +8,7 @@ import ActionBar from "@/components/ui/action-bar";
 import { Toast } from '@/components/ui/toast';
 import VendorModal from "./_components/vendor-modal";
 import VendorTable from "./_components/vendor-table";
-import LoadingSpinner from '@/components/ui/loader';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useVendorManagement } from "@/lib/hooks/useVendors"; 
 
 const VendorsPage = () => {
@@ -45,22 +45,22 @@ const VendorsPage = () => {
   } = useVendorManagement(branchId);
 
   if (loading) {
-    return <LoadingSpinner message="Loading Vendors..."/>;
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
   }
 
   if (!branchId) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="flex justify-center items-center min-h-screen bg-background">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-gray-600">Branch ID not found in URL parameters</p>
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <p className="text-muted-foreground">Branch ID not found in URL parameters</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="px-4 bg-gray-50 min-h-screen">
+    <div className="px-4 bg-background min-h-screen">
       {toast && (
         <Toast
           message={toast.message}

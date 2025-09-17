@@ -1,7 +1,8 @@
-// components/SimplePageSkeleton.tsx
-
+// @deprecated - Use GlobalSkeleton with type="simple" instead
+// This component is kept for backward compatibility but should not be used in new code
 import React from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { GlobalSkeleton } from "@/components/ui/global-skeleton";
+
 
 interface SimplePageSkeletonProps {
   showHeader?: boolean;
@@ -15,28 +16,11 @@ export const SimplePageSkeleton: React.FC<SimplePageSkeletonProps> = ({
   showContent = true,
   contentRows = 6
 }) => (
-  <div className="bg-gray-50 min-h-screen w-full p-4">
-    {/* Header */}
-    {showHeader && (
-      <div className="mb-8 mt-2">
-        <Skeleton className="h-9 w-64" />
-      </div>
-    )}
-
-    {/* Content */}
-    {showContent && (
-      <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm">
-        <div className="space-y-6">
-          {[...Array(contentRows)].map((_, i) => (
-            <div key={i} className="space-y-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-  </div>
+  <GlobalSkeleton
+    type="simple"
+    showHeader={showHeader}
+    contentRows={contentRows}
+  />
 );
 
 export default SimplePageSkeleton;

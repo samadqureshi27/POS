@@ -10,7 +10,7 @@ import { Toast } from '@/components/ui/toast';
 import { useLicense } from '@/lib/hooks/useLicense';
 
 // Components
-import LoadingSpinner from '@/components/ui/loader';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { PageHeader } from './_components/page-header'
 import { LicenseInfoCard } from './_components/license-info-card';
 import { ResourcesAllocationCard } from './_components/resource-allocation-card';
@@ -31,13 +31,13 @@ const BillingLicensePage = () => {
   } = useLicense({ showToast });
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <GlobalSkeleton type="settings" showHeader={true} />;
   }
 
   if (!licenseInfo) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <div className="min-h-screen bg-background w-full">
       {toast && (
         <Toast
           message={toast.message}
