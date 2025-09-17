@@ -1,6 +1,7 @@
 // components/login/ManagerLoginForm.tsx
 "use client";
 import React from "react";
+import { ArrowLeft } from "lucide-react";
 import ErrorMessage from "@/components/ui/error-message";
 import { useLoginContext } from "./login-context";
 import { validateManagerPinForm } from "@/lib/validations";
@@ -17,6 +18,7 @@ const ManagerLoginForm: React.FC = () => {
     handleManagerLogin,
     setShowManagerForgotPin,
     setShowManagerForgotContainer,
+    handleBackToRoleSelection,
   } = useLoginContext();
 
   const handlePinChange = (index: number, value: string) => {
@@ -79,20 +81,28 @@ const ManagerLoginForm: React.FC = () => {
           : "opacity-0 transform translate-y-4"
       }`}
     >
-      <div className="mb-12 text-center -mt-8">
-        <p className="text-gray-500 text-sm mb-3 tracking-widest font-medium">
+      {/* Mobile Back Button */}
+      <button
+        onClick={handleBackToRoleSelection}
+        className="absolute top-4 left-4 sm:hidden w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors z-10"
+      >
+        <ArrowLeft size={20} />
+      </button>
+
+      <div className="mb-8 sm:mb-12 text-center -mt-6 sm:-mt-8">
+        <p className="text-gray-500 text-xs sm:text-sm mb-2 sm:mb-3 tracking-widest font-medium">
           WELCOME BACK
         </p>
-        <h2 className="text-2xl font-semibold text-gray-900">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
           Log In to your Account
         </h2>
       </div>
 
-      {error && <ErrorMessage message={error} className="mb-6" />}
+      {error && <ErrorMessage message={error} className="mb-4 sm:mb-6" />}
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* PIN Input */}
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-2 sm:gap-3 md:gap-4">
           {pinCode.map((digit, index) => (
             <input
               key={index}
@@ -101,7 +111,7 @@ const ManagerLoginForm: React.FC = () => {
               maxLength={1}
               value={digit}
               onChange={(e) => handlePinChange(index, e.target.value)}
-              className="w-12 h-12 text-center text-2xl font-bold border-0 bg-gray-100 rounded-lg focus:bg-gray-800 focus:text-white focus:ring-2 focus:ring-gray-600 focus:outline-none transition-colors"
+              className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl md:text-2xl font-bold border-0 bg-gray-100 rounded-lg focus:bg-gray-800 focus:text-white focus:ring-2 focus:ring-gray-600 focus:outline-none transition-colors"
               style={{
                 backgroundColor: digit ? "#374151" : "#f3f4f6",
                 color: digit ? "white" : "#374151",
@@ -121,12 +131,12 @@ const ManagerLoginForm: React.FC = () => {
         )}
 
         {/* Number Keypad */}
-        <div className="grid grid-cols-3 gap-4 max-w-xs mx-auto">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 max-w-xs mx-auto px-4 sm:px-0">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <button
               key={num}
               type="button"
-              className="h-14 text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
               onClick={() => handleKeypadInput(num.toString())}
               disabled={
                 isLoading || pinCode.every((digit) => digit !== "")
@@ -138,7 +148,7 @@ const ManagerLoginForm: React.FC = () => {
           <div></div> {/* Empty space */}
           <button
             type="button"
-            className="h-14 text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
+            className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
             onClick={() => handleKeypadInput("0")}
             disabled={isLoading || pinCode.every((digit) => digit !== "")}
           >
@@ -146,7 +156,7 @@ const ManagerLoginForm: React.FC = () => {
           </button>
           <button
             type="button"
-            className="h-14 text-lg font-medium text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
+            className="h-12 sm:h-14 text-base sm:text-lg font-medium text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
             onClick={handleBackspace}
             disabled={isLoading || pinCode.every((digit) => digit === "")}
           >

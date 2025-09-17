@@ -51,7 +51,7 @@ const ForgotPasswordOverlay: React.FC = () => {
 
   return (
     <div
-      className={`absolute inset-0 bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-16 py-20 z-10 transition-transform duration-1000 ease-out ${
+      className={`absolute inset-0 bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-6 sm:px-12 md:px-16 py-12 sm:py-16 md:py-20 z-10 transition-transform duration-1000 ease-out ${
         showForgotContainer
           ? "transform translate-y-0"
           : "transform translate-y-full"
@@ -60,8 +60,8 @@ const ForgotPasswordOverlay: React.FC = () => {
         willChange: "transform",
       }}
     >
-      <div className="mb-12 text-center -mt-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+      <div className="mb-8 sm:mb-12 text-center -mt-6 sm:-mt-8">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">
           Forgot your password?
         </h2>
         <p className="text-gray-500 text-sm">
@@ -69,7 +69,7 @@ const ForgotPasswordOverlay: React.FC = () => {
         </p>
       </div>
 
-      <div className="space-y-5">
+      <div className="space-y-4 sm:space-y-5">
         <Input
           label=""
           type="email"
@@ -82,15 +82,15 @@ const ForgotPasswordOverlay: React.FC = () => {
           icon={<User size={18} className="text-gray-400" />}
           error={resetEmailError}
           disabled={isLoading}
-          className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-xl py-4"
+          className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-xl py-3 sm:py-4"
         />
 
-        <div className="pt-4">
+        <div className="pt-3 sm:pt-4">
           <Button
             type="button"
             variant="primary"
             size="lg"
-            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-4 rounded-xl text-sm"
+            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
             isLoading={isLoading}
             disabled={isLoading}
             onClick={handleResetPassword}
@@ -99,7 +99,7 @@ const ForgotPasswordOverlay: React.FC = () => {
           </Button>
         </div>
 
-        <div className="text-center pt-3">
+        <div className="text-center pt-2 sm:pt-3">
           <button
             type="button"
             onClick={handleBackToLogin}

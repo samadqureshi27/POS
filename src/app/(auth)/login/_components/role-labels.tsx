@@ -13,9 +13,9 @@ const RoleLabels: React.FC = () => {
   } = useLoginContext();
 
   return (
-    <div className="absolute inset-0 z-40 flex items-center justify-center gap-16">
+    <div className="absolute inset-0 z-40 flex items-center justify-center gap-8 sm:gap-16 px-4">
       <span
-        className={`pointer-events-auto cursor-pointer select-none text-black text-3xl md:text-4xl font-semibold tracking-wide transition-opacity duration-300 ${
+        className={`pointer-events-auto cursor-pointer select-none text-black text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-wide transition-opacity duration-300 ${
           phase === "managerLogin"
             ? "opacity-0 pointer-events-none"
             : "opacity-100"
@@ -34,7 +34,7 @@ const RoleLabels: React.FC = () => {
         </span>
       </span>
       <span
-        className={`pointer-events-auto cursor-pointer select-none pl-[50px] text-[#d1ab35] text-3xl md:text-4xl font-semibold tracking-wide transition-opacity duration-300 ${
+        className={`pointer-events-auto cursor-pointer select-none pl-4 sm:pl-8 lg:pl-[50px] text-[#d1ab35] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-wide transition-opacity duration-300 ${
           phase === "adminLogin"
             ? "opacity-0 pointer-events-none"
             : "opacity-100"

@@ -43,17 +43,15 @@ const LoginPageContent: React.FC = () => {
 
       {/* Admin login container with all overlays */}
       {phase === "adminLogin" && (
-        <div className="absolute right-0 top-0 h-full z-50">
+        <div className="absolute right-0 top-0 h-full z-50 w-full sm:w-auto">
           <div
-            className={`h-full bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-16 py-20 shadow-lg mr-16 mt-16 transition-transform duration-1000 ease-out relative ${
+            className={`h-full bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-6 sm:px-12 md:px-16 py-12 sm:py-16 md:py-20 shadow-lg mr-0 sm:mr-8 md:mr-16 mt-0 sm:mt-8 md:mt-16 transition-transform duration-1000 ease-out relative w-full sm:w-96 md:w-[450px] sm:-ml-6 md:-ml-12 ${
 
               showLoginContainer ? "transform translate-y-0" : "transform translate-y-full"
 
             }`}
             style={{
               willChange: "transform",
-              width: "450px",
-              marginLeft: "-50px",
             }}
           >
             <AdminLoginForm />
@@ -66,17 +64,15 @@ const LoginPageContent: React.FC = () => {
 
       {/* Manager PIN login container with overlays */}
       {phase === "managerLogin" && (
-        <div className="absolute left-0 top-0 h-full z-50">
+        <div className="absolute left-0 top-0 h-full z-50 w-full sm:w-auto">
           <div
-            className={`h-full bg-white rounded-tr-3xl rounded-tl-3xl flex flex-col justify-center px-16 py-20 shadow-lg ml-16 mt-16 transition-transform duration-1000 ease-out relative ${
+            className={`h-full bg-white rounded-tr-3xl rounded-tl-3xl flex flex-col justify-center px-6 sm:px-12 md:px-16 py-12 sm:py-16 md:py-20 shadow-lg ml-0 sm:ml-8 md:ml-16 mt-0 sm:mt-8 md:mt-16 transition-transform duration-1000 ease-out relative w-full sm:w-96 md:w-[450px] sm:-mr-6 md:-mr-12 ${
 
               showManagerContainer ? "transform translate-y-0" : "transform translate-y-full"
 
             }`}
             style={{
               willChange: "transform",
-              width: "450px",
-              marginRight: "-50px",
             }}
           >
             <ManagerLoginForm />
