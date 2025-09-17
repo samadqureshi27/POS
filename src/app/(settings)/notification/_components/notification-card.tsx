@@ -3,7 +3,7 @@ import { LucideIcon } from 'lucide-react';
 
 
 import { NotificationSettings } from '@/lib/types/notification';
-import ButtonPage from '@/components/layout/ui/button';
+import ButtonPage from '@/components/ui/button';
 
 
 interface NotificationOption {

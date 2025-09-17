@@ -1,6 +1,6 @@
 import React from "react";
 import ImageUpload from "./image-upload";
-import ButtonPage from "@/components/layout/ui/button";
+import ButtonPage from "@/components/ui/button";
 import {MenuItemTabProps,MenuItem} from "@/lib/types/menum";
 
 const MenuItemTab: React.FC<MenuItemTabProps> = ({

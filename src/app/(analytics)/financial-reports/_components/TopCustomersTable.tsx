@@ -1,7 +1,7 @@
 // components/tables/TopCustomersTable.tsx
 import React from 'react';
 import { CustomerItem } from '@/lib/types/analytics';
-import { StarRating } from '@/components/layout/ui/StarRating';
+import { StarRating } from '@/components/ui/StarRating';
 
 interface TopCustomersTableProps {
   customers: CustomerItem[];

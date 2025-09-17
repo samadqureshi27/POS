@@ -3,10 +3,10 @@
 
 import React from "react";
 import Checkbox from "@mui/material/Checkbox";
-import ResponsiveEditButton from "@/components/layout/ui/responsive-detail-button";
+import ResponsiveEditButton from "@/components/ui/responsive-detail-button";
 import { VendorItem, VendorTableProps } from "@/lib/types/vendors";
 
-import CustomCheckbox from "@/components/layout/ui/custom-checkbox";
+import CustomCheckbox from "@/components/ui/custom-checkbox";
 const VendorTable: React.FC<VendorTableProps> = ({
     vendorItems,
     selectedItems,

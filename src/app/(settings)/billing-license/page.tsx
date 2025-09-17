@@ -6,11 +6,11 @@ import { LicenseInfo, ApiResponse, ToastState } from '@/lib/types/billing';
 
 // Hooks
 import { useToast } from '@/lib/hooks';
-import { Toast } from '@/components/layout/ui/toast';
+import { Toast } from '@/components/ui/toast';
 import { useLicense } from '@/lib/hooks/useLicense';
 
 // Components
-import LoadingSpinner from '@/components/layout/ui/loader';
+import LoadingSpinner from '@/components/ui/loader';
 import { PageHeader } from './_components/page-header'
 import { LicenseInfoCard } from './_components/license-info-card';
 import { ResourcesAllocationCard } from './_components/resource-allocation-card';

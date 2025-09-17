@@ -1,5 +1,5 @@
 import React from 'react';
-import ButtonPage from '@/components/layout/ui/button';
+import ButtonPage from '@/components/ui/button';
 import { NotificationSettings } from '@/lib/types/notification';
 
 interface QuietHoursSettingsProps {

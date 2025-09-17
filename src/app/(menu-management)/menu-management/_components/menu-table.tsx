@@ -1,7 +1,7 @@
 import React from "react";
 import { Edit } from "lucide-react";
 import FilterDropdown from "./filter-dropdown";
-import CustomCheckbox from "@/components/layout/ui/custom-checkbox"; // Import the new component
+import CustomCheckbox from "@/components/ui/custom-checkbox"; // Import the new component
 
 import {MenuItem,MenuTableProps} from "@/lib/types/menum";
 

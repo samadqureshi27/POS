@@ -1,7 +1,7 @@
 // _components/hooks/useOrderFilters.ts
 import { useState, useEffect } from 'react';
 import { OrderItem, DateRangeType } from '@/lib/types';
-import { OrderAPI } from '@/components/auth/order-API';
+import { OrderAPI } from '@/lib/util/order-api';
 
 export const useOrderFilters = (items: OrderItem[]) => {
   const [filteredItems, setFilteredItems] = useState<OrderItem[]>([]);
