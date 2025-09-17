@@ -79,6 +79,7 @@ const EmailVerificationOverlay: React.FC = () => {
           >
             <ArrowLeft size={16} className="sm:w-5 sm:h-5" />
           </Button>
+
           <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center">
             <User size={20} className="sm:size-6 text-gray-600" />
           </div>
@@ -122,6 +123,12 @@ const EmailVerificationOverlay: React.FC = () => {
 
         <div className="pt-3 sm:pt-4">
           <Button
+            type="button"
+            variant="primary"
+            size="lg"
+            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
+            isLoading={isLoading}
+            disabled={isLoading || otpCode.join("").length !== 5}
             onClick={handleVerifyOtp}
             className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
             disabled={isLoading || otpCode.join("").length !== 5}
