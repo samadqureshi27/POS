@@ -3,6 +3,7 @@
 import React from "react";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
+
 interface SimplePageSkeletonProps {
   showHeader?: boolean;
   headerTitle?: string;
