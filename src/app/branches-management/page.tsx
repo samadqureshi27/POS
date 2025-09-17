@@ -120,4 +120,5 @@ const BranchManagementPage = () => {
   );
 };
 
+
 export default BranchManagementPage;

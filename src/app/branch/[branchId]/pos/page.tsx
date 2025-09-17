@@ -125,4 +125,5 @@ const PosListPage = () => {
     );
 };
 
+
 export default PosListPage;
