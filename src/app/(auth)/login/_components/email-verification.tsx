@@ -129,8 +129,6 @@ const EmailVerificationOverlay: React.FC = () => {
             className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
             disabled={isLoading || otpCode.join("").length !== 5}
             onClick={handleVerifyOtp}
-            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
-            disabled={isLoading || otpCode.join("").length !== 5}
           >
             VERIFY & PROCEED
           </Button>
