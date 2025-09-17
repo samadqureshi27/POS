@@ -4,9 +4,9 @@ import React from "react";
 import { User, Lock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Button from "@/components/ui/role-button";
-import Input from "@/components/ui/input";
+// import { Label } from "@/components/ui/label";
+// import Button from "@/components/ui/role-button";
+// import Input from "@/components/ui/input";
 import ErrorMessage from "@/components/ui/error-message";
 import { useLoginContext } from "./login-context";
 import { validateAdminLoginForm } from "@/lib/validations";
@@ -115,7 +115,6 @@ const AdminLoginForm: React.FC = () => {
             type="submit"
             size="lg"
             className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
-            isLoading={isLoading}
             disabled={isLoading}
             onClick={handleLogin}
           >
