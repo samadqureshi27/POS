@@ -1,58 +1,79 @@
-import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import React from "react";
+import { ChevronDown, X } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {FilterOption,FilterDropdownProps } from "@/lib/types/menum"; 
 
 const FilterDropdown: React.FC<FilterDropdownProps> = ({ 
   label, 
   value, 
   onChange, 
-  options 
+  options
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
+  const hasValue = Boolean(value);
+  const selectedOption = options.find(option => option.value === value);
+  const displayValue = selectedOption?.label || label;
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <div 
-        onClick={() => setIsOpen(!isOpen)}
-        className="px-2 py-1 rounded text-sm bg-transparent border-none outline-none hover:bg-transparent flex items-center gap-2 focus:outline-none focus:ring-0 cursor-pointer"
-      >
-        {value || label}
-        <ChevronDown size={14} className="text-gray-500 ml-auto" />
-      </div>
-      {isOpen && (
-        <div className="absolute z-50 mt-1 min-w-[200px] bg-white rounded-sm shadow-lg border border-gray-200 py-1">
-          {options.map((option) => (
-            <div
-              key={option.value}
-              className={`px-3 py-1 text-sm cursor-pointer hover:bg-gray-100 ${option.className || ''}`}
-              onClick={() => {
-                onChange(option.value);
-                setIsOpen(false);
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "h-8 px-2 lg:px-3"
+          )}
+        >
+          <span className="truncate">{displayValue}</span>
+          {hasValue ? (
+            <X 
+              className="ml-2 h-4 w-4" 
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange("");
               }}
-            >
-              {option.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+            />
+          ) : (
+            <ChevronDown className="ml-2 h-4 w-4" />
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-[200px]"
+        align="start"
+      >
+        <DropdownMenuItem
+          onClick={() => onChange("")}
+          className={cn(
+            "cursor-pointer",
+            !hasValue && "bg-accent"
+          )}
+        >
+          {label}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        {options.map((option) => (
+          <DropdownMenuItem
+            key={option.value}
+            className={cn(
+              "cursor-pointer",
+              value === option.value && "bg-accent",
+              option.className || ""
+            )}
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

@@ -73,58 +73,52 @@ const ActionBar: React.FC<ActionBarProps> = ({
   // Determine if we should show action buttons section
   const showActionButtons = customActions || onAdd || onDelete;
 
-  // Button style helpers - preserving your original design with shadcn improvements
-  const getAddButtonStyle = (disabled: boolean, customClass?: string) => {
-    const baseStyle = "flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-md transition-colors font-medium";
-    const statusStyle = disabled
-      ? "bg-muted text-muted-foreground cursor-not-allowed"
-      : "bg-primary text-primary-foreground hover:bg-primary/90";
-
-    return `${baseStyle} ${statusStyle} ${customClass || ''}`;
+  // Button style helpers - using shadcn Button component
+  const getAddButtonVariant = (disabled: boolean) => {
+    return disabled ? "secondary" : "default";
   };
 
-  const getDeleteButtonStyle = (disabled: boolean, loading?: boolean, customClass?: string) => {
-    const baseStyle = "flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-md transition-colors font-medium";
-    const statusStyle = (disabled || loading)
-      ? "bg-muted text-muted-foreground cursor-not-allowed"
-      : "bg-destructive text-destructive-foreground hover:bg-destructive/90";
-
-    return `${baseStyle} ${statusStyle} ${customClass || ''}`;
+  const getDeleteButtonVariant = (disabled: boolean, loading?: boolean) => {
+    return (disabled || loading) ? "secondary" : "destructive";
   };
 
   return (
     <div className={`mb-8 flex items-center justify-between gap-4 flex-wrap ${className}`}>
       {/* Action Buttons Section */}
       {showActionButtons && (
-        <div className={`flex gap-3 h-[35px] w-full md:h-[40px] ${!showSearch ? 'md:w-full' : 'md:w-[250px]'} ${actionButtonsClassName}`}>
+        <div className={`flex gap-3 w-full ${!showSearch ? 'md:w-full' : 'md:w-[250px]'} ${actionButtonsClassName}`}>
           {customActions ? (
             // Custom actions override default buttons
-            <div className="flex gap-3 w-full h-full">
+            <div className="flex gap-3 w-full h-[35px] md:h-[40px]">
               {customActions}
             </div>
           ) : (
             // Default Add/Delete buttons
             <>
               {onAdd && (
-                <button
+                <Button
                   onClick={onAdd}
                   disabled={addDisabled}
-                  className={getAddButtonStyle(addDisabled, addButtonClassName)}
+                  variant={getAddButtonVariant(addDisabled)}
+                  size="default"
+                  className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] h-[35px] md:h-[40px] ${addButtonClassName}`}
                 >
                   {addIcon}
                   {addLabel}
-                </button>
+                </Button>
               )}
 
               {onDelete && (
-                <button
+                <Button
                   onClick={onDelete}
                   disabled={deleteDisabled || isDeleting}
-                  className={getDeleteButtonStyle(deleteDisabled || isDeleting, isDeleting, deleteButtonClassName)}
+                  variant={getDeleteButtonVariant(deleteDisabled || isDeleting, isDeleting)}
+                  size="default"
+                  className={`flex w-[50%] items-center gap-2 md:w-[60%] h-[35px] md:h-[40px] ${deleteButtonClassName}`}
                 >
                   {deleteIcon}
                   {isDeleting ? deletingLabel : deleteLabel}
-                </button>
+                </Button>
               )}
             </>
           )}

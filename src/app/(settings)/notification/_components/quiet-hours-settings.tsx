@@ -1,5 +1,5 @@
 import React from 'react';
-import ButtonPage from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { NotificationSettings } from '@/lib/types/notification';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,9 +21,9 @@ export const QuietHoursSettings: React.FC<QuietHoursSettingsProps> = ({
                         Quiet Hours
                     </Label>
                 </div>
-                <ButtonPage
+                <Switch
                     checked={settings.quietHoursEnabled}
-                    onChange={(isActive) => onSettingChange("quietHoursEnabled", isActive)}
+                    onCheckedChange={(isActive) => onSettingChange("quietHoursEnabled", isActive)}
                 />
             </div>
 

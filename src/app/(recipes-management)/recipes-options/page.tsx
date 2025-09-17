@@ -6,9 +6,9 @@
 import React from "react";
 import ActionBar from "@/components/ui/action-bar";
 import { Toast } from "@/components/ui/toast";
-import LoadingSpinner from "@/components/ui/loader";
 import RecipeModal from "./_components/recipe-option-modal";
 import RecipeTable from "./_components/recipe-option-table";
+import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
 import { useRecipeOptions } from "@/lib/hooks/useRecipeOptions";
 
 const RecipeOptionsPage = () => {
@@ -35,7 +35,7 @@ const RecipeOptionsPage = () => {
   } = useRecipeOptions();
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <ManagementPageSkeleton showSummaryCards={false} showActionBar={true} />;
   }
 
   return (

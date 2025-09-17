@@ -12,7 +12,7 @@ import { useStaff } from "@/lib/hooks/useSatffManagement";
 import { useStaffModal } from "@/lib/hooks/useStaffModal";
 import { useStaffFiltering } from "@/lib/hooks/useSatffFiltering";
 import { useSelection } from "@/lib/hooks/selection";
-import LoadingSpinner from '@/components/ui/loader';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 const EmployeeRecordsPage = () => {
   const params = useParams();
   const branchId = params?.branchId as string;
@@ -88,22 +88,22 @@ const EmployeeRecordsPage = () => {
   };
 
   if (loading) {
-    <LoadingSpinner message="Loading Staff Management..."/>
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
   }
 
   if (!branchId) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="flex justify-center items-center min-h-screen bg-background">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-gray-600">Branch ID not found in URL parameters</p>
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <p className="text-muted-foreground">Branch ID not found in URL parameters</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen w-full mt-17">
+    <div className="bg-background min-h-screen w-full mt-17">
       {toast && (
         <Toast
           message={toast.message}

@@ -164,7 +164,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                             </tr>
                         ) : (
                             filteredItems.map((item) => (
-                                <tr key={item.ID} className="bg-white hover:bg-gray-50">
+                                <tr key={item.ID} className="bg-card hover:bg-accent/50">
                                     <td className="px-6 py-8 card-checkbox-cell" onClick={(e) => e.stopPropagation()}>
                                         <CustomCheckbox
                                             checked={selectedItems.includes(item.ID)}
@@ -179,9 +179,9 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                     <td className="px-4 py-4 whitespace-nowrap" data-label="Status">
                                         <span
                                             className={`inline-block w-20 text-right py-[2px] rounded-sm text-xs font-medium
-                                                ${item.Status === "Low" ? "text-red-400 border-red-400" : ""}
-                                                ${item.Status === "Medium" ? "text-yellow-400 border-yellow-600" : ""}
-                                                ${item.Status === "High" ? "text-green-400 border-green-700" : ""}
+                                                ${item.Status === "Low" ? "text-destructive border-destructive" : ""}
+                                                ${item.Status === "Medium" ? "text-yellow-500 border-yellow-500" : ""}
+                                                ${item.Status === "High" ? "text-green-500 border-green-500" : ""}
                                             `}
                                         >
                                             {item.Status}

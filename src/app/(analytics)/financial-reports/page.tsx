@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 // Components
 import { StarRating } from '@/components/ui/StarRating';
-import LoadingSpinner from '@/components/ui/loader';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { MetricCard } from './_components/MetricCard';
 import { CustomerGrowthChart } from './_components/CustomerGrowthChart';
 import { RevenueTrendsChart } from './_components/RevenueTrendsChart';
@@ -123,13 +123,13 @@ const AnalyticsDashboard = () => {
   // Add error boundary for debugging
   if (error) {
     return (
-      <div className="bg-gray-50 min-h-screen p-6 mt-4 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-300">
-          <h2 className="text-xl font-semibold text-red-600 mb-4">Error Loading Dashboard</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+      <div className="bg-background min-h-screen p-6 mt-4 flex items-center justify-center">
+        <div className="bg-card p-8 rounded-lg shadow-sm border">
+          <h2 className="text-xl font-semibold text-destructive mb-4">Error Loading Dashboard</h2>
+          <p className="text-muted-foreground mb-4">{error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90"
           >
             Retry
           </button>
@@ -139,17 +139,17 @@ const AnalyticsDashboard = () => {
   }
 
   if (loading) {
-    return <LoadingSpinner message="Loading Analytics Dashboard..." />;
+    return <GlobalSkeleton type="dashboard" showPeriodSelector={true} showCharts={true} summaryCardCount={8} />;
   }
 
   // Add null check for analyticsData
   if (!analyticsData) {
     console.log('Analytics data not loaded yet');
-    return <LoadingSpinner message="Preparing dashboard..." />;
+    return <GlobalSkeleton type="dashboard" showPeriodSelector={true} showCharts={true} summaryCardCount={8} />;
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen p-6 mt-4">
+    <div className="bg-background min-h-screen p-6 mt-4">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-6">
@@ -210,10 +210,10 @@ const AnalyticsDashboard = () => {
           value={analyticsData.repeatCustomers || 0}
           subtitle="Returning customers"
         />
-        <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm">
+        <div className="bg-card rounded-sm border p-6 shadow-sm">
           <div className="space-y-2">
             <p className="text-3xl font-bold">{analyticsData.customerSatisfaction || 0}</p>
-            <p className="text-sm text-gray-500">Customer Satisfaction</p>
+            <p className="text-sm text-muted-foreground">Customer Satisfaction</p>
             <StarRating rating={Math.floor(analyticsData.customerSatisfaction || 0)} />
           </div>
         </div>

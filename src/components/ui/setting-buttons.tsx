@@ -1,5 +1,8 @@
+"use client";
 import React from "react";
-import { Save } from "lucide-react";
+import { Save, RotateCcw } from "lucide-react";
+import { Button } from "./button";
+import LoadingSpinner from "./loading-spinner";
 
 interface ActionButtonsProps {
   hasChanges: boolean;
@@ -19,32 +22,33 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   return (
     <div className="flex justify-center items-center w-full md:justify-end">
       <div className="flex gap-3 w-full lg:w-[60%]">
-        <button
+        <Button
           onClick={onReset}
           disabled={resetting}
-          className="flex w-[50%] items-center gap-2 px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="outline"
+          className="flex w-[50%] items-center gap-2"
         >
           {resetting ? (
             <>
-              <div className="animate-spin h-4 w-4 border-b-2 border-gray-600 rounded-full"></div>
+              <LoadingSpinner size="sm" color="gray" />
               Resetting...
             </>
           ) : (
-            "Reset to Defaults"
+            <>
+              <RotateCcw size={16} />
+              Reset to Defaults
+            </>
           )}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onSave}
           disabled={!hasChanges || saving}
-          className={`flex w-[50%] items-center gap-2 px-6 py-2 rounded-sm transition-colors ${
-            hasChanges && !saving
-              ? "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-          }`}
+          variant={hasChanges && !saving ? "default" : "secondary"}
+          className="flex w-[50%] items-center gap-2"
         >
           {saving ? (
             <>
-              <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+              <LoadingSpinner size="sm" color="white" />
               Saving...
             </>
           ) : (
@@ -53,7 +57,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               Save Changes
             </>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );
