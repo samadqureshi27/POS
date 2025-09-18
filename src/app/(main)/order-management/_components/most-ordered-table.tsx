@@ -1,6 +1,6 @@
 // _components/OrderStats/MostOrderedTable.tsx
 import React from 'react';
-
+import { DataTable, DataTableColumn } from "@/components/ui/data-table";
 import { OrderItem } from '@/lib/types';
 
 interface MostOrderedTableProps {
@@ -9,6 +9,26 @@ interface MostOrderedTableProps {
 }
 
 const MostOrderedTable: React.FC<MostOrderedTableProps> = ({ data, loading }) => {
+  const columns: DataTableColumn<OrderItem>[] = [
+    {
+      key: "rank",
+      title: "Rank",
+      render: (_, __, index) => `#${index + 1}`,
+      width: "80px"
+    },
+    {
+      key: "name",
+      title: "Name",
+      dataIndex: "Name"
+    },
+    {
+      key: "totalNumber",
+      title: "Total Number",
+      dataIndex: "number_item",
+      mobileLabel: "Count"
+    }
+  ];
+
   return (
     <div className="bg-muted rounded-sm overflow-x-auto">
       <div className="max-h-[300px] overflow-y-auto">
@@ -18,32 +38,18 @@ const MostOrderedTable: React.FC<MostOrderedTableProps> = ({ data, loading }) =>
           </div>
         </div>
 
-        <table className="min-w-full divide-y divide-border border border-border rounded-sm table-fixed text-sm">
-          <thead className="bg-card border-b rounded-sm border-border sticky top-0">
-            <tr>
-              <th className="px-2 py-2 text-left">Rank</th>
-              <th className="px-2 py-2 text-left">Name</th>
-              <th className="px-2 py-2 text-left">Total Number</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {loading ? (
-              <tr>
-                <td colSpan={3} className="px-2 py-4 text-center text-muted-foreground">
-                  Loading statistics...
-                </td>
-              </tr>
-            ) : (
-              data.map((item, index) => (
-                <tr key={item.Order} className="bg-card hover:bg-accent">
-                  <td className="px-2 py-2">#{index + 1}</td>
-                  <td className="px-2 py-2">{item.Name}</td>
-                  <td className="px-2 py-2">{item.number_item}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <DataTable
+          data={data}
+          columns={columns}
+          selectable={false}
+          getRowId={(item) => item.Order}
+          maxHeight="250px"
+          emptyMessage={loading ? "Loading statistics..." : "No data available"}
+          loading={loading}
+          mobileResponsive={true}
+          nameColumn="name"
+          className="border border-border rounded-sm"
+        />
       </div>
     </div>
   );

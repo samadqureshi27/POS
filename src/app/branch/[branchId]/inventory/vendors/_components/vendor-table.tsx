@@ -71,6 +71,8 @@ const VendorTable: React.FC<VendorTableProps> = ({
             getRowId={(item) => item.ID}
             maxHeight="600px"
             emptyMessage={`No vendors found for Branch #${branchId}.`}
+            mobileResponsive={true}
+            nameColumn="companyName"
         />
     );
 };

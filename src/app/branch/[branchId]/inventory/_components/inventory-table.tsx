@@ -115,6 +115,8 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
             getRowId={(item) => item.ID}
             maxHeight="600px"
             emptyMessage="No inventory items match your search criteria."
+            mobileResponsive={true}
+            nameColumn="name"
         />
     );
 };
