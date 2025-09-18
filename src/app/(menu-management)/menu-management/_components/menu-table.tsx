@@ -1,6 +1,6 @@
 import React from "react";
 import { Edit } from "lucide-react";
-import FilterDropdown from "./filter-dropdown";
+import FilterDropdown from "@/components/ui/filter-dropdown";
 import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 
