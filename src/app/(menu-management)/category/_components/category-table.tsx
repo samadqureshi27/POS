@@ -19,7 +19,6 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   onEdit,
 }) => {
   const statusOptions = [
-    { value: "", label: "All Statuses" },
     { value: "Active", label: "Active", className: "text-green-600" },
     { value: "Inactive", label: "Inactive", className: "text-red-600" }
   ];

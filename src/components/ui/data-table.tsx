@@ -128,7 +128,7 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div className={cn("w-full", className)}>
       <div className={cn(
-        "rounded-md border",
+        "rounded-sm border",
         mobileResponsive && "responsive-customer-table"
       )}>
         <div className={cn("relative", mobileResponsive && "table-container")} style={{ maxHeight, overflowY: 'auto', overflowX: 'auto' }}>
