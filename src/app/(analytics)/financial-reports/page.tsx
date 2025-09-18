@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 // Components
 import { StarRating } from '@/components/ui/StarRating';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
-import { MetricCard } from './_components/MetricCard';
+import { MetricCard } from '@/components/ui/MetricCard';
 import { CustomerGrowthChart } from './_components/CustomerGrowthChart';
 import { RevenueTrendsChart } from './_components/RevenueTrendsChart';
 import { OrderTypesChart } from './_components/OrderTypesChart';
