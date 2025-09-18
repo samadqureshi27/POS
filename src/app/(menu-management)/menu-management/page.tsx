@@ -61,7 +61,7 @@ const MenuManagementPage = () => {
   }
 
   return (
-    <div className="bg-background min-w-full h-full overflow-y-hidden">
+    <div className="p-6 bg-background min-w-full h-full overflow-y-hidden">
       <Toaster position="top-right" />
 
       <h1 className="text-3xl font-semibold tracking-tight mt-14 mb-8">Menu Management</h1>

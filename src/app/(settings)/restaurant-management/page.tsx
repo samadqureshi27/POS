@@ -33,7 +33,7 @@ const RestaurantProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="p-6 min-h-screen bg-background w-full">
       <Toaster position="top-right" />
 
       <div className="flex-1 justify-center items-center w-full px-6">

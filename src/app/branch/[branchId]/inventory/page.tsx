@@ -51,7 +51,7 @@ const InventoryManagementPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen mt-17">
+    <div className="p-6 bg-background min-h-screen mt-17">
       {toast && toastVisible && (
         <Toast
           message={toast.message}

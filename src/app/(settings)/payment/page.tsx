@@ -48,7 +48,7 @@ const PaymentManagementPage = () => {
   }
 
   return (
-    <div className="px-4 bg-background min-h-screen">
+    <div className="p-6 px-4 bg-background min-h-screen">
       {toast && (
         <Toast
           message={toast.message}

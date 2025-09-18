@@ -42,7 +42,7 @@ const BackupRecoveryPage = () => {
   if (!settings) return null;
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="p-6 min-h-screen bg-background w-full">
       {toast && (
         <Toast
           message={toast.message}
