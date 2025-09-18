@@ -8,7 +8,7 @@ export default function CustomerMgmtLayout({
 }) {
   return (
     <>
-      <main className="p-6">
+      <main>
         {children}
       </main>
     </>

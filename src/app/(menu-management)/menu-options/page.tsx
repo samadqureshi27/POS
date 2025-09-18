@@ -47,7 +47,7 @@ const CategoryPage = () => {
   }
 
   return (
-    <div className="bg-background min-w-full h-full overflow-y-auto">
+    <div className="p-6 bg-background min-w-full h-full overflow-y-auto">
       {toast && (
         <Toast
           message={toast.message}

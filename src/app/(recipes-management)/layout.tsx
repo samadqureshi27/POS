@@ -10,7 +10,7 @@ export default function RecipesLayout({
   return (
     <>
       <RecipesSubmenu />
-      <main className="p-6">
+      <main>
         {children}
       </main>
     </>

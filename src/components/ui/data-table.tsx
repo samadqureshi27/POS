@@ -203,8 +203,8 @@ export function DataTable<T extends Record<string, any>>({
                   const isSelected = selectedItems.includes(rowId);
 
                   return (
-                    <tr
-                      key={rowId}
+                    <tr 
+                      key={`${rowId}-${index}`}
                       className={cn(
                         "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
                         isSelected && "bg-muted/50",
@@ -233,7 +233,7 @@ export function DataTable<T extends Record<string, any>>({
 
                         return (
                           <td
-                            key={column.key}
+                            key={`${column.key}-${index}`}
                             className={cn(
                               "p-4 align-middle",
                               column.align === "center" && "text-center",
@@ -254,7 +254,7 @@ export function DataTable<T extends Record<string, any>>({
                           "p-4 align-middle",
                           mobileResponsive && "card-actions-cell"
                         )}>
-                          <DropdownMenu>
+                          <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className={cn(
                                 "h-8 w-8 p-0",
@@ -267,7 +267,7 @@ export function DataTable<T extends Record<string, any>>({
                             <DropdownMenuContent align="end">
                               {actions.map((action) => (
                                 <DropdownMenuItem
-                                  key={action.key}
+                                  key={`${action.key}-${index}`}
                                   onClick={() => action.onClick(record)}
                                   className={cn(
                                     "cursor-pointer",

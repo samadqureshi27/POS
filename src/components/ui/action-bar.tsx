@@ -83,13 +83,13 @@ const ActionBar: React.FC<ActionBarProps> = ({
   };
 
   return (
-    <div className={`mb-8 flex items-center justify-between gap-4 flex-wrap ${className}`}>
+    <div className={`mb-8 flex items-center justify-between flex-wrap ${className}`}>
       {/* Action Buttons Section */}
       {showActionButtons && (
-        <div className={`flex gap-3 w-full ${!showSearch ? 'md:w-full' : 'md:w-[250px]'} ${actionButtonsClassName}`}>
+        <div className={`flex w-full ${!showSearch ? 'md:w-full' : 'md:w-[250px]'} ${actionButtonsClassName}`}>
           {customActions ? (
             // Custom actions override default buttons
-            <div className="flex gap-3 w-full h-[35px] md:h-[40px]">
+            <div className="flex w-full h-[35px] md:h-[40px]">
               {customActions}
             </div>
           ) : (
@@ -101,7 +101,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
                   disabled={addDisabled}
                   variant={getAddButtonVariant(addDisabled)}
                   size="default"
-                  className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] h-[35px] md:h-[40px] ${addButtonClassName}`}
+                  className={`flex w-[50%] items-center text-center md:w-[40%] h-[35px] md:h-[40px] ${addButtonClassName}`}
                 >
                   {addIcon}
                   {addLabel}

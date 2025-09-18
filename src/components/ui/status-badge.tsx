@@ -1,12 +1,12 @@
 "use client";
 // Status Badge Component using shadcn/ui Badge
 import React from "react";
-import { Badge, BadgeProps } from "@/components/ui/badge";
+import { Badge, badgeVariants } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { VariantProps } from "class-variance-authority";
 
-export interface StatusBadgeProps extends Omit<BadgeProps, 'variant'> {
+export interface StatusBadgeProps extends React.ComponentProps<"span">, VariantProps<typeof badgeVariants> {
   status: string;
-  variant?: "default" | "secondary" | "destructive" | "outline";
 }
 
 const getStatusVariant = (status: string): StatusBadgeProps["variant"] => {
@@ -55,7 +55,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   return (
     <Badge
       variant={badgeVariant}
-      className={cn(colorClass, className)}
+      className={className}
       {...props}
     >
       {status}

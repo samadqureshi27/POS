@@ -70,7 +70,7 @@ const IngredientsManagementPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-w-full h-full overflow-y-auto">
+    <div className="p-6 bg-background min-w-full h-full overflow-y-auto">
       {/* Toast Notifications */}
       {toast && (
         <Toast
