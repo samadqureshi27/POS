@@ -1,8 +1,10 @@
 // components/BasicInfoCard.tsx
 import React from 'react';
 import { Store } from 'lucide-react';
-import { SimpleInput } from './simple-input';
-import { SimpleTextarea } from './simple-textarea';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { RestaurantDropdown } from './restaurant-dropdown';
 import { RestaurantData } from '@/lib/types';
 
@@ -25,27 +27,34 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
     ];
 
     return (
-        <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
-            <div className="flex items-center gap-2 mb-8">
-                <Store className="text-black" size={24} />
-                <h2 className="text-xl font-semibold">Basic Information</h2>
-            </div>
+        <Card className="shadow-sm min-h-[600px] flex flex-col">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Store size={24} />
+                    Basic Information
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6 flex-grow">
 
-            <div className="space-y-6 flex-grow">
-                <SimpleInput
-                    label="Restaurant Name"
-                    required
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={onInputChange}
-                    placeholder="Enter restaurant name"
-                />
+                <div>
+                    <Label htmlFor="restaurant-name">
+                        Restaurant Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                        id="restaurant-name"
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={onInputChange}
+                        placeholder="Enter restaurant name"
+                        required
+                    />
+                </div>
 
-                <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Restaurant Type <span className="text-red-500">*</span>
-                    </label>
+                <div>
+                    <Label>
+                        Restaurant Type <span className="text-destructive">*</span>
+                    </Label>
                     <RestaurantDropdown
                         value={formData.type}
                         options={restaurantTypeOptions}
@@ -54,24 +63,30 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
                     />
                 </div>
 
-                <SimpleTextarea
-                    label="Description"
-                    name="description"
-                    value={formData.description}
-                    onChange={onInputChange}
-                    placeholder="Brief description of your restaurant"
-                    rows={3}
-                />
+                <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                        id="description"
+                        name="description"
+                        value={formData.description}
+                        onChange={onInputChange}
+                        placeholder="Brief description of your restaurant"
+                        rows={3}
+                    />
+                </div>
 
-                <SimpleInput
-                    label="Website"
-                    type="url"
-                    name="website"
-                    value={formData.website}
-                    onChange={onInputChange}
-                    placeholder="Enter your website URL"
-                />
-            </div>
-        </div>
+                <div>
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                        id="website"
+                        type="url"
+                        name="website"
+                        value={formData.website}
+                        onChange={onInputChange}
+                        placeholder="Enter your website URL"
+                    />
+                </div>
+            </CardContent>
+        </Card>
     );
 };

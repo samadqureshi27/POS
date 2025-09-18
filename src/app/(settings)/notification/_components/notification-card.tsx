@@ -1,11 +1,9 @@
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
-
-
-import { NotificationSettings } from '@/lib/types/notification';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-
+import { NotificationSettings } from '@/lib/types/notification';
 
 interface NotificationOption {
     key: keyof NotificationSettings;
@@ -31,32 +29,36 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
     children
 }) => {
     return (
-        <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-                <Icon className="text-black" size={20} />
-                <h2 className="text-lg font-semibold">{title}</h2>
-            </div>
+        <Card className="shadow-sm">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Icon size={20} />
+                    {title}
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
 
-            <div className="space-y-4">
-                {options.map((option) => (
-                    <div key={option.key} className="flex items-center justify-between">
-                        <div>
-                            <Label className="text-sm font-medium text-gray-700">
-                                {option.label}
-                            </Label>
-                            {option.description && (
-                                <p className="text-xs text-gray-500 mt-1">{option.description}</p>
-                            )}
+                <div className="space-y-4">
+                    {options.map((option) => (
+                        <div key={option.key} className="flex items-center justify-between">
+                            <div>
+                                <Label className="text-sm font-medium">
+                                    {option.label}
+                                </Label>
+                                {option.description && (
+                                    <p className="text-xs text-muted-foreground mt-1">{option.description}</p>
+                                )}
+                            </div>
+                            <Switch
+                                checked={settings[option.key] as boolean}
+                                onCheckedChange={(isActive) => onSettingChange(option.key, isActive)}
+                            />
                         </div>
-                        <Switch
-                            checked={settings[option.key] as boolean}
-                            onCheckedChange={(isActive) => onSettingChange(option.key, isActive)}
-                        />
-                    </div>
-                ))}
+                    ))}
 
-                {children}
-            </div>
-        </div>
+                    {children}
+                </div>
+            </CardContent>
+        </Card>
     );
 };

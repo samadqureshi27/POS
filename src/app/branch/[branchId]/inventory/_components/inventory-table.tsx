@@ -7,7 +7,6 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import FilterDropdown from "@/components/ui/filter-dropdown";
 import { InventoryTableProps } from "@/lib/types/inventory";
 import ResponsiveEditButton from "@/components/ui/responsive-edit-button";
-import CustomCheckbox from "@/components/ui/custom-checkbox";
 const InventoryTable: React.FC<InventoryTableProps> = ({
     inventoryItems,
     filteredItems,
@@ -115,6 +114,8 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
             getRowId={(item) => item.ID}
             maxHeight="600px"
             emptyMessage="No inventory items match your search criteria."
+            mobileResponsive={true}
+            nameColumn="name"
         />
     );
 };

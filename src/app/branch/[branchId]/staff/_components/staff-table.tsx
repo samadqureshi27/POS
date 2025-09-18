@@ -166,6 +166,8 @@ const StaffTable: React.FC<StaffTableProps> = ({
             getRowId={(item) => item.Staff_ID}
             maxHeight="600px"
             emptyMessage={emptyMessage}
+            mobileResponsive={true}
+            nameColumn="name"
         />
     );
 };

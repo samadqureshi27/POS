@@ -96,6 +96,8 @@ const BranchTable: React.FC<BranchTableProps> = ({
             maxHeight="600px"
             emptyMessage={emptyMessage}
             onRowClick={(record) => onItemClick(record["Branch-ID"])}
+            mobileResponsive={true}
+            nameColumn="branchName"
         />
     );
 };

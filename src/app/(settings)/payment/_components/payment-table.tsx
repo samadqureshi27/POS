@@ -100,6 +100,8 @@ const PaymentTable: React.FC<PaymentTableProps> = ({
             getRowId={(item) => item.ID}
             maxHeight="600px"
             emptyMessage={emptyMessage}
+            mobileResponsive={true}
+            nameColumn="name"
         />
     );
 };

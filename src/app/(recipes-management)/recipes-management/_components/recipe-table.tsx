@@ -89,6 +89,8 @@ const RecipeTable: React.FC<RecipeTableProps> = ({
       getRowId={(item) => item.ID}
       maxHeight="600px"
       emptyMessage="No recipes found"
+      mobileResponsive={true}
+      nameColumn="name"
     />
   );
 };

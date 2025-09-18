@@ -83,6 +83,8 @@ const MenuTable: React.FC<MenuTableProps> = ({
       getRowId={(item) => item.ID}
       maxHeight="600px"
       emptyMessage={emptyMessage}
+      mobileResponsive={true}
+      nameColumn="name"
     />
   );
 };

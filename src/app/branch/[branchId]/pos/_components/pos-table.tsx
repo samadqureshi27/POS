@@ -81,6 +81,8 @@ const PosTable: React.FC<PosTableProps> = ({
             getRowId={(item) => item.POS_ID}
             maxHeight="600px"
             emptyMessage={emptyMessage}
+            mobileResponsive={true}
+            nameColumn="posName"
         />
     );
 };
