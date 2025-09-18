@@ -122,6 +122,8 @@ const OrderTable: React.FC<OrderTableProps> = ({
       maxHeight="600px"
       emptyMessage={emptyMessage}
       loading={loading}
+      mobileResponsive={true}
+      nameColumn="name"
     />
   );
 };

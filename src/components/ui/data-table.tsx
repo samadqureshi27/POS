@@ -21,6 +21,8 @@ export interface DataTableColumn<T> {
   sortable?: boolean;
   filterable?: boolean;
   filterComponent?: React.ReactNode;
+  hideOnMobile?: boolean;
+  mobileLabel?: string;
 }
 
 export interface DataTableAction<T> {
@@ -45,6 +47,8 @@ export interface DataTableProps<T> {
   emptyMessage?: string;
   loading?: boolean;
   onRowClick?: (record: T) => void;
+  mobileResponsive?: boolean;
+  nameColumn?: string;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -60,7 +64,10 @@ export function DataTable<T extends Record<string, any>>({
   className,
   emptyMessage = "No data available",
   loading = false,
-  onRowClick
+  onRowClick,
+  mobileResponsive = false,
+  nameColumn = "name"
+
 }: DataTableProps<T>) {
   const isAllSelected = selectable && data.length > 0 && selectedItems.length === data.length;
   const isIndeterminate = selectable && selectedItems.length > 0 && selectedItems.length < data.length;
@@ -120,8 +127,11 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="rounded-md border">
-        <div className="relative" style={{ maxHeight, overflowY: 'auto', overflowX: 'auto' }}>
+      <div className={cn(
+        "rounded-md border",
+        mobileResponsive && "responsive-customer-table"
+      )}>
+        <div className={cn("relative", mobileResponsive && "table-container")} style={{ maxHeight, overflowY: 'auto', overflowX: 'auto' }}>
           <table className="w-full caption-bottom text-sm">
             <thead className="[&_tr]:border-b">
               <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
@@ -139,13 +149,16 @@ export function DataTable<T extends Record<string, any>>({
                   </th>
                 )}
                 {columns.map((column) => (
-                  <th 
-                    key={column.key} 
+                  <th
+                    key={column.key}
                     className={cn(
                       "h-12 px-4 text-left align-middle font-medium text-muted-foreground",
                       column.align === "center" && "text-center",
                       column.align === "right" && "text-right",
-                      column.width && `w-[${column.width}]`
+                      column.width && `w-[${column.width}]`,
+                      column.hideOnMobile && "hidden md:table-cell",
+                      // Add vertical lines only when mobile responsive
+                      mobileResponsive && "relative"
                     )}
                   >
                     {column.filterable && column.filterComponent ? (
@@ -153,19 +166,31 @@ export function DataTable<T extends Record<string, any>>({
                     ) : (
                       column.title
                     )}
+                    {mobileResponsive && (
+                      <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+                    )}
                   </th>
                 ))}
                 {actions.length > 0 && (
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                  <th className={cn(
+                    "h-12 px-4 text-left align-middle font-medium text-muted-foreground",
+                    mobileResponsive && "relative"
+                  )}>
                     Actions
+                    {mobileResponsive && (
+                      <span className="absolute left-0 top-[15%] h-[70%] w-[2px] bg-gray-300"></span>
+                    )}
                   </th>
                 )}
               </tr>
             </thead>
-            <tbody className="[&_tr:last-child]:border-0">
+            <tbody className={cn(
+              "[&_tr:last-child]:border-0",
+              mobileResponsive && "divide-y divide-gray-100"
+            )}>
               {data.length === 0 ? (
                 <tr>
-                  <td 
+                  <td
                     colSpan={columns.length + (selectable ? 1 : 0) + (actions.length > 0 ? 1 : 0)}
                     className="h-24 text-center text-muted-foreground"
                   >
@@ -176,19 +201,23 @@ export function DataTable<T extends Record<string, any>>({
                 data.map((record, index) => {
                   const rowId = getRowId(record);
                   const isSelected = selectedItems.includes(rowId);
-                  
+
                   return (
                     <tr
                       key={rowId}
                       className={cn(
                         "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
                         isSelected && "bg-muted/50",
-                        onRowClick && "cursor-pointer"
+                        onRowClick && "cursor-pointer",
+                        mobileResponsive && "bg-white hover:bg-gray-50"
                       )}
                       onClick={() => onRowClick?.(record)}
                     >
                       {selectable && (
-                        <td className="p-4 align-middle">
+                        <td className={cn(
+                          "p-4 align-middle",
+                          mobileResponsive && "card-checkbox-cell"
+                        )}>
                           <input
                             type="checkbox"
                             checked={isSelected}
@@ -200,25 +229,37 @@ export function DataTable<T extends Record<string, any>>({
                       {columns.map((column) => {
                         const value = column.dataIndex ? record[column.dataIndex] : null;
                         const content = column.render ? column.render(value, record, index) : value;
-                        
+                        const isNameColumn = column.key === nameColumn || column.dataIndex === nameColumn || column.dataIndex === "Name" || column.dataIndex === "name";
+
                         return (
-                          <td 
-                            key={column.key} 
+                          <td
+                            key={column.key}
                             className={cn(
                               "p-4 align-middle",
                               column.align === "center" && "text-center",
-                              column.align === "right" && "text-right"
+                              column.align === "right" && "text-right",
+                              column.hideOnMobile && "hidden md:table-cell",
+                              // Apply mobile styles only when mobileResponsive is true
+                              mobileResponsive && "whitespace-nowrap text-sm",
+                              mobileResponsive && isNameColumn && "card-name-cell font-medium"
                             )}
+                            data-label={mobileResponsive ? (column.mobileLabel || column.title) : undefined}
                           >
                             {content}
                           </td>
                         );
                       })}
                       {actions.length > 0 && (
-                        <td className="p-4 align-middle">
+                        <td className={cn(
+                          "p-4 align-middle",
+                          mobileResponsive && "card-actions-cell"
+                        )}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Button variant="ghost" className={cn(
+                                "h-8 w-8 p-0",
+                                mobileResponsive && "desktop-edit-icon"
+                              )}>
                                 <span className="sr-only">Open menu</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
@@ -239,6 +280,18 @@ export function DataTable<T extends Record<string, any>>({
                               ))}
                             </DropdownMenuContent>
                           </DropdownMenu>
+                          {mobileResponsive && actions.length > 0 && (
+                            <Button
+                              variant="outline"
+                              className="mobile-edit-button w-full"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                actions[0].onClick(record);
+                              }}
+                            >
+                              {actions[0].label || "Edit"}
+                            </Button>
+                          )}
                         </td>
                       )}
                     </tr>

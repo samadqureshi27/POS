@@ -105,6 +105,8 @@ const IngredientsTable: React.FC<IngredientsTableProps> = ({
       getRowId={(item) => item.ID}
       maxHeight="600px"
       emptyMessage="No ingredients found"
+      mobileResponsive={true}
+      nameColumn="name"
     />
   );
 };

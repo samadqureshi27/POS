@@ -2,6 +2,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import ActionBar from "@/components/ui/action-bar";
+import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 // Import all our new components
 import {Toast} from "@/components/ui/toast";
@@ -108,14 +109,7 @@ const OrderManagementPage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Order Management...</p>
-        </div>
-      </div>
-    );
+    return <GlobalSkeleton type="management" showSummaryCards={false} showActionBar={true} showPeriodSelector={true} />;
   }
 
   return (
