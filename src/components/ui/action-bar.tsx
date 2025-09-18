@@ -9,7 +9,7 @@ interface ActionBarProps {
   addLabel?: string;
   addIcon?: React.ReactNode;
   addDisabled?: boolean;
-  
+
   // Delete button props
   onDelete?: () => void;
   deleteLabel?: string;
@@ -17,19 +17,19 @@ interface ActionBarProps {
   deleteDisabled?: boolean;
   isDeleting?: boolean;
   deletingLabel?: string;
-  
+
   // Search props
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
   showSearch?: boolean;
-  
+
   // Layout and styling
   className?: string;
-  
+
   // Custom actions (replaces default buttons)
   customActions?: React.ReactNode;
-  
+
   // Advanced customization
   actionButtonsClassName?: string;
   searchClassName?: string;
@@ -43,7 +43,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
   addLabel = "Add",
   addIcon = <Plus size={16} />,
   addDisabled = false,
-  
+
   // Delete button defaults
   onDelete,
   deleteLabel = "Delete Selected",
@@ -51,19 +51,19 @@ const ActionBar: React.FC<ActionBarProps> = ({
   deleteDisabled = false,
   isDeleting = false,
   deletingLabel = "Deleting...",
-  
+
   // Search defaults
   searchValue = "",
   onSearchChange,
   searchPlaceholder = "Search...",
   showSearch = true,
-  
+
   // Layout defaults
   className = "",
-  
+
   // Custom actions
   customActions,
-  
+
   // Advanced styling
   actionButtonsClassName = "",
   searchClassName = "",
@@ -83,10 +83,10 @@ const ActionBar: React.FC<ActionBarProps> = ({
   };
 
   return (
-    <div className={`mb-8 flex items-center justify-between flex-wrap ${className}`}>
+    <div className={`mb-8 flex gap-4 items-center justify-between flex-wrap ${className}`}>
       {/* Action Buttons Section */}
       {showActionButtons && (
-        <div className={`flex w-full ${!showSearch ? 'md:w-full' : 'md:w-[250px]'} ${actionButtonsClassName}`}>
+        <div className={`flex gap-2 w-full ${!showSearch ? 'md:w-full' : 'md:w-[250px]'} ${actionButtonsClassName}`}>
           {customActions ? (
             // Custom actions override default buttons
             <div className="flex w-full h-[35px] md:h-[40px]">
@@ -107,7 +107,6 @@ const ActionBar: React.FC<ActionBarProps> = ({
                   {addLabel}
                 </Button>
               )}
-
               {onDelete && (
                 <Button
                   onClick={onDelete}
