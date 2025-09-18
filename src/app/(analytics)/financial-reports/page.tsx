@@ -210,13 +210,11 @@ const AnalyticsDashboard = () => {
           value={analyticsData.repeatCustomers || 0}
           subtitle="Returning customers"
         />
-        <div className="bg-card rounded-sm border p-6 shadow-sm">
-          <div className="space-y-2">
-            <p className="text-3xl font-bold">{analyticsData.customerSatisfaction || 0}</p>
-            <p className="text-sm text-muted-foreground">Customer Satisfaction</p>
-            <StarRating rating={Math.floor(analyticsData.customerSatisfaction || 0)} />
-          </div>
-        </div>
+        <MetricCard
+          title="Customer Satisfaction"
+          value={analyticsData.customerSatisfaction || 0}
+          subtitle={<StarRating rating={Math.floor(analyticsData.customerSatisfaction || 0)} />}
+        />
       </div>
 
       {/* Charts Section */}
