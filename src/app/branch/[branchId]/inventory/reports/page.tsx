@@ -12,6 +12,8 @@ import ImportExportControls from "@/components/ui/import-export-btn";
 import { useReportsManagement } from "@/lib/hooks/useReport";
 import { useImportExport } from "@/lib/hooks/importExportHook";
 import { useToast } from "@/lib/hooks/toast";
+import GlobalSkeleton from "@/components/ui/global-skeleton";
+import ManagementPageSkeleton from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
 
 const ReportsPage = () => {
     const params = useParams();
@@ -45,7 +47,7 @@ const ReportsPage = () => {
     };
 
     if (loading) {
-        return <LoadingSpinner message="Loading Inventory reports..." />;
+        return <GlobalSkeleton type='management' showSummaryCards={true} summaryCardCount={2} showActionBar={true} />
     }
 
     if (!branchId) {

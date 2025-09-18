@@ -64,7 +64,7 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
       {/* Main navbar */}
       <header className="fixed top-0 z-50 w-full h-18">
         <nav className="bg-[#161616] text-white w-full h-full">
-          <div className="w-full px-3 sm:px-6 lg:px-8 h-full">
+          <div className="w-full px-3 h-full">
             <div className="flex h-full items-center justify-between">
               {/* Left: logo + brand */}
               <div className="flex items-center gap-2 flex-shrink-0">
