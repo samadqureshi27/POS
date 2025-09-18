@@ -25,6 +25,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               {typeof subtitle === 'string' ? subtitle : subtitle}
             </div>
           )}
+
         </div>
       </CardContent>
     </Card>
