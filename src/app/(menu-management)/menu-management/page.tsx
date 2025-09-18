@@ -3,7 +3,7 @@
 import React from "react";
 import { Toast } from "@/components/ui/toast";
 import { useMenuManagement } from "@/lib/hooks/useMenuManagement";
-import MenuActionBar from "./_components/menu-actionbar";
+import ActionBar from "@/components/ui/action-bar";
 import MenuTable from "./_components/menu-table";
 import MenuModal from "./_components/MenuModal";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
@@ -66,13 +66,14 @@ const MenuManagementPage = () => {
 
       <h1 className="text-3xl font-semibold tracking-tight mt-14 mb-8">Menu Management</h1>
 
-      <MenuActionBar
-        selectedItems={selectedItems}
-        onAddClick={handleAddItem}
-        onDeleteClick={handleDeleteSelected}
-        searchTerm={searchTerm}
+      <ActionBar
+        onAdd={handleAddItem}
+        addDisabled={selectedItems.length > 0}
+        onDelete={handleDeleteSelected}
+        deleteDisabled={selectedItems.length === 0}
+        isDeleting={actionLoading}
+        searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        actionLoading={actionLoading}
       />
 
       <MenuTable

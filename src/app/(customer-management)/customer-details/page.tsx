@@ -10,8 +10,7 @@ import ImportExportControls from "@/components/ui/import-export-btn";
 import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/hooks/useCustomerDetails";
 import { exportCustomersToCSV } from "@/lib/util/customer-details-utils";
 import { useToast } from "@/lib/hooks";
-import LoadingSpinner from "@/components/ui/loader";
-import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { Toaster } from "@/components/ui/sonner";
 
 const CustomerManagementPage = () => {
@@ -39,7 +38,7 @@ const CustomerManagementPage = () => {
 
 
   if (loading) {
-    return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={4} showImportExport={true} />;
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={4} showImportExport={true} />;
   }
 
   return (

@@ -21,7 +21,7 @@ interface RecipeOption {
 interface Ingredient {
   ID: number;
   Name: string;
-  Unit: string;
+  Unit?: string;
 }
 
 interface RecipeIngredientsTabProps {
@@ -125,6 +125,9 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
   const title = isOption ? "Recipe Options" : "Ingredients";
   const priceLabel = isOption ? "Price" : "Amount";
 
+  // Use real data from management tables
+  const dataToUse = ingredients || [];
+
   return (
     <div className="space-y-4 h-full flex flex-col">
       {/* Add Ingredient Button */}
@@ -133,12 +136,20 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
           <SelectTrigger className="w-full mb-2">
             <SelectValue placeholder={`Add New ${title}`} />
           </SelectTrigger>
-          <SelectContent className="max-h-60">
-            {ingredients.map((ingredient) => (
-              <SelectItem key={ingredient.ID} value={ingredient.Name}>
-                {ingredient.Name}
+          <SelectContent className="z-[100]">
+            {dataToUse && dataToUse.length > 0 ? (
+              dataToUse
+                .filter((ingredient) => !values.includes(ingredient.Name))
+                .map((ingredient) => (
+                  <SelectItem key={ingredient.ID} value={ingredient.Name}>
+                    {ingredient.Name}
+                  </SelectItem>
+                ))
+            ) : (
+              <SelectItem key="no-data" value="" disabled>
+                No {title.toLowerCase()} available
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
       </div>

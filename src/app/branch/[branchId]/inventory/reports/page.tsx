@@ -5,15 +5,13 @@ import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import StatCard from "@/components/ui/summary-card";
 import ActionBar from "@/components/ui/action-bar";
-import { Toast } from '@/components/ui/toast';
+import { Toaster } from "@/components/ui/sonner";
 import ReportsTable from "./_components/reports-table";
-import LoadingSpinner from '@/components/ui/loader';
 import ImportExportControls from "@/components/ui/import-export-btn";
 import { useReportsManagement } from "@/lib/hooks/useReport";
 import { useImportExport } from "@/lib/hooks/importExportHook";
-import { useToast } from "@/lib/hooks/toast";
+import { useToast } from "@/lib/hooks";
 import GlobalSkeleton from "@/components/ui/global-skeleton";
-import ManagementPageSkeleton from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
 
 const ReportsPage = () => {
     const params = useParams();
@@ -33,7 +31,7 @@ const ReportsPage = () => {
     } = useReportsManagement(branchId);
 
     // Toast for export operations
-    const { toast, showToast, hideToast } = useToast();
+    const { showToast } = useToast();
 
     // Export functionality only
     const { handleExportWithConfig, isLoading } = useImportExport({
@@ -47,7 +45,7 @@ const ReportsPage = () => {
     };
 
     if (loading) {
-        return <GlobalSkeleton type='management' showSummaryCards={true} summaryCardCount={2} showActionBar={true} />
+        return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={2} showActionBar={true} />
     }
 
     if (!branchId) {
@@ -63,13 +61,7 @@ const ReportsPage = () => {
 
     return (
         <div className="px-4 bg-gray-50 min-h-screen">
-            {toast && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={hideToast}
-                />
-            )}
+            <Toaster position="top-right" />
 
             {/* Header with Title and Export Controls */}
             <div className="grid grid-cols-1 md:grid-cols-2 items-center max-w-[100vw] mb-8 mt-20">

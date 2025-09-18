@@ -25,16 +25,18 @@ interface RecipeModalProps {
   isOpen: boolean;
   editingItem: RecipeOption | null;
   ingredients: Ingredient[];
+  availableRecipeOptions: any[];
   onClose: () => void;
   onSubmit: (data: Omit<RecipeOption, "ID">) => void;
   actionLoading: boolean;
-  showToast: (message: string, type: "success" | "error") => void;
+  showToast: (message: string, type?: "success" | "error" | "warning" | "info") => void;
 }
 
 const RecipeModal: React.FC<RecipeModalProps> = ({
   isOpen,
   editingItem,
   ingredients,
+  availableRecipeOptions,
   onClose,
   onSubmit,
   actionLoading,
@@ -140,7 +142,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
         </div>
 
         {/* Modal Content */}
-        <div className="p-3 sm:p-6 flex-1 overflow-hidden">
+        <div className="p-3 sm:p-6 flex-1 overflow-visible">
           {activeTab === "Recipe Info" && (
             <RecipeInfoTab
               formData={formData}
@@ -152,7 +154,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
           {activeTab === "Recipe Option" && (
             <RecipeIngredientsTab
               formData={formData}
-              ingredients={ingredients}
+              ingredients={availableRecipeOptions}
               onFormDataChange={setFormData}
               tabType="option"
             />
