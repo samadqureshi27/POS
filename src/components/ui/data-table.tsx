@@ -44,6 +44,7 @@ export interface DataTableProps<T> {
   className?: string;
   emptyMessage?: string;
   loading?: boolean;
+  onRowClick?: (record: T) => void;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -58,7 +59,8 @@ export function DataTable<T extends Record<string, any>>({
   maxHeight = "600px",
   className,
   emptyMessage = "No data available",
-  loading = false
+  loading = false,
+  onRowClick
 }: DataTableProps<T>) {
   const isAllSelected = selectable && data.length > 0 && selectedItems.length === data.length;
   const isIndeterminate = selectable && selectedItems.length > 0 && selectedItems.length < data.length;
@@ -180,8 +182,10 @@ export function DataTable<T extends Record<string, any>>({
                       key={rowId}
                       className={cn(
                         "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-                        isSelected && "bg-muted/50"
+                        isSelected && "bg-muted/50",
+                        onRowClick && "cursor-pointer"
                       )}
+                      onClick={() => onRowClick?.(record)}
                     >
                       {selectable && (
                         <td className="p-4 align-middle">

@@ -1,7 +1,7 @@
 // components/OrdersTable.tsx
 import React from 'react';
 import { OrderItem } from '@/lib/types/customer-profile';
-import { FilterDropdown } from '@/components/ui/filter-dropdown';
+import  FilterDropdown  from '@/components/ui/filter-dropdown';
 import ResponsiveDetailButton from "@/components/ui/responsive-detail-button";
 
 interface OrdersTableProps {
@@ -59,8 +59,16 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
             }`;
     };
 
-    const uniqueTypes = Array.from(new Set(orders.map((order) => order.Type)));
-    const uniqueStatuses = Array.from(new Set(orders.map((order) => order.Status)));
+    const uniqueTypes = Array.from(new Set(orders.map((order) => order.Type))).map(type => ({
+        value: type,
+        label: type,
+        className: getTypeClassName(type)
+    }));
+    const uniqueStatuses = Array.from(new Set(orders.map((order) => order.Status))).map(status => ({
+        value: status,
+        label: status,
+        className: getStatusClassName(status)
+    }));
 
     return (
         <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm overflow-x-auto responsive-customer-table">
@@ -80,9 +88,8 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
                                     <FilterDropdown
                                         label="Type"
                                         value={typeFilter}
-                                        options={uniqueTypes} // Changed from allTypes to uniqueTypes
+                                        options={uniqueTypes}
                                         onChange={setTypeFilter}
-                                        getOptionClassName={getTypeClassName}
                                     />
                                 </div>
                                 <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
@@ -100,9 +107,8 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
                                     <FilterDropdown
                                         label="Status"
                                         value={statusFilter}
-                                        options={uniqueStatuses} // Changed from allStatuses to uniqueStatuses
+                                        options={uniqueStatuses}
                                         onChange={setStatusFilter}
-                                        getOptionClassName={getStatusClassName}
                                     />
                                 </div>
                                 <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>

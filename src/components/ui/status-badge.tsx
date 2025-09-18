@@ -18,6 +18,7 @@ const statusVariants = {
 };
 
 const getStatusVariant = (status: string): StatusBadgeProps["variant"] => {
+  if (!status) return "default";
   const lowerStatus = status.toLowerCase();
   
   if (lowerStatus.includes("active") || lowerStatus.includes("enabled") || lowerStatus.includes("completed") || lowerStatus.includes("success")) {

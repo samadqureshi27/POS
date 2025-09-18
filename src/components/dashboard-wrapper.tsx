@@ -15,8 +15,8 @@ export default function DashboardWrapper({ children, hasSubmenu = false }: Dashb
   const { pageTitle } = useNavigation();
 
   return (
-    // 🔴 CHANGED: Added min-h-screen and bg-gray-50
-    <div className="min-h-screen bg-gray-50">
+    // 🔴 CHANGED: Added min-h-screen and bg-background
+    <div className="min-h-screen bg-background">
       <Navbar title={pageTitle} />
       <Sidebar />
       
