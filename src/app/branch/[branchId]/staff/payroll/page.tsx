@@ -58,7 +58,7 @@ const StaffManagementPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen mt-17 w-full px-2">
+    <div className="p-6 bg-gray-50 min-h-screen mt-17 w-full">
       {toast && (
         <Toast
           message={toast.message}
