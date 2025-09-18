@@ -59,7 +59,7 @@ const CustomerProfilePage = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="p-6 bg-background min-h-screen">
       <CustomerProfileHeader onBackClick={handleBackClick} />
 
       <CustomerMetricsSection

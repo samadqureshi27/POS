@@ -43,7 +43,7 @@ const CustomerManagementPage = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="p-6 bg-background min-h-screen">
       <Toaster position="top-right" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 items-center max-w-[100vw] mb-8 mt-2">

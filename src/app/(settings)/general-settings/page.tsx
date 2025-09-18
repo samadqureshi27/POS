@@ -35,7 +35,7 @@ const GeneralSettingsPage = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-background">
+    <div className="p-6 min-h-screen w-full bg-background">
       {/* Toast positioned absolutely */}
       {toast && (
         <Toast

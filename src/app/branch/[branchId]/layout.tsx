@@ -34,7 +34,7 @@ export default function BranchLayout({ children }: { children: React.ReactNode }
   return (
     <div className="flex">
       <BaseSubmenu items={mainItems} showBackArrow={true} />
-      <div className="flex-1 p-4">{children}</div>
+      <div className="flex-1">{children}</div>
     </div>
   );
 }

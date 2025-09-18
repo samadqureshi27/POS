@@ -10,7 +10,7 @@ export default function MenuLayout({
   return (
     <>
       <MenuSubmenu />
-      <main className="p-6">
+      <main>
         {children}
       </main>
     </>

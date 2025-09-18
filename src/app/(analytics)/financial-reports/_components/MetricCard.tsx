@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 interface MetricCardProps {
   title: string;
   value: string | number;
-  subtitle?: string;
+  subtitle?: string | React.ReactNode;
 }
 
 export const MetricCard: React.FC<MetricCardProps> = ({
@@ -20,7 +20,11 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         <div className="space-y-1">
           <p className="text-3xl font-bold">{value}</p>
           <p className="text-sm text-muted-foreground">{title}</p>
-          {subtitle && <p className="text-xs text-muted-foreground/80">{subtitle}</p>}
+          {subtitle && (
+            <div className="text-xs text-muted-foreground/80">
+              {typeof subtitle === 'string' ? subtitle : subtitle}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

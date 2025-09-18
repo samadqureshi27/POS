@@ -59,7 +59,7 @@ const RecipesManagementPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-w-full h-full overflow-y-auto thin-scroll">
+    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
       {/* Toast Notifications */}
       {toast && (
         <Toast

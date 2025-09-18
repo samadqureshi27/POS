@@ -34,7 +34,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
   const displayValue = selectedOption?.label || label;
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"

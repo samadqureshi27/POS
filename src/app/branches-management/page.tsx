@@ -60,7 +60,7 @@ const BranchManagementPage = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen mt-6 w-full px-4">
+    <div className="p-6 bg-background min-h-screen mt-6 w-full px-4">
       <Toaster position="top-right" />
 
       <div className="mb-8 mt-2">

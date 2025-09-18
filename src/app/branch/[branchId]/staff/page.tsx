@@ -93,7 +93,7 @@ const EmployeeRecordsPage = () => {
 
   if (!branchId) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
+      <div className="p-6 flex justify-center items-center min-h-screen bg-background">
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <p className="text-muted-foreground">Branch ID not found in URL parameters</p>
