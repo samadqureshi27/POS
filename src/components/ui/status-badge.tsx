@@ -29,6 +29,20 @@ const getStatusVariant = (status: string): StatusBadgeProps["variant"] => {
   return "default";
 };
 
+const getStatusColorClass = (status: string) => {
+  if (!status) return "";
+  const lowerStatus = status.toLowerCase();
+
+  if (lowerStatus.includes("active") || lowerStatus.includes("enabled") || lowerStatus.includes("completed") || lowerStatus.includes("success")) {
+    return "bg-green-100 text-green-800 hover:bg-green-200";
+  }
+  if (lowerStatus.includes("pending") || lowerStatus.includes("processing") || lowerStatus.includes("warning")) {
+    return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
+  }
+
+  return "";
+};
+
 export const StatusBadge: React.FC<StatusBadgeProps> = ({
   status,
   variant,
@@ -36,6 +50,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   ...props
 }) => {
   const badgeVariant = variant || getStatusVariant(status);
+  const colorClass = getStatusColorClass(status);
 
   return (
     <Badge
