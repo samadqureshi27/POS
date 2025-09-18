@@ -50,6 +50,7 @@ const MostOrderedTable: React.FC<MostOrderedTableProps> = ({ data, loading }) =>
           nameColumn="name"
           className="border border-border rounded-sm"
         />
+
       </div>
     </div>
   );

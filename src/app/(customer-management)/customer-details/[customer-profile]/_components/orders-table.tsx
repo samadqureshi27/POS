@@ -6,6 +6,7 @@ import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/dat
 import { StatusBadge } from "@/components/ui/status-badge";
 import FilterDropdown from '@/components/ui/filter-dropdown';
 
+
 interface OrdersTableProps {
     orders: OrderItem[];
     filteredOrders: OrderItem[];
@@ -125,6 +126,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
     const emptyMessage = searchTerm || typeFilter || statusFilter
         ? "No orders match your search criteria."
         : "No orders found.";
+
 
     return (
         <DataTable

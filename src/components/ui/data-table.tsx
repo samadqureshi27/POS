@@ -67,6 +67,7 @@ export function DataTable<T extends Record<string, any>>({
   onRowClick,
   mobileResponsive = false,
   nameColumn = "name"
+
 }: DataTableProps<T>) {
   const isAllSelected = selectable && data.length > 0 && selectedItems.length === data.length;
   const isIndeterminate = selectable && selectedItems.length > 0 && selectedItems.length < data.length;

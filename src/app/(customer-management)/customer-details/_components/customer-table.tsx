@@ -82,6 +82,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
             onRowClick={(record) => onCustomerClick(record.Customer_ID)}
             mobileResponsive={true}
             nameColumn="name"
+
         />
     );
 };
