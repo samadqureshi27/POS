@@ -103,7 +103,7 @@ const EmployeeRecordsPage = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen w-full mt-17">
+    <div className="p-6 bg-background min-h-screen w-full mt-17">
       {toast && (
         <Toast
           message={toast.message}
