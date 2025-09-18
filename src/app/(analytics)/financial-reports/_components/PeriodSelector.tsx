@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
 import { DateRange } from "react-date-range";
+import { Button } from "@/components/ui/button";
 import "react-date-range/dist/styles.css"; // main css
 import "react-date-range/dist/theme/default.css"; // theme css
 
@@ -56,7 +57,7 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
         <div className="flex overflow-x-auto pb-2 gap-2 w-full hide-scrollbar">
           {periods.map((period) => (
             <div key={period} className="relative flex-shrink-0">
-              <button
+              <Button 
                 onClick={() => {
                   if (period === "Custom") {
                     onPeriodChange("Custom");
@@ -66,11 +67,8 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
                     setShowDatePicker(false);
                   }
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors border ${
-                  selectedPeriod === period
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background text-muted-foreground border-border hover:bg-accent"
-                }`}
+                variant={selectedPeriod === period ? "default" : "outline"}
+                className="flex items-center gap-2 whitespace-nowrap"
               >
                 {period === "Custom" && <Calendar size={16} />}
                 <span className="whitespace-nowrap">
@@ -80,7 +78,7 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
                     ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
                     : period}
                 </span>
-              </button>
+              </Button>
 
               {/* Calendar dropdown attached to Custom button */}
               {period === "Custom" &&
@@ -88,7 +86,7 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
                 showDatePicker && (
                   <div
                     ref={calendarRef}
-                    className="fixed z-50 mt-2 w-64 h-64 md:w-80 md:h-80 bg-white shadow-lg border border-gray-200 rounded-sm"
+                    className="fixed z-50 mt-2 w-64 h-64 md:w-80 md:h-80 bg-card shadow-lg border border-border rounded-sm"
                     style={{
                       top: '120px', // Adjust based on your header height
                       left: '50%',
