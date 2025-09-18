@@ -1,7 +1,10 @@
 "use client";
 import React, { ReactNode } from 'react';
+import { Input as ShadcnInput } from './input';
+import { Label } from './label';
+import { cn } from '@/lib/utils';
 
-interface InputProps {
+interface InputComponentProps {
   label?: string;
   type?: string;
   value: string;
@@ -15,7 +18,7 @@ interface InputProps {
   className?: string;
 }
 
-const Input: React.FC<InputProps> = ({
+const InputComponent: React.FC<InputComponentProps> = ({
   label,
   type = 'text',
   value,
@@ -29,40 +32,34 @@ const Input: React.FC<InputProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`space-y-1 ${className}`}>
+    <div className={cn("space-y-2", className)}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <Label className="text-sm font-medium text-foreground">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
+          {required && <span className="text-destructive ml-1">*</span>}
+        </Label>
       )}
       
       <div className="relative">
         {icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <div className="text-gray-400">{icon}</div>
+            <div className="text-muted-foreground">{icon}</div>
           </div>
         )}
         
-        <input
+        <ShadcnInput
           type={type}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
           required={required}
-          className={`
-            block w-full rounded-lg border-2 transition-all duration-200
-            ${icon ? 'pl-10' : 'pl-4'}
-            ${rightIcon ? 'pr-10' : 'pr-4'}
-            py-3 text-gray-900 placeholder-gray-500
-            focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent
-            ${error 
-              ? 'border-red-300 bg-red-50 text-red-900' 
-              : 'border-gray-300 bg-white hover:border-gray-400'
-            }
-            ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-          `}
+          className={cn(
+            icon && "pl-10",
+            rightIcon && "pr-10",
+            error && "border-destructive focus-visible:ring-destructive/20",
+            "transition-all duration-200"
+          )}
         />
         
         {rightIcon && (
@@ -73,10 +70,10 @@ const Input: React.FC<InputProps> = ({
       </div>
       
       {error && (
-        <p className="text-sm text-red-600 mt-1">{error}</p>
+        <p className="text-sm text-destructive mt-1">{error}</p>
       )}
     </div>
   );
 };
 
-export default Input;
+export default InputComponent;

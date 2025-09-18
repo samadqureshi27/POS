@@ -1,5 +1,7 @@
-// components/LoadingSpinner.tsx
+// @deprecated - Use GlobalSkeleton instead
+// This component is kept for backward compatibility but should not be used in new code
 import React from 'react';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 
 interface LoadingSpinnerProps {
     customerId: number | null;
@@ -7,12 +9,11 @@ interface LoadingSpinnerProps {
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ customerId }) => {
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-50">
-            <div className="text-center">
-                <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-                <p className="mt-4 text-gray-600">Loading Customer Profile...</p>
-                <p className="text-sm text-gray-400 mt-2">Customer ID: {customerId}</p>
-            </div>
-        </div>
+        <GlobalSkeleton 
+            type="simple" 
+            showHeader={true} 
+            contentRows={4}
+            containerClassName="min-h-screen"
+        />
     );
 };

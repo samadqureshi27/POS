@@ -1,6 +1,9 @@
 import React from "react";
-import { ChevronDown, Grip, X } from "lucide-react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Grip, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 interface RecipeOption {
@@ -126,34 +129,18 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
     <div className="space-y-4 h-full flex flex-col">
       {/* Add Ingredient Button */}
       <div className="flex items-center gap-2 flex-shrink-0">
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger className="w-full flex items-center justify-between px-4 py-2 mb-2 text-black rounded-sm hover:bg-gray-300 transition-colors cursor-pointer border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]">
-            <span className="text-sm">Add New {title}</span>
-            <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
-          </DropdownMenu.Trigger>
-
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              className="w-full min-w-[280px] max-w-[90vw] sm:min-w-[510px] rounded-sm bg-white shadow-sm border border-gray-200 p-1 outline-none overflow-visible z-[99999]"
-              sideOffset={6}
-              avoidCollisions={true}
-              collisionPadding={20}
-            >
-              <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-              <div className="max-h-60 overflow-y-auto">
-                {ingredients.map((ingredient) => (
-                  <DropdownMenu.Item
-                    key={ingredient.ID}
-                    className="px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 text-black rounded outline-none select-none"
-                    onSelect={() => addIngredient(ingredient.Name)}
-                  >
-                    {ingredient.Name}
-                  </DropdownMenu.Item>
-                ))}
-              </div>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+        <Select onValueChange={(value) => addIngredient(value)}>
+          <SelectTrigger className="w-full mb-2">
+            <SelectValue placeholder={`Add New ${title}`} />
+          </SelectTrigger>
+          <SelectContent className="max-h-60">
+            {ingredients.map((ingredient) => (
+              <SelectItem key={ingredient.ID} value={ingredient.Name}>
+                {ingredient.Name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Mobile Card Layout */}
@@ -171,34 +158,36 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
                     {isOption ? "Option" : "Ingredient"} {idx + 1}
                   </span>
                 </div>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => removeIngredient(idx)}
-                  className="text-red-500 hover:text-red-700 p-1"
+                  className="text-red-500 hover:text-red-700 h-8 w-8"
                 >
                   <X size={18} />
-                </button>
+                </Button>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <Label className="text-xs font-medium text-gray-600">
                     Name
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     value={opt}
                     readOnly
-                    className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-gray-100 text-sm"
+                    className="bg-gray-100 text-sm"
                     placeholder="Ingredient name"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <Label className="text-xs font-medium text-gray-600">
                     {priceLabel}
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     inputMode="numeric"
                     pattern="[0-9]*"
@@ -207,7 +196,7 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
                       const value = Number(e.target.value.replace(/\D/g, "")) || 0;
                       updatePrice(idx, value);
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                    className="text-sm"
                     placeholder="0"
                   />
                 </div>
@@ -272,18 +261,18 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
 
                             {/* Ingredient Name (readonly) */}
                             <td className="p-3">
-                              <input
+                              <Input
                                 type="text"
                                 value={opt}
                                 readOnly
-                                className="w-full px-2 py-1 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] bg-gray-100"
+                                className="bg-gray-100"
                                 placeholder="Ingredient name"
                               />
                             </td>
 
                             {/* Price/Amount */}
                             <td className="p-3 text-center w-24">
-                              <input
+                              <Input
                                 type="text"
                                 inputMode="numeric"
                                 pattern="[0-9]*"
@@ -292,20 +281,22 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
                                   const value = Number(e.target.value.replace(/\D/g, "")) || 0;
                                   updatePrice(idx, value);
                                 }}
-                                className="w-full px-2 py-1 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center"
+                                className="text-center"
                                 placeholder="0"
                               />
                             </td>
 
                             {/* Delete Button */}
                             <td className="p-3 text-center w-12">
-                              <button
+                              <Button
                                 type="button"
+                                variant="outline"
+                                size="icon"
                                 onClick={() => removeIngredient(idx)}
-                                className="text-black border-2 px-2 py-1 rounded-sm hover:text-gray-700"
+                                className="text-black hover:text-gray-700 h-8 w-8"
                               >
                                 <X size={20} />
-                              </button>
+                              </Button>
                             </td>
                           </tr>
                         )}

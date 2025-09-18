@@ -4,10 +4,10 @@ import { useParams } from "next/navigation";
 import { useInventoryManagement } from "@/lib/hooks/inventoryManagement";
 import { Toast } from "@/components/ui/toast";
 import ActionBar from "@/components/ui/action-bar";
-import LoadingSpinner from "@/components/ui/loader";
 import StatCard from "@/components/ui/summary-card";
 import InventoryModal from "./_components/inventory-modal";
 import InventoryTable from "./_components/inventory-table";
+import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
 const InventoryManagementPage = () => {
   const params = useParams();
   const branchId = parseInt(params?.branchId as string) || 1;
@@ -47,7 +47,7 @@ const InventoryManagementPage = () => {
   } = useInventoryManagement(branchId);
 
   if (loading) {
-    return <LoadingSpinner message="Loading Inventory..." />;
+    return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={2} showActionBar={true} />;
   }
 
   return (

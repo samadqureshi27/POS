@@ -9,6 +9,7 @@ import { Toast } from "@/components/ui/toast";
 import StatCard from "@/components/ui/summary-card";
 import { StaffTable } from "./components/payroll-staff-table";
 import ActionBar from "@/components/ui/action-bar";
+import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
 
 // Hooks
 import { useDateFilter } from "@/lib/hooks/useDateFilter";
@@ -42,14 +43,7 @@ const StaffManagementPage = () => {
   }, [loading, branchId, showToast]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Payroll...</p>
-        </div>
-      </div>
-    );
+    return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
   }
 
   if (!branchId) {

@@ -3,7 +3,8 @@ import { LucideIcon } from 'lucide-react';
 
 
 import { NotificationSettings } from '@/lib/types/notification';
-import ButtonPage from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 
 interface NotificationOption {
@@ -40,16 +41,16 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                 {options.map((option) => (
                     <div key={option.key} className="flex items-center justify-between">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">
+                            <Label className="text-sm font-medium text-gray-700">
                                 {option.label}
-                            </label>
+                            </Label>
                             {option.description && (
                                 <p className="text-xs text-gray-500 mt-1">{option.description}</p>
                             )}
                         </div>
-                        <ButtonPage
+                        <Switch
                             checked={settings[option.key] as boolean}
-                            onChange={(isActive) => onSettingChange(option.key, isActive)}
+                            onCheckedChange={(isActive) => onSettingChange(option.key, isActive)}
                         />
                     </div>
                 ))}

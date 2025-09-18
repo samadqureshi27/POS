@@ -1,44 +1,52 @@
+"use client";
 import React from 'react';
-import { Edit,Info } from 'lucide-react';
+import { Info } from 'lucide-react';
+import { Button } from './button';
+import { cn } from '@/lib/utils';
 
-interface ResponsiveEditButtonProps {
+interface ResponsiveDetailButtonProps {
   onClick: (e: React.MouseEvent) => void;
   disabled?: boolean;
   className?: string;
 }
 
-const ResponsiveEditButton: React.FC<ResponsiveEditButtonProps> = ({ 
+const ResponsiveDetailButton: React.FC<ResponsiveDetailButtonProps> = ({ 
   onClick, 
   disabled = false, 
   className = '' 
 }) => {
   return (
     <>
-      {/* Desktop Edit Icon - Hidden on mobile */}
-      <button
+      {/* Desktop Detail Icon - Hidden on mobile */}
+      <Button
         onClick={onClick}
         disabled={disabled}
-        className={`desktop-edit-icon text-gray-600 hover:text-gray-800 cursor-pointer p-1 ${className} ${
-          disabled ? 'opacity-50 ' : ''
-        }`}
+        variant="ghost"
+        size="icon"
+        className={cn(
+          "desktop-edit-icon text-muted-foreground hover:text-foreground",
+          className
+        )}
         title="Detail"
       >
         <Info size={16} />
-      </button>
+      </Button>
 
-      {/* Mobile Edit Button - Hidden on desktop */}
-      <button
+      {/* Mobile Detail Button - Hidden on desktop */}
+      <Button
         onClick={onClick}
         disabled={disabled}
-        className={`mobile-edit-button w-full bg-[#2C2C2C] text-white hover:bg-gray-700 px-4 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 mt-3 cursor-pointer ${className} ${
-          disabled ? 'opacity-50 bg-gray-400' : ''
-        }`}
+        variant="default"
+        className={cn(
+          "mobile-edit-button w-full flex items-center justify-center gap-2 mt-3",
+          className
+        )}
       >
         <Info size={16} />
         Details
-      </button>
+      </Button>
     </>
   );
 };
 
-export default ResponsiveEditButton;
+export default ResponsiveDetailButton;

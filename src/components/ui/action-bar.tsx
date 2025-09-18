@@ -1,5 +1,7 @@
 import React from 'react';
 import { Plus, Trash2, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ActionBarProps {
   // Add button props
@@ -71,58 +73,52 @@ const ActionBar: React.FC<ActionBarProps> = ({
   // Determine if we should show action buttons section
   const showActionButtons = customActions || onAdd || onDelete;
 
-  // Button style helpers - preserving your original design
-  const getAddButtonStyle = (disabled: boolean, customClass?: string) => {
-    const baseStyle = "flex w-[50%] items-center text-center gap-2 md:w-[40%] px-6.5 py-2 rounded-sm transition-colors";
-    const statusStyle = disabled
-      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-      : "bg-[#2C2C2C] text-white hover:bg-gray-700";
-    
-    return `${baseStyle} ${statusStyle} ${customClass || ''}`;
+  // Button style helpers - using shadcn Button component
+  const getAddButtonVariant = (disabled: boolean) => {
+    return disabled ? "secondary" : "default";
   };
 
-  const getDeleteButtonStyle = (disabled: boolean, loading?: boolean, customClass?: string) => {
-    const baseStyle = "flex w-[50%] items-center gap-2 px-4 md:w-[60%] py-2 rounded-sm transition-colors";
-    const statusStyle = (disabled || loading)
-      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-      : "bg-[#2C2C2C] text-white hover:bg-gray-700";
-    
-    return `${baseStyle} ${statusStyle} ${customClass || ''}`;
+  const getDeleteButtonVariant = (disabled: boolean, loading?: boolean) => {
+    return (disabled || loading) ? "secondary" : "destructive";
   };
 
   return (
     <div className={`mb-8 flex items-center justify-between gap-4 flex-wrap ${className}`}>
       {/* Action Buttons Section */}
       {showActionButtons && (
-        <div className={`flex gap-3 h-[35px] w-full md:h-[40px] ${!showSearch ? 'md:w-full' : 'md:w-[250px]'} ${actionButtonsClassName}`}>
+        <div className={`flex gap-3 w-full ${!showSearch ? 'md:w-full' : 'md:w-[250px]'} ${actionButtonsClassName}`}>
           {customActions ? (
             // Custom actions override default buttons
-            <div className="flex gap-3 w-full h-full">
+            <div className="flex gap-3 w-full h-[35px] md:h-[40px]">
               {customActions}
             </div>
           ) : (
             // Default Add/Delete buttons
             <>
               {onAdd && (
-                <button
+                <Button
                   onClick={onAdd}
                   disabled={addDisabled}
-                  className={getAddButtonStyle(addDisabled, addButtonClassName)}
+                  variant={getAddButtonVariant(addDisabled)}
+                  size="default"
+                  className={`flex w-[50%] items-center text-center gap-2 md:w-[40%] h-[35px] md:h-[40px] ${addButtonClassName}`}
                 >
                   {addIcon}
                   {addLabel}
-                </button>
+                </Button>
               )}
-              
+
               {onDelete && (
-                <button
+                <Button
                   onClick={onDelete}
                   disabled={deleteDisabled || isDeleting}
-                  className={getDeleteButtonStyle(deleteDisabled || isDeleting, isDeleting, deleteButtonClassName)}
+                  variant={getDeleteButtonVariant(deleteDisabled || isDeleting, isDeleting)}
+                  size="default"
+                  className={`flex w-[50%] items-center gap-2 md:w-[60%] h-[35px] md:h-[40px] ${deleteButtonClassName}`}
                 >
                   {deleteIcon}
                   {isDeleting ? deletingLabel : deleteLabel}
-                </button>
+                </Button>
               )}
             </>
           )}
@@ -132,15 +128,15 @@ const ActionBar: React.FC<ActionBarProps> = ({
       {/* Search Bar */}
       {showSearch && onSearchChange && (
         <div className={`relative flex-1 min-w-[200px] ${searchClassName}`}>
-          <input
+          <Input
             type="text"
             placeholder={searchPlaceholder}
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full h-[35px] pr-10 pl-4 md:h-[40px] py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
+            className="w-full h-[35px] pr-10 md:h-[40px]"
           />
           <Search
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
             size={16}
           />
         </div>

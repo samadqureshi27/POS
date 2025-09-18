@@ -6,9 +6,12 @@ import { useRouter } from "next/navigation";
 import StatCard from "@/components/ui/summary-card";
 import ActionBar from "@/components/ui/action-bar";
 import { Toast } from '@/components/ui/toast';
+import { Toaster } from '@/components/ui/sonner';
+import { toast as sonnerToast } from 'sonner';
 import BranchModal from "./_components/branch-modal";
 import BranchTable from "./_components/branch-table";
 import LoadingSpinner from '@/components/ui/loader';
+import { ManagementPageSkeleton } from '@/app/(main)/dashboard/_components/ManagementPageSkeleton';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 
 const BranchManagementPage = () => {
@@ -53,21 +56,15 @@ const BranchManagementPage = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner message="Loading Branches..." />;
+    return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={2} />;
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen mt-6 w-full px-4">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+    <div className="bg-background min-h-screen mt-6 w-full px-4">
+      <Toaster position="top-right" />
 
       <div className="mb-8 mt-2">
-        <h1 className="text-3xl font-semibold">Branch Management</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Branch Management</h1>
       </div>
 
       {/* Summary Cards */}
@@ -122,5 +119,6 @@ const BranchManagementPage = () => {
     </div>
   );
 };
+
 
 export default BranchManagementPage;

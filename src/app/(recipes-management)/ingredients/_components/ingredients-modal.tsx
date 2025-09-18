@@ -1,6 +1,10 @@
 import React from 'react';
 import { X, Save } from 'lucide-react';
-import ButtonPage from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface InventoryItem {
   ID: string;
@@ -37,32 +41,29 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
     });
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-      <div className="bg-white rounded-sm p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-semibold">
             {editItem ? "Edit Ingredients" : "Add New Ingredients"}
-          </h2>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
         {/* Scrollable Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1">
           {/* Name */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label htmlFor="name" className="text-sm font-medium">
               Name <span className="text-red-500">*</span>
-            </label>
-            <input
+            </Label>
+            <Input
+              id="name"
               type="text"
               value={formData.Name}
               onChange={(e) =>
                 setFormData({ ...formData, Name: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
               placeholder="Enter item name"
               required
             />
@@ -70,16 +71,16 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
 
           {/* Description */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label htmlFor="description" className="text-sm font-medium">
               Description <span className="text-red-500">*</span>
-            </label>
-            <input
+            </Label>
+            <Input
+              id="description"
               type="text"
               value={formData.Description}
               onChange={(e) =>
                 setFormData({ ...formData, Description: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
               placeholder="Enter description"
               required
             />
@@ -87,40 +88,38 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
 
           {/* Unit */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label htmlFor="unit" className="text-sm font-medium">
               Unit
-            </label>
-            <input
+            </Label>
+            <Input
+              id="unit"
               type="text"
               value={formData.Unit}
               onChange={(e) =>
                 setFormData({ ...formData, Unit: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
               placeholder="Unit (e.g. Kg, Bottles)"
             />
           </div>
 
           {/* Priority */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label htmlFor="priority" className="text-sm font-medium">
               Priority
-            </label>
-            <input
+            </Label>
+            <Input
+              id="priority"
               type="text"
               value={formData.Priority || ""}
               onChange={(e) => {
                 const value = e.target.value;
-                // Only allow numbers and empty string
                 if (value === '' || /^\d+$/.test(value)) {
                   setFormData({
                     ...formData,
                     Priority: value === '' ? 0 : Number(value)
                   });
                 }
-                // If invalid input, just ignore it (don't update state)
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
               placeholder="1"
               min={1}
               required
@@ -129,38 +128,35 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
 
           {/* Status */}
           <div className="flex items-center justify-between">
-            <label className="block text-sm font-medium text-gray-700">
+            <Label className="text-sm font-medium">
               Status
-            </label>
+            </Label>
             <div className="flex items-center gap-3">
-              <ButtonPage
+              <Switch
                 checked={formData.Status === "Active"}
-                onChange={handleStatusChange}
+                onCheckedChange={handleStatusChange}
               />
             </div>
           </div>
         </div>
 
         {/* Fixed Action Buttons */}
-        <div className="flex flex-col p-2 md:flex-row gap-3 pt-6 justify-end md:pr-6 border-t border-gray-200 mt-6">
-          <button
+        <div className="flex flex-col p-2 md:flex-row gap-3 pt-6 justify-end md:pr-6 border-t border-gray-200">
+          <Button
             type="button"
+            variant="outline"
             onClick={onClose}
             disabled={actionLoading}
-            className="px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed order-2 md:order-1"
+            className="order-2 md:order-1"
           >
             <X size={16} />
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={onSave}
             disabled={!formData.Name.trim() || actionLoading}
-            className={`px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 order-1 md:order-2 ${
-              !formData.Name.trim() || actionLoading
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-            }`}
+            className="order-1 md:order-2"
           >
             {actionLoading ? (
               <>
@@ -173,10 +169,10 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
                 {editItem ? "Update Item" : "Add Item"}
               </>
             )}
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -1,5 +1,7 @@
 import React from "react";
-import ButtonPage from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RecipeOption } from "@/lib/util/recipeApi";
 
 interface RecipeInfoTabProps {
@@ -24,14 +26,13 @@ const RecipeInfoTab: React.FC<RecipeInfoTabProps> = ({
     <div className="space-y-6 sm:space-y-8">
       {/* Name */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <Label className="text-sm font-medium">
           Recipe Name
-        </label>
-        <input
+        </Label>
+        <Input
           type="text"
           value={formData.Name}
           onChange={(e) => handleInputChange("Name", e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           placeholder="Enter recipe name"
           required
         />
@@ -39,10 +40,10 @@ const RecipeInfoTab: React.FC<RecipeInfoTabProps> = ({
 
       {/* Priority */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <Label className="text-sm font-medium">
           Priority
-        </label>
-        <input
+        </Label>
+        <Input
           type="text"
           value={formData.Priority || ""}
           onChange={(e) => {
@@ -51,7 +52,6 @@ const RecipeInfoTab: React.FC<RecipeInfoTabProps> = ({
               handleInputChange("Priority", value === "" ? 0 : Number(value));
             }
           }}
-          className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           placeholder="1"
           min={1}
           required
@@ -60,26 +60,25 @@ const RecipeInfoTab: React.FC<RecipeInfoTabProps> = ({
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <Label className="text-sm font-medium">
           Description
-        </label>
-        <input
+        </Label>
+        <Input
           type="text"
           value={formData.Description}
           onChange={(e) => handleInputChange("Description", e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
           placeholder="Enter description"
         />
       </div>
 
       {/* Status */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-        <label className="block text-sm font-medium text-gray-700">
+        <Label className="text-sm font-medium">
           Status
-        </label>
-        <ButtonPage
+        </Label>
+        <Switch
           checked={formData.Status === "Active"}
-          onChange={onStatusChange}
+          onCheckedChange={onStatusChange}
         />
       </div>
     </div>

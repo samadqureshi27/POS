@@ -68,8 +68,8 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
                 }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors border ${
                   selectedPeriod === period
-                    ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
-                    : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:bg-accent"
                 }`}
               >
                 {period === "Custom" && <Calendar size={16} />}

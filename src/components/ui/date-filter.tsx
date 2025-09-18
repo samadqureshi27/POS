@@ -4,6 +4,8 @@ import React from "react";
 import { DateRange } from "react-date-range";
 import { Calendar } from "lucide-react";
 import { DateFilterProps } from "@/lib/types/payroll";
+import { Button } from "./button";
+import { cn } from "@/lib/utils";
 
 import "react-date-range/dist/styles.css"; // main css
 import "react-date-range/dist/theme/default.css"; // theme css
@@ -26,20 +28,23 @@ export const DateFilter: React.FC<DateFilterProps> = ({ dateFilter }) => {
             <div className="flex overflow-x-auto pb-2 gap-2 w-full hide-scrollbar">
                 {periods.map((period) => (
                     <div key={period} className="relative flex-shrink-0">
-                        <button
+                        <Button
                             onClick={() => {
                                 if (period === "Custom") {
                                     setActiveTimePeriod("Custom");
-                                    setShowDatePicker((prev) => !prev);
+                                    setShowDatePicker(!showDatePicker);
                                 } else {
                                     setActiveTimePeriod(period);
                                     setShowDatePicker(false);
                                 }
                             }}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors border ${activeTimePeriod === period
-                                ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
-                                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
-                                }`}
+                            variant={activeTimePeriod === period ? "default" : "outline"}
+                            className={cn(
+                                "flex items-center gap-2 whitespace-nowrap",
+                                activeTimePeriod === period
+                                    ? "bg-[#2C2C2C] text-white border-[#2C2C2C] hover:bg-[#2C2C2C]/90"
+                                    : "bg-background text-foreground border-border hover:bg-accent"
+                            )}
                         >
                             {period === "Custom" && <Calendar size={16} />}
                             <span className="whitespace-nowrap">
@@ -49,7 +54,7 @@ export const DateFilter: React.FC<DateFilterProps> = ({ dateFilter }) => {
                                     ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
                                     : period}
                             </span>
-                        </button>
+                        </Button>
 
                         {/* Calendar dropdown attached to Custom button */}
                         {period === "Custom" &&

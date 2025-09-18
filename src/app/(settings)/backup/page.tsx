@@ -9,7 +9,7 @@ import { useBackup } from '@/lib/hooks/useBackup';
 // Components
 import { BackupModal } from './_components/backup-modal';
 import { Toast } from '@/components/ui/toast';
-import LoadingSpinner from '@/components/ui/loader';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { BackupPageHeader } from './_components/backup-page-header';
 import { BackupSettingsCard } from './_components/backup-settings-card';
 import { BackupHistoryCard } from './_components/backup-history-cards';
@@ -36,13 +36,13 @@ const BackupRecoveryPage = () => {
   } = useBackup({ showToast, showModal });
 
   if (loading) {
-    return <LoadingSpinner message='Backup Page Loading' />;
+    return <GlobalSkeleton type="settings" showHeader={true} />;
   }
 
   if (!settings) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <div className="min-h-screen bg-background w-full">
       {toast && (
         <Toast
           message={toast.message}

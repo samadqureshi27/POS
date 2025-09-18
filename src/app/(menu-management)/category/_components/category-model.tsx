@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { X, Save, ImageIcon } from "lucide-react";
-import ButtonPage from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { CategoryItem, CategoryFormData, CategoryModalProps } from '@/lib/types/category';
 
 const CategoryModal: React.FC<CategoryModalProps> = ({
@@ -112,32 +117,29 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-      <div className="bg-white rounded-sm p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-semibold">
             {editingItem ? "Edit Category" : "Add New Category"}
-          </h2>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
         {/* Scrollable Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 py-2">
           {/* Name */}
           <div className="md:col-span-2 mt-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name <span className="text-red-500">*</span>
-            </label>
-            <input
+            <Label htmlFor="name" className="text-sm font-medium">
+              Name <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="name"
               type="text"
               value={formData.Name}
               onChange={(e) =>
                 setFormData({ ...formData, Name: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
               placeholder="Enter category name"
               required
             />
@@ -145,15 +147,16 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
 
           {/* Description */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description <span className="text-red-500">*</span>
-            </label>
-            <textarea
+            <Label htmlFor="description" className="text-sm font-medium">
+              Description <span className="text-destructive">*</span>
+            </Label>
+            <Textarea
+              id="description"
               value={formData.Description}
               onChange={(e) =>
                 setFormData({ ...formData, Description: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] h-32 resize-none"
+              className="h-32 resize-none"
               placeholder="Enter description"
               required
             />
@@ -161,9 +164,9 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
 
           {/* Image Upload with Drag & Drop */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label className="text-sm font-medium">
               Image
-            </label>
+            </Label>
             <div
               className="relative border-2 border-dashed border-gray-300 rounded-sm p-4 h-32 bg-white flex flex-col justify-center items-center hover:bg-gray-50 transition cursor-pointer"
               onDragOver={(e) => e.preventDefault()}
@@ -210,26 +213,27 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
 
           {/* Parent */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label htmlFor="parent" className="text-sm font-medium">
               Parent
-            </label>
-            <input
+            </Label>
+            <Input
+              id="parent"
               type="text"
               value={formData.Parent}
               onChange={(e) =>
                 setFormData({ ...formData, Parent: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
               placeholder="Parent category"
             />
           </div>
 
           {/* Priority */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label htmlFor="priority" className="text-sm font-medium">
               Priority
-            </label>
-            <input
+            </Label>
+            <Input
+              id="priority"
               type="text"
               value={formData.Priority || ""}
               onChange={(e) => {
@@ -243,37 +247,35 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                 }
                 // If invalid input, just ignore it (don't update state)
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
               placeholder="1"
-              min={1}
               required
             />
           </div>
 
           {/* Status */}
           <div className="flex items-center justify-between">
-            <label className="block text-sm font-medium text-gray-700">
+            <Label className="text-sm font-medium">
               Status
-            </label>
-            <ButtonPage
+            </Label>
+            <Switch
               checked={formData.Status === "Active"}
-              onChange={handleStatusChange}
+              onCheckedChange={handleStatusChange}
             />
           </div>
         </div>
 
         {/* Fixed Action Buttons */}
         <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={onClose}
             disabled={actionLoading}
-            className="px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <X size={16} />
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={handleSubmit}
             disabled={
@@ -281,12 +283,6 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
               !formData.Description.trim() ||
               actionLoading
             }
-            className={`px-6 py-2 rounded-sm transition-colors flex items-center gap-2 ${!formData.Name.trim() ||
-                !formData.Description.trim() ||
-                actionLoading
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-              }`}
           >
             {actionLoading ? (
               <>
@@ -299,10 +295,10 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                 {editingItem ? "Update" : "Save & Close"}
               </>
             )}
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

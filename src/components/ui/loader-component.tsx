@@ -1,18 +1,20 @@
+"use client";
 import React from 'react';
+import LoadingSpinner from './loading-spinner';
 
-interface LoadingSpinnerProps {
+interface LoaderComponentProps {
     message?: string;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = "Loading..." }) => {
+const LoaderComponent: React.FC<LoaderComponentProps> = ({ message = "Loading..." }) => {
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="flex justify-center items-center min-h-screen bg-background">
             <div className="text-center">
-                <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-                <p className="mt-4 text-gray-600">{message}</p>
+                <LoadingSpinner size="lg" color="primary" />
+                <p className="mt-4 text-muted-foreground">{message}</p>
             </div>
         </div>
     );
 };
 
-export default LoadingSpinner;
+export default LoaderComponent;

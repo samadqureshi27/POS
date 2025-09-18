@@ -3,6 +3,8 @@
 
 import React from 'react';
 import { Download, Upload } from 'lucide-react';
+import { Button } from './button';
+import { cn } from '@/lib/utils';
 
 export interface ImportExportControlsProps {
     onExport: () => void;
@@ -29,38 +31,38 @@ const ImportExportControls: React.FC<ImportExportControlsProps> = ({
     disabled = false
 }) => {
     return (
-        <div className={`flex gap-4 justify-start md:justify-end mt-4 md:mt-0 ${className}`}>
+        <div className={cn("flex gap-4 justify-start md:justify-end mt-4 md:mt-0", className)}>
             {showImport && onImport && (
-                <label
-                    className={`flex items-center gap-2 px-4 py-2 rounded-sm cursor-pointer transition-colors ${disabled
-                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                            : 'bg-[#2C2C2C] text-white hover:bg-gray-700'
-                        }`}
+                <Button
+                    asChild
+                    variant={disabled ? "secondary" : "default"}
+                    disabled={disabled}
+                    className="flex items-center gap-2"
                 >
-                    <Upload size={16} />
-                    {importLabel}
-                    <input
-                        type="file"
-                        accept={acceptedFileTypes}
-                        onChange={onImport}
-                        className="hidden"
-                        disabled={disabled}
-                    />
-                </label>
+                    <label className="cursor-pointer">
+                        <Upload size={16} />
+                        {importLabel}
+                        <input
+                            type="file"
+                            accept={acceptedFileTypes}
+                            onChange={onImport}
+                            className="hidden"
+                            disabled={disabled}
+                        />
+                    </label>
+                </Button>
             )}
 
             {showExport && (
-                <button
+                <Button
                     onClick={onExport}
                     disabled={disabled}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-sm transition-colors ${disabled
-                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                            : 'bg-[#2C2C2C] text-white hover:bg-gray-700'
-                        }`}
+                    variant={disabled ? "secondary" : "default"}
+                    className="flex items-center gap-2"
                 >
                     <Download size={16} />
                     {exportLabel}
-                </button>
+                </Button>
             )}
         </div>
     );

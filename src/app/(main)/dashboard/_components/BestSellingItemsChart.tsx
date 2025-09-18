@@ -14,11 +14,11 @@ export const BestSellingItemsChart: React.FC<BestSellingItemsChartProps> = ({
   bestSellingItems,
   selectedPeriod,
 }) => (
-  <div className="bg-white p-4 sm:p-6 rounded-sm shadow-sm border border-gray-200">
-    <h2 className="text-lg font-semibold text-gray-900 mb-6">Best selling items</h2>
+  <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm">
+    <h2 className="text-lg font-semibold tracking-tight mb-6">Best selling items</h2>
 
     {bestSellingItems.length === 0 ? (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-muted-foreground">
         No data available for {selectedPeriod}
       </div>
     ) : (

@@ -1,8 +1,10 @@
 "use client";
 import React, { ReactNode } from 'react';
-import LoadingSpinner from './loader';
+import { Button as ShadcnButton, buttonVariants } from './button';
+import { cn } from '@/lib/utils';
+import LoadingSpinner from './loading-spinner';
 
-interface ButtonProps {
+interface RoleButtonProps {
   children: ReactNode;
   type?: 'button' | 'submit';
   variant?: 'primary' | 'secondary' | 'outline' | 'login';
@@ -13,7 +15,7 @@ interface ButtonProps {
   className?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({
+const RoleButton: React.FC<RoleButtonProps> = ({
   children,
   type = 'button',
   variant = 'primary',
@@ -23,47 +25,68 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   className = ''
 }) => {
-  const baseClasses = `
-    inline-flex items-center justify-center font-medium
-    transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
-    disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden
-  `;
-
-  const variants = {
-    primary: `
-      bg-black hover:bg-black text-[#d1ab35] rounded-lg
-      focus:ring-black-500 shadow-lg hover:shadow-xl
-    `,
-    secondary: `
-      bg-gray-900 hover:bg-gray-800 text-white rounded-lg
-      focus:ring-gray-500 shadow-lg hover:shadow-xl
-    `,
-    outline: `
-      border-2 border-yellow-600 text-yellow-600 hover:bg-yellow-600 hover:text-white rounded-lg
-      focus:ring-yellow-500
-    `
+  // Map custom variants to shadcn variants
+  const getShadcnVariant = () => {
+    switch (variant) {
+      case 'primary':
+        return 'default';
+      case 'secondary':
+        return 'secondary';
+      case 'outline':
+        return 'outline';
+      case 'login':
+        return 'default';
+      default:
+        return 'default';
+    }
   };
 
-  const sizes = {
-    sm: 'px-4 py-2 text-sm',
-    md: 'px-6 py-3 text-base',
-    lg: 'px-8 py-4 text-lg'
+  // Map custom sizes to shadcn sizes
+  const getShadcnSize = () => {
+    switch (size) {
+      case 'sm':
+        return 'sm';
+      case 'md':
+        return 'default';
+      case 'lg':
+        return 'lg';
+      default:
+        return 'default';
+    }
   };
 
-  // Special sizing for login variant
-  const loginSize = variant === 'login' ? 'px-12 py-4 text-sm min-w-[200px]' : sizes[size];
+  // Custom styling for specific variants
+  const getCustomStyles = () => {
+    switch (variant) {
+      case 'primary':
+        return 'bg-black hover:bg-black text-[#d1ab35] focus:ring-black-500 shadow-lg hover:shadow-xl';
+      case 'secondary':
+        return 'bg-muted-foreground hover:bg-muted-foreground/90 text-muted shadow-lg hover:shadow-xl';
+      case 'outline':
+        return 'border-2 border-yellow-600 text-yellow-600 hover:bg-yellow-600 hover:text-white focus:ring-yellow-500';
+      case 'login':
+        return 'bg-black text-[#d1ab35] hover:bg-muted-foreground font-semibold tracking-widest min-w-[200px]';
+      default:
+        return '';
+    }
+  };
 
   return (
-    <button
+    <ShadcnButton
       type={type}
-      onClick={onClick}
+      variant={getShadcnVariant() as any}
+      size={getShadcnSize() as any}
       disabled={disabled || isLoading}
-      className={`${baseClasses} ${variants[variant]} ${variant === 'login' ? loginSize : sizes[size]} ${className}`}
+      onClick={onClick}
+      className={cn(
+        getCustomStyles(),
+        className
+      )}
     >
-      {isLoading && <LoadingSpinner />}
+      {isLoading && <LoadingSpinner size="sm" color="white" className="mr-2" />}
       <span className="relative z-10">{children}</span>
-    </button>
+    </ShadcnButton>
   );
 };
 
-export default Button;
+export default RoleButton;
