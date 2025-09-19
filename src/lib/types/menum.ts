@@ -136,6 +136,7 @@ export interface MenuItem {
     StaffPick?: "Active" | "Inactive";
     DisplayType?: string;
     Displaycat?: string;
+    Unit?: string;
     SpecialStartDate?: string;
     SpecialEndDate?: string;
     SpecialPrice?: number;
