@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-const sizeOptions = ["Small", "Regular", "Large", "Extra Large"];
 
 const OptionsTab: React.FC<OptionsTabProps> = ({
     formData,
     updateFormData,
     handleFormFieldChange,
+    menuOptions,
 }) => {
     const handleAddOption = (size: string) => {
         if (size && !formData.OptionValue?.includes(size)) {
@@ -55,12 +55,20 @@ const OptionsTab: React.FC<OptionsTabProps> = ({
                     <SelectTrigger className="flex-1">
                         <SelectValue placeholder="Add New Size Option" />
                     </SelectTrigger>
-                    <SelectContent>
-                        {sizeOptions.map((size) => (
-                            <SelectItem key={size} value={size}>
-                                {size}
+                    <SelectContent className="z-[100]">
+                        {menuOptions && menuOptions.length > 0 ? (
+                            menuOptions
+                                .filter((option) => !formData.OptionValue?.includes(option.Name))
+                                .map((option) => (
+                                    <SelectItem key={option.ID} value={option.Name}>
+                                        {option.Name}
+                                    </SelectItem>
+                                ))
+                        ) : (
+                            <SelectItem key="no-data" value="" disabled>
+                                No menu options available
                             </SelectItem>
-                        ))}
+                        )}
                     </SelectContent>
                 </Select>
             </div>

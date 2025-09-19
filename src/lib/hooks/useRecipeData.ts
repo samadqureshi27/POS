@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import MenuAPI from "@/lib/util/recipeApi";
+import { recipeOptionsApi } from "@/lib/util/recipe-options-api";
 import {
   RecipeOption,
   Ingredient,
@@ -13,6 +14,7 @@ export const useRecipeData = () => {
   // State management
   const [recipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [availableRecipeOptions, setAvailableRecipeOptions] = useState<any[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -35,7 +37,8 @@ export const useRecipeData = () => {
   const loadInitialData = async () => {
     await Promise.all([
       loadRecipeOptions(),
-      loadIngredients()
+      loadIngredients(),
+      loadAvailableRecipeOptions()
     ]);
   };
 
@@ -58,6 +61,28 @@ export const useRecipeData = () => {
     } catch (error) {
       console.error("Error fetching ingredients:", error);
       showToast("Failed to load ingredients", "error");
+    }
+  }, []);
+
+  const loadAvailableRecipeOptions = useCallback(async () => {
+    try {
+      const response = await recipeOptionsApi.getRecipeOptions();
+      if (response.success) {
+        // Map the response data to match expected format
+        const optionsWithDefaults = response.data.map(option => ({
+          ID: option.ID,
+          Name: option.Name,
+          Status: option.Status || "Active" as "Active" | "Inactive",
+          Description: option.Description || "",
+          Priority: option.Priority || 0
+        }));
+        setAvailableRecipeOptions(optionsWithDefaults);
+      } else {
+        throw new Error(response.message || "Failed to fetch recipe options");
+      }
+    } catch (error) {
+      console.error("Error fetching available recipe options:", error);
+      showToast("Failed to load recipe options", "error");
     }
   }, []);
 
@@ -290,6 +315,7 @@ export const useRecipeData = () => {
     // Data
     recipeOptions,
     ingredients,
+    availableRecipeOptions,
     filteredItems,
     selectedItems,
     loading,

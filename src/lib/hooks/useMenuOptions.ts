@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { MenuAPI } from "@/lib/util/menu-options-api";
 import { MenuItemOptions } from "@/lib/types/menuItemOptions";
+import { useToast } from "@/lib/hooks";
 
 export const useMenuOptions = () => {
+    const { showToast } = useToast();
     const [MenuItemOptionss, setMenuItemOptionss] = useState<MenuItemOptions[]>([]);
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
@@ -10,11 +12,6 @@ export const useMenuOptions = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [editingItem, setEditingItem] = useState<MenuItemOptions | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const [toast, setToast] = useState<{
-        message: string;
-        type: "success" | "error";
-    } | null>(null);
     const [DisplayFilter, setDisplayFilter] = useState<
         "" | "Radio" | "Select" | "Checkbox"
     >("");
@@ -28,10 +25,6 @@ export const useMenuOptions = () => {
         OptionPrice: [],
     });
 
-    const showToast = (message: string, type: "success" | "error") => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 3000);
-    };
 
     useEffect(() => {
         loadMenuItemOptionss();
@@ -58,7 +51,7 @@ export const useMenuOptions = () => {
                 DisplayType: "Radio",
                 OptionValue: [],
                 OptionPrice: [],
-                Priority: 0,
+                Priority: maxPriority + 1,
             });
         }
     }, [editingItem, isModalOpen, MenuItemOptionss]);
@@ -180,7 +173,6 @@ export const useMenuOptions = () => {
     const isFormValid = () => {
         if (!formData.Name.trim()) return false;
         if (!formData.DisplayType.trim()) return false;
-        if (formData.Priority < 1) return false;
 
         // If there are option values, validate them
         if (formData.OptionValue.length > 0) {
@@ -193,13 +185,6 @@ export const useMenuOptions = () => {
                 if (formData.OptionPrice[i] == null || formData.OptionPrice[i] < 0) return false;
             }
         }
-
-        // Check for duplicate priority (excluding current item when editing)
-        const duplicatePriority = MenuItemOptionss.some(item =>
-            item.Priority === formData.Priority &&
-            (!editingItem || item.ID !== editingItem.ID)
-        );
-        if (duplicatePriority) return false;
 
         return true;
     };
@@ -240,7 +225,6 @@ export const useMenuOptions = () => {
         searchTerm,
         editingItem,
         isModalOpen,
-        toast,
         DisplayFilter,
         formData,
         filteredItems,
@@ -251,7 +235,6 @@ export const useMenuOptions = () => {
         setDisplayFilter,
         setFormData,
         setIsModalOpen,
-        setToast,
 
         // Handlers
         handleCreateItem,
@@ -264,7 +247,6 @@ export const useMenuOptions = () => {
         handleEditItem,
 
         // Utils
-        showToast,
         isFormValid,
     };
 };

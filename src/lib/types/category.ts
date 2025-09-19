@@ -44,6 +44,7 @@ export interface CategoryModalProps {
   isOpen: boolean;
   editingItem: CategoryItem | null;
   actionLoading: boolean;
+  categories: CategoryItem[];
   onClose: () => void;
   onCreate: (data: CategoryFormData) => void;
   onUpdate: (data: CategoryFormData) => void;

@@ -9,7 +9,7 @@ import { Toast } from '@/components/ui/toast';
 import PosModal from "./_components/pos-modal";
 import PosTable from "./_components/pos-table";
 import LoadingSpinner from '@/components/ui/loader';
-import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { Toaster } from "@/components/ui/sonner";
 import { usePosManagement } from "@/lib/hooks/usePosManagement";
 
@@ -50,7 +50,7 @@ const PosListPage = () => {
     } = usePosManagement(branchId);
 
     if (loading) {
-        return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
+        return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
     }
 
     if (!branchId) {

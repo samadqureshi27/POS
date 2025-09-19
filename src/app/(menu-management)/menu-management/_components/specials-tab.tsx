@@ -104,18 +104,15 @@ const SpecialsTab: React.FC<SpecialsTabProps> = ({ formData, setFormData, handle
       <div>
         <Label className="text-sm font-medium">Special Price</Label>
         <Input
-          type="text"
+          type="number"
+          step="0.01"
           value={formData.SpecialPrice || ""}
           onChange={(e) => {
             const value = e.target.value;
-            // Only allow numbers and empty string
-            if (value === "" || /^\d+$/.test(value)) {
-              setFormData({
-                ...formData,
-                SpecialPrice: value === "" ? 0 : Number(value),
-              });
-            }
-            // If invalid input, just ignore it (don't update state)
+            setFormData({
+              ...formData,
+              SpecialPrice: value === "" ? 0 : Number(value),
+            });
           }}
           placeholder="499.00"
         />

@@ -11,9 +11,7 @@ import { Switch } from "@/components/ui/switch";
 
 import {MealTabProps} from "@/lib/types/menum";
 
-const sizeOptionss = ["Cheese", "Pepperoni", "Olives", "Onions", "Bacon", "Pineapple"];
-
-const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusChange }) => {
+const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusChange, menuItems }) => {
   return (
     <div className="max-w-4xl mx-auto">
       <Label className="text-sm font-medium">
@@ -33,12 +31,20 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
           <SelectTrigger className="w-full sm:flex-1">
             <SelectValue placeholder="Add New Option" />
           </SelectTrigger>
-          <SelectContent className="max-h-60">
-            {sizeOptionss.map((size, i) => (
-              <SelectItem key={i} value={size}>
-                {size}
+          <SelectContent className="max-h-60 z-[100]">
+            {menuItems && menuItems.length > 0 ? (
+              menuItems
+                .filter((item) => !formData.MealValue?.includes(item.Name))
+                .map((item) => (
+                  <SelectItem key={item.ID} value={item.Name}>
+                    {item.Name}
+                  </SelectItem>
+                ))
+            ) : (
+              <SelectItem key="no-data" value="" disabled>
+                No menu items available
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
 

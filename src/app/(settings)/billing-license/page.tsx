@@ -6,7 +6,7 @@ import { LicenseInfo, ApiResponse, ToastState } from '@/lib/types/billing';
 
 // Hooks
 import { useToast } from '@/lib/hooks';
-import { Toast } from '@/components/ui/toast';
+import { Toaster } from "@/components/ui/sonner";
 import { useLicense } from '@/lib/hooks/useLicense';
 
 // Components
@@ -17,8 +17,8 @@ import { ResourcesAllocationCard } from './_components/resource-allocation-card'
 import { UpdateLicenseCard } from './_components/update-license-card';
 
 const BillingLicensePage = () => {
-  const { toast, toastVisible, showToast, hideToast } = useToast();
-  
+  const { showToast } = useToast();
+
   const {
     licenseInfo,
     loading,
@@ -38,13 +38,7 @@ const BillingLicensePage = () => {
 
   return (
     <div className="p-6 min-h-screen bg-background w-full">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <div className="flex-1 justify-center items-center w-full px-6">
         {/* Container with proper centering and full width utilization */}

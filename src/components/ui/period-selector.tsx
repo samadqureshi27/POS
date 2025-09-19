@@ -1,4 +1,4 @@
-// components/PeriodSelector.tsx
+// components/ui/period-selector.tsx
 import React, { useRef, useEffect, useState } from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';

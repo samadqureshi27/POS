@@ -2,15 +2,17 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { useInventoryManagement } from "@/lib/hooks/inventoryManagement";
-import { Toast } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/sonner";
+import { useToast } from "@/lib/hooks";
 import ActionBar from "@/components/ui/action-bar";
 import StatCard from "@/components/ui/summary-card";
 import InventoryModal from "./_components/inventory-modal";
 import InventoryTable from "./_components/inventory-table";
-import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 const InventoryManagementPage = () => {
   const params = useParams();
   const branchId = parseInt(params?.branchId as string) || 1;
+  const { showToast } = useToast();
   const {
     // State
     inventoryItems,
@@ -21,10 +23,6 @@ const InventoryManagementPage = () => {
     loading,
     actionLoading,
     statistics,
-    // Toast
-    toast,
-    toastVisible,
-    hideToast,
     // Selection
     selectedItems,
     isAllSelected, // This is a function, not a boolean
@@ -46,19 +44,26 @@ const InventoryManagementPage = () => {
     updateFormData,
   } = useInventoryManagement(branchId);
 
+  // Enhanced action handlers with consistent toast notifications
+  const handleAddWithToast = () => {
+    openCreateModal();
+  };
+
+  const handleDeleteWithToast = async () => {
+    if (selectedItems.length === 0) {
+      showToast("Please select items to delete", "warning");
+      return;
+    }
+    await handleDeleteSelected();
+  };
+
   if (loading) {
-    return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={2} showActionBar={true} />;
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={2} showActionBar={true} />;
   }
 
   return (
     <div className="p-6 bg-background min-h-screen mt-17">
-      {toast && toastVisible && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <div className="mb-8 mt-2">
         <h1 className="text-3xl font-semibold">
@@ -80,9 +85,9 @@ const InventoryManagementPage = () => {
 
       {/* Action bar: add, delete, search */}
       <ActionBar
-        onAdd={openCreateModal}
+        onAdd={handleAddWithToast}
         addDisabled={selectedItems.length > 0}
-        onDelete={handleDeleteSelected}
+        onDelete={handleDeleteWithToast}
         deleteDisabled={selectedItems.length === 0}
         isDeleting={actionLoading}
         searchValue={searchTerm}

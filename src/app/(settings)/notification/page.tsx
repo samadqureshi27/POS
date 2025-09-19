@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { Toast } from '@/components/ui/toast';
-import { useToast } from '@/lib/hooks/toast';
+import { Toaster } from "@/components/ui/sonner";
+import { useToast } from '@/lib/hooks';
 import { useNotificationSettings } from "@/lib/hooks/useNotificationSettings";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import  { NotificationCard } from "./_components/notification-card";
@@ -10,7 +10,7 @@ import { NOTIFICATION_SECTIONS } from "@/lib/util/notification-options";
 import ActionButtons from '@/components/ui/setting-buttons';
 
 const NotificationSettingsPage = () => {
-  const { toast, toastVisible, showToast, hideToast } = useToast();
+  const { showToast } = useToast();
   const {
     settings,
     loading,
@@ -30,13 +30,7 @@ const NotificationSettingsPage = () => {
 
   return (
     <div className="p-6 min-h-screen bg-background w-full">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+      <Toaster position="top-right" />
       <div className="flex-1 justify-center items-center w-full px-6">
         <div className="mt-20">
           {/* Header */}
