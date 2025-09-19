@@ -56,6 +56,14 @@ export interface MenuItemTabProps {
     fileInputRef: React.RefObject<HTMLInputElement>;
     categories: any[];
 }
+export interface MenuItem {
+    ID: number;
+    Name: string;
+    Price: number;
+    Category: string;
+    StockQty: string;
+    Status: "Active" | "Inactive";
+}
 
 export interface MenuTableProps {
     filteredItems: MenuItem[];
