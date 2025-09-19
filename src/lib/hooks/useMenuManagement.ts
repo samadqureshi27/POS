@@ -61,16 +61,16 @@ export const useMenuManagement = () => {
     Price: 0,
     Category: "",
     StockQty: "",
-    Status: "Inactive",
+    Status: "Active",
     Description: "",
-    MealType: "Morning",
+    MealType: "All Day",
     Priority: 1,
-    MinimumQuantity: 0,
+    MinimumQuantity: 1,
     ShowOnMenu: "Inactive",
     Featured: "Inactive",
     StaffPick: "Inactive",
     DisplayType: "Select a type",
-    Displaycat: "Var",
+    Displaycat: "",
     SpecialStartDate: "",
     SpecialEndDate: "",
     SpecialPrice: 0,
@@ -140,16 +140,16 @@ export const useMenuManagement = () => {
       Price: 0,
       Category: "",
       StockQty: "",
-      Status: "Inactive",
+      Status: "Active",
       Description: "",
-      MealType: "Morning",
+      MealType: "All Day",
       Priority: 1,
-      MinimumQuantity: 0,
+      MinimumQuantity: 1,
       ShowOnMenu: "Inactive",
       Featured: "Inactive",
       StaffPick: "Inactive",
       DisplayType: "Select a type",
-      Displaycat: "Var",
+      Displaycat: "",
       SpecialStartDate: "",
       SpecialEndDate: "",
       SpecialPrice: 0,
@@ -182,7 +182,7 @@ export const useMenuManagement = () => {
         StockQty: editingItem.StockQty,
         Status: editingItem.Status,
         Description: editingItem.Description || "",
-        MealType: editingItem.MealType || "Morning",
+        MealType: editingItem.MealType || "All Day",
         Priority: editingItem.Priority || 1,
         MinimumQuantity: editingItem.MinimumQuantity || 0,
         ShowOnMenu: editingItem.ShowOnMenu || "Inactive",
@@ -193,7 +193,7 @@ export const useMenuManagement = () => {
         Special: editingItem.Special || "Inactive",
         SubTBE: editingItem.SubTBE || "Inactive",
         DisplayType: editingItem.DisplayType || "Select a type",
-        Displaycat: editingItem.Displaycat || "Var",
+        Displaycat: editingItem.Displaycat || "",
         SpecialStartDate: editingItem.SpecialStartDate || "",
         SpecialEndDate: editingItem.SpecialEndDate || "",
         SpecialPrice: editingItem.SpecialPrice || 0,
@@ -234,12 +234,13 @@ export const useMenuManagement = () => {
   });
 
   const isFormValid = () => {
-    const isPriceValid = formData.Displaycat === "Var" || formData.Price > 0;
+    // Only require price when display type is selected and it's not Var
+    const isPriceValid = !formData.Displaycat || formData.Displaycat === "Var" || formData.Price > 0;
 
     return (
       formData.Name?.trim() &&
-      formData.DisplayType &&
-      formData.DisplayType !== "Select a type" &&
+      formData.Displaycat &&
+      formData.Displaycat !== "" &&
       formData.Category?.trim() &&
       isPriceValid
     );
