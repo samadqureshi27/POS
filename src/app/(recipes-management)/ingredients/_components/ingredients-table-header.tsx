@@ -95,6 +95,10 @@ const IngredientsTableHeader: React.FC<IngredientsTableHeaderProps> = ({
           <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
         </th>
         <th className="relative px-4 py-3 text-left">
+          Threshold
+          <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
+        </th>
+        <th className="relative px-4 py-3 text-left">
           Priority
           <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
         </th>

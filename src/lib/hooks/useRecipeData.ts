@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import MenuAPI from "@/lib/util/recipeApi";
 import { recipeOptionsApi } from "@/lib/util/recipe-options-api";
+import { useIngredientsData } from "./useIngredientsData";
 import {
   RecipeOption,
   Ingredient,
@@ -11,9 +12,17 @@ import {
 } from "../types/recipes";
 
 export const useRecipeData = () => {
+  // Get ingredients data from ingredients hook and transform to match expected format
+  const { items: rawIngredients } = useIngredientsData();
+
+  // Transform ingredients to match expected format (string ID to number ID)
+  const ingredients: Ingredient[] = rawIngredients.map(item => ({
+    ...item,
+    ID: parseInt(item.ID.replace('#', '')) || 0
+  }));
+
   // State management
   const [recipeOptions, setRecipeOptions] = useState<RecipeOption[]>([]);
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [availableRecipeOptions, setAvailableRecipeOptions] = useState<any[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,32 +46,10 @@ export const useRecipeData = () => {
   const loadInitialData = async () => {
     await Promise.all([
       loadRecipeOptions(),
-      loadIngredients(),
       loadAvailableRecipeOptions()
     ]);
   };
 
-  const loadIngredients = useCallback(async () => {
-    try {
-      const response = await MenuAPI.getIngredients();
-      if (response.success) {
-        // Ensure ingredients have the required structure
-        const ingredientsWithDefaults = response.data.map(ingredient => ({
-          ...ingredient,
-          Status: ingredient.Status || "Active" as "Active" | "Inactive",
-          Description: ingredient.Description || "",
-          Priority: ingredient.Priority || 0,
-          Unit: ingredient.Unit || ""
-        }));
-        setIngredients(ingredientsWithDefaults);
-      } else {
-        throw new Error(response.message || "Failed to fetch ingredients");
-      }
-    } catch (error) {
-      console.error("Error fetching ingredients:", error);
-      showToast("Failed to load ingredients", "error");
-    }
-  }, []);
 
   const loadAvailableRecipeOptions = useCallback(async () => {
     try {

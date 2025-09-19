@@ -64,7 +64,6 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
             </Select>
           </div>
 
-
           <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50/50">
             <Label className="text-sm font-medium text-gray-700">
               Deal Package
