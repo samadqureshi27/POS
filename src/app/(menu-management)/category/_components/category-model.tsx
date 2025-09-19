@@ -98,125 +98,174 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
-          {/* Name and Status Row */}
-          <div className="flex gap-4 items-end">
-            <div className="flex-1">
-              <Label htmlFor="name" className="text-sm font-medium">
-                Category Name <span className="text-destructive">*</span>
+          {/* Header Section */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">
+              Category Information
+            </h3>
+            <p className="text-xs text-gray-500 mb-4">
+              Configure the basic details and organization settings for this category
+            </p>
+          </div>
+
+          {/* Category Name Section */}
+          <div className="space-y-4">
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                  Category Name <span className="text-red-500">*</span>
+                </Label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Name that will appear in menus and POS system
+                </p>
+                <Input
+                  id="name"
+                  type="text"
+                  value={formData.Name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, Name: e.target.value })
+                  }
+                  placeholder="e.g., Beverages, Appetizers, Main Courses"
+                  required
+                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              {/* Status Toggle */}
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50/50 border border-gray-200">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Active Status
+                  </Label>
+                  <p className="text-xs text-gray-500">Enable this category</p>
+                </div>
+                <Switch
+                  checked={formData.Status === "Active"}
+                  onCheckedChange={handleStatusChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Organization Settings */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-gray-700 pb-2 border-b border-gray-100">
+              Organization Settings
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="parent" className="text-sm font-medium text-gray-700">
+                  Parent Category
+                </Label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Optional parent for hierarchical organization
+                </p>
+                <Select
+                  value={formData.Parent || "none"}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, Parent: value === "none" ? "" : value })
+                  }
+                >
+                  <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20">
+                    <SelectValue placeholder="No parent category" />
+                  </SelectTrigger>
+                  <SelectContent className="z-[100]">
+                    <SelectItem value="none">No parent category</SelectItem>
+                    {categories
+                      .filter(cat => cat.Status === "Active" && (!editingItem || cat.ID !== editingItem.ID))
+                      .map((category) => (
+                        <SelectItem key={category.ID} value={category.Name}>
+                          {category.Name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="priority" className="text-sm font-medium text-gray-700">
+                  Display Priority
+                </Label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Order in menus (lower numbers appear first)
+                </p>
+                <Input
+                  id="priority"
+                  type="number"
+                  min="1"
+                  value={formData.Priority || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData({
+                      ...formData,
+                      Priority: value === '' ? 1 : Number(value)
+                    });
+                  }}
+                  placeholder="1"
+                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Description & Media Section */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-gray-700 pb-2 border-b border-gray-100">
+              Description & Media
+            </h4>
+
+            {/* Description */}
+            <div>
+              <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+                Description
               </Label>
-              <Input
-                id="name"
-                type="text"
-                value={formData.Name}
+              <p className="text-xs text-gray-500 mb-2">
+                Brief description for this category (optional)
+              </p>
+              <Textarea
+                id="description"
+                value={formData.Description}
                 onChange={(e) =>
-                  setFormData({ ...formData, Name: e.target.value })
+                  setFormData({ ...formData, Description: e.target.value })
                 }
-                placeholder="e.g., Beverages, Appetizers"
-                required
-                className="mt-1"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Label className="text-sm font-medium">
-                Active
-              </Label>
-              <Switch
-                checked={formData.Status === "Active"}
-                onCheckedChange={handleStatusChange}
-              />
-            </div>
-          </div>
-
-          {/* Parent and Priority Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="parent" className="text-sm font-medium">
-                Parent Category
-              </Label>
-              <Select
-                value={formData.Parent || "none"}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, Parent: value === "none" ? "" : value })
-                }
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="No parent category" />
-                </SelectTrigger>
-                <SelectContent className="z-[100]">
-                  <SelectItem value="none">No parent category</SelectItem>
-                  {categories
-                    .filter(cat => cat.Status === "Active" && (!editingItem || cat.ID !== editingItem.ID))
-                    .map((category) => (
-                      <SelectItem key={category.ID} value={category.Name}>
-                        {category.Name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="priority" className="text-sm font-medium">
-                Display Priority
-              </Label>
-              <Input
-                id="priority"
-                type="number"
-                min="1"
-                value={formData.Priority || ""}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setFormData({
-                    ...formData,
-                    Priority: value === '' ? 1 : Number(value)
-                  });
+                className="min-h-[80px] resize-none transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                placeholder="Brief description of this category..."
+                rows={3}
+                style={{
+                  height: 'auto',
+                  minHeight: '80px',
+                  maxHeight: '120px'
                 }}
-                placeholder="1"
-                className="mt-1"
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = Math.min(target.scrollHeight, 120) + 'px';
+                }}
               />
             </div>
-          </div>
 
-          {/* Description */}
-          <div>
-            <Label htmlFor="description" className="text-sm font-medium">
-              Description
-            </Label>
-            <Textarea
-              id="description"
-              value={formData.Description}
-              onChange={(e) =>
-                setFormData({ ...formData, Description: e.target.value })
-              }
-              className="mt-1 min-h-[80px] resize-none"
-              placeholder="Brief description of this category..."
-              rows={3}
-              style={{
-                height: 'auto',
-                minHeight: '80px',
-                maxHeight: '120px'
-              }}
-              onInput={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                target.style.height = 'auto';
-                target.style.height = Math.min(target.scrollHeight, 120) + 'px';
-              }}
-            />
-          </div>
-
-          {/* Icon Selection */}
-          <div>
-            <Label className="text-sm font-medium">
-              Category Icon
-            </Label>
-            <div className="mt-2 p-4 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
-              <div className="text-center">
-                <ImageIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">
-                  Icon selector will be implemented here
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Choose from food & beverage icons
-                </p>
+            {/* Icon Selection */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700">
+                Category Icon
+              </Label>
+              <p className="text-xs text-gray-500 mb-2">
+                Choose an icon to represent this category visually
+              </p>
+              <div className="p-4 border border-gray-200 rounded-lg bg-gray-50/50">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-blue-50 border border-blue-200 mb-3">
+                    <ImageIcon className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h5 className="text-sm font-medium text-gray-700 mb-1">Icon Selection</h5>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Icon selector will be implemented here
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Choose from food & beverage icons
+                  </p>
+                </div>
               </div>
             </div>
           </div>
