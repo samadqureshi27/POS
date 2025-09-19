@@ -81,7 +81,6 @@ const MenuTable: React.FC<MenuTableProps> = ({
       onSelectAll={onSelectAll}
       onSelectItem={onSelectItem}
       getRowId={(item) => item.ID}
-      maxHeight="600px"
       emptyMessage={emptyMessage}
       mobileResponsive={true}
       nameColumn="name"

@@ -71,9 +71,9 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
           {label}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {options.filter(option => option && option.value !== undefined).map((option) => (
+        {options.filter(option => option && option.value !== undefined).map((option, index) => (
           <DropdownMenuItem
-            key={option.value}
+            key={`${option.value}-${index}`}
             className={cn(
               "cursor-pointer",
               value === option.value && "bg-accent",

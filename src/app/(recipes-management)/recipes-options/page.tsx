@@ -5,13 +5,15 @@
 
 import React from "react";
 import ActionBar from "@/components/ui/action-bar";
-import { Toast } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/sonner";
+import { useToast } from "@/lib/hooks";
 import RecipeModal from "./_components/recipe-option-modal";
 import RecipeTable from "./_components/recipe-option-table";
-import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeOptions } from "@/lib/hooks/useRecipeOptions";
 
 const RecipeOptionsPage = () => {
+  const { showToast: globalShowToast } = useToast();
   const {
     items,
     selectedItems,
@@ -20,7 +22,6 @@ const RecipeOptionsPage = () => {
     searchTerm,
     editingItem,
     isModalOpen,
-    toast,
     displayFilter,
     setSearchTerm,
     setDisplayFilter,
@@ -30,31 +31,48 @@ const RecipeOptionsPage = () => {
     handleEdit,
     handleDelete,
     handleModalClose,
-    handleModalSubmit,
-    dismissToast,
+    handleModalSubmit: handleModalSubmitOriginal,
   } = useRecipeOptions();
 
+  // Enhanced action handlers with consistent toast notifications
+  const handleAddWithToast = () => {
+    handleAddNew();
+  };
+
+  const handleDeleteWithToast = async () => {
+    if (selectedItems.length === 0) {
+      globalShowToast("Please select recipe options to delete", "warning");
+      return;
+    }
+    await handleDelete();
+    globalShowToast(`${selectedItems.length} recipe option(s) deleted successfully`, "success");
+  };
+
+  const handleModalSubmit = async (data: any) => {
+    const result = await handleModalSubmitOriginal(data);
+    if (editingItem) {
+      globalShowToast("Recipe option updated successfully", "success");
+    } else {
+      globalShowToast("Recipe option added successfully", "success");
+    }
+    return result;
+  };
+
   if (loading) {
-    return <ManagementPageSkeleton showSummaryCards={false} showActionBar={true} />;
+    return <GlobalSkeleton type="management" showSummaryCards={false} showActionBar={true} />;
   }
 
   return (
       <div className="p-6 bg-background min-w-full h-full overflow-y-auto">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={dismissToast}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <h1 className="text-3xl font-semibold mt-14 mb-8">Recipe Options</h1>
 
       {/* Action bar */}
       <ActionBar
-        onAdd={handleAddNew}
+        onAdd={handleAddWithToast}
         addDisabled={selectedItems.length > 0}
-        onDelete={handleDelete}
+        onDelete={handleDeleteWithToast}
         deleteDisabled={selectedItems.length === 0}
         isDeleting={actionLoading}
         searchValue={searchTerm}

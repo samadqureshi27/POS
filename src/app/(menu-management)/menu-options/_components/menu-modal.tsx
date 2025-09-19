@@ -26,7 +26,11 @@ const MenuModal: React.FC<MenuModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg lg:max-w-2xl h-[70vh] flex flex-col">
+      <DialogContent
+        className="max-w-lg lg:max-w-2xl h-[80vh] max-h-[800px] flex flex-col"
+        showCloseButton={false}
+        onWheel={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="text-lg sm:text-xl md:text-2xl">
             {editingItem ? "Edit Option" : "Add Option"}

@@ -5,17 +5,17 @@ import { AlertCircle } from "lucide-react";
 
 // Components
 import { DateFilter } from "@/components/ui/date-filter";
-import { Toast } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/sonner";
 import StatCard from "@/components/ui/summary-card";
 import { StaffTable } from "./components/payroll-staff-table";
 import ActionBar from "@/components/ui/action-bar";
-import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 
 // Hooks
 import { useDateFilter } from "@/lib/hooks/useDateFilter";
 import { useStaffData } from "@/lib/hooks/usePayrollStaffData";
 import { useFilters } from "@/lib/hooks/payrollFilter";
-import { useToast } from "@/lib/hooks/toast";
+import { useToast } from "@/lib/hooks";
 
 const StaffManagementPage = () => {
   // For demo purposes, let's set a default branch ID since we can't access real routing
@@ -27,11 +27,11 @@ const StaffManagementPage = () => {
 
   // Custom hooks
   const dateFilter = useDateFilter("Week");
-  const { toast, showToast, hideToast } = useToast();
-  
+  const { showToast } = useToast();
+
   // Staff data hook with error handling
   const { staffItems, loading, summaryData } = useStaffData(branchId);
-  
+
   // Filters hook
   const filters = useFilters(staffItems, dateFilter);
 
@@ -43,7 +43,7 @@ const StaffManagementPage = () => {
   }, [loading, branchId, showToast]);
 
   if (loading) {
-    return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
   }
 
   if (!branchId) {
@@ -59,13 +59,7 @@ const StaffManagementPage = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen mt-17 w-full">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <div className="mb-8 mt-2">
         <h1 className="text-3xl font-semibold">Payroll - Branch #{branchId}</h1>
@@ -98,7 +92,7 @@ const StaffManagementPage = () => {
       <ActionBar
         searchValue={filters.searchTerm}
         onSearchChange={filters.setSearchInput}
-        searchPlaceholder="Search"
+        searchPlaceholder="Search staff..."
       />
 
       {/* Staff Table Component */}

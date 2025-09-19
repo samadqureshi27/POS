@@ -17,6 +17,9 @@ const MenuModal: React.FC<MenuModalProps> = ({
     activeTab,
     setActiveTab,
     formData,
+    menuOptions,
+    menuItems,
+    categories,
     onClose,
     onSubmit,
     actionLoading,
@@ -30,7 +33,16 @@ const MenuModal: React.FC<MenuModalProps> = ({
 }) => {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="w-full max-w-lg h-[70vh] lg:max-w-2xl flex flex-col">
+            <DialogContent
+                className="w-full max-w-lg h-[70vh] lg:max-w-2xl flex flex-col"
+                showCloseButton={false}
+                onWheel={(e) => e.preventDefault()}
+            >
+                <DialogHeader>
+                    <DialogTitle className="sr-only">
+                        {editingItem ? "Edit Menu Item" : "Add Menu Item"}
+                    </DialogTitle>
+                </DialogHeader>
                 <ModalHeader
                     editingItem={editingItem}
                     activeTab={activeTab}
@@ -47,6 +59,9 @@ const MenuModal: React.FC<MenuModalProps> = ({
                     updateFormData={updateFormData}
                     handleFormFieldChange={handleFormFieldChange}
                     handleStatusChange={handleStatusChange}
+                    menuOptions={menuOptions}
+                    menuItems={menuItems}
+                    categories={categories}
                 />
 
                 <ModalFooter
@@ -68,7 +83,7 @@ const ModalHeader: React.FC<{
     formData: Omit<MenuItem, "ID">;
 }> = ({ editingItem, activeTab, setActiveTab, formData }) => (
     <div className="flex-shrink-0">
-        <h1 className="text-xl sm:text-2xl px-4 sm:px-6 pt-3 sm:pt-4 font-medium">
+        <h1 className="text-xl font-medium">
             {editingItem ? "Edit Menu Item" : "Add Menu Item"}
         </h1>
         <TabNavigation
@@ -88,6 +103,9 @@ const ModalContent: React.FC<{
     updateFormData: (updates: Partial<Omit<MenuItem, "ID">>) => void;
     handleFormFieldChange: (field: keyof Omit<MenuItem, "ID">, value: any) => void;
     handleStatusChange: (field: keyof Omit<MenuItem, "ID">, isActive: boolean) => void;
+    menuOptions: any[];
+    menuItems: MenuItem[];
+    categories: any[];
 }> = ({
     activeTab,
     formData,
@@ -97,8 +115,11 @@ const ModalContent: React.FC<{
     updateFormData,
     handleFormFieldChange,
     handleStatusChange,
+    menuOptions,
+    menuItems,
+    categories,
 }) => (
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="flex-1 overflow-y-auto">
             {activeTab === "Menu Items" && (
                 <MenuItemTab
                     formData={formData}
@@ -108,6 +129,7 @@ const ModalContent: React.FC<{
                     preview={preview}
                     setPreview={setPreview}
                     fileInputRef={fileInputRef}
+                    categories={categories}
                 />
             )}
 
@@ -125,6 +147,7 @@ const ModalContent: React.FC<{
                     formData={formData}
                     updateFormData={updateFormData}
                     handleFormFieldChange={handleFormFieldChange}
+                    menuOptions={menuOptions}
                 />
             )}
 
@@ -133,6 +156,7 @@ const ModalContent: React.FC<{
                     formData={formData}
                     setFormData={updateFormData}
                     handleStatusChange={handleStatusChange}
+                    menuItems={menuItems}
                 />
             )}
 
@@ -158,7 +182,7 @@ const ModalFooter: React.FC<{
     onClose: () => void;
     onSubmit: () => void;
     actionLoading: boolean;
-    isFormValid: boolean;
+    isFormValid: () => boolean;
 }> = ({ editingItem, onClose, onSubmit, actionLoading, isFormValid }) => (
     <div className="flex-shrink-0 flex flex-col sm:flex-row justify-end gap-3 p-4 border-t border-gray-200 bg-white">
         <button
@@ -171,8 +195,8 @@ const ModalFooter: React.FC<{
         <button
             type="button"
             onClick={onSubmit}
-            disabled={actionLoading || !isFormValid}
-            className={`px-4 py-2 min-w-[120px] rounded-sm transition-colors text-white order-1 sm:order-2 ${actionLoading || !isFormValid
+            disabled={actionLoading || !isFormValid()}
+            className={`px-4 py-2 min-w-[120px] rounded-sm transition-colors text-white order-1 sm:order-2 ${actionLoading || !isFormValid()
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-black hover:bg-gray-700"
                 }`}

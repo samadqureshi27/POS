@@ -21,13 +21,13 @@ import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/loader";
 import ErrorDisplay from "@/components/ui/error-message";
 import { DashboardHeader } from "./_components/DashboardHeader";
-import { PeriodSelector } from "./_components/PeriodSelector";
+import { PeriodSelector } from "@/components/ui/period-selector";
 import { MetricsCards } from "./_components/MetricsCards";
 import { CustomerAnalytics } from "./_components/CustomerAnalytics";
 import { RevenueTrendChart } from "./_components/RevenueTrendChart";
 import { BestSellingItemsChart } from "./_components/BestSellingItemsChart";
 import ErrorMessage from "@/components/ui/error-message";
-import { DashboardSkeleton } from "./_components/DashboardSkeleton";
+import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 // Main Dashboard Component
 const Dashboard = () => {
@@ -168,7 +168,7 @@ const Dashboard = () => {
   }, []); // Empty dependency array - only run once
 
   if (loading) {
-    return <DashboardSkeleton />;
+    return <GlobalSkeleton type="dashboard" showHeader={true} showSummaryCards={true} showPeriodSelector={true} showCharts={true} summaryCardCount={4} />;
   }
 
   if (!dashboardData) {

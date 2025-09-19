@@ -28,6 +28,7 @@ export interface MealTabProps {
     formData: any;
     setFormData: (data: any) => void;
     handleStatusChange: (field: string, isActive: boolean) => void;
+    menuItems: MenuItem[];
 }
 
 export interface MenuActionBarProps {
@@ -53,14 +54,7 @@ export interface MenuItemTabProps {
     preview: string | null;
     setPreview: (preview: string | null) => void;
     fileInputRef: React.RefObject<HTMLInputElement>;
-}
-export interface MenuItem {
-    ID: number;
-    Name: string;
-    Price: number;
-    Category: string;
-    StockQty: string;
-    Status: "Active" | "Inactive";
+    categories: any[];
 }
 
 export interface MenuTableProps {
@@ -82,10 +76,13 @@ export interface MenuModalProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
     formData: Omit<MenuItem, "ID">;
+    menuOptions: any[];
+    menuItems: MenuItem[];
+    categories: any[];
     onClose: () => void;
     onSubmit: () => void;
     actionLoading: boolean;
-    isFormValid: boolean;
+    isFormValid: () => boolean;
     preview: string | null;
     setPreview: (preview: string | null) => void;
     fileInputRef: React.RefObject<HTMLInputElement>;
@@ -97,6 +94,7 @@ export interface OptionsTabProps {
     formData: Omit<MenuItem, "ID">;
     updateFormData: (updates: Partial<Omit<MenuItem, "ID">>) => void;
     handleFormFieldChange: (field: keyof Omit<MenuItem, "ID">, value: any) => void;
+    menuOptions: any[];
 }
 export interface PriceTabProps {
     formData: any;
@@ -130,6 +128,7 @@ export interface MenuItem {
     StaffPick?: "Active" | "Inactive";
     DisplayType?: string;
     Displaycat?: string;
+    Unit?: string;
     SpecialStartDate?: string;
     SpecialEndDate?: string;
     SpecialPrice?: number;

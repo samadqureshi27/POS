@@ -7,6 +7,7 @@ export interface InventoryItem {
   Status: "Active" | "Inactive";
   Description: string;
   Unit: string;
+  Threshold: number;
   Priority: number;
 }
 
@@ -43,6 +44,7 @@ export const useIngredientsData = () => {
     Status: "Inactive",
     Description: "",
     Unit: "",
+    Threshold: 0,
     Priority: 0,
   });
 
@@ -56,7 +58,8 @@ export const useIngredientsData = () => {
             Name: "Bread",
             Status: "Active",
             Description: "Fresh bread for daily use",
-            Unit: "Kilograms (Kg's)",
+            Unit: "Weight in Grams",
+            Threshold: 500,
             Priority: 1,
           },
           {
@@ -64,7 +67,8 @@ export const useIngredientsData = () => {
             Name: "Oat Bread",
             Status: "Active",
             Description: "Healthy oat bread option",
-            Unit: "Kilograms (Kg's)",
+            Unit: "Weight in Grams",
+            Threshold: 300,
             Priority: 2,
           },
           {
@@ -72,7 +76,8 @@ export const useIngredientsData = () => {
             Name: "French Bread",
             Status: "Inactive",
             Description: "Traditional French bread",
-            Unit: "Kilograms (Kg's)",
+            Unit: "Quantity Count",
+            Threshold: 10,
             Priority: 3,
           },
         ]);
@@ -213,6 +218,7 @@ export const useIngredientsData = () => {
       Status: "Inactive",
       Description: "",
       Unit: "",
+      Threshold: 0,
       Priority: 0,
     });
     setModalOpen(true);

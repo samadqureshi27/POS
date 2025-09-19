@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 // Components
 import { StarRating } from '@/components/ui/StarRating';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
-import { MetricCard } from '@/components/ui/MetricCard';
+import  {MetricCard } from '@/components/ui/MetricCard';
 import { CustomerGrowthChart } from './_components/CustomerGrowthChart';
 import { RevenueTrendsChart } from './_components/RevenueTrendsChart';
 import { OrderTypesChart } from './_components/OrderTypesChart';
@@ -13,7 +13,7 @@ import { MonthlyComparisonChart } from './_components/MonthlyComparisonChart';
 import { CustomerSegmentsChart } from './_components/CustomerSegmentsChart';
 import { TopCustomersTable } from './_components/TopCustomersTable';
 import { RecentOrdersTable } from './_components/RecentOrdersTable';
-import { PeriodSelector } from './_components/PeriodSelector';
+import { PeriodSelector } from '@/components/ui/period-selector';
 // Hooks
 import { useDashboard } from '@/lib/hooks/useAnalytics';
 
@@ -213,7 +213,8 @@ const AnalyticsDashboard = () => {
         <MetricCard
           title="Customer Satisfaction"
           value={analyticsData.customerSatisfaction || 0}
-          subtitle={<StarRating rating={Math.floor(analyticsData.customerSatisfaction || 0)} />}
+          showStarRating={true}
+          starRating={analyticsData.customerSatisfaction || 0}
         />
       </div>
 

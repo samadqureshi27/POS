@@ -21,7 +21,7 @@ const MenuTable: React.FC<MenuTableProps> = ({
 }) => {
   const categoryOptions = [
     { value: "", label: "All Categories" },
-    ...categories.map(cat => ({ value: cat, label: cat }))
+    ...categories.map(cat => ({ value: cat.Name, label: cat.Name }))
   ];
 
   const statusOptions = [
@@ -46,7 +46,21 @@ const MenuTable: React.FC<MenuTableProps> = ({
       key: "price",
       title: "Price",
       dataIndex: "Price",
-      render: (value) => `$${value}`
+      render: (value, record) => {
+        if (record.Displaycat === "Var") {
+          // For variations, show first variation price or "Varies"
+          if (record.PPrice && record.PPrice.length > 0) {
+            return `$${record.PPrice[0]}`;
+          }
+          return "Varies";
+        } else if (record.Displaycat === "Weight") {
+          // For weight-based pricing, show price per unit
+          return `$${value}/${record.Unit || "gm"}`;
+        } else {
+          // For quantity (Qty) or default
+          return `$${value}`;
+        }
+      }
     },
     {
       key: "category",

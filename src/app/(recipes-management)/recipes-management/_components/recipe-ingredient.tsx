@@ -21,7 +21,7 @@ interface RecipeOption {
 interface Ingredient {
   ID: number;
   Name: string;
-  Unit: string;
+  Unit?: string;
 }
 
 interface RecipeIngredientsTabProps {
@@ -125,191 +125,199 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
   const title = isOption ? "Recipe Options" : "Ingredients";
   const priceLabel = isOption ? "Price" : "Amount";
 
+  // Use real data from management tables
+  const dataToUse = ingredients || [];
+
   return (
-    <div className="space-y-4 h-full flex flex-col">
-      {/* Add Ingredient Button */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <Select onValueChange={(value) => addIngredient(value)}>
-          <SelectTrigger className="w-full mb-2">
-            <SelectValue placeholder={`Add New ${title}`} />
-          </SelectTrigger>
-          <SelectContent className="max-h-60">
-            {ingredients.map((ingredient) => (
-              <SelectItem key={ingredient.ID} value={ingredient.Name}>
-                {ingredient.Name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="pr-1 py-4 space-y-6">
+      {/* Header Section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-gray-800 mb-2">
+          {title} Configuration
+        </h3>
+        <p className="text-xs text-gray-500 mb-4">
+          Add and configure {title.toLowerCase()} for this recipe with pricing
+        </p>
+
+        {/* Add Item Selector */}
+        <div className="flex-1">
+          <Label className="text-sm font-medium text-gray-700">
+            Add {title.slice(0, -1)}
+          </Label>
+          <Select onValueChange={(value) => addIngredient(value)}>
+            <SelectTrigger className="mt-1 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20">
+              <SelectValue placeholder={`Select ${title.toLowerCase().slice(0, -1)} to add...`} />
+            </SelectTrigger>
+            <SelectContent className="max-h-60 z-[100]">
+              {dataToUse && dataToUse.length > 0 ? (
+                dataToUse
+                  .filter((ingredient) => !values.includes(ingredient.Name))
+                  .map((ingredient) => (
+                    <SelectItem key={ingredient.ID} value={ingredient.Name} className="cursor-pointer">
+                      <div>
+                        <div className="font-medium">{ingredient.Name}</div>
+                        {ingredient.Unit && (
+                          <div className="text-xs text-gray-500">Unit: {ingredient.Unit}</div>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))
+              ) : (
+                <SelectItem key="no-data" value="" disabled>
+                  No {title.toLowerCase()} available
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Mobile Card Layout */}
-      <div className="block sm:hidden overflow-y-auto max-h-[300px]">
-        <div className="space-y-3 pb-4">
-          {values.map((opt, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-gray-200 rounded-sm p-4 shadow-sm"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Grip size={16} className="text-gray-400" />
-                  <span className="font-medium text-gray-700">
-                    {isOption ? "Option" : "Ingredient"} {idx + 1}
-                  </span>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeIngredient(idx)}
-                  className="text-red-500 hover:text-red-700 h-8 w-8"
-                >
-                  <X size={18} />
-                </Button>
-              </div>
 
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-xs font-medium text-gray-600">
-                    Name
-                  </Label>
-                  <Input
-                    type="text"
-                    value={opt}
-                    readOnly
-                    className="bg-gray-100 text-sm"
-                    placeholder="Ingredient name"
-                  />
-                </div>
+      {/* Items Display */}
+      {values && values.length > 0 && (
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-gray-700 pb-2 border-b border-gray-100">
+            {title} Items ({values.length})
+          </h4>
 
+          {/* Desktop Table View */}
+          <div className="hidden lg:block">
+            <div className="border border-gray-200 rounded-lg bg-gray-50/50">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="w-12 p-3 text-center text-xs font-medium text-gray-500 uppercase"></th>
+                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Item Name</th>
+                    <th className="w-24 p-3 text-center text-xs font-medium text-gray-500 uppercase">{priceLabel}</th>
+                    <th className="w-12 p-3 text-center text-xs font-medium text-gray-500 uppercase"></th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[120px] overflow-y-auto bg-white">
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId={`${tabType}-items`}>
+                  {(provided) => (
+                    <table className="w-full border-collapse">
+                      <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                        {values.map((opt, idx) => (
+                          <Draggable
+                            key={idx}
+                            draggableId={`${tabType}-item-${idx}`}
+                            index={idx}
+                          >
+                            {(provided, snapshot) => (
+                              <tr
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className={`hover:bg-gray-50 transition-colors ${
+                                  snapshot.isDragging ? "bg-blue-50 shadow-lg" : ""
+                                } border-b border-gray-100 last:border-b-0`}
+                              >
+                                <td
+                                  className="p-3 text-center cursor-grab w-12"
+                                  {...provided.dragHandleProps}
+                                >
+                                  <Grip size={16} className="text-gray-400 mx-auto" />
+                                </td>
+                                <td className="p-3">
+                                  <div className="font-medium text-gray-800">{opt}</div>
+                                  <div className="text-xs text-gray-500">{title.slice(0, -1)} component</div>
+                                </td>
+                                <td className="p-3 text-center">
+                                  <Input
+                                    type="number"
+                                    step={isOption ? "0.01" : "1"}
+                                    value={prices[idx] || 0}
+                                    onChange={(e) => {
+                                      const value = Number(e.target.value) || 0;
+                                      updatePrice(idx, value);
+                                    }}
+                                    className="w-20 text-center mx-auto transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                                    placeholder="0"
+                                  />
+                                </td>
+                                <td className="p-3 text-center w-12">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeIngredient(idx)}
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors px-2 py-1 rounded h-auto w-auto"
+                                  >
+                                    <X size={16} />
+                                  </Button>
+                                </td>
+                              </tr>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </tbody>
+                    </table>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </div>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="lg:hidden space-y-3">
+            {values.map((opt, idx) => (
+              <div key={idx} className="p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50/50 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <Grip size={16} className="text-gray-400" />
+                    <div>
+                      <div className="font-medium text-gray-800">{opt}</div>
+                      <div className="text-xs text-gray-500">{title.slice(0, -1)} component</div>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeIngredient(idx)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
+                  >
+                    <X size={16} />
+                  </Button>
+                </div>
                 <div>
-                  <Label className="text-xs font-medium text-gray-600">
-                    {priceLabel}
-                  </Label>
+                  <Label className="text-xs font-medium text-gray-700 mb-1 block">{priceLabel}</Label>
                   <Input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={prices[idx]}
+                    type="number"
+                    step={isOption ? "0.01" : "1"}
+                    value={prices[idx] || 0}
                     onChange={(e) => {
-                      const value = Number(e.target.value.replace(/\D/g, "")) || 0;
+                      const value = Number(e.target.value) || 0;
                       updatePrice(idx, value);
                     }}
-                    className="text-sm"
                     placeholder="0"
+                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Desktop Table Layout */}
-      <div className="hidden sm:flex sm:flex-col flex-1 min-h-0">
-        {/* Fixed Header */}
-        <div className="border border-gray-200 rounded-t-sm bg-gray-50 flex-shrink-0">
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-                <th className="p-3 text-left text-sm font-medium text-gray-700">Name</th>
-                <th className="w-24 p-3 text-left text-sm font-medium text-gray-700">{priceLabel}</th>
-                <th className="w-12 p-3 text-center text-sm font-medium text-gray-700"></th>
-              </tr>
-            </thead>
-          </table>
+      {/* Empty State */}
+      {(!values || values.length === 0) && (
+        <div className="text-center py-12 bg-gray-50/50 rounded-lg border-2 border-dashed border-gray-200">
+          <div className="text-gray-400 mb-2">
+            <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <h4 className="text-sm font-medium text-gray-600 mb-1">No {title.toLowerCase()} added</h4>
+          <p className="text-xs text-gray-500">
+            Select {title.toLowerCase()} from the dropdown above to add them to this recipe
+          </p>
         </div>
-
-        {/* Scrollable Body */}
-        <div
-          className="border-l border-r border-b border-gray-200 rounded-b-sm overflow-y-auto bg-white max-h-[250px] min-h-[250px]"
-          style={{
-            scrollbarWidth: "thin",
-            scrollbarColor: "#cbd5e1 #f1f5f9",
-          }}
-        >
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId={`${tabType}-items`}>
-              {(provided) => (
-                <table className="w-full border-collapse">
-                  <tbody ref={provided.innerRef} {...provided.droppableProps}>
-                    {values.map((opt, idx) => (
-                      <Draggable
-                        key={idx}
-                        draggableId={`${tabType}-item-${idx}`}
-                        index={idx}
-                      >
-                        {(provided, snapshot) => (
-                          <tr
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            className={`hover:bg-gray-50 ${
-                              snapshot.isDragging
-                                ? "bg-gray-100 shadow-sm"
-                                : ""
-                            } border-b border-gray-200`}
-                          >
-                            {/* Drag Handle */}
-                            <td
-                              className="p-3 text-center cursor-grab w-12"
-                              {...provided.dragHandleProps}
-                            >
-                              <Grip size={18} className="text-gray-500 mx-auto" />
-                            </td>
-
-                            {/* Ingredient Name (readonly) */}
-                            <td className="p-3">
-                              <Input
-                                type="text"
-                                value={opt}
-                                readOnly
-                                className="bg-gray-100"
-                                placeholder="Ingredient name"
-                              />
-                            </td>
-
-                            {/* Price/Amount */}
-                            <td className="p-3 text-center w-24">
-                              <Input
-                                type="text"
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                value={prices[idx]}
-                                onChange={(e) => {
-                                  const value = Number(e.target.value.replace(/\D/g, "")) || 0;
-                                  updatePrice(idx, value);
-                                }}
-                                className="text-center"
-                                placeholder="0"
-                              />
-                            </td>
-
-                            {/* Delete Button */}
-                            <td className="p-3 text-center w-12">
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                onClick={() => removeIngredient(idx)}
-                                className="text-black hover:text-gray-700 h-8 w-8"
-                              >
-                                <X size={20} />
-                              </Button>
-                            </td>
-                          </tr>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </tbody>
-                </table>
-              )}
-            </Droppable>
-          </DragDropContext>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

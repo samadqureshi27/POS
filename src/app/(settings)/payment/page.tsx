@@ -2,13 +2,15 @@
 import React from "react";
 import StatCard from "@/components/ui/summary-card";
 import ActionBar from "@/components/ui/action-bar";
-import { Toast } from '@/components/ui/toast'
+import { Toaster } from "@/components/ui/sonner";
+import { useToast } from "@/lib/hooks";
 import PaymentModal from "./_components/payment-modal";
 import PaymentTable from "./_components/payment-table";;
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { usePaymentManagement } from "@/lib/hooks/usePaymentManagement";
 
 const PaymentManagementPage = () => {
+  const { showToast } = useToast();
   const {
     // State
     filteredItems,
@@ -18,9 +20,6 @@ const PaymentManagementPage = () => {
     loading,
     actionLoading,
     statistics,
-    // Toast
-    toast,
-    hideToast,
     // Selection
     selectedItems,
     isAllSelected,
@@ -43,19 +42,26 @@ const PaymentManagementPage = () => {
     handleStatusChange,
   } = usePaymentManagement();
 
+  // Enhanced action handlers with consistent toast notifications
+  const handleAddWithToast = () => {
+    openCreateModal();
+  };
+
+  const handleDeleteWithToast = async () => {
+    if (selectedItems.length === 0) {
+      showToast("Please select payment methods to delete", "warning");
+      return;
+    }
+    await handleDeleteSelected();
+  };
+
   if (loading) {
     return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
   }
 
   return (
     <div className="p-6 px-4 bg-background min-h-screen">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <h1 className="text-3xl font-semibold mb-8 mt-20">
         Payment Management
@@ -76,9 +82,9 @@ const PaymentManagementPage = () => {
 
       {/* Action bar */}
       <ActionBar
-        onAdd={openCreateModal}
+        onAdd={handleAddWithToast}
         addDisabled={selectedItems.length > 0}
-        onDelete={handleDeleteSelected}
+        onDelete={handleDeleteWithToast}
         deleteDisabled={selectedItems.length === 0}
         isDeleting={actionLoading}
         searchValue={searchTerm}
