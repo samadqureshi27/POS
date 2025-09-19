@@ -5,7 +5,7 @@ import ActionBar from "@/components/ui/action-bar";
 import {Toast} from "@/components/ui/toast";
 import MenuTable from "./_components/menu-table";
 import MenuModal from "./_components/menu-modal";
-import LoadingSpinner from "@/components/ui/loader";
+import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import { useMenuOptions } from "@/lib/hooks/useMenuOptions"; // Adjust path as needed
 
 const CategoryPage = () => {
@@ -43,11 +43,11 @@ const CategoryPage = () => {
   } = useMenuOptions();
 
   if (loading) {
-    return <LoadingSpinner message="Loading Menu Options..."/>
+    return <GlobalSkeleton type="management" showSummaryCards={false} showActionBar={true} />;
   }
 
   return (
-    <div className="bg-gray-50 min-w-full h-full overflow-y-auto">
+    <div className="p-6 bg-background min-w-full h-full overflow-y-auto">
       {toast && (
         <Toast
           message={toast.message}

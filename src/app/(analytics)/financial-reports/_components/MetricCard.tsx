@@ -1,25 +1,33 @@
 
 // components/ui/MetricCard.tsx
 import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface MetricCardProps {
   title: string;
   value: string | number;
-  subtitle?: string;
+  subtitle?: string | React.ReactNode;
 }
 
-export const MetricCard: React.FC<MetricCardProps> = ({ 
-  title, 
-  value, 
-  subtitle 
+export const MetricCard: React.FC<MetricCardProps> = ({
+  title,
+  value,
+  subtitle
 }) => {
   return (
-    <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm">
-      <div className="space-y-1">
-        <p className="text-3xl font-bold">{value}</p>
-        <p className="text-sm text-gray-500">{title}</p>
-        {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
-      </div>
-    </div>
+    <Card className="shadow-sm">
+      <CardContent className="p-6">
+        <div className="space-y-1">
+          <p className="text-3xl font-bold">{value}</p>
+          <p className="text-sm text-muted-foreground">{title}</p>
+          {subtitle && (
+            <div className="text-xs text-muted-foreground/80">
+              {typeof subtitle === 'string' ? subtitle : subtitle}
+            </div>
+          )}
+
+        </div>
+      </CardContent>
+    </Card>
   );
 };

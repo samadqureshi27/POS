@@ -4,29 +4,23 @@ import React from "react";
 import { AreaChart, Area, XAxis, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from "recharts";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { VisitData } from "@/lib/types/Dtypes";
+import { Separator } from "@/components/ui/separator";
 
 interface CustomerAnalyticsProps {
   visitData: VisitData[];
   getPeriodLabel: () => string;
 }
 
-export const CustomerAnalytics: React.FC<CustomerAnalyticsProps> = ({ 
-  visitData, 
-  getPeriodLabel 
+export const CustomerAnalytics: React.FC<CustomerAnalyticsProps> = ({
+  visitData,
+  getPeriodLabel
 }) => (
-  <div className="bg-white md:p-4 rounded-sm shadow-sm border border-gray-200 mb-6 sm:mb-8">
+  <div className="bg-white rounded-sm border border-gray-300 p-6 shadow-sm mb-6 sm:mb-8">
     <div className="w-full">
-      <p className="pt-5 pl-2 md:pt-0 md:pl-0 text-lg font-bold text-gray-500">
+      <h2 className="text-lg font-semibold tracking-tight text-muted-foreground">
         {getPeriodLabel()}
-      </p>
-      <div
-        style={{
-          height: "1px",
-          backgroundColor: "#e5e7eb",
-          margin: "1rem 0 0 0",
-          width: "100%",
-        }}
-      />
+      </h2>
+      <Separator className="mt-4" />
     </div>
 
     <div className="flex flex-col lg:flex-row gap-6">
@@ -34,37 +28,42 @@ export const CustomerAnalytics: React.FC<CustomerAnalyticsProps> = ({
       <div className="flex-1 min-w-0 w-[100%]">
         {/* Top metrics row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="border-b md:border-r md:border-b-0 p-4 border-gray-300">
+          <div className="p-4 relative">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-gray-500">Total Revenue</p>
+              <p className="text-sm text-muted-foreground">Total Revenue</p>
               <div className="flex items-center text-green-500">
                 <span className="text-sm font-medium">+1,023</span>
                 <TrendingUp size={12} className="ml-1" />
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-gray-900">1,731</h3>
+            <h3 className="text-3xl font-bold tracking-tight">1,731</h3>
+            <Separator className="md:hidden mt-4" />
+            <Separator orientation="vertical" className="hidden md:block absolute right-0 top-0 h-full" />
           </div>
 
-          <div className="border-b md:border-r md:border-b-0 p-4 border-gray-300">
+          <div className="p-4 relative">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-gray-500">Total Expense</p>
+              <p className="text-sm text-muted-foreground">Total Expense</p>
               <div className="flex items-center text-green-500">
                 <span className="text-sm font-medium">+125</span>
                 <TrendingUp size={12} className="ml-1" />
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-gray-900">258</h3>
+            <h3 className="text-3xl font-bold tracking-tight">258</h3>
+            <Separator className="md:hidden mt-4" />
+            <Separator orientation="vertical" className="hidden md:block absolute right-0 top-0 h-full" />
           </div>
 
-          <div className="border-b md:border-none p-4 border-gray-300">
+          <div className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-gray-500">Total Orders</p>
+              <p className="text-sm text-muted-foreground">Total Orders</p>
               <div className="flex items-center text-green-500">
                 <span className="text-sm font-medium">+95</span>
                 <TrendingUp size={12} className="ml-1" />
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-gray-900">98</h3>
+            <h3 className="text-3xl font-bold tracking-tight">98</h3>
+            <Separator className="md:hidden mt-4" />
           </div>
         </div>
 
@@ -142,46 +141,54 @@ export const CustomerAnalytics: React.FC<CustomerAnalyticsProps> = ({
       </div>
 
       {/* Right side stats cards */}
-      <div className="lg:w-80 flex-shrink-0 border-l border-gray-300 space-y-6">
-        <div className="p-4 border-b border-t md:border-t-0 border-gray-300">
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-4xl pb-8 font-bold text-gray-900">258</div>
-            <TrendingUp size={14} className="text-green-500" />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-              <span className="text-sm text-gray-600">Total Revenue</span>
+      <div className="lg:w-80 flex-shrink-0 relative">
+        <Separator orientation="vertical" className="hidden lg:block absolute left-0 top-0 h-full" />
+        <div className="lg:pl-6 space-y-6">
+          <div className="p-4">
+            <Separator className="lg:hidden mb-4" />
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-4xl pb-8 font-bold tracking-tight">258</div>
+              <TrendingUp size={14} className="text-green-500" />
             </div>
-            <div className="text-green-500 text-sm font-medium">+125</div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                <span className="text-sm text-muted-foreground">Total Revenue</span>
+              </div>
+              <div className="text-green-500 text-sm font-medium">+125</div>
+            </div>
           </div>
-        </div>
 
-        <div className="p-4 border-b border-gray-300">
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-4xl pb-8 font-bold text-gray-900">369</div>
-            <TrendingDown size={14} className="text-red-500" />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
-              <span className="text-sm text-gray-600">Total Expense</span>
-            </div>
-            <div className="text-red-500 text-sm font-medium">-5</div>
-          </div>
-        </div>
+          <Separator />
 
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-4xl pb-8 font-bold text-gray-900">20</div>
-            <TrendingUp size={14} className="text-green-500" />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              <span className="text-sm text-gray-600">Total Orders</span>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-4xl pb-8 font-bold tracking-tight">369</div>
+              <TrendingDown size={14} className="text-red-500" />
             </div>
-            <div className="text-green-500 text-sm font-medium">+19</div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
+                <span className="text-sm text-muted-foreground">Total Expense</span>
+              </div>
+              <div className="text-red-500 text-sm font-medium">-5</div>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-4xl pb-8 font-bold tracking-tight">20</div>
+              <TrendingUp size={14} className="text-green-500" />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                <span className="text-sm text-muted-foreground">Total Orders</span>
+              </div>
+              <div className="text-green-500 text-sm font-medium">+19</div>
+            </div>
           </div>
         </div>
       </div>

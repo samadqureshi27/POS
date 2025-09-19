@@ -3,7 +3,7 @@
 import React from "react";
 import { useCategory } from '@/lib/hooks/useCategory';
 import {Toast} from "@/components/ui/toast";
-import LoadingSpinner from "@/components/ui/loader";
+import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import CategoryTable from './_components/category-table';
 import CategoryModal from './_components/category-model';
 import ActionBar from "@/components/ui/action-bar";
@@ -41,11 +41,11 @@ const CategoriesPage = () => {
     selectedItems.length === filteredItems.length && filteredItems.length > 0;
 
   if (loading) {
-    return <LoadingSpinner message="Category Loading..."/>;
+    return <GlobalSkeleton type="management" showSummaryCards={false} showActionBar={true} />;
   }
 
   return (
-    <div className="bg-gray-50 min-w-full h-full overflow-y-auto">
+    <div className="p-6 bg-background min-w-full h-full overflow-y-auto">
       {toast && (
         <Toast
           message={toast.message}

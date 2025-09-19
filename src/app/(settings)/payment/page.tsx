@@ -5,7 +5,7 @@ import ActionBar from "@/components/ui/action-bar";
 import { Toast } from '@/components/ui/toast'
 import PaymentModal from "./_components/payment-modal";
 import PaymentTable from "./_components/payment-table";;
-import LoadingSpinner from '@/components/ui/loader';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { usePaymentManagement } from "@/lib/hooks/usePaymentManagement";
 
 const PaymentManagementPage = () => {
@@ -44,11 +44,11 @@ const PaymentManagementPage = () => {
   } = usePaymentManagement();
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
   }
 
   return (
-    <div className="px-4 bg-gray-50 min-h-screen">
+    <div className="p-6 px-4 bg-background min-h-screen">
       {toast && (
         <Toast
           message={toast.message}

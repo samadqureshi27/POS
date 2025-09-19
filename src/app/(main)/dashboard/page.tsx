@@ -16,7 +16,8 @@ import { dashboardAPI } from "@/lib/util/DsahboradApi";
 import { getPeriodLabel } from "@/lib/util/Dashboradutils";
 
 // Components
-import { Toast } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/loader";
 import ErrorDisplay from "@/components/ui/error-message";
 import { DashboardHeader } from "./_components/DashboardHeader";
@@ -26,6 +27,7 @@ import { CustomerAnalytics } from "./_components/CustomerAnalytics";
 import { RevenueTrendChart } from "./_components/RevenueTrendChart";
 import { BestSellingItemsChart } from "./_components/BestSellingItemsChart";
 import ErrorMessage from "@/components/ui/error-message";
+import { DashboardSkeleton } from "./_components/DashboardSkeleton";
 
 // Main Dashboard Component
 const Dashboard = () => {
@@ -33,10 +35,6 @@ const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error" | "info";
-  } | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>("");
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -56,14 +54,14 @@ const Dashboard = () => {
   console.log('Dashboard render - Loading:', loading);
 
   // Modified load dashboard data function with optional loading parameter
-  const loadDashboardData = useCallback(async (period: string, showLoading = true) => {
+  const loadDashboardData = useCallback(async (period: string, showLoading = true, startDate?: string, endDate?: string) => {
     try {
       if (showLoading) {
         setLoading(true);
       }
-      console.log('Loading dashboard data for period:', period);
-      
-      const data = await dashboardAPI.getDashboardData(period);
+      console.log('Loading dashboard data for period:', period, startDate ? `from ${startDate} to ${endDate}` : '');
+
+      const data = await dashboardAPI.getDashboardData(period, startDate, endDate);
       setDashboardData(data);
       setLastUpdated(new Date().toISOString());
     } catch (error) {
@@ -77,16 +75,35 @@ const Dashboard = () => {
   }, []);
 
   const showToast = useCallback((message: string, type: "success" | "error" | "info") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    switch (type) {
+      case "success":
+        toast.success(message);
+        break;
+      case "error":
+        toast.error(message);
+        break;
+      case "info":
+        toast.info(message);
+        break;
+      default:
+        toast(message);
+    }
   }, []);
 
   const handleRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
       console.log('Refreshing dashboard data for period:', selectedPeriod);
-      
-      const data = await dashboardAPI.refreshDashboardData(selectedPeriod);
+
+      let data;
+      if (selectedPeriod === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) {
+        const startDate = customDateRange[0].startDate.toISOString().split('T')[0];
+        const endDate = customDateRange[0].endDate.toISOString().split('T')[0];
+        data = await dashboardAPI.refreshDashboardData(selectedPeriod, startDate, endDate);
+      } else {
+        data = await dashboardAPI.refreshDashboardData(selectedPeriod);
+      }
+
       setDashboardData(data);
       setLastUpdated(new Date().toISOString());
       showToast("Dashboard refreshed successfully", "success");
@@ -95,7 +112,7 @@ const Dashboard = () => {
     } finally {
       setRefreshing(false);
     }
-  }, [selectedPeriod, showToast]);
+  }, [selectedPeriod, showToast, customDateRange]);
 
   // Modified period change handler - no loading animation for period changes
   const handlePeriodChange = useCallback(async (period: string) => {
@@ -103,14 +120,22 @@ const Dashboard = () => {
       console.log('Period changed to:', period);
       setSelectedPeriod(period);
       setShowDatePicker(false);
-      
-      // Load data without showing loading spinner for period changes
-      await loadDashboardData(period, false); // Pass false to skip loading animation
+
+      // For Custom period, check if we have date range data
+      if (period === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) {
+        const startDate = customDateRange[0].startDate.toISOString().split('T')[0];
+        const endDate = customDateRange[0].endDate.toISOString().split('T')[0];
+        console.log('Loading custom range data:', startDate, 'to', endDate);
+        await loadDashboardData(period, false, startDate, endDate);
+      } else {
+        // Load data without showing loading spinner for period changes
+        await loadDashboardData(period, false);
+      }
     } catch (error) {
       console.error("Error changing period:", error);
       showToast("Failed to load data for selected period", "error");
     }
-  }, [loadDashboardData, showToast]);
+  }, [loadDashboardData, showToast, customDateRange]);
 
   const getPeriodLabelWithCustomRange = useCallback(() => {
     return getPeriodLabel(selectedPeriod, customDateRange);
@@ -143,7 +168,7 @@ const Dashboard = () => {
   }, []); // Empty dependency array - only run once
 
   if (loading) {
-    return <LoadingSpinner message="Loading Dashboard..." />;
+    return <DashboardSkeleton />;
   }
 
   if (!dashboardData) {
@@ -156,14 +181,8 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+    <div className="w-full min-h-screen bg-background p-4 sm:p-6 lg:p-8">
+      <Toaster position="top-right" />
 
       <div className="w-full">
         <DashboardHeader
@@ -174,13 +193,11 @@ const Dashboard = () => {
 
         <PeriodSelector
           selectedPeriod={selectedPeriod}
-          // periods={periods}
           onPeriodChange={handlePeriodChange}
           customDateRange={customDateRange}
           setCustomDateRange={setCustomDateRange}
           showDatePicker={showDatePicker}
           setShowDatePicker={setShowDatePicker}
-          // calendarRef={calendarRef}
         />
 
         <MetricsCards metrics={dashboardData.metrics} />

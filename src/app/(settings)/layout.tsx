@@ -10,8 +10,8 @@ export default function SettingsLayout({
   return (
     <>
       <SettingsSubmenu />
-      <main className="">
-        {children}
+      <main>
+        {children}  
       </main>
     </>
   );

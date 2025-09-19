@@ -1,5 +1,8 @@
 import React from "react";
 import { CreditCard, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface UpdateLicenseCardProps {
     licenseKeyInput: string;
@@ -27,15 +30,15 @@ export const UpdateLicenseCard: React.FC<UpdateLicenseCardProps> = ({
 
             <form onSubmit={handleUpdateLicense} className="space-y-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <Label className="text-sm font-medium text-gray-700 mb-3">
                         License Key
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         type="text"
                         value={licenseKeyInput}
                         onChange={(e) => setLicenseKeyInput(e.target.value)}
                         placeholder="Enter your license key (e.g., LIC-XXXX-XXXX-XXXX)"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
+                        className="px-4 py-3 rounded-sm"
                         disabled={updating}
                     />
                     <p className="text-xs text-gray-500 mt-2">
@@ -43,10 +46,10 @@ export const UpdateLicenseCard: React.FC<UpdateLicenseCardProps> = ({
                     </p>
                 </div>
 
-                <button
+                <Button
                     type="submit"
                     disabled={updating || !licenseKeyInput.trim()}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#2C2C2C] text-white rounded-sm hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#2C2C2C] text-white rounded-sm hover:bg-gray-700 transition-colors"
                 >
                     {updating ? (
                         <>
@@ -59,7 +62,7 @@ export const UpdateLicenseCard: React.FC<UpdateLicenseCardProps> = ({
                             Update License
                         </>
                     )}
-                </button>
+                </Button>
             </form>
         </div>
     );

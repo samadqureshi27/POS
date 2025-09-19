@@ -3,7 +3,7 @@ import React from "react";
 import { Toast } from '@/components/ui/toast';
 import { useToast } from '@/lib/hooks/toast';
 import { useNotificationSettings } from "@/lib/hooks/useNotificationSettings";
-import LoadingSpinner from '@/components/ui/loader';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import  { NotificationCard } from "./_components/notification-card";
 import { QuietHoursSettings } from "./_components/quiet-hours-settings";
 import { NOTIFICATION_SECTIONS } from "@/lib/util/notification-options";
@@ -23,13 +23,13 @@ const NotificationSettingsPage = () => {
   } = useNotificationSettings(showToast);
 
   if (loading) {
-    return <LoadingSpinner message="Loading Notification page"/>;
+    return <GlobalSkeleton type="settings" showHeader={true} />;
   }
 
   if (!settings) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <div className="p-6 min-h-screen bg-background w-full">
       {toast && (
         <Toast
           message={toast.message}
@@ -41,7 +41,7 @@ const NotificationSettingsPage = () => {
         <div className="mt-20">
           {/* Header */}
           <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
-            <h1 className="text-3xl font-semibold mb-5 text-gray-900">
+            <h1 className="text-3xl font-semibold mb-5 text-foreground">
               Notification Settings
             </h1>
             <ActionButtons

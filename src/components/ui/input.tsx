@@ -1,82 +1,21 @@
-"use client";
-import React, { ReactNode } from 'react';
+import * as React from "react"
 
-interface InputProps {
-  label?: string;
-  type?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  icon?: ReactNode;
-  rightIcon?: ReactNode;
-  error?: string;
-  disabled?: boolean;
-  required?: boolean;
-  className?: string;
+import { cn } from "@/lib/utils"
+
+function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+  return (
+    <input
+      type={type}
+      data-slot="input"
+      className={cn(
+        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-sm border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        className
+      )}
+      {...props}
+    />
+  )
 }
 
-const Input: React.FC<InputProps> = ({
-  label,
-  type = 'text',
-  value,
-  onChange,
-  placeholder,
-  icon,
-  rightIcon,
-  error,
-  disabled = false,
-  required = false,
-  className = ''
-}) => {
-  return (
-    <div className={`space-y-1 ${className}`}>
-      {label && (
-        <label className="block text-sm font-medium text-gray-700">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-      )}
-      
-      <div className="relative">
-        {icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <div className="text-gray-400">{icon}</div>
-          </div>
-        )}
-        
-        <input
-          type={type}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          disabled={disabled}
-          required={required}
-          className={`
-            block w-full rounded-lg border-2 transition-all duration-200
-            ${icon ? 'pl-10' : 'pl-4'}
-            ${rightIcon ? 'pr-10' : 'pr-4'}
-            py-3 text-gray-900 placeholder-gray-500
-            focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent
-            ${error 
-              ? 'border-red-300 bg-red-50 text-red-900' 
-              : 'border-gray-300 bg-white hover:border-gray-400'
-            }
-            ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-          `}
-        />
-        
-        {rightIcon && (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-            {rightIcon}
-          </div>
-        )}
-      </div>
-      
-      {error && (
-        <p className="text-sm text-red-600 mt-1">{error}</p>
-      )}
-    </div>
-  );
-};
-
-export default Input;
+export { Input }

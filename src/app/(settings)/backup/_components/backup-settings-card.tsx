@@ -1,8 +1,12 @@
 import React from "react";
 import { Settings } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { BackupSettings } from '@/lib/types/backup';
 import { SettingsDropdown } from './backup-settings-dropdown';
-import ButtonPage from "@/components/ui/button";
 
 interface BackupSettingsCardProps {
     settings: BackupSettings;
@@ -20,128 +24,124 @@ export const BackupSettingsCard: React.FC<BackupSettingsCardProps> = ({
     ];
 
     return (
-        <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-                <Settings className="text-black" size={20} />
-                <h2 className="text-lg font-semibold">Backup Settings</h2>
-            </div>
+        <Card className="shadow-sm">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Settings size={20} />
+                    Backup Settings
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
 
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Automatic Backups
-                        </label>
-                        <p className="text-xs text-gray-500">Enable scheduled backups</p>
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <Label className="text-sm font-medium">
+                                Automatic Backups
+                            </Label>
+                            <p className="text-xs text-muted-foreground">Enable scheduled backups</p>
+                        </div>
+                        <Switch
+                            checked={settings.autoBackupEnabled}
+                            onCheckedChange={(isActive) => handleSettingChange("autoBackupEnabled", isActive)}
+                        />
                     </div>
-                    <ButtonPage
-                        checked={settings.autoBackupEnabled}
-                        onChange={(isActive) => handleSettingChange("autoBackupEnabled", isActive)}
-                    />
-                </div>
 
-                {settings.autoBackupEnabled && (
-                    <>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Backup Frequency
-                            </label>
-                            <SettingsDropdown
-                                value={settings.backupFrequency}
-                                options={frequencyOptions}
-                                onValueChange={(value) => handleSettingChange("backupFrequency", value)}
-                                placeholder="Select frequency"
-                            />
-                        </div>
+                    {settings.autoBackupEnabled && (
+                        <>
+                            <div>
+                                <Label className="text-sm font-medium">
+                                    Backup Frequency
+                                </Label>
+                                <SettingsDropdown
+                                    value={settings.backupFrequency}
+                                    options={frequencyOptions}
+                                    onValueChange={(value) => handleSettingChange("backupFrequency", value)}
+                                    placeholder="Select frequency"
+                                />
+                            </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Backup Time
-                            </label>
-                            <input
-                                type="time"
-                                value={settings.backupTime}
-                                onChange={(e) => handleSettingChange("backupTime", e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                            />
-                        </div>
+                            <div>
+                                <Label className="text-sm font-medium">
+                                    Backup Time
+                                </Label>
+                                <Input
+                                    type="time"
+                                    value={settings.backupTime}
+                                    onChange={(e) => handleSettingChange("backupTime", e.target.value)}
+                                />
+                            </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Retention Period (days)
-                            </label>
-                            <input
-                                type="number"
-                                min="1"
-                                max="365"
-                                value={settings.retentionPeriod}
-                                onChange={(e) => handleSettingChange("retentionPeriod", parseInt(e.target.value))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1]"
-                            />
-                        </div>
-                    </>
-                )}
+                            <div>
+                                <Label className="text-sm font-medium">
+                                    Retention Period (days)
+                                </Label>
+                                <Input
+                                    type="number"
+                                    min="1"
+                                    max="365"
+                                    value={settings.retentionPeriod}
+                                    onChange={(e) => handleSettingChange("retentionPeriod", parseInt(e.target.value))}
+                                />
+                            </div>
+                        </>
+                    )}
 
-                <div className="pt-4 border-t border-gray-200">
-                    <h3 className="text-sm font-medium text-gray-700 mb-3">Data to Include</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={settings.includeMenuData}
-                                onChange={(e) => handleSettingChange("includeMenuData", e.target.checked)}
-                                className="mr-2 text-black"
-                            />
-                            <label className="text-sm">Menu Data</label>
-                        </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={settings.includeOrderHistory}
-                                onChange={(e) => handleSettingChange("includeOrderHistory", e.target.checked)}
-                                className="mr-2 text-black"
-                            />
-                            <label className="text-sm">Order History</label>
-                        </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={settings.includeCustomerData}
-                                onChange={(e) => handleSettingChange("includeCustomerData", e.target.checked)}
-                                className="mr-2 text-black"
-                            />
-                            <label className="text-sm">Customer Data</label>
-                        </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={settings.includeEmployeeData}
-                                onChange={(e) => handleSettingChange("includeEmployeeData", e.target.checked)}
-                                className="mr-2 text-black"
-                            />
-                            <label className="text-sm">Employee Data</label>
-                        </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={settings.includeSettings}
-                                onChange={(e) => handleSettingChange("includeSettings", e.target.checked)}
-                                className="mr-2 text-black"
-                            />
-                            <label className="text-sm">System Settings</label>
-                        </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={settings.includeFinancialData}
-                                onChange={(e) => handleSettingChange("includeFinancialData", e.target.checked)}
-                                className="mr-2 text-black"
-                            />
-                            <label className="text-sm">Financial Data</label>
+                    <div className="pt-4 border-t">
+                        <h3 className="text-sm font-medium mb-3">Data to Include</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="includeMenuData"
+                                    checked={settings.includeMenuData}
+                                    onCheckedChange={(checked) => handleSettingChange("includeMenuData", checked)}
+                                />
+                                <Label htmlFor="includeMenuData" className="text-sm">Menu Data</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="includeOrderHistory"
+                                    checked={settings.includeOrderHistory}
+                                    onCheckedChange={(checked) => handleSettingChange("includeOrderHistory", checked)}
+                                />
+                                <Label htmlFor="includeOrderHistory" className="text-sm">Order History</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="includeCustomerData"
+                                    checked={settings.includeCustomerData}
+                                    onCheckedChange={(checked) => handleSettingChange("includeCustomerData", checked)}
+                                />
+                                <Label htmlFor="includeCustomerData" className="text-sm">Customer Data</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="includeEmployeeData"
+                                    checked={settings.includeEmployeeData}
+                                    onCheckedChange={(checked) => handleSettingChange("includeEmployeeData", checked)}
+                                />
+                                <Label htmlFor="includeEmployeeData" className="text-sm">Employee Data</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="includeSettings"
+                                    checked={settings.includeSettings}
+                                    onCheckedChange={(checked) => handleSettingChange("includeSettings", checked)}
+                                />
+                                <Label htmlFor="includeSettings" className="text-sm">System Settings</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="includeFinancialData"
+                                    checked={settings.includeFinancialData}
+                                    onCheckedChange={(checked) => handleSettingChange("includeFinancialData", checked)}
+                                />
+                                <Label htmlFor="includeFinancialData" className="text-sm">Financial Data</Label>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 }

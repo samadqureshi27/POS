@@ -2,11 +2,10 @@
 "use client";
 
 import React from "react";
-import Checkbox from "@mui/material/Checkbox";
-import ResponsiveEditButton from "@/components/ui/responsive-detail-button";
+import { Edit } from "lucide-react";
+import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 import { VendorItem, VendorTableProps } from "@/lib/types/vendors";
 
-import CustomCheckbox from "@/components/ui/custom-checkbox";
 const VendorTable: React.FC<VendorTableProps> = ({
     vendorItems,
     selectedItems,
@@ -16,108 +15,65 @@ const VendorTable: React.FC<VendorTableProps> = ({
     isAllSelected,
     branchId,
 }) => {
+    const columns: DataTableColumn<VendorItem>[] = [
+        {
+            key: "id",
+            title: "ID",
+            dataIndex: "ID",
+            width: "80px"
+        },
+        {
+            key: "companyName",
+            title: "Company Name",
+            dataIndex: "Company_Name",
+            render: (value) => <span className="font-medium">{value}</span>
+        },
+        {
+            key: "contactPerson",
+            title: "Contact Person",
+            dataIndex: "Name"
+        },
+        {
+            key: "contact",
+            title: "Contact",
+            dataIndex: "Contact"
+        },
+        {
+            key: "email",
+            title: "Email",
+            dataIndex: "Email"
+        },
+        {
+            key: "address",
+            title: "Address",
+            dataIndex: "Address"
+        }
+    ];
+
+    const actions: DataTableAction<VendorItem>[] = [
+        {
+            key: "edit",
+            label: "Edit",
+            icon: <Edit className="h-4 w-4" />,
+            onClick: onEditItem
+        }
+    ];
+
     return (
-        <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[100vw] shadow-sm responsive-customer-table">
-            <div className="rounded-sm table-container">
-                <table className="min-w-full divide-y max-w-[800px] divide-gray-200 table-fixed">
-                    <thead className="bg-white border-b text-gray-500 border-gray-200 py-50 sticky top-0 z-10">
-                        <tr>
-                            <th className="px-6 py-6 text-left w-[2.5px]">
-                                <CustomCheckbox
-                                    checked={isAllSelected}
-                                    onChange={onSelectAll}
-                                />
-                            </th>
-                            <th className="relative px-4 py-3 text-left">
-                                ID
-                                <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
-                            </th>
-                            <th className="relative px-4 py-3 text-left">
-                                Company Name
-                                <span className="absolute left-0 top-[15%] h-[70%] w-[2.5px] bg-[#d9d9e1]"></span>
-                            </th>
-                            <th className="relative px-4 py-3 text-left">
-                                Contact Person
-                                <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
-                            </th>
-                            <th className="relative px-4 py-3 text-left">
-                                Contact
-                                <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
-                            </th>
-                            <th className="relative px-4 py-3 text-left">
-                                Email
-                                <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
-                            </th>
-                            <th className="relative px-4 py-3 text-left">
-                                Address
-                                <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
-                            </th>
-                            <th className="relative px-4 py-3 text-left">
-                                Actions
-                                <span className="absolute left-0 top-[15%] h-[70%] w-[1.5px] bg-gray-300"></span>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="divide-y text-gray-500 divide-gray-300">
-                        {vendorItems.length === 0 ? (
-                            <tr>
-                                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                                    No vendors found for Branch #{branchId}.
-                                </td>
-                            </tr>
-                        ) : (
-                            vendorItems.map((item) => (
-                                <tr
-                                    key={item.ID}
-                                    className="bg-white hover:bg-gray-50"
-                                >
-                                    <td className="px-6 py-8 card-checkbox-cell" onClick={(e) => e.stopPropagation()}>
-                                        <CustomCheckbox
-                                            checked={selectedItems.includes(item.ID)}
-                                            onChange={(checked) => onSelectItem(item.ID, checked)}
-                                        />
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap" data-label="Vendor ID">
-                                        {item.ID}
-                                    </td>
-
-                                    <td className="px-4 py-4 whitespace-nowrap card-name-cell" data-label="Company Name">
-                                        <div className="name-content">
-                                            <span className="font-medium">{item.Company_Name}</span>
-                                        </div>
-                                    </td>
-
-                                    <td className="px-4 py-4 whitespace-nowrap" data-label="Contact Person">
-                                        {item.Name}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap" data-label="Contact">
-                                        {item.Contact}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap" data-label="Email">
-                                        {item.Email}
-                                    </td>
-                                    <td
-                                        className="px-4 py-4 whitespace-nowrap"
-                                        data-label="Address"
-                                    >
-                                        {item.Address}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap card-actions-cell" data-label="Actions" onClick={(e) => e.stopPropagation()}>
-                                        <ResponsiveEditButton
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onEditItem(item);
-                                            }}
-                                        />
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <DataTable
+            data={vendorItems}
+            columns={columns}
+            actions={actions}
+            selectable={true}
+            selectedItems={selectedItems}
+            onSelectAll={onSelectAll}
+            onSelectItem={onSelectItem}
+            getRowId={(item) => item.ID}
+            maxHeight="600px"
+            emptyMessage={`No vendors found for Branch #${branchId}.`}
+            mobileResponsive={true}
+            nameColumn="companyName"
+        />
     );
 };
 

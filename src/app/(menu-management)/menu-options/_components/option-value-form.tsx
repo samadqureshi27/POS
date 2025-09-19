@@ -7,6 +7,9 @@ import {
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { MenuItemOptions,OptionValuesFormProps } from '@/lib/types/menuItemOptions';
 
 const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDataChange }) => {
@@ -51,14 +54,14 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
       <div className="block md:hidden">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Option Values</h3>
-          <button
+          <Button
             type="button"
             onClick={addOptionPair}
-            className="bg-black text-white px-3 py-2 rounded-sm text-sm flex items-center gap-2 hover:bg-gray-700 transition-colors"
+            className="text-sm"
           >
             <Plus size={16} />
             Add Option
-          </button>
+          </Button>
         </div>
 
         <div className="space-y-3 max-h-96 overflow-y-auto" style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e1 #f1f5f9" }}>
@@ -69,21 +72,23 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                   <Grip size={16} className="text-gray-400" />
                   <span className="font-medium text-gray-700">Option {idx + 1}</span>
                 </div>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => removeOptionPair(idx)}
-                  className="text-red-500 hover:text-red-700 p-1"
+                  className="text-red-500 hover:text-red-700 h-8 w-8"
                 >
                   <X size={18} />
-                </button>
+                </Button>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <Label className="text-xs font-medium text-gray-600">
                     Option Value
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     value={opt}
                     onChange={(e) => {
@@ -94,16 +99,16 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                         OptionValue: updated,
                       });
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                    className="text-sm"
                     placeholder="Enter option value"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <Label className="text-xs font-medium text-gray-600">
                     Option Price
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     inputMode="numeric"
                     pattern="[0-9]*"
@@ -116,7 +121,7 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                         OptionPrice: updated,
                       });
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                    className="text-sm"
                     placeholder="0"
                   />
                 </div>
@@ -134,13 +139,15 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
             <thead>
               <tr>
                 <th className="w-12 p-2 lg:p-3 text-center text-sm font-medium text-gray-700">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={addOptionPair}
-                    className="w-8 h-8 flex items-center justify-center text-black rounded-sm hover:bg-gray-200 transition-colors"
+                    className="w-8 h-8 text-black hover:bg-gray-200"
                   >
                     <Plus size={18} />
-                  </button>
+                  </Button>
                 </th>
                 <th className="p-2 lg:p-3 text-left text-sm font-medium text-gray-700">
                   Option Value
@@ -192,7 +199,7 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
 
                             {/* Option Name */}
                             <td className="p-2 lg:p-3">
-                              <input
+                              <Input
                                 type="text"
                                 value={opt}
                                 onChange={(e) => {
@@ -203,14 +210,14 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                                     OptionValue: updated,
                                   });
                                 }}
-                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-sm"
+                                className="text-sm"
                                 placeholder="Enter option value"
                               />
                             </td>
 
                             {/* Option Price */}
                             <td className="p-2 lg:p-3 text-center">
-                              <input
+                              <Input
                                 type="text"
                                 inputMode="numeric"
                                 pattern="[0-9]*"
@@ -226,20 +233,22 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                                     OptionPrice: updated,
                                   });
                                 }}
-                                className="w-16 lg:w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] text-center text-sm mx-auto"
+                                className="w-16 lg:w-20 text-center text-sm mx-auto"
                                 placeholder="0"
                               />
                             </td>
 
                             {/* Delete Button */}
                             <td className="p-2 lg:p-3 text-center w-12">
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="icon"
                                 onClick={() => removeOptionPair(idx)}
-                                className="text-black px-2 py-1 rounded hover:text-gray-700"
+                                className="text-black hover:text-gray-700 h-8 w-8"
                               >
                                 <X size={20} />
-                              </button>
+                              </Button>
                             </td>
                           </tr>
                         )}

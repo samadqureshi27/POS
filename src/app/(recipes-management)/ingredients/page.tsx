@@ -2,9 +2,9 @@
 import React, { useEffect } from "react";
 import ActionBar from "@/components/ui/action-bar";
 import { Toast } from "@/components/ui/toast";
-import LoadingSpinner from "@/components/ui/loader";
 import IngredientsTable from "./_components/ingredients-table";
 import IngredientsModal from "./_components/ingredients-modal";
+import { ManagementPageSkeleton } from "@/app/(main)/dashboard/_components/ManagementPageSkeleton";
 import { useIngredientsData } from "@/lib/hooks/useIngredientsData";
 
 const IngredientsManagementPage = () => {
@@ -64,13 +64,13 @@ const IngredientsManagementPage = () => {
     };
   }, [modalOpen]);
 
-  // Show loading spinner during initial load
+  // Show skeleton loading during initial load
   if (loading) {
-    return <LoadingSpinner />;
+    return <ManagementPageSkeleton showSummaryCards={false} showActionBar={true} />;
   }
 
   return (
-    <div className="bg-gray-50 min-w-full h-full overflow-y-auto">
+    <div className="p-6 bg-background min-w-full h-full overflow-y-auto">
       {/* Toast Notifications */}
       {toast && (
         <Toast

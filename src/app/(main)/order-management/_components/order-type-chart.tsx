@@ -25,13 +25,13 @@ const OrderTypeChart: React.FC<OrderTypeChartProps> = ({ data, loading }) => {
     <div className="w-full flex items-center justify-center overflow-hidden outline-none border-none">
       <div className="w-full max-h-[300px] outline-none border-none">
         <div className="flex items-center justify-center">
-          <p className="text-2xl mb-1">Most Type of Orders</p>
+          <p className="text-2xl mb-1 text-foreground">Most Type of Orders</p>
         </div>
         
         <div className="w-full flex items-center justify-center outline-none border-none">
           {loading ? (
             <div className="flex items-center justify-center h-[250px]">
-              <div className="animate-spin h-8 w-8 border-b-2 border-gray-600 rounded-full"></div>
+              <div className="animate-spin h-8 w-8 border-b-2 border-primary rounded-full"></div>
             </div>
           ) : (
             <div

@@ -1,6 +1,8 @@
 import React from 'react';
-import IngredientsTableHeader from './ingredients-table-header';
-import IngredientsTableRow from './ingredients-table-rows';
+import { Edit } from "lucide-react";
+import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
+import { StatusBadge } from "@/components/ui/status-badge";
+import FilterDropdown from "@/components/ui/filter-dropdown";
 
 interface InventoryItem {
   ID: string;
@@ -32,31 +34,80 @@ const IngredientsTable: React.FC<IngredientsTableProps> = ({
   statusFilter,
   setStatusFilter
 }) => {
-  return (
-    <div className="bg-gray-50 rounded-sm border border-gray-300 max-w-[95vw] shadow-sm responsive-customer-table">
-      <div className="rounded-sm table-container">
-        <table className="min-w-full divide-y max-h-[800px] divide-gray-200 table-fixed">
-          <IngredientsTableHeader 
-            isAllSelected={isAllSelected}
-            onSelectAll={onSelectAll}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-          />
+  const statusOptions = [
+    { value: "", label: "All Status" },
+    { value: "Inactive", label: "Inactive", className: "hover:bg-red-100 text-red-400" },
+    { value: "Active", label: "Active", className: "hover:bg-green-100 text-green-400" }
+  ];
 
-          <tbody className="divide-y text-gray-500 divide-gray-300">
-            {filteredItems.map((item) => (
-              <IngredientsTableRow
-                key={item.ID}
-                item={item}
-                isSelected={selectedItems.includes(item.ID)}
-                onSelectItem={onSelectItem}
-                onEditItem={onEditItem}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  const columns: DataTableColumn<InventoryItem>[] = [
+    {
+      key: "id",
+      title: "ID",
+      dataIndex: "ID",
+      width: "80px"
+    },
+    {
+      key: "name",
+      title: "Name",
+      dataIndex: "Name"
+    },
+    {
+      key: "status",
+      title: "Status",
+      dataIndex: "Status",
+      filterable: true,
+      filterComponent: (
+        <FilterDropdown
+          label="Status"
+          value={statusFilter}
+          onChange={setStatusFilter}
+          options={statusOptions}
+        />
+      ),
+      render: (value) => <StatusBadge status={value} />
+    },
+    {
+      key: "description",
+      title: "Description",
+      dataIndex: "Description"
+    },
+    {
+      key: "unit",
+      title: "Unit",
+      dataIndex: "Unit"
+    },
+    {
+      key: "priority",
+      title: "Priority",
+      dataIndex: "Priority"
+    }
+  ];
+
+  const actions: DataTableAction<InventoryItem>[] = [
+    {
+      key: "edit",
+      label: "Edit",
+      icon: <Edit className="h-4 w-4" />,
+      onClick: onEditItem
+    }
+  ];
+
+  return (
+    <DataTable
+      data={filteredItems}
+      columns={columns}
+      actions={actions}
+      selectable={true}
+      selectedItems={selectedItems}
+      onSelectAll={onSelectAll}
+      onSelectItem={onSelectItem}
+      getRowId={(item) => item.ID}
+      maxHeight="600px"
+      emptyMessage="No ingredients found"
+      mobileResponsive={true}
+      nameColumn="name"
+    />
   );
 };
 

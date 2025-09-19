@@ -1,6 +1,11 @@
 "use client";
 import React, { useEffect } from "react";
 import { X, Save } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { VendorModalProps } from "@/lib/types/vendors";
 
 const VendorModal: React.FC<VendorModalProps> = ({
@@ -29,32 +34,29 @@ const VendorModal: React.FC<VendorModalProps> = ({
         onSubmit(formData);
     };
 
-    if (!isOpen) return null;
-
     return (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71">
-            <div className="bg-white rounded-lg p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-semibold text-gray-800">
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-semibold">
                         {editingItem ? "Edit Vendor" : `Add New Vendor - Branch #${branchId}`}
-                    </h2>
-                </div>
+                    </DialogTitle>
+                </DialogHeader>
 
                 {/* Scrollable Content */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 pl-1">
                     {/* Company Name */}
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Company Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
+                        <Label htmlFor="companyName" className="text-sm font-medium">
+                            Company Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            id="companyName"
                             type="text"
                             value={formData.Company_Name}
                             onChange={(e) =>
                                 onFormDataChange({ Company_Name: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                             placeholder="Enter company name"
                             required
                         />
@@ -62,16 +64,16 @@ const VendorModal: React.FC<VendorModalProps> = ({
 
                     {/* Contact Person Name */}
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Contact Person Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
+                        <Label htmlFor="contactName" className="text-sm font-medium">
+                            Contact Person Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            id="contactName"
                             type="text"
                             value={formData.Name}
                             onChange={(e) =>
                                 onFormDataChange({ Name: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                             placeholder="Enter contact person name"
                             required
                         />
@@ -79,56 +81,57 @@ const VendorModal: React.FC<VendorModalProps> = ({
 
                     {/* Contact Number */}
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Label htmlFor="contactNumber" className="text-sm font-medium">
                             Contact Number
-                            <span className="text-xs text-gray-500 ml-1">
+                            <span className="text-xs text-muted-foreground ml-1">
                                 (Phone/Mobile)
                             </span>
-                        </label>
-                        <input
+                        </Label>
+                        <Input
+                            id="contactNumber"
                             type="text"
                             value={formData.Contact}
                             onChange={(e) =>
                                 onFormDataChange({ Contact: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                             placeholder="Enter contact number"
                         />
                     </div>
 
                     {/* Email */}
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Label htmlFor="email" className="text-sm font-medium">
                             Email Address
-                            <span className="text-xs text-gray-500 ml-1">
+                            <span className="text-xs text-muted-foreground ml-1">
                                 (Business email)
                             </span>
-                        </label>
-                        <input
+                        </Label>
+                        <Input
+                            id="email"
                             type="email"
                             value={formData.Email}
                             onChange={(e) =>
                                 onFormDataChange({ Email: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent"
                             placeholder="Enter email address"
                         />
                     </div>
 
                     {/* Address */}
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Label htmlFor="address" className="text-sm font-medium">
                             Business Address
-                            <span className="text-xs text-gray-500 ml-1">
+                            <span className="text-xs text-muted-foreground ml-1">
                                 (Complete address)
                             </span>
-                        </label>
-                        <textarea
+                        </Label>
+                        <Textarea
+                            id="address"
                             value={formData.Address}
                             onChange={(e) =>
                                 onFormDataChange({ Address: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent h-24 resize-none"
+                            className="h-24 resize-none"
                             placeholder="Enter complete business address..."
                             rows={3}
                         />
@@ -137,16 +140,17 @@ const VendorModal: React.FC<VendorModalProps> = ({
 
                 {/* Fixed Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
-                    <button
+                    <Button
                         type="button"
+                        variant="outline"
                         onClick={onClose}
                         disabled={actionLoading}
-                        className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full sm:w-auto"
                     >
                         <X size={16} />
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="button"
                         onClick={handleSubmit}
                         disabled={
@@ -154,12 +158,7 @@ const VendorModal: React.FC<VendorModalProps> = ({
                             !formData.Company_Name.trim() ||
                             actionLoading
                         }
-                        className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2  ${!formData.Name.trim() ||
-                                !formData.Company_Name.trim() ||
-                                actionLoading
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                            }`}
+                        className="w-full sm:w-auto"
                     >
                         {actionLoading ? (
                             <>
@@ -172,10 +171,10 @@ const VendorModal: React.FC<VendorModalProps> = ({
                                 {editingItem ? "Update Vendor" : "Add Vendor"}
                             </>
                         )}
-                    </button>
+                    </Button>
                 </div>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

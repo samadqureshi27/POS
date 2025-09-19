@@ -1,3 +1,5 @@
+// @deprecated - Use LoaderComponent or Skeleton components instead
+// This component is kept for backward compatibility but should not be used in new code
 import React from 'react';
 
 interface LoadingSpinnerProps {
@@ -6,10 +8,10 @@ interface LoadingSpinnerProps {
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = "Loading..." }) => {
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="flex justify-center items-center min-h-screen bg-background">
             <div className="text-center">
-                <div className="animate-spin h-12 w-12 border-b-2 border-yellow-600 rounded-full mx-auto"></div>
-                <p className="mt-4 text-gray-600">{message}</p>
+                <div className="animate-spin h-12 w-12 border-b-2 border-primary rounded-full mx-auto"></div>
+                <p className="mt-4 text-muted-foreground">{message}</p>
             </div>
         </div>
     );

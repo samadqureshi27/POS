@@ -1,7 +1,12 @@
 import React from "react";
-import { Save, ChevronDown } from "lucide-react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import ButtonPage from "@/components/ui/button";
+import { Save, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import FilterDropdown from "@/components/ui/filter-dropdown"; // Import your FilterDropdown
 import { StaffFormData } from "@/lib/types/staff-management";
 import { formatCNIC } from "@/lib/util/Staff-formatters";
 
@@ -32,6 +37,16 @@ const StaffModal: React.FC<StaffModalProps> = ({
 }) => {
     if (!isOpen) return null;
 
+    // Role options for the FilterDropdown
+    const roleOptions = [
+        { value: "Manager", label: "Manager" },
+        { value: "Cashier", label: "Cashier" },
+        { value: "Waiter", label: "Waiter" },
+        { value: "Cleaner", label: "Cleaner" },
+        { value: "Chef", label: "Chef" },
+        { value: "Security", label: "Security" },
+    ];
+
     const handleSubmit = () => {
         if (!formData.Name.trim() || !formData.CNIC.trim()) {
             return;
@@ -52,36 +67,29 @@ const StaffModal: React.FC<StaffModalProps> = ({
     };
 
     return (
-        <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-71 px-4"
-            onClick={onClose}
-        >
-            <div
-                className="bg-white rounded-sm p-4 sm:p-6 min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] shadow-lg relative flex flex-col"
-                onClick={(e) => e.stopPropagation()}
-            >
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                    <h2 className="text-2xl font-semibold text-gray-800">
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-semibold">
                         {isEditing ? "Edit Staff Member" : "Add New Staff Member"}
-                    </h2>
-                </div>
+                    </DialogTitle>
+                </DialogHeader>
 
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto p-2">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Name */}
                         <div className="md:col-span-2">
-                            <label className="block font-medium text-gray-700 mb-2">
+                            <Label htmlFor="staffName" className="text-sm font-medium">
                                 Staff Name <span className="text-red-500">*</span>
-                            </label>
-                            <input
+                            </Label>
+                            <Input
+                                id="staffName"
                                 type="text"
                                 value={formData.Name}
                                 onChange={(e) =>
                                     setFormData({ ...formData, Name: e.target.value })
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
                                 placeholder="Enter staff name"
                                 required
                                 autoFocus
@@ -90,27 +98,28 @@ const StaffModal: React.FC<StaffModalProps> = ({
 
                         {/* Contact */}
                         <div>
-                            <label className="block font-medium text-gray-700 mb-2">
+                            <Label htmlFor="contact" className="text-sm font-medium">
                                 Contact Number
-                            </label>
-                            <input
+                            </Label>
+                            <Input
+                                id="contact"
                                 type="tel"
                                 value={formData.Contact}
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/[^\d+\-\s]/g, "");
                                     setFormData({ ...formData, Contact: value });
                                 }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
                                 placeholder="03001234567"
                             />
                         </div>
 
                         {/* CNIC */}
                         <div>
-                            <label className="block font-medium text-gray-700 mb-2">
+                            <Label htmlFor="cnic" className="text-sm font-medium">
                                 CNIC <span className="text-red-500">*</span>
-                            </label>
-                            <input
+                            </Label>
+                            <Input
+                                id="cnic"
                                 type="text"
                                 value={formData.CNIC}
                                 onChange={(e) =>
@@ -119,7 +128,6 @@ const StaffModal: React.FC<StaffModalProps> = ({
                                         CNIC: formatCNIC(e.target.value),
                                     })
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
                                 placeholder="35202-1234567-8"
                                 maxLength={15}
                                 required
@@ -128,92 +136,45 @@ const StaffModal: React.FC<StaffModalProps> = ({
 
                         {/* Address */}
                         <div className="md:col-span-2">
-                            <label className="block font-medium text-gray-700 mb-2">
+                            <Label htmlFor="address" className="text-sm font-medium">
                                 Address
-                            </label>
-                            <textarea
+                            </Label>
+                            <Textarea
+                                id="address"
                                 value={formData.Address}
                                 onChange={(e) =>
                                     setFormData({ ...formData, Address: e.target.value })
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent resize-none transition-colors"
+                                className="resize-none"
                                 placeholder="Enter complete address"
                                 rows={3}
                             />
                         </div>
 
-                        {/* Role Dropdown */}
-                        <div className="flex flex-col gap-1 relative">
-                            <label className="block font-medium text-gray-700 mb-2">
+                        {/* Role Dropdown - Updated to use FilterDropdown */}
+                        <div className="flex flex-col gap-2">
+                            <Label className="text-sm font-medium">
                                 Role
-                            </label>
-
-                            <DropdownMenu.Root modal={false}>
-                                <DropdownMenu.Trigger className="px-3 py-2 rounded-lg border border-gray-300 bg-white flex items-center gap-2 w-full focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors hover:border-gray-400">
-                                    <span
-                                        className={
-                                            formData.Role ? "text-gray-900" : "text-gray-500"
-                                        }
-                                    >
-                                        {formData.Role || "Select Role"}
-                                    </span>
-                                    <ChevronDown
-                                        size={16}
-                                        className="text-gray-500 ml-auto"
-                                    />
-                                </DropdownMenu.Trigger>
-
-                                <DropdownMenu.Portal>
-                                    <DropdownMenu.Content
-                                        className="min-w-[200px] rounded-sm bg-white shadow-lg border border-gray-200 p-1 relative outline-none z-[100] max-h-60 overflow-y-auto"
-                                        sideOffset={6}
-                                    >
-                                        <DropdownMenu.Arrow className="fill-white stroke-gray-200 w-5 h-3" />
-
-                                        <DropdownMenu.Item
-                                            className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded outline-none text-gray-500"
-                                            onClick={() =>
-                                                setFormData({ ...formData, Role: "" })
-                                            }
-                                        >
-                                            Select Role
-                                        </DropdownMenu.Item>
-
-                                        {[
-                                            "Manager",
-                                            "Cashier",
-                                            "Waiter",
-                                            "Cleaner",
-                                            "Chef",
-                                            "Security",
-                                        ].map((role) => (
-                                            <DropdownMenu.Item
-                                                key={role}
-                                                className="px-3 py-2 cursor-pointer hover:bg-gray-100 hover:text-gray-700 rounded outline-none"
-                                                onClick={() =>
-                                                    setFormData({ ...formData, Role: role })
-                                                }
-                                            >
-                                                {role}
-                                            </DropdownMenu.Item>
-                                        ))}
-                                    </DropdownMenu.Content>
-                                </DropdownMenu.Portal>
-                            </DropdownMenu.Root>
+                            </Label>
+                            <FilterDropdown
+                                label="Select Role"
+                                value={formData.Role}
+                                onChange={(value) => setFormData({ ...formData, Role: value })}
+                                options={roleOptions}
+                            />
                         </div>
 
                         {/* Salary */}
                         <div>
-                            <label className="block font-medium text-gray-700 mb-2">
+                            <Label className="text-sm font-medium">
                                 Salary (PKR)
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 type="number"
                                 value={formData.Salary}
                                 onChange={(e) =>
                                     setFormData({ ...formData, Salary: e.target.value })
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
                                 placeholder="30000"
                                 min="0"
                                 step="1000"
@@ -222,10 +183,10 @@ const StaffModal: React.FC<StaffModalProps> = ({
 
                         {/* Shift Times */}
                         <div>
-                            <label className="block font-medium text-gray-700 mb-2">
+                            <Label className="text-sm font-medium">
                                 Shift Start Time
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 type="time"
                                 value={formData.Shift_Start_Time}
                                 onChange={(e) =>
@@ -234,15 +195,14 @@ const StaffModal: React.FC<StaffModalProps> = ({
                                         Shift_Start_Time: e.target.value,
                                     })
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
                             />
                         </div>
 
                         <div>
-                            <label className="block font-medium text-gray-700 mb-2">
+                            <Label className="text-sm font-medium">
                                 Shift End Time
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 type="time"
                                 value={formData.Shift_End_Time}
                                 onChange={(e) =>
@@ -251,7 +211,6 @@ const StaffModal: React.FC<StaffModalProps> = ({
                                         Shift_End_Time: e.target.value,
                                     })
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent transition-colors"
                             />
                         </div>
 
@@ -260,13 +219,13 @@ const StaffModal: React.FC<StaffModalProps> = ({
                             formData.Role === "Manager" ||
                             formData.Role === "Waiter") && (
                                 <div>
-                                    <label className="block font-medium text-gray-700 mb-2">
+                                    <Label className="text-sm font-medium">
                                         Access Code <span className="text-red-500">*</span>
                                         <span className="text-xs text-gray-500 ml-1">
                                             (4 digits)
                                         </span>
-                                    </label>
-                                    <input
+                                    </Label>
+                                    <Input
                                         type="password"
                                         value={formData.Access_Code}
                                         onChange={(e) => {
@@ -275,7 +234,7 @@ const StaffModal: React.FC<StaffModalProps> = ({
                                                 .slice(0, 4);
                                             setFormData({ ...formData, Access_Code: value });
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent font-mono tracking-widest transition-colors"
+                                        className="font-mono tracking-widest"
                                         placeholder="••••"
                                         maxLength={4}
                                         required
@@ -291,21 +250,21 @@ const StaffModal: React.FC<StaffModalProps> = ({
 
                         {/* Status Toggle */}
                         <div className="flex items-center justify-between py-2">
-                            <label className="block font-medium text-gray-700">
+                            <Label className="text-sm font-medium">
                                 Status
-                            </label>
+                            </Label>
                             <div className="flex items-center gap-3">
                                 <span
                                     className={`font-medium ${formData.Status === "Active"
-                                            ? "text-green-600"
-                                            : "text-red-500"
+                                        ? "text-green-600"
+                                        : "text-red-500"
                                         }`}
                                 >
                                     {formData.Status}
                                 </span>
-                                <ButtonPage
+                                <Switch
                                     checked={formData.Status === "Active"}
-                                    onChange={onStatusChange}
+                                    onCheckedChange={onStatusChange}
                                 />
                             </div>
                         </div>
@@ -314,22 +273,21 @@ const StaffModal: React.FC<StaffModalProps> = ({
 
                 {/* Fixed Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
-                    <button
+                    <Button
                         type="button"
+                        variant="outline"
                         onClick={onClose}
                         disabled={actionLoading}
-                        className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full sm:w-auto"
                     >
+                        <X size={16} />
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
                         onClick={handleSubmit}
                         disabled={!isFormValid() || actionLoading}
-                        className={`w-full sm:w-auto px-6 py-2 rounded-sm transition-colors flex items-center justify-center gap-2 ${!isFormValid() || actionLoading
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-[#2C2C2C] text-white hover:bg-gray-700"
-                            }`}
+                        className="w-full sm:w-auto"
                     >
                         {actionLoading ? (
                             <>
@@ -342,10 +300,10 @@ const StaffModal: React.FC<StaffModalProps> = ({
                                 {isEditing ? "Update Staff" : "Add Staff"}
                             </>
                         )}
-                    </button>
+                    </Button>
                 </div>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

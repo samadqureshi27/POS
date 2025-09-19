@@ -2,6 +2,8 @@
 import React from 'react';
 import { Upload, Camera, Trash2 } from 'lucide-react';
 import { useFileUpload } from '@/lib/hooks/useFileUpload';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 
 interface LogoUploadProps {
     previewUrl: string | null;
@@ -25,9 +27,9 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
 
     return (
         <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <Label className="text-sm font-medium text-gray-700 mb-2">
                 Restaurant Logo
-            </label>
+            </Label>
             <div
                 className={`relative border-2 border-dashed rounded-sm p-6 bg-gray-50 flex flex-col justify-center items-center hover:bg-gray-100 transition-all duration-300 cursor-pointer ${dragActive
                         ? "border-gray-500 bg-blue-50"
@@ -47,26 +49,30 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
                             className="max-h-32 max-w-full object-contain mb-4 rounded-sm shadow-md"
                         />
                         <div className="absolute inset-0 bg-black bg-opacity-50 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
-                            <button
+                            <Button
+                                variant="secondary"
+                                size="sm"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleClickUpload();
                                 }}
-                                className="bg-white text-gray-900 rounded-sm p-2 hover:bg-gray-100 transition-colors"
+                                className="bg-white text-gray-900 rounded-sm p-2 hover:bg-gray-100 transition-colors h-auto w-auto"
                                 title="Change logo"
                             >
                                 <Camera size={16} />
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                size="sm"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     onRemoveLogo();
                                 }}
-                                className="bg-red-500 text-white rounded-sm p-2 hover:bg-red-600 transition-colors"
+                                className="bg-red-500 text-white rounded-sm p-2 hover:bg-red-600 transition-colors h-auto w-auto"
                                 title="Remove logo"
                             >
                                 <Trash2 size={16} />
-                            </button>
+                            </Button>
                         </div>
                         <p className="text-sm text-gray-600 text-center mt-2">
                             Click to change logo
