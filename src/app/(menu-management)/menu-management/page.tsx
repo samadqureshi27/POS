@@ -13,6 +13,7 @@ const MenuManagementPage = () => {
   const {
     // State
     filteredItems,
+    menuOptions,
     selectedItems,
     loading,
     statusFilter,
@@ -96,6 +97,9 @@ const MenuManagementPage = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         formData={formData}
+        menuOptions={menuOptions}
+        menuItems={filteredItems}
+        categories={categories}
         onClose={handleCloseModal}
         onSubmit={handleModalSubmit}
         actionLoading={actionLoading}

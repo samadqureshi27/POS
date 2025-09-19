@@ -2,7 +2,7 @@
 
 import React from "react";
 import ActionBar from "@/components/ui/action-bar";
-import {Toast} from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/sonner";
 import MenuTable from "./_components/menu-table";
 import MenuModal from "./_components/menu-modal";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
@@ -12,7 +12,6 @@ const CategoryPage = () => {
   const {
     // State
     loading,
-    toast,
     searchTerm,
     selectedItems,
     actionLoading,
@@ -28,7 +27,6 @@ const CategoryPage = () => {
     setDisplayFilter,
     setFormData,
     setIsModalOpen,
-    setToast,
     
     // Handlers
     handleDeleteSelected,
@@ -48,13 +46,7 @@ const CategoryPage = () => {
 
   return (
     <div className="p-6 bg-background min-w-full h-full overflow-y-auto">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <h1 className="text-3xl font-semibold mt-14 mb-8 ">Menu Options</h1>
 

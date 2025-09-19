@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-const mealTimeOptions = ["Morning", "Afternoon", "Evening"];
+const mealTimeOptions = ["Morning", "Afternoon", "Evening", "All Day"];
 import { DetailsTabProps,MenuItem } from "@/lib/types/menum";   // Correct - named import
 
 
@@ -16,43 +16,25 @@ const DetailsTab: React.FC<DetailsTabProps> = ({
 }) => {
     return (
         <div className="space-y-6 max-w-2xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <Label className="text-sm font-medium">
-                        Meal Time
-                    </Label>
-                    <Select
-                        value={formData.MealType}
-                        onValueChange={(value) => handleFormFieldChange("MealType", value)}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select meal time" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {mealTimeOptions.map((time) => (
-                                <SelectItem key={time} value={time}>
-                                    {time}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div>
-                    <Label className="text-sm font-medium">
-                        Priority
-                    </Label>
-                    <Input
-                        type="number"
-                        value={formData.Priority || ""}
-                        onChange={(e) => {
-                            const value = Number(e.target.value);
-                            handleFormFieldChange("Priority", value || 1);
-                        }}
-                        placeholder="1"
-                        min={1}
-                    />
-                </div>
+            <div>
+                <Label className="text-sm font-medium">
+                    Meal Time
+                </Label>
+                <Select
+                    value={formData.MealType}
+                    onValueChange={(value) => handleFormFieldChange("MealType", value)}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select meal time" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {mealTimeOptions.map((time) => (
+                            <SelectItem key={time} value={time}>
+                                {time}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
 
             <div>

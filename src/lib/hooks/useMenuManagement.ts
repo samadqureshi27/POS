@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/lib/hooks";
 import MenuAPI from "@/lib/util/menu1-api";
+import { MenuAPI as MenuOptionsAPI } from "@/lib/util/menu-options-api";
+import { MenuAPI as CategoryAPI } from "@/lib/util/category-api";
+import { MenuItemOptions } from "@/lib/types/menuItemOptions";
+import { CategoryItem } from "@/lib/types/category";
 
 // Define MenuItem interface
 interface MenuItem {
@@ -38,6 +42,8 @@ interface MenuItem {
 export const useMenuManagement = () => {
   // State management
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuOptions, setMenuOptions] = useState<MenuItemOptions[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
@@ -84,14 +90,40 @@ export const useMenuManagement = () => {
   // Utility functions
   const { toast, toastVisible, showToast, hideToast } = useToast();
 
+  const loadMenuOptions = async () => {
+    try {
+      const response = await MenuOptionsAPI.getMenuItemOptions();
+      if (response.success) {
+        setMenuOptions(response.data);
+      }
+    } catch (error) {
+      console.error("Error loading menu options:", error);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const response = await CategoryAPI.getCategoryItems();
+      if (response.success) {
+        setCategories(response.data);
+      }
+    } catch (error) {
+      console.error("Error loading categories:", error);
+    }
+  };
+
   const loadMenuItems = async () => {
     try {
       setLoading(true);
-      const response = await MenuAPI.getMenuItems();
-      if (response.success) {
-        setMenuItems(response.data);
+      const [menuResponse] = await Promise.all([
+        MenuAPI.getMenuItems(),
+        loadMenuOptions(),
+        loadCategories()
+      ]);
+      if (menuResponse.success) {
+        setMenuItems(menuResponse.data);
       } else {
-        throw new Error(response.message || "Failed to fetch menu items");
+        throw new Error(menuResponse.message || "Failed to fetch menu items");
       }
     } catch (error) {
       console.error("Error fetching menu items:", error);
@@ -207,19 +239,12 @@ export const useMenuManagement = () => {
     return (
       formData.Name?.trim() &&
       formData.DisplayType &&
-      isPriceValid &&
-      preview &&
-      formData.Description?.trim() &&
-      formData.MealType &&
-      formData.Priority > 0 &&
-      formData.MinimumQuantity >= 0 &&
-      formData.OptionValue?.length > 0 &&
-      formData.OptionValue.every((val) => val.trim() !== "") &&
-      formData.OptionPrice?.length === formData.OptionValue?.length
+      formData.DisplayType !== "Select a type" &&
+      formData.Category?.trim() &&
+      isPriceValid
     );
   };
 
-  const categories = [...new Set(menuItems.map((item) => item.Category))];
   const isAllSelected = selectedItems.length === filteredItems.length && filteredItems.length > 0;
 
   // Event handlers
@@ -348,6 +373,8 @@ export const useMenuManagement = () => {
   return {
     // State
     menuItems,
+    menuOptions,
+    categories,
     selectedItems,
     loading,
     statusFilter,
@@ -363,8 +390,7 @@ export const useMenuManagement = () => {
     
     // Computed values
     filteredItems,
-    isFormValid: isFormValid(),
-    categories,
+    isFormValid,
     isAllSelected,
     
     // Toast

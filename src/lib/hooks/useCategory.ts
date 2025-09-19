@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { CategoryItem, CategoryFormData } from '@/lib/types/category';
 import { MenuAPI } from '@/lib/util/category-api';
+import { useToast } from '@/lib/hooks';
 
 export const useCategory = () => {
+  const { showToast } = useToast();
   const [categoryItems, setCategoryItems] = useState<CategoryItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -10,16 +12,7 @@ export const useCategory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingItem, setEditingItem] = useState<CategoryItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
   const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
-  
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
 
   const loadCategoryItems = async () => {
     try {
@@ -153,13 +146,11 @@ export const useCategory = () => {
     searchTerm,
     editingItem,
     isModalOpen,
-    toast,
     statusFilter,
     
     // Actions
     setSearchTerm,
     setStatusFilter,
-    setToast,
     handleCreateItem,
     handleUpdateItem,
     handleDeleteSelected,
