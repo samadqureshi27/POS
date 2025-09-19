@@ -27,6 +27,7 @@ export interface Ingredient {
   Status: "Active" | "Inactive";
   Description: string;
   Unit: string;
+  Threshold: number;
   Priority: number;
 }
 

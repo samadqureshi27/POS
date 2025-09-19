@@ -8,6 +8,7 @@ interface InventoryItem {
   Status: "Active" | "Inactive";
   Description: string;
   Unit: string;
+  Threshold: number;
   Priority: number;
 }
 
@@ -101,6 +102,9 @@ const IngredientsTableRow: React.FC<IngredientsTableRowProps> = ({
       </td>
       <td className="px-4 py-4 whitespace-nowrap" data-label="Unit">
         {item.Unit}
+      </td>
+      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600" data-label="Threshold">
+        {item.Threshold}
       </td>
       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600" data-label="Priority">
         {item.Priority}

@@ -61,6 +61,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({
                             />
                             <p className="text-xs text-gray-500 mt-1">Minimum order quantity</p>
                         </div>
+
                         <div>
                             <Label htmlFor="stockQty" className="text-sm font-medium text-gray-700">
                                 Stock Quantity

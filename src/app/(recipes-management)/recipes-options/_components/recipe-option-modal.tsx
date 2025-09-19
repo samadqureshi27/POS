@@ -75,45 +75,79 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
         </DialogHeader>
 
         {/* Scrollable Content */}
-        <div className="grid grid-cols-1 gap-2 overflow-y-auto pr-1 py-2">
-          {/* Name */}
-          <div>
-            <Label htmlFor="name" className="text-sm font-medium">
-              Name <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="name"
-              type="text"
-              value={formData.Name}
-              onChange={(e) =>
-                setFormData({ ...formData, Name: e.target.value })
-              }
-              placeholder="Enter category name"
-              required
-            />
+        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
+          {/* Header Section */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">
+              Recipe Option Details
+            </h3>
+            <p className="text-xs text-gray-500 mb-4">
+              Configure the name and pricing for this recipe option
+            </p>
           </div>
 
-          {/* Price */}
-          <div>
-            <Label htmlFor="price" className="text-sm font-medium">
-              Price <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="price"
-              type="number"
-              value={formData.price || ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '' || /^\d+$/.test(value)) {
+          {/* Option Configuration */}
+          <div className="space-y-6">
+            {/* Name */}
+            <div>
+              <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                Option Name <span className="text-red-500">*</span>
+              </Label>
+              <p className="text-xs text-gray-500 mb-2">
+                Name that will appear in recipe option lists
+              </p>
+              <Input
+                id="name"
+                type="text"
+                value={formData.Name}
+                onChange={(e) =>
+                  setFormData({ ...formData, Name: e.target.value })
+                }
+                placeholder="Enter option name (e.g., Extra Cheese, Spicy Level)"
+                required
+                className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+
+            {/* Price */}
+            <div>
+              <Label htmlFor="price" className="text-sm font-medium text-gray-700">
+                Price <span className="text-red-500">*</span>
+              </Label>
+              <p className="text-xs text-gray-500 mb-2">
+                Additional cost for selecting this option
+              </p>
+              <Input
+                id="price"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.price || ''}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
                   setFormData({
                     ...formData,
-                    price: value === '' ? 0 : Number(value)
+                    price: isNaN(value) ? 0 : value
                   });
-                }
-              }}
-              placeholder="Enter price"
-              required
-            />
+                }}
+                placeholder="0.00"
+                required
+                className="w-full sm:w-32 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+
+            {/* Information Card */}
+            <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                <div>
+                  <h4 className="text-sm font-medium text-blue-800 mb-1">Usage</h4>
+                  <p className="text-xs text-blue-700">
+                    Recipe options can be used to provide customization choices for recipes, allowing customers to add extras or modify ingredients with associated pricing.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
