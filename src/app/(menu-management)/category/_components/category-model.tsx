@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Save, ImageIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CategoryItem, CategoryFormData, CategoryModalProps } from '@/lib/types/category';
 
 const CategoryModal: React.FC<CategoryModalProps> = ({
   isOpen,
   editingItem,
   actionLoading,
+  categories,
   onClose,
   onCreate,
   onUpdate,
@@ -26,8 +28,6 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
     Priority: 1,
     Image: "",
   });
-  const [preview, setPreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Modal form effect
   useEffect(() => {
@@ -40,17 +40,15 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
         Priority: editingItem.Priority,
         Image: editingItem.Image || "",
       });
-      setPreview(editingItem.Image || null);
     } else {
       setFormData({
         Name: "",
         Status: "Active",
         Description: "",
         Parent: "",
-        Priority: 0,
+        Priority: 1,
         Image: "",
       });
-      setPreview(null);
     }
   }, [editingItem, isOpen]);
 
@@ -73,40 +71,8 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
     });
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      const objectUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({ ...prev, Image: objectUrl }));
-      setPreview(objectUrl);
-    }
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    if (file && file.type.startsWith("image/")) {
-      const objectUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({ ...prev, Image: objectUrl }));
-      setPreview(objectUrl);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setFormData((prev) => ({ ...prev, Image: "" }));
-    setPreview(null);
-  };
-
-  const handleClickUpload = () => {
-    fileInputRef.current?.click();
-  };
-
   const handleSubmit = () => {
-    if (
-      !formData.Name.trim() ||
-      !formData.Description.trim() ||
-      formData.Priority < 1
-    ) {
+    if (!formData.Name.trim()) {
       return;
     }
 
@@ -119,7 +85,11 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+      <DialogContent
+        className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col"
+        showCloseButton={false}
+        onWheel={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">
             {editingItem ? "Edit Category" : "Add New Category"}
@@ -127,28 +97,89 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
         </DialogHeader>
 
         {/* Scrollable Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 py-2">
-          {/* Name */}
-          <div className="md:col-span-2 mt-2">
-            <Label htmlFor="name" className="text-sm font-medium">
-              Name <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="name"
-              type="text"
-              value={formData.Name}
-              onChange={(e) =>
-                setFormData({ ...formData, Name: e.target.value })
-              }
-              placeholder="Enter category name"
-              required
-            />
+        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
+          {/* Name and Status Row */}
+          <div className="flex gap-4 items-end">
+            <div className="flex-1">
+              <Label htmlFor="name" className="text-sm font-medium">
+                Category Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                value={formData.Name}
+                onChange={(e) =>
+                  setFormData({ ...formData, Name: e.target.value })
+                }
+                placeholder="e.g., Beverages, Appetizers"
+                required
+                className="mt-1"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium">
+                Active
+              </Label>
+              <Switch
+                checked={formData.Status === "Active"}
+                onCheckedChange={handleStatusChange}
+              />
+            </div>
+          </div>
+
+          {/* Parent and Priority Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="parent" className="text-sm font-medium">
+                Parent Category
+              </Label>
+              <Select
+                value={formData.Parent || "none"}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, Parent: value === "none" ? "" : value })
+                }
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="No parent category" />
+                </SelectTrigger>
+                <SelectContent className="z-[100]">
+                  <SelectItem value="none">No parent category</SelectItem>
+                  {categories
+                    .filter(cat => cat.Status === "Active" && (!editingItem || cat.ID !== editingItem.ID))
+                    .map((category) => (
+                      <SelectItem key={category.ID} value={category.Name}>
+                        {category.Name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="priority" className="text-sm font-medium">
+                Display Priority
+              </Label>
+              <Input
+                id="priority"
+                type="number"
+                min="1"
+                value={formData.Priority || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData({
+                    ...formData,
+                    Priority: value === '' ? 1 : Number(value)
+                  });
+                }}
+                placeholder="1"
+                className="mt-1"
+              />
+            </div>
           </div>
 
           {/* Description */}
-          <div className="md:col-span-2">
+          <div>
             <Label htmlFor="description" className="text-sm font-medium">
-              Description <span className="text-destructive">*</span>
+              Description
             </Label>
             <Textarea
               id="description"
@@ -156,111 +187,38 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, Description: e.target.value })
               }
-              className="h-32 resize-none"
-              placeholder="Enter description"
-              required
-            />
-          </div>
-
-          {/* Image Upload with Drag & Drop */}
-          <div className="md:col-span-2">
-            <Label className="text-sm font-medium">
-              Image
-            </Label>
-            <div
-              className="relative border-2 border-dashed border-gray-300 rounded-sm p-4 h-32 bg-white flex flex-col justify-center items-center hover:bg-gray-50 transition cursor-pointer"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-              onClick={handleClickUpload}
-            >
-              {preview ? (
-                <>
-                  <img
-                    src={preview}
-                    alt="Preview"
-                    className="max-h-24 object-contain mb-2"
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveImage();
-                    }}
-                    className="absolute top-2 right-2 text-gray-500 text-2xl hover:text-gray-800"
-                    title="Remove image"
-                  >
-                    ×
-                  </button>
-                </>
-              ) : (
-                <>
-                  <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
-                  <p className="text-gray-500 text-sm text-center">
-                    Click or drag & drop your image here
-                  </p>
-                </>
-              )}
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-                title="Upload Image"
-              />
-            </div>
-          </div>
-
-          {/* Parent */}
-          <div>
-            <Label htmlFor="parent" className="text-sm font-medium">
-              Parent
-            </Label>
-            <Input
-              id="parent"
-              type="text"
-              value={formData.Parent}
-              onChange={(e) =>
-                setFormData({ ...formData, Parent: e.target.value })
-              }
-              placeholder="Parent category"
-            />
-          </div>
-
-          {/* Priority */}
-          <div>
-            <Label htmlFor="priority" className="text-sm font-medium">
-              Priority
-            </Label>
-            <Input
-              id="priority"
-              type="text"
-              value={formData.Priority || ""}
-              onChange={(e) => {
-                const value = e.target.value;
-                // Only allow numbers and empty string
-                if (value === '' || /^\d+$/.test(value)) {
-                  setFormData({
-                    ...formData,
-                    Priority: value === '' ? 0 : Number(value)
-                  });
-                }
-                // If invalid input, just ignore it (don't update state)
+              className="mt-1 min-h-[80px] resize-none"
+              placeholder="Brief description of this category..."
+              rows={3}
+              style={{
+                height: 'auto',
+                minHeight: '80px',
+                maxHeight: '120px'
               }}
-              placeholder="1"
-              required
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = Math.min(target.scrollHeight, 120) + 'px';
+              }}
             />
           </div>
 
-          {/* Status */}
-          <div className="flex items-center justify-between">
+          {/* Icon Selection */}
+          <div>
             <Label className="text-sm font-medium">
-              Status
+              Category Icon
             </Label>
-            <Switch
-              checked={formData.Status === "Active"}
-              onCheckedChange={handleStatusChange}
-            />
+            <div className="mt-2 p-4 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+              <div className="text-center">
+                <ImageIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-500">
+                  Icon selector will be implemented here
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Choose from food & beverage icons
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -280,7 +238,6 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
             onClick={handleSubmit}
             disabled={
               !formData.Name.trim() ||
-              !formData.Description.trim() ||
               actionLoading
             }
           >

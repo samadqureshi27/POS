@@ -11,7 +11,7 @@ import { toast as sonnerToast } from 'sonner';
 import BranchModal from "./_components/branch-modal";
 import BranchTable from "./_components/branch-table";
 import LoadingSpinner from '@/components/ui/loader';
-import { ManagementPageSkeleton } from '@/app/(main)/dashboard/_components/ManagementPageSkeleton';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 
 const BranchManagementPage = () => {
@@ -56,7 +56,7 @@ const BranchManagementPage = () => {
   };
 
   if (loading) {
-    return <ManagementPageSkeleton showSummaryCards={true} summaryCardCount={2} />;
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={2} />;
   }
 
   return (

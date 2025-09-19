@@ -21,7 +21,7 @@ const MenuTable: React.FC<MenuTableProps> = ({
 }) => {
   const categoryOptions = [
     { value: "", label: "All Categories" },
-    ...categories.map(cat => ({ value: cat, label: cat }))
+    ...categories.map(cat => ({ value: cat.Name, label: cat.Name }))
   ];
 
   const statusOptions = [

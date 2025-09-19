@@ -6,7 +6,7 @@ import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 // Import all our new components
 import {Toast} from "@/components/ui/toast";
-import PeriodSelector from "./_components/period-selector";
+import { PeriodSelector } from "@/components/ui/period-selector";
 import MostOrderedTable from "./_components/most-ordered-table";
 import LeastOrderedTable from "./_components/least-order-table";
 import OrderTypeChart from "./_components/order-type-chart";
