@@ -81,7 +81,7 @@ export const useMenuManagement = () => {
     MealPrice: [],
     PName: [],
     PPrice: [],
-    ShowOnMain: "Inactive",
+    ShowOnMain: "Active",
     SubTBE: "Inactive",
     Deal: "Inactive",
     Special: "Inactive",
@@ -160,7 +160,7 @@ export const useMenuManagement = () => {
       MealPrice: [],
       PName: [],
       PPrice: [],
-      ShowOnMain: "Inactive",
+      ShowOnMain: "Active",
       SubTBE: "Inactive",
       Deal: "Inactive",
       Special: "Inactive",
@@ -224,14 +224,16 @@ export const useMenuManagement = () => {
   }, [isModalOpen]);
 
   // Computed values
-  const filteredItems = menuItems.filter((item) => {
-    const matchesSearch =
-      item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.Category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "" || item.Status === statusFilter;
-    const matchesCategory = categoryFilter === "" || item.Category === categoryFilter;
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
+  const filteredItems = menuItems
+    .filter((item) => {
+      const matchesSearch =
+        item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.Category.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === "" || item.Status === statusFilter;
+      const matchesCategory = categoryFilter === "" || item.Category === categoryFilter;
+      return matchesSearch && matchesStatus && matchesCategory;
+    })
+    .sort((a, b) => (a.Priority || 0) - (b.Priority || 0)); // Sort by Priority for POS app display order
 
   const isFormValid = () => {
     // Only require price when display type is selected and it's not Var

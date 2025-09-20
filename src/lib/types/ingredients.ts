@@ -6,6 +6,7 @@ export interface InventoryItem {
   Status: "Active" | "Inactive";
   Description: string;
   Unit: string;
+  Threshold: number;
   Priority: number;
 }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Edit } from "lucide-react";
+import { Edit, Infinity } from "lucide-react";
 import FilterDropdown from "@/components/ui/filter-dropdown";
 import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -79,7 +79,19 @@ const MenuTable: React.FC<MenuTableProps> = ({
     {
       key: "stockQty",
       title: "Stock Qty",
-      dataIndex: "StockQty"
+      dataIndex: "StockQty",
+      render: (value, record) => {
+        // Show infinity icon when track inventory is disabled (SubTBE is Inactive)
+        if (record.SubTBE === "Inactive") {
+          return (
+            <div className="flex items-center justify-center text-green-600">
+              <Infinity className="h-4 w-4" />
+            </div>
+          );
+        }
+        // Show actual stock quantity when tracking is enabled
+        return value || "0";
+      }
     },
     {
       key: "status",

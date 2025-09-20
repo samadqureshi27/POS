@@ -1,26 +1,11 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-
-export interface InventoryItem {
-  ID: string;
-  Name: string;
-  Status: "Active" | "Inactive";
-  Description: string;
-  Unit: string;
-  Threshold: number;
-  Priority: number;
-}
-
-export interface ToastMessage {
-  message: string;
-  type: "success" | "error";
-}
-
-export interface FilterOptions {
-  searchTerm: string;
-  statusFilter: "" | "Active" | "Inactive";
-  unitFilter: string;
-}
+import { ingredientsApi } from "@/lib/util/ingredientsApi";
+import {
+  InventoryItem,
+  ToastMessage,
+  FilterOptions
+} from "@/lib/types/ingredients";
 
 export const useIngredientsData = () => {
   // State management
@@ -48,45 +33,35 @@ export const useIngredientsData = () => {
     Priority: 0,
   });
 
-  // Initialize data - simulate API call
-  useEffect(() => {
-    const loadInitialData = () => {
-      setTimeout(() => {
-        setItems([
-          {
-            ID: "#001",
-            Name: "Bread",
-            Status: "Active",
-            Description: "Fresh bread for daily use",
-            Unit: "Weight in Grams",
-            Threshold: 500,
-            Priority: 1,
-          },
-          {
-            ID: "#002",
-            Name: "Oat Bread",
-            Status: "Active",
-            Description: "Healthy oat bread option",
-            Unit: "Weight in Grams",
-            Threshold: 300,
-            Priority: 2,
-          },
-          {
-            ID: "#003",
-            Name: "French Bread",
-            Status: "Inactive",
-            Description: "Traditional French bread",
-            Unit: "Quantity Count",
-            Threshold: 10,
-            Priority: 3,
-          },
-        ]);
-        setLoading(false);
-      }, 800);
-    };
 
-    loadInitialData();
+  // Toast management
+  const showToast = useCallback((message: string, type: "success" | "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
   }, []);
+
+  // Load ingredients from API
+  const loadIngredients = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await ingredientsApi.getIngredients();
+      if (response.success) {
+        setItems(response.data);
+      } else {
+        showToast("Failed to load ingredients", "error");
+      }
+    } catch (error) {
+      console.error("Error loading ingredients:", error);
+      showToast("Failed to load ingredients", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [showToast]);
+
+  // Initialize data - load from API
+  useEffect(() => {
+    loadIngredients();
+  }, [loadIngredients]);
 
   // Computed values
   const filteredItems = items.filter((item) => {
@@ -124,11 +99,6 @@ export const useIngredientsData = () => {
       )
     : null;
 
-  // Utility functions
-  const showToast = useCallback((message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  }, []);
 
   const generateNextId = useCallback(() => {
     const nextNumber =
@@ -143,54 +113,66 @@ export const useIngredientsData = () => {
   }, [items]);
 
   // CRUD Operations
-  const addItem = useCallback((newItem: Omit<InventoryItem, "ID">) => {
-    const itemWithId: InventoryItem = {
-      ...newItem,
-      ID: generateNextId(),
-    };
-    
-    setActionLoading(true);
-    setTimeout(() => {
-      setItems((prev) => [...prev, itemWithId]);
-      showToast("Item added successfully.", "success");
+  const addItem = useCallback(async (newItem: Omit<InventoryItem, "ID">) => {
+    try {
+      setActionLoading(true);
+      const response = await ingredientsApi.createIngredient(newItem);
+      if (response.success) {
+        setItems((prev) => [...prev, response.data]);
+        showToast(response.message || "Ingredient added successfully", "success");
+      } else {
+        showToast("Failed to add ingredient", "error");
+      }
+    } catch (error) {
+      console.error("Error adding ingredient:", error);
+      showToast("Failed to add ingredient", "error");
+    } finally {
       setActionLoading(false);
-    }, 700);
-  }, [generateNextId, showToast]);
-
-  const updateItem = useCallback((updatedItem: InventoryItem) => {
-    setActionLoading(true);
-    setTimeout(() => {
-      setItems((prev) =>
-        prev.map((item) => (item.ID === updatedItem.ID ? updatedItem : item))
-      );
-      showToast("Item updated successfully.", "success");
-      setActionLoading(false);
-    }, 700);
+    }
   }, [showToast]);
 
-  const deleteItems = useCallback((itemIds: string[]) => {
-    if (itemIds.length === 0) return;
-    
-    setActionLoading(true);
-    setTimeout(() => {
-      // Remove selected items
-      let remaining = items.filter((item) => !itemIds.includes(item.ID));
-
-      // Reassign IDs sequentially starting from 1
-      remaining = remaining.map((item, index) => ({
-        ...item,
-        ID: `#${String(index + 1).padStart(3, "0")}`,
-      }));
-
-      setItems(remaining);
-      setSelectedItems([]);
+  const updateItem = useCallback(async (updatedItem: InventoryItem) => {
+    try {
+      setActionLoading(true);
+      const { ID, ...updates } = updatedItem;
+      const response = await ingredientsApi.updateIngredient(ID, updates);
+      if (response.success) {
+        setItems((prev) =>
+          prev.map((item) => (item.ID === ID ? response.data : item))
+        );
+        showToast(response.message || "Ingredient updated successfully", "success");
+      } else {
+        showToast("Failed to update ingredient", "error");
+      }
+    } catch (error) {
+      console.error("Error updating ingredient:", error);
+      showToast("Failed to update ingredient", "error");
+    } finally {
       setActionLoading(false);
-      showToast(
-        `${itemIds.length} item${itemIds.length > 1 ? 's' : ''} deleted successfully.`,
-        "success"
-      );
-    }, 600);
-  }, [items, showToast]);
+    }
+  }, [showToast]);
+
+  const deleteItems = useCallback(async () => {
+    if (selectedItems.length === 0) return;
+
+    try {
+      setActionLoading(true);
+      const response = await ingredientsApi.deleteIngredients(selectedItems);
+      if (response.success) {
+        // Reload data to get updated list with reassigned IDs
+        await loadIngredients();
+        setSelectedItems([]);
+        showToast(response.message || "Ingredients deleted successfully", "success");
+      } else {
+        showToast("Failed to delete ingredients", "error");
+      }
+    } catch (error) {
+      console.error("Error deleting ingredients:", error);
+      showToast("Failed to delete ingredients", "error");
+    } finally {
+      setActionLoading(false);
+    }
+  }, [selectedItems, showToast, loadIngredients]);
 
   // Selection handlers
   const handleSelectItem = useCallback((id: string, checked: boolean) => {
@@ -308,7 +290,7 @@ export const useIngredientsData = () => {
     // CRUD operations
     addItem,
     updateItem,
-    deleteItems: () => deleteItems(selectedItems),
+    deleteItems,
     
     // Selection handlers
     handleSelectItem,
