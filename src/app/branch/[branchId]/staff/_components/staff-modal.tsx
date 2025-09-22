@@ -56,9 +56,9 @@ const StaffModal: React.FC<StaffModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+            <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col gap-0">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-semibold">
+                    <DialogTitle className="text-2xl font-semibold mb-2">
                         {isEditing ? "Edit Staff Member" : "Add New Staff Member"}
                     </DialogTitle>
                 </DialogHeader>
@@ -140,15 +140,19 @@ const StaffModal: React.FC<StaffModalProps> = ({
                         </div>
 
                         {/* Role Dropdown */}
-                        <div className="flex flex-col gap-1 relative">
+                        <div className="flex flex-col gap-1 relative ">
                             <Label htmlFor="role" className="font-medium">
                                 Role
                             </Label>
-                            <Select value={formData.Role} onValueChange={(value) => setFormData({ ...formData, Role: value })}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Role" />
+                            <Select
+                            
+                                value={formData.Role}
+                                onValueChange={(value) => setFormData({ ...formData, Role: value })}
+                            >
+                                <SelectTrigger  className="w-full ">
+                                    <SelectValue className=""  placeholder="Select Role" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="z-[100]">
                                     <SelectItem value="Manager">Manager</SelectItem>
                                     <SelectItem value="Cashier">Cashier</SelectItem>
                                     <SelectItem value="Waiter">Waiter</SelectItem>
@@ -255,8 +259,8 @@ const StaffModal: React.FC<StaffModalProps> = ({
                             <div className="flex items-center gap-3">
                                 <span
                                     className={`font-medium ${formData.Status === "Active"
-                                            ? "text-green-600"
-                                            : "text-red-500"
+                                        ? "text-green-600"
+                                        : "text-red-500"
                                         }`}
                                 >
                                     {formData.Status}
@@ -271,7 +275,7 @@ const StaffModal: React.FC<StaffModalProps> = ({
                 </div>
 
                 {/* Fixed Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
+                <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
                     <Button
                         type="button"
                         variant="outline"

@@ -121,8 +121,8 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style={{ display: isOpen ? 'flex' : 'none' }}>
       <div className="relative bg-white rounded-lg shadow-xl border w-[95vw] max-w-lg lg:max-w-2xl h-[90vh] max-h-[800px] flex flex-col overflow-hidden">
         {/* Header - Fixed and Centered */}
-        <div className="px-6 py-4 border-b border-gray-200 bg-white flex-shrink-0">
-          <div className="flex items-center justify-center relative">
+        <div className="px-6 py-4  border-gray-200 bg-white flex-shrink-0">
+          <div className="flex items-center justify-start relative">
             <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
               {editingItem ? "Edit Recipe" : "Add Recipe"}
             </h2>
@@ -143,7 +143,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
         <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
             {/* Tab List - Fixed and Centered */}
-            <div className="px-6 pt-4 pb-0 flex justify-center flex-shrink-0">
+            <div className="px-6  pb-0 flex justify-center flex-shrink-0">
               <TabsList className="grid grid-cols-3 w-full max-w-md">
                 <TabsTrigger value="Recipe Info" className="text-xs sm:text-sm">Recipe Info</TabsTrigger>
                 <TabsTrigger value="Ingredients" className="text-xs sm:text-sm">Ingredients</TabsTrigger>
