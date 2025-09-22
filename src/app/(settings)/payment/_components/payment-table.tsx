@@ -46,7 +46,7 @@ const PaymentTable: React.FC<PaymentTableProps> = ({
         {
             key: "paymentType",
             title: "Payment Type",
-            dataIndex: "Payment_Type",
+            dataIndex: "PaymentType",
             filterable: true,
             filterComponent: (
                 <FilterDropdown
@@ -61,7 +61,7 @@ const PaymentTable: React.FC<PaymentTableProps> = ({
         {
             key: "taxType",
             title: "Tax Type",
-            dataIndex: "Tax_Type",
+            dataIndex: "TaxType",
             filterable: true,
             filterComponent: (
                 <FilterDropdown

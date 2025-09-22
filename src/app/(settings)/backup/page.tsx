@@ -8,7 +8,7 @@ import { useBackup } from '@/lib/hooks/useBackup';
 
 // Components
 import { BackupModal } from './_components/backup-modal';
-import { Toast } from '@/components/ui/toast';
+import { Toaster } from "@/components/ui/sonner";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { BackupPageHeader } from './_components/backup-page-header';
 import { BackupSettingsCard } from './_components/backup-settings-card';
@@ -16,7 +16,7 @@ import { BackupHistoryCard } from './_components/backup-history-cards';
 
 const BackupRecoveryPage = () => {
   // Custom hooks
-  const { toast, toastVisible, showToast, hideToast } = useToast();
+  const { showToast } = useToast();
   const { modal, showModal, closeModal } = useModal();
   
   const {
@@ -43,13 +43,7 @@ const BackupRecoveryPage = () => {
 
   return (
     <div className="p-6 min-h-screen bg-background w-full">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <BackupModal
         isOpen={modal.isOpen}

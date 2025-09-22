@@ -6,14 +6,14 @@ import { useToast } from '@/lib/hooks';
 import { useSettings } from '@/lib/hooks/gsettings';
 
 // Components
-import { Toast } from '@/components/ui/toast';
+import { Toaster } from "@/components/ui/sonner";
 import ActionButtons from '@/components/ui/setting-buttons';
 import SettingsCards from './_components/cards';
-import { SimplePageSkeleton } from '@/app/(main)/dashboard/_components/SimplePageSkeleton';
+import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 
 
 const GeneralSettingsPage = () => {
-  const { toast, toastVisible, showToast, hideToast } = useToast();
+  const { showToast } = useToast();
 
   const {
     settings,
@@ -31,19 +31,12 @@ const GeneralSettingsPage = () => {
 
   // Single loading check - no early return with null
   if (loading || !settings) {
-    return <SimplePageSkeleton showHeader={true} contentRows={6} />;
+    return <GlobalSkeleton type="simple" showHeader={true} contentRows={6} />;
   }
 
   return (
     <div className="p-6 min-h-screen w-full bg-background">
-      {/* Toast positioned absolutely */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
+      <Toaster position="top-right" />
 
       <div className="flex-1 justify-center items-center w-full px-6">
         <div className="mt-20">

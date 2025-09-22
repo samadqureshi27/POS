@@ -1,7 +1,8 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import TabNavigation from "./tab-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import MenuItemTab from "./menu-item-tab";
 import DetailsTab from "./details-tab";
 import OptionsTab from "./options-tab";
@@ -17,6 +18,9 @@ const MenuModal: React.FC<MenuModalProps> = ({
     activeTab,
     setActiveTab,
     formData,
+    menuOptions,
+    menuItems,
+    categories,
     onClose,
     onSubmit,
     actionLoading,
@@ -30,155 +34,120 @@ const MenuModal: React.FC<MenuModalProps> = ({
 }) => {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="w-full max-w-lg h-[70vh] lg:max-w-2xl flex flex-col">
-                <ModalHeader
-                    editingItem={editingItem}
-                    activeTab={activeTab}
-                    setActiveTab={setActiveTab}
-                    formData={formData}
-                />
+            <DialogContent
+                className="max-w-lg lg:max-w-2xl h-[85vh] max-h-[700px] flex flex-col"
+                showCloseButton={false}
+            >
+                <DialogHeader>
+                    <DialogTitle className="text-lg sm:text-xl md:text-2xl">
+                        {editingItem ? "Edit Menu Item" : "Add Menu Item"}
+                    </DialogTitle>
+                </DialogHeader>
 
-                <ModalContent
-                    activeTab={activeTab}
-                    formData={formData}
-                    preview={preview}
-                    setPreview={setPreview}
-                    fileInputRef={fileInputRef}
-                    updateFormData={updateFormData}
-                    handleFormFieldChange={handleFormFieldChange}
-                    handleStatusChange={handleStatusChange}
-                />
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
+                    <TabsList className="grid w-full grid-cols-6 flex-shrink-0">
+                        <TabsTrigger value="Menu Items">Menu Item</TabsTrigger>
+                        <TabsTrigger value="Details">Details</TabsTrigger>
+                        <TabsTrigger value="Options">Options</TabsTrigger>
+                        <TabsTrigger value="Meal">Meal</TabsTrigger>
+                        <TabsTrigger value="Specials">Specials</TabsTrigger>
+                        <TabsTrigger value="Price">Price</TabsTrigger>
+                    </TabsList>
 
-                <ModalFooter
-                    editingItem={editingItem}
-                    onClose={onClose}
-                    onSubmit={onSubmit}
-                    actionLoading={actionLoading}
-                    isFormValid={isFormValid}
-                />
+                    <div className="flex-1 overflow-y-auto mt-4">
+                        <TabsContent value="Menu Items" className="mt-0">
+                            <MenuItemTab
+                                formData={formData}
+                                updateFormData={updateFormData}
+                                handleFormFieldChange={handleFormFieldChange}
+                                handleStatusChange={handleStatusChange}
+                                preview={preview}
+                                setPreview={setPreview}
+                                fileInputRef={fileInputRef}
+                                categories={categories}
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="Details" className="mt-0">
+                            <DetailsTab
+                                formData={formData}
+                                updateFormData={updateFormData}
+                                handleFormFieldChange={handleFormFieldChange}
+                                handleStatusChange={handleStatusChange}
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="Options" className="mt-0">
+                            <OptionsTab
+                                formData={formData}
+                                updateFormData={updateFormData}
+                                handleFormFieldChange={handleFormFieldChange}
+                                menuOptions={menuOptions}
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="Meal" className="mt-0">
+                            <MealTab
+                                formData={formData}
+                                setFormData={updateFormData}
+                                handleStatusChange={handleStatusChange}
+                                menuItems={menuItems}
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="Specials" className="mt-0">
+                            <SpecialsTab
+                                formData={formData}
+                                setFormData={updateFormData}
+                                handleStatusChange={handleStatusChange}
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="Price" className="mt-0">
+                            <PriceTab
+                                formData={formData}
+                                setFormData={updateFormData}
+                            />
+                        </TabsContent>
+                    </div>
+
+                    <ModalFooter
+                        editingItem={editingItem}
+                        onClose={onClose}
+                        onSubmit={onSubmit}
+                        actionLoading={actionLoading}
+                        isFormValid={isFormValid}
+                    />
+                </Tabs>
             </DialogContent>
         </Dialog>
     );
 };
 
-const ModalHeader: React.FC<{
-    editingItem: MenuItem | null;
-    activeTab: string;
-    setActiveTab: (tab: string) => void;
-    formData: Omit<MenuItem, "ID">;
-}> = ({ editingItem, activeTab, setActiveTab, formData }) => (
-    <div className="flex-shrink-0">
-        <h1 className="text-xl sm:text-2xl px-4 sm:px-6 pt-3 sm:pt-4 font-medium">
-            {editingItem ? "Edit Menu Item" : "Add Menu Item"}
-        </h1>
-        <TabNavigation
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            formData={formData}
-        />
-    </div>
-);
-
-const ModalContent: React.FC<{
-    activeTab: string;
-    formData: Omit<MenuItem, "ID">;
-    preview: string | null;
-    setPreview: (preview: string | null) => void;
-    fileInputRef: React.RefObject<HTMLInputElement>;
-    updateFormData: (updates: Partial<Omit<MenuItem, "ID">>) => void;
-    handleFormFieldChange: (field: keyof Omit<MenuItem, "ID">, value: any) => void;
-    handleStatusChange: (field: keyof Omit<MenuItem, "ID">, isActive: boolean) => void;
-}> = ({
-    activeTab,
-    formData,
-    preview,
-    setPreview,
-    fileInputRef,
-    updateFormData,
-    handleFormFieldChange,
-    handleStatusChange,
-}) => (
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-            {activeTab === "Menu Items" && (
-                <MenuItemTab
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    handleFormFieldChange={handleFormFieldChange}
-                    handleStatusChange={handleStatusChange}
-                    preview={preview}
-                    setPreview={setPreview}
-                    fileInputRef={fileInputRef}
-                />
-            )}
-
-            {activeTab === "Details" && (
-                <DetailsTab
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    handleFormFieldChange={handleFormFieldChange}
-                    handleStatusChange={handleStatusChange}
-                />
-            )}
-
-            {activeTab === "Options" && (
-                <OptionsTab
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    handleFormFieldChange={handleFormFieldChange}
-                />
-            )}
-
-            {activeTab === "Meal" && (
-                <MealTab
-                    formData={formData}
-                    setFormData={updateFormData}
-                    handleStatusChange={handleStatusChange}
-                />
-            )}
-
-            {activeTab === "Specials" && (
-                <SpecialsTab
-                    formData={formData}
-                    setFormData={updateFormData}
-                    handleStatusChange={handleStatusChange}
-                />
-            )}
-
-            {activeTab === "Price" && (
-                <PriceTab
-                    formData={formData}
-                    setFormData={updateFormData}
-                />
-            )}
-        </div>
-    );
 
 const ModalFooter: React.FC<{
     editingItem: MenuItem | null;
     onClose: () => void;
     onSubmit: () => void;
     actionLoading: boolean;
-    isFormValid: boolean;
+    isFormValid: () => boolean;
 }> = ({ editingItem, onClose, onSubmit, actionLoading, isFormValid }) => (
-    <div className="flex-shrink-0 flex flex-col sm:flex-row justify-end gap-3 p-4 border-t border-gray-200 bg-white">
-        <button
+    <div className="flex-shrink-0 flex flex-col sm:flex-row justify-end gap-3 p-6 border-t border-gray-200 bg-white">
+        <Button
+            variant="outline"
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-sm hover:bg-gray-50 order-2 sm:order-1"
             disabled={actionLoading}
+            className="order-2 sm:order-1"
         >
             Cancel
-        </button>
-        <button
-            type="button"
+        </Button>
+        <Button
             onClick={onSubmit}
-            disabled={actionLoading || !isFormValid}
-            className={`px-4 py-2 min-w-[120px] rounded-sm transition-colors text-white order-1 sm:order-2 ${actionLoading || !isFormValid
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-black hover:bg-gray-700"
-                }`}
+            disabled={actionLoading || !isFormValid()}
+            className="min-w-[120px] order-1 sm:order-2"
         >
             {actionLoading ? (
-                <div className="flex items-center gap-2 justify-center">
+                <div className="flex items-center gap-2">
                     <Loader2 className="animate-spin w-4 h-4" />
                     {editingItem ? "Updating..." : "Saving..."}
                 </div>
@@ -187,7 +156,7 @@ const ModalFooter: React.FC<{
             ) : (
                 "Save & Close"
             )}
-        </button>
+        </Button>
     </div>
 );
 

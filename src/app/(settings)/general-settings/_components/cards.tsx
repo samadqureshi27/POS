@@ -5,6 +5,7 @@ import RegionalSettingsCard from './regional-settings-card';
 import ReceiptSettingsCard from './receipt-settings-card';
 import SecurityAccessCard from './security-access-card';
 import OrderTimerCard from './order-timer-card';
+import UnitManagementCard from './unit-management-card';
 
 interface SettingsCardsProps {
     settings: GeneralSettings;
@@ -19,6 +20,7 @@ const SettingsCards: React.FC<SettingsCardsProps> = ({ settings, onSettingChange
             <ReceiptSettingsCard settings={settings} onSettingChange={onSettingChange} />
             <SecurityAccessCard settings={settings} onSettingChange={onSettingChange} />
             <OrderTimerCard settings={settings} onSettingChange={onSettingChange} />
+            <UnitManagementCard />
         </div>
     );
 };

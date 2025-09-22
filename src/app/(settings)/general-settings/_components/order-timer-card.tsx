@@ -1,4 +1,6 @@
 import React from "react";
+import { Clock } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GeneralSettings } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,16 +13,14 @@ interface OrderTimerCardProps {
 
 const OrderTimerCard: React.FC<OrderTimerCardProps> = ({ settings, onSettingChange }) => {
     return (
-        <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[450px]">
-            <div className="flex items-center gap-2 mb-8">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12,6 12,12 16,14"></polyline>
-                </svg>
-                <h2 className="text-xl font-semibold">Order Timer Settings</h2>
-            </div>
-
-            <div className="space-y-6">
+        <Card className="shadow-sm max-h-[450px]">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Clock size={24} />
+                    Order Timer Settings
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <Label className="text-sm font-medium text-gray-500">
@@ -114,8 +114,8 @@ const OrderTimerCard: React.FC<OrderTimerCardProps> = ({ settings, onSettingChan
                         </div>
                     </>
                 )}
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 };
 
