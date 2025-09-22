@@ -130,6 +130,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+
           <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
             <TabsTrigger value="Recipe Info">Recipe Info</TabsTrigger>
             <TabsTrigger value="Ingredients">Ingredients</TabsTrigger>

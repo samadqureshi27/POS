@@ -7,6 +7,7 @@ import {
   FilterOptions
 } from "@/lib/types/ingredients";
 
+
 export const useIngredientsData = () => {
   // State management
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -38,6 +39,44 @@ export const useIngredientsData = () => {
   const showToast = useCallback((message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
+  // Initialize data - simulate API call
+  useEffect(() => {
+    const loadInitialData = () => {
+      setTimeout(() => {
+        setItems([
+          {
+            ID: "#001",
+            Name: "Bread",
+            Status: "Active",
+            Description: "Fresh bread for daily use",
+            Unit: "Weight in Grams",
+            Threshold: 500,
+            Priority: 1,
+          },
+          {
+            ID: "#002",
+            Name: "Oat Bread",
+            Status: "Active",
+            Description: "Healthy oat bread option",
+            Unit: "Weight in Grams",
+            Threshold: 300,
+            Priority: 2,
+          },
+          {
+            ID: "#003",
+            Name: "French Bread",
+            Status: "Inactive",
+            Description: "Traditional French bread",
+            Unit: "Quantity Count",
+            Threshold: 10,
+            Priority: 3,
+          },
+        ]);
+        setLoading(false);
+      }, 800);
+    };
+
+    loadInitialData();
   }, []);
 
   // Load ingredients from API
