@@ -67,7 +67,7 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
     };
 
     return (
-        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6 pl-1">
             {/* Header Section 
             <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-gray-800 mb-2">
@@ -97,13 +97,13 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
                                     onChange={(e) => handleNameInputChange(e.target.value)}
                                     placeholder="Enter custom name or select from recipes"
                                     required
-                                    className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                                    className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-gray-500/20"
                                 />
                                 <Button
                                     type="button"
                                     variant="outline"
                                     size="sm"
-                                    className="px-3 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 hover:bg-blue-50"
+                                    className="px-3 transition-all duration-200 focus:ring-2 focus:ring-gray-500/20 hover:bg-gray-50"
                                     onClick={() => setShowNameDropdown(!showNameDropdown)}
                                 >
                                     <ChevronDown className="h-4 w-4" />
@@ -194,7 +194,7 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
                                 }
                             }}
                         >
-                            <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20">
+                            <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-gray-500/20">
                                 <SelectValue placeholder="Select display type" />
                             </SelectTrigger>
                             <SelectContent className="z-[100]">
@@ -228,13 +228,13 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
                                     value={formData.Price || ""}
                                     onChange={(e) => handleFormFieldChange("Price", Number(e.target.value) || 0)}
                                     placeholder="0.00"
-                                    className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                                    className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-gray-500/20"
                                 />
                                 <Select
                                     value={formData.Unit || "gm"}
                                     onValueChange={(value) => handleFormFieldChange("Unit", value)}
                                 >
-                                    <SelectTrigger className="w-20 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20">
+                                    <SelectTrigger className="w-20 transition-all duration-200 focus:ring-2 focus:ring-gray-500/20">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="z-[100]">
@@ -254,7 +254,7 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
                                 value={formData.Price || ""}
                                 disabled={!formData.Displaycat || formData.Displaycat === "Var"}
                                 onChange={(e) => handleFormFieldChange("Price", Number(e.target.value) || 0)}
-                                className={`transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 ${
+                                className={`transition-all duration-200 focus:ring-2 focus:ring-gray-500/20 ${
                                     !formData.Displaycat || formData.Displaycat === "Var"
                                         ? "bg-gray-100 text-gray-500 cursor-not-allowed"
                                         : ""
@@ -279,7 +279,7 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
                             value={formData.Category}
                             onValueChange={(value) => handleFormFieldChange("Category", value)}
                         >
-                            <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20">
+                            <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-gray-500/20">
                                 <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                             <SelectContent className="z-[100]">
@@ -339,7 +339,7 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
                             target.style.height = 'auto';
                             target.style.height = Math.min(target.scrollHeight, 120) + 'px';
                         }}
-                        className="min-h-[80px] resize-none transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                        className="min-h-[80px] resize-none transition-all duration-200 focus:ring-2 focus:ring-gray-500/20"
                         placeholder="Brief description of this menu item..."
                         rows={3}
                         style={{

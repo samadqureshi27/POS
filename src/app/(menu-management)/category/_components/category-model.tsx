@@ -97,7 +97,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
         </DialogHeader>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6 pl-1">
           {/* Header Section */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-800 mb-2">
@@ -127,7 +127,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                   }
                   placeholder="e.g., Beverages, Appetizers, Main Courses"
                   required
-                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                  className="transition-all duration-200 focus:ring-2 focus:ring-gray-500/20"
                 />
               </div>
 
@@ -167,7 +167,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                     setFormData({ ...formData, Parent: value === "none" ? "" : value })
                   }
                 >
-                  <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20">
+                  <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-gray-500/20">
                     <SelectValue placeholder="No parent category" />
                   </SelectTrigger>
                   <SelectContent className="z-[100]">
@@ -203,7 +203,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                     });
                   }}
                   placeholder="1"
-                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                  className="transition-all duration-200 focus:ring-2 focus:ring-gray-500/20"
                 />
               </div>
             </div>
@@ -229,7 +229,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, Description: e.target.value })
                 }
-                className="min-h-[80px] resize-none transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                className="min-h-[80px] resize-none transition-all duration-200 focus:ring-2 focus:ring-gray-500/20"
                 placeholder="Brief description of this category..."
                 rows={3}
                 style={{
@@ -255,8 +255,8 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
               </p>
               <div className="p-4 border border-gray-200 rounded-lg bg-gray-50/50">
                 <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-blue-50 border border-blue-200 mb-3">
-                    <ImageIcon className="w-6 h-6 text-blue-600" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 mb-3">
+                    <ImageIcon className="w-6 h-6 text-gray-600" />
                   </div>
                   <h5 className="text-sm font-medium text-gray-700 mb-1">Icon Selection</h5>
                   <p className="text-xs text-gray-500 mb-2">
