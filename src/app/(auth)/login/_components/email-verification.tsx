@@ -80,7 +80,7 @@ const EmailVerificationOverlay: React.FC = () => {
             <ArrowLeft size={16} className="sm:w-5 sm:h-5" />
           </Button>
 
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center">
+          <div className="w-10 h-11 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center">
             <User size={20} className="sm:size-6 text-gray-600" />
           </div>
           <span className="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 font-medium">
