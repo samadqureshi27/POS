@@ -408,12 +408,12 @@ export class RecipeApiService {
 
 // Create default instance that matches the original RecipeAPI interface
 const RecipeAPI = {
-  getRecipeOption: () => RecipeApiService.getInstance().getRecipeOption(),
-  createRecipeOption: (recipe: RecipePayload) => 
+  getRecipeOption: () => RecipeApiService.getInstance().getRecipeOption({}, 1, 1000), // Get all recipes without pagination limit
+  createRecipeOption: (recipe: RecipePayload) =>
     RecipeApiService.getInstance().createRecipeOption(recipe),
-  updateRecipeOption: (id: number, updates: RecipePayload) => 
+  updateRecipeOption: (id: number, updates: RecipePayload) =>
     RecipeApiService.getInstance().updateRecipeOption(id, updates),
-  bulkDeleteRecipeOption: (ids: number[]) => 
+  bulkDeleteRecipeOption: (ids: number[]) =>
     RecipeApiService.getInstance().bulkDeleteRecipeOption(ids),
   getIngredients: () => RecipeApiService.getInstance().getIngredients(),
 };

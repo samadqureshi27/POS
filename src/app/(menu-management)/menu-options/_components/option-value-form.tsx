@@ -1,15 +1,10 @@
 // components/OptionValuesForm.tsx
 import React from 'react';
 import { Plus, X, Grip } from 'lucide-react';
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "@hello-pangea/dnd";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import DragTable from '@/components/ui/drag-table';
 import { MenuItemOptions,OptionValuesFormProps } from '@/lib/types/menuItemOptions';
 
 const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDataChange }) => {
@@ -29,7 +24,7 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
     });
   };
 
-  const handleDragEnd = (result: DropResult) => {
+  const handleDragEnd = (result: any) => {
     const { source, destination } = result;
     if (!destination || source.index === destination.index) return;
 
@@ -47,6 +42,64 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
       OptionPrice: newOptionPrice,
     });
   };
+
+  const updateValue = (index: number, value: string) => {
+    const updated = [...formData.OptionValue];
+    updated[index] = value;
+    onFormDataChange({
+      ...formData,
+      OptionValue: updated,
+    });
+  };
+
+  const updatePrice = (index: number, value: number) => {
+    const updated = [...formData.OptionPrice];
+    updated[index] = value;
+    onFormDataChange({
+      ...formData,
+      OptionPrice: updated,
+    });
+  };
+
+  // Prepare data for DragTable
+  const tableData = formData.OptionValue.map((value: string, idx: number) => ({
+    value: value,
+    price: formData.OptionPrice[idx] || 0,
+    index: idx
+  }));
+
+  const tableColumns = [
+    {
+      key: 'value',
+      label: 'Value Name',
+      width: 'minmax(200px, 1fr)',
+      render: (value: string, item: any, index: number) => (
+        <Input
+          type="text"
+          value={value}
+          onChange={(e) => updateValue(index, e.target.value)}
+          placeholder="Option value (e.g., Small, Medium, Large)"
+          className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+        />
+      )
+    },
+    {
+      key: 'price',
+      label: 'Price',
+      width: '100px',
+      render: (value: number, item: any, index: number) => (
+        <Input
+          type="number"
+          step="0.01"
+          min="0"
+          value={value}
+          onChange={(e) => updatePrice(index, Number(e.target.value) || 0)}
+          className="w-20 text-center mx-auto transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+          placeholder="0.00"
+        />
+      )
+    }
+  ];
 
   return (
     <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
@@ -81,97 +134,14 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
 
           {/* Desktop Table Layout */}
           <div className="hidden lg:block">
-            <div className="border border-gray-200 rounded-lg bg-gray-50/50">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="w-12 p-3 text-center text-xs font-medium text-gray-500 uppercase"></th>
-                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Value Name</th>
-                    <th className="w-24 p-3 text-center text-xs font-medium text-gray-500 uppercase">Price</th>
-                    <th className="w-12 p-3 text-center text-xs font-medium text-gray-500 uppercase"></th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-
-            <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[120px] overflow-y-auto bg-white">
-              <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="option-values">
-                  {(provided) => (
-                    <table className="w-full border-collapse">
-                      <tbody ref={provided.innerRef} {...provided.droppableProps}>
-                        {formData.OptionValue.map((opt, idx) => (
-                          <Draggable key={idx} draggableId={`option-${idx}`} index={idx}>
-                            {(provided, snapshot) => (
-                              <tr
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className={`hover:bg-gray-50 transition-colors ${
-                                  snapshot.isDragging ? "bg-blue-50 shadow-lg" : ""
-                                } border-b border-gray-100 last:border-b-0`}
-                              >
-                                <td
-                                  className="p-3 text-center cursor-grab w-12"
-                                  {...provided.dragHandleProps}
-                                >
-                                  <Grip size={16} className="text-gray-400 mx-auto" />
-                                </td>
-                                <td className="p-3">
-                                  <Input
-                                    type="text"
-                                    value={opt}
-                                    onChange={(e) => {
-                                      const updated = [...formData.OptionValue];
-                                      updated[idx] = e.target.value;
-                                      onFormDataChange({
-                                        ...formData,
-                                        OptionValue: updated,
-                                      });
-                                    }}
-                                    placeholder="Enter option value (e.g., Small, Medium, Large)"
-                                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
-                                  />
-                                </td>
-                                <td className="p-3 text-center">
-                                  <Input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    value={formData.OptionPrice[idx]}
-                                    onChange={(e) => {
-                                      const updated = [...formData.OptionPrice];
-                                      updated[idx] = Number(e.target.value) || 0;
-                                      onFormDataChange({
-                                        ...formData,
-                                        OptionPrice: updated,
-                                      });
-                                    }}
-                                    placeholder="0.00"
-                                    className="w-20 text-center mx-auto transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
-                                  />
-                                </td>
-                                <td className="p-3 text-center w-12">
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => removeOptionPair(idx)}
-                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors px-2 py-1 rounded h-auto w-auto"
-                                  >
-                                    <X size={16} />
-                                  </Button>
-                                </td>
-                              </tr>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </tbody>
-                    </table>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            </div>
+            <DragTable
+              data={tableData}
+              columns={tableColumns}
+              onReorder={handleDragEnd}
+              onDelete={removeOptionPair}
+              droppableId="option-values"
+              emptyMessage="No option values added"
+            />
           </div>
 
           {/* Mobile Card Layout */}
@@ -202,14 +172,7 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                     <Input
                       type="text"
                       value={opt}
-                      onChange={(e) => {
-                        const updated = [...formData.OptionValue];
-                        updated[idx] = e.target.value;
-                        onFormDataChange({
-                          ...formData,
-                          OptionValue: updated,
-                        });
-                      }}
+                      onChange={(e) => updateValue(idx, e.target.value)}
                       placeholder="Option name"
                       className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                     />
@@ -221,14 +184,7 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                       step="0.01"
                       min="0"
                       value={formData.OptionPrice[idx]}
-                      onChange={(e) => {
-                        const updated = [...formData.OptionPrice];
-                        updated[idx] = Number(e.target.value) || 0;
-                        onFormDataChange({
-                          ...formData,
-                          OptionPrice: updated,
-                        });
-                      }}
+                      onChange={(e) => updatePrice(idx, Number(e.target.value) || 0)}
                       placeholder="0.00"
                       className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                     />

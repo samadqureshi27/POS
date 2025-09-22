@@ -1,5 +1,6 @@
 import React from "react";
 import { History, Database, RefreshCw, Download, Trash2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BackupHistoryItem } from '@/lib/types/backup';
 
 interface BackupHistoryCardProps {
@@ -27,13 +28,14 @@ export const BackupHistoryCard: React.FC<BackupHistoryCardProps> = ({
     };
 
     return (
-        <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-                <History className="text-black" size={20} />
-                <h2 className="text-lg font-semibold">Backup History</h2>
-            </div>
-
-            <div className="space-y-4">
+        <Card className="shadow-sm">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <History size={20} />
+                    Backup History
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
                 {backupHistory.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                         <Database size={32} className="mx-auto mb-2 opacity-50" />
@@ -109,7 +111,7 @@ export const BackupHistoryCard: React.FC<BackupHistoryCardProps> = ({
                         </div>
                     ))
                 )}
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 };

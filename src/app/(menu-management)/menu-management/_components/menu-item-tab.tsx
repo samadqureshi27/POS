@@ -20,7 +20,7 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
     fileInputRef,
     categories,
 }) => {
-    const { recipeOptions } = useRecipeData();
+    const { recipeOptions, refreshData } = useRecipeData();
     const [showNameDropdown, setShowNameDropdown] = useState(false);
     const [nameInputValue, setNameInputValue] = useState(formData.Name || "");
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -28,6 +28,13 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
     useEffect(() => {
         setNameInputValue(formData.Name || "");
     }, [formData.Name]);
+
+    // Refresh recipes when dropdown is opened
+    useEffect(() => {
+        if (showNameDropdown) {
+            refreshData();
+        }
+    }, [showNameDropdown, refreshData]);
 
     // Click outside handler for dropdown
     useEffect(() => {
