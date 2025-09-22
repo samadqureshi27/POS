@@ -86,7 +86,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col"
+        className="min-w-[35vw] max-w-2xl max-h-[80vh] min-h-[80vh] flex flex-col gap-0"
         showCloseButton={false}
         onWheel={(e) => e.preventDefault()}
       >
@@ -97,7 +97,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
         </DialogHeader>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6 pl-1">
+        <div className="flex-1 overflow-y-auto pr-1 py-2 space-y-6 pl-1">
           {/* Header Section */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-800 mb-2">
@@ -272,7 +272,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
         </div>
 
         {/* Fixed Action Buttons */}
-        <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+        <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
           <Button
             type="button"
             variant="outline"

@@ -43,7 +43,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 flex-1 overflow-y-auto pr-1 pl-1">
           {/* Payment Method Name */}
           <div className="md:col-span-2">
-            <Label htmlFor="paymentName" className="text-sm font-medium">
+            <Label htmlFor="paymentName" className="text-sm font-medium mb-1">
               Payment Method Name <span className="text-destructive">*</span>
             </Label>
             <Input
@@ -58,7 +58,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
           {/* Payment Type */}
           <div className="sm:col-span-1 md:col-span-1">
-            <Label htmlFor="paymentType" className="text-sm font-medium">
+            <Label htmlFor="paymentType" className="text-sm font-medium mb-1">
               Payment Type
             </Label>
             <Select value={formData.PaymentType} onValueChange={(value) => onFormDataChange({ PaymentType: value })}>
@@ -75,7 +75,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
           {/* Tax Type */}
           <div className="sm:col-span-1 md:col-span-1">
-            <Label htmlFor="taxType" className="text-sm font-medium">
+            <Label htmlFor="taxType" className="text-sm font-medium mb-1">
               Tax Type <span className="text-destructive">*</span>
             </Label>
             <Input
@@ -89,8 +89,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           </div>
 
           {/* Tax Percentage */}
-          <div className="sm:col-span-2 md:col-span-2">
-            <Label htmlFor="taxPercentage" className="text-sm font-medium">
+          <div className="sm:col-span-2 md:col-span-2 ">
+            <Label htmlFor="taxPercentage" className="text-sm font-medium mb-1">
               Tax Percentage (%)
               <span className="text-xs text-muted-foreground ml-1">
                 (Enter rate between 0-100)
@@ -134,7 +134,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         </div>
 
         {/* Fixed Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
+        <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
           <Button
             type="button"
             variant="outline"
