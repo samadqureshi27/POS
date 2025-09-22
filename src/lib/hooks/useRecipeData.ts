@@ -348,7 +348,6 @@ export const useRecipeData = () => {
     // Utility functions
     showToast,
     refreshData,
-    loadIngredients,
     loadRecipeOptions,
 
     // Toast handler
