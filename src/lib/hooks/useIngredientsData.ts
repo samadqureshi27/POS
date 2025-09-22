@@ -39,6 +39,8 @@ export const useIngredientsData = () => {
   const showToast = useCallback((message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
+  }, []);
+
   // Initialize data - simulate API call
   useEffect(() => {
     const loadInitialData = () => {
