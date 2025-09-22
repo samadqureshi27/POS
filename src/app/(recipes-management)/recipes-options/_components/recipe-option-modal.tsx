@@ -75,7 +75,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
         </DialogHeader>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6 pl-1">
           {/* Header Section */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-800 mb-2">

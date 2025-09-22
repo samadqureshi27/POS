@@ -118,56 +118,78 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className="max-w-lg lg:max-w-2xl h-[85vh] max-h-[700px] flex flex-col"
-        showCloseButton={false}
-      >
-        <DialogHeader>
-          <DialogTitle className="text-lg sm:text-xl md:text-2xl">
-            {editingItem ? "Edit Recipe" : "Add Recipe"}
-          </DialogTitle>
-        </DialogHeader>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-
-          <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
-            <TabsTrigger value="Recipe Info">Recipe Info</TabsTrigger>
-            <TabsTrigger value="Ingredients">Ingredients</TabsTrigger>
-            <TabsTrigger value="Recipe Option">Recipe Options</TabsTrigger>
-          </TabsList>
-
-          <div className="flex-1 overflow-y-auto mt-4">
-            <TabsContent value="Recipe Info" className="mt-0">
-              <RecipeInfoTab
-                formData={formData}
-                onFormDataChange={setFormData}
-                onStatusChange={handleStatusChange}
-              />
-            </TabsContent>
-
-            <TabsContent value="Recipe Option" className="mt-0">
-              <RecipeIngredientsTab
-                formData={formData}
-                ingredients={availableRecipeOptions}
-                onFormDataChange={setFormData}
-                tabType="option"
-              />
-            </TabsContent>
-
-            <TabsContent value="Ingredients" className="mt-0">
-              <RecipeIngredientsTab
-                formData={formData}
-                ingredients={ingredients}
-                onFormDataChange={setFormData}
-                tabType="ingredient"
-              />
-            </TabsContent>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style={{ display: isOpen ? 'flex' : 'none' }}>
+      <div className="relative bg-white rounded-lg shadow-xl border w-[95vw] max-w-lg lg:max-w-2xl h-[90vh] max-h-[800px] flex flex-col overflow-hidden">
+        {/* Header - Fixed and Centered */}
+        <div className="px-6 py-4 border-b border-gray-200 bg-white flex-shrink-0">
+          <div className="flex items-center justify-center relative">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
+              {editingItem ? "Edit Recipe" : "Add Recipe"}
+            </h2>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="absolute right-0 text-gray-400 hover:text-gray-600"
+              disabled={actionLoading}
+            >
+              <X size={20} />
+            </Button>
           </div>
-        </Tabs>
+        </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-3 pt-4 pb-2 justify-end border-t border-gray-200 flex-shrink-0 bg-white">
+        {/* Tabs Container - Flexible with proper overflow */}
+        <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
+            {/* Tab List - Fixed and Centered */}
+            <div className="px-6 pt-4 pb-0 flex justify-center flex-shrink-0">
+              <TabsList className="grid grid-cols-3 w-full max-w-md">
+                <TabsTrigger value="Recipe Info" className="text-xs sm:text-sm">Recipe Info</TabsTrigger>
+                <TabsTrigger value="Ingredients" className="text-xs sm:text-sm">Ingredients</TabsTrigger>
+                <TabsTrigger value="Recipe Option" className="text-xs sm:text-sm">Recipe Options</TabsTrigger>
+              </TabsList>
+            </div>
+
+            {/* Tab Content - Scrollable */}
+            <div className="flex-1 overflow-hidden">
+              <TabsContent value="Recipe Info" className="h-full m-0 px-6">
+                <div className="h-full overflow-y-auto">
+                  <RecipeInfoTab
+                    formData={formData}
+                    onFormDataChange={setFormData}
+                    onStatusChange={handleStatusChange}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="Recipe Option" className="h-full m-0 px-6">
+                <div className="h-full overflow-y-auto">
+                  <RecipeIngredientsTab
+                    formData={formData}
+                    ingredients={availableRecipeOptions}
+                    onFormDataChange={setFormData}
+                    tabType="option"
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="Ingredients" className="h-full m-0 px-6">
+                <div className="h-full overflow-y-auto">
+                  <RecipeIngredientsTab
+                    formData={formData}
+                    ingredients={ingredients}
+                    onFormDataChange={setFormData}
+                    tabType="ingredient"
+                  />
+                </div>
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
+
+        {/* Action Buttons - Fixed */}
+        <div className="flex gap-3 px-6 py-4 justify-end border-t border-gray-200 flex-shrink-0 bg-white">
           <Button
             type="button"
             variant="outline"
@@ -195,8 +217,8 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
             )}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 

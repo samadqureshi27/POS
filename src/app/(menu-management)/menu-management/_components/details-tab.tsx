@@ -16,7 +16,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({
     handleStatusChange,
 }) => {
     return (
-        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6 pl-1">
             {/* Inventory Settings Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>

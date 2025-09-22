@@ -6,10 +6,71 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+// Helper function to check if element is inside an overlay/modal
+function isInsideOverlay(element: Element | null): boolean {
+  if (!element) return false;
+
+  // Check for common overlay/modal selectors
+  const overlaySelectors = [
+    '[role="dialog"]',
+    '[role="modal"]',
+    '.modal',
+    '.overlay',
+    '[data-overlay]',
+    '[data-modal]',
+    '.fixed', // Often overlays use fixed positioning
+  ];
+
+  // Walk up the DOM tree to find overlay containers
+  let current = element;
+  while (current && current !== document.body) {
+    // Check if current element matches overlay patterns
+    for (const selector of overlaySelectors) {
+      if (current.matches?.(selector)) {
+        return true;
+      }
+    }
+
+    // Also check for common overlay styling patterns
+    const styles = window.getComputedStyle(current);
+    if (styles.position === 'fixed' && styles.zIndex && parseInt(styles.zIndex) > 50) {
+      return true;
+    }
+
+    current = current.parentElement;
+  }
+
+  return false;
+}
+
 function Select({
+  onOpenChange,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />
+  const handleOpenChange = React.useCallback((open: boolean) => {
+    if (open) {
+      // Only restore scrollbar if we're NOT inside an overlay
+      requestAnimationFrame(() => {
+        const selectElement = document.querySelector('[data-slot="select-trigger"]');
+        const insideOverlay = isInsideOverlay(selectElement);
+
+        if (!insideOverlay) {
+          document.body.style.overflow = 'visible';
+          document.body.style.paddingRight = '0px';
+          document.body.removeAttribute('data-scroll-locked');
+        }
+      });
+    }
+    onOpenChange?.(open);
+  }, [onOpenChange]);
+
+  return (
+    <SelectPrimitive.Root
+      data-slot="select"
+      onOpenChange={handleOpenChange}
+      {...props}
+    />
+  );
 }
 
 function SelectGroup({
@@ -56,17 +117,52 @@ function SelectContent({
   position = "popper",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const observer = new MutationObserver(() => {
+      // Only reset body styles if we're NOT inside an overlay
+      if (contentRef.current) {
+        const insideOverlay = isInsideOverlay(contentRef.current);
+
+        if (!insideOverlay) {
+          document.body.style.overflow = 'visible';
+          document.body.style.paddingRight = '0px';
+          document.body.removeAttribute('data-scroll-locked');
+        }
+      }
+    });
+
+    if (contentRef.current) {
+      observer.observe(contentRef.current, { childList: true, subtree: true });
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <SelectPrimitive.Portal>
+    <SelectPrimitive.Portal container={document.body}>
       <SelectPrimitive.Content
+        ref={contentRef}
         data-slot="select-content"
         className={cn(
           "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md",
           position === "popper" &&
-            "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+          "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
           className
         )}
         position={position}
+        onOpenAutoFocus={(e) => {
+          e.preventDefault();
+          // Only ensure scrollbar stays visible if we're NOT inside an overlay
+          const insideOverlay = isInsideOverlay(e.currentTarget);
+
+          if (!insideOverlay) {
+            document.body.style.overflow = 'visible';
+            document.body.style.paddingRight = '0px';
+            document.body.removeAttribute('data-scroll-locked');
+          }
+        }}
         {...props}
       >
         <SelectScrollUpButton />
@@ -74,7 +170,7 @@ function SelectContent({
           className={cn(
             "p-1",
             position === "popper" &&
-              "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1"
+            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1"
           )}
         >
           {children}
