@@ -1,4 +1,8 @@
 import React from "react";
+import { Globe } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { GeneralSettings } from '@/lib/types';
 import { OPTIONS } from '@/lib/util/drop-down-settings';
 import SettingsDropdown from './Dropdown';
@@ -10,21 +14,18 @@ interface RegionalSettingsCardProps {
 
 const RegionalSettingsCard: React.FC<RegionalSettingsCardProps> = ({ settings, onSettingChange }) => {
     return (
-        <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[450px]">
-            <div className="flex items-center gap-2 mb-8">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="2" y1="12" x2="22" y2="12"></line>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                </svg>
-                <h2 className="text-xl font-semibold">Regional Settings</h2>
-            </div>
-
-            <div className="space-y-6">
+        <Card className="shadow-sm max-h-[450px]">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Globe size={24} />
+                    Regional Settings
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
                         Language
-                    </label>
+                    </Label>
                     <SettingsDropdown
                         value={settings.language}
                         options={OPTIONS.language}
@@ -34,9 +35,9 @@ const RegionalSettingsCard: React.FC<RegionalSettingsCardProps> = ({ settings, o
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
                         Timezone
-                    </label>
+                    </Label>
                     <SettingsDropdown
                         value={settings.timezone}
                         options={OPTIONS.timezone}
@@ -46,9 +47,9 @@ const RegionalSettingsCard: React.FC<RegionalSettingsCardProps> = ({ settings, o
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
                         Date Format
-                    </label>
+                    </Label>
                     <SettingsDropdown
                         value={settings.dateFormat}
                         options={OPTIONS.dateFormat}
@@ -58,34 +59,26 @@ const RegionalSettingsCard: React.FC<RegionalSettingsCardProps> = ({ settings, o
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
                         Time Format
-                    </label>
-                    <div className="flex flex-col gap-2">
-                        <label className="flex items-center">
-                            <input
-                                type="radio"
-                                value="12"
-                                checked={settings.timeFormat === "12"}
-                                onChange={(e) => onSettingChange("timeFormat", e.target.value)}
-                                className="mr-2 text-blue-600"
-                            />
-                            12-hour (3:30 PM)
-                        </label>
-                        <label className="flex items-center">
-                            <input
-                                type="radio"
-                                value="24"
-                                checked={settings.timeFormat === "24"}
-                                onChange={(e) => onSettingChange("timeFormat", e.target.value)}
-                                className="mr-2 text-blue-600"
-                            />
-                            24-hour (15:30)
-                        </label>
-                    </div>
+                    </Label>
+                    <RadioGroup
+                        value={settings.timeFormat}
+                        onValueChange={(value) => onSettingChange("timeFormat", value)}
+                        className="mt-2"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="12" id="12hour" />
+                            <Label htmlFor="12hour">12-hour (3:30 PM)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="24" id="24hour" />
+                            <Label htmlFor="24hour">24-hour (15:30)</Label>
+                        </div>
+                    </RadioGroup>
                 </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 };
 

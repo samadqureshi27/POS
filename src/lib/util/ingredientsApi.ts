@@ -18,7 +18,8 @@ const mockData: InventoryItem[] = [
     Name: "Bread",
     Status: "Active",
     Description: "Fresh bread for daily use",
-    Unit: "Kilograms (Kg's)",
+    Unit: "Weight in Grams",
+    Threshold: 500,
     Priority: 1,
   },
   {
@@ -26,7 +27,8 @@ const mockData: InventoryItem[] = [
     Name: "Oat Bread",
     Status: "Active",
     Description: "Healthy oat bread option",
-    Unit: "Kilograms (Kg's)",
+    Unit: "Weight in Grams",
+    Threshold: 300,
     Priority: 2,
   },
   {
@@ -34,7 +36,8 @@ const mockData: InventoryItem[] = [
     Name: "French Bread",
     Status: "Inactive",
     Description: "Traditional French bread",
-    Unit: "Kilograms (Kg's)",
+    Unit: "Quantity Count",
+    Threshold: 10,
     Priority: 3,
   },
 ];

@@ -30,7 +30,7 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
             setFormData({
               ...formData,
               PName: [...(formData.PName || []), ""],
-              PPrice: [...(formData.PPrice || []), 0],
+              PPrice: [...(formData.PPrice || []), ""],
             })
           }
           className="flex items-center gap-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 hover:bg-blue-50"
@@ -124,10 +124,10 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    value={(formData.PPrice || [])[idx] || 0}
+                                    value={(formData.PPrice || [])[idx] || ""}
                                     onChange={(e) => {
                                       const updated = [...(formData.PPrice || [])];
-                                      updated[idx] = Number(e.target.value) || 0;
+                                      updated[idx] = e.target.value === "" ? "" : Number(e.target.value);
                                       setFormData({
                                         ...formData,
                                         PPrice: updated,
@@ -231,10 +231,10 @@ const PriceTab: React.FC<PriceTabProps> = ({ formData, setFormData }) => {
                       type="number"
                       step="0.01"
                       min="0"
-                      value={(formData.PPrice || [])[idx] || 0}
+                      value={(formData.PPrice || [])[idx] || ""}
                       onChange={(e) => {
                         const updated = [...(formData.PPrice || [])];
-                        updated[idx] = Number(e.target.value) || 0;
+                        updated[idx] = e.target.value === "" ? "" : Number(e.target.value);
                         setFormData({
                           ...formData,
                           PPrice: updated,

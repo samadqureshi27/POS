@@ -19,7 +19,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       Dashboard
     </h1>
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-      
+      Welcome!
       
     </div>
   </div>

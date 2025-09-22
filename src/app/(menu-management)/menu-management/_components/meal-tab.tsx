@@ -2,16 +2,143 @@
 
 import React from "react";
 import { Plus, X, Grip } from "lucide-react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import DragTable from "@/components/ui/drag-table";
 
 import {MealTabProps} from "@/lib/types/menum";
 
 const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusChange, menuItems }) => {
+
+  // Helper function for reordering meal items
+  const handleMealReorder = (result: any) => {
+    const { source, destination } = result;
+    if (!destination || source.index === destination.index) return;
+
+    const newMealValue = Array.from(formData.MealValue || []);
+    const [movedValue] = newMealValue.splice(source.index, 1);
+    newMealValue.splice(destination.index, 0, movedValue);
+
+    const newMealPrice = Array.from(formData.MealPrice || []);
+    const [movedPrice] = newMealPrice.splice(source.index, 1);
+    newMealPrice.splice(destination.index, 0, movedPrice);
+
+    const newOverRide = Array.from(formData.OverRide || []);
+    const [movedOverRide] = newOverRide.splice(source.index, 1);
+    newOverRide.splice(destination.index, 0, movedOverRide);
+
+    const newStatus = Array.from(formData.status || []);
+    const [movedStatus] = newStatus.splice(source.index, 1);
+    newStatus.splice(destination.index, 0, movedStatus);
+
+    setFormData({
+      ...formData,
+      MealValue: newMealValue,
+      MealPrice: newMealPrice,
+      OverRide: newOverRide,
+      status: newStatus,
+    });
+  };
+
+  // Helper function for removing meal items
+  const handleRemoveMealItem = (idx: number) => {
+    const updatedValues = (formData.MealValue || []).filter((_: any, i: number) => i !== idx);
+    const updatedPrices = (formData.MealPrice || []).filter((_: any, i: number) => i !== idx);
+    const updatedOverRide = (formData.OverRide || []).filter((_: any, i: number) => i !== idx);
+    const updatedStatus = (formData.status || []).filter((_: any, i: number) => i !== idx);
+
+    setFormData({
+      ...formData,
+      MealValue: updatedValues,
+      MealPrice: updatedPrices,
+      OverRide: updatedOverRide,
+      status: updatedStatus,
+    });
+  };
+
+  // Helper function for updating field values
+  const handleUpdateField = (index: number, field: string, value: any) => {
+    if (field === 'price') {
+      const updated = [...(formData.MealPrice || [])];
+      updated[index] = Number(value) || 0;
+      setFormData({ ...formData, MealPrice: updated });
+    } else if (field === 'override') {
+      const updated = [...(formData.OverRide || [])];
+      updated[index] = value ? "Active" : "Inactive";
+      setFormData({ ...formData, OverRide: updated });
+    } else if (field === 'status') {
+      const updated = [...(formData.status || [])];
+      updated[index] = value ? "Active" : "Inactive";
+      setFormData({ ...formData, status: updated });
+    }
+  };
+
+  // Prepare data for DragTable
+  const tableData = (formData.MealValue || []).map((itemName: string, idx: number) => ({
+    name: itemName,
+    price: formData.MealPrice?.[idx] || 0,
+    override: formData.OverRide?.[idx] === "Active",
+    status: formData.status?.[idx] === "Active",
+    index: idx
+  }));
+
+  const tableColumns = [
+    {
+      key: 'name',
+      label: 'Item Name',
+      width: 'minmax(200px, 1fr)',
+      render: (value: string) => (
+        <div>
+          <div className="font-medium text-gray-800">{value}</div>
+        </div>
+      )
+    },
+    {
+      key: 'price',
+      label: 'Price',
+      width: '100px',
+      render: (value: number, item: any, index: number) => (
+        <Input
+          type="number"
+          step="0.01"
+          value={value}
+          onChange={(e) => handleUpdateField(index, 'price', e.target.value)}
+          className="w-20 text-center mx-auto transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+          placeholder="0.00"
+        />
+      )
+    },
+    {
+      key: 'override',
+      label: 'Override',
+      width: '80px',
+      render: (value: boolean, item: any, index: number) => (
+        <div className="flex justify-center">
+          <Switch
+            checked={value}
+            onCheckedChange={(checked) => handleUpdateField(index, 'override', checked)}
+          />
+        </div>
+      )
+    },
+    {
+      key: 'status',
+      label: 'Active',
+      width: '80px',
+      render: (value: boolean, item: any, index: number) => (
+        <div className="flex justify-center">
+          <Switch
+            checked={value}
+            onCheckedChange={(checked) => handleUpdateField(index, 'status', checked)}
+          />
+        </div>
+      )
+    }
+  ];
+
   return (
     <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
       {/* Header Section */}
@@ -85,161 +212,14 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
 
           {/* Desktop Table View */}
           <div className="hidden lg:block">
-            <div className="border border-gray-200 rounded-lg bg-gray-50/50">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="w-12 p-3 text-center text-xs font-medium text-gray-500 uppercase"></th>
-                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Item Name</th>
-                    <th className="w-24 p-3 text-center text-xs font-medium text-gray-500 uppercase">Price</th>
-                    <th className="w-20 p-3 text-center text-xs font-medium text-gray-500 uppercase">Override</th>
-                    <th className="w-20 p-3 text-center text-xs font-medium text-gray-500 uppercase">Active</th>
-                    <th className="w-12 p-3 text-center text-xs font-medium text-gray-500 uppercase"></th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-
-            <div className="border-l border-r border-b border-gray-200 rounded-b-lg min-h-[120px] overflow-y-auto bg-white">
-              <DragDropContext
-                onDragEnd={(result) => {
-                  const { source, destination } = result;
-                  if (!destination || source.index === destination.index) return;
-
-                  const newMealValue = Array.from(formData.MealValue || []);
-                  const [movedValue] = newMealValue.splice(source.index, 1);
-                  newMealValue.splice(destination.index, 0, movedValue);
-
-                  const newMealPrice = Array.from(formData.MealPrice || []);
-                  const [movedPrice] = newMealPrice.splice(source.index, 1);
-                  newMealPrice.splice(destination.index, 0, movedPrice);
-
-                  const newOverRide = Array.from(formData.OverRide || []);
-                  const [movedOverRide] = newOverRide.splice(source.index, 1);
-                  newOverRide.splice(destination.index, 0, movedOverRide);
-
-                  const newStatus = Array.from(formData.status || []);
-                  const [movedStatus] = newStatus.splice(source.index, 1);
-                  newStatus.splice(destination.index, 0, movedStatus);
-
-                  setFormData({
-                    ...formData,
-                    MealValue: newMealValue,
-                    MealPrice: newMealPrice,
-                    OverRide: newOverRide,
-                    status: newStatus,
-                  });
-                }}
-              >
-                <Droppable droppableId="meal-items">
-                  {(provided) => (
-                    <table className="w-full border-collapse">
-                      <tbody ref={provided.innerRef} {...provided.droppableProps}>
-                        {(formData.MealValue || []).map((itemName: string, idx: number) => (
-                          <Draggable key={idx} draggableId={`meal-${idx}`} index={idx}>
-                            {(provided, snapshot) => (
-                              <tr
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className={`hover:bg-gray-50 transition-colors ${
-                                  snapshot.isDragging ? "bg-blue-50 shadow-lg" : ""
-                                } border-b border-gray-100 last:border-b-0`}
-                              >
-                                <td
-                                  className="p-3 text-center cursor-grab w-12"
-                                  {...provided.dragHandleProps}
-                                >
-                                  <Grip size={16} className="text-gray-400 mx-auto" />
-                                </td>
-                                <td className="p-3">
-                                  <div className="font-medium text-gray-800">{itemName}</div>
-                                  <div className="text-xs text-gray-500">Menu item component</div>
-                                </td>
-                                <td className="p-3 text-center">
-                                  <Input
-                                    type="number"
-                                    step="0.01"
-                                    value={formData.MealPrice?.[idx] || 0}
-                                    onChange={(e) => {
-                                      const updated = [...(formData.MealPrice || [])];
-                                      updated[idx] = Number(e.target.value) || 0;
-                                      setFormData({
-                                        ...formData,
-                                        MealPrice: updated,
-                                      });
-                                    }}
-                                    className="w-20 text-center mx-auto transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
-                                    placeholder="0.00"
-                                  />
-                                </td>
-                                <td className="p-3 text-center">
-                                  <Switch
-                                    checked={formData.OverRide?.[idx] === "Active"}
-                                    onCheckedChange={(checked) => {
-                                      const updated = [...(formData.OverRide || [])];
-                                      updated[idx] = checked ? "Active" : "Inactive";
-                                      setFormData({
-                                        ...formData,
-                                        OverRide: updated,
-                                      });
-                                    }}
-                                  />
-                                </td>
-                                <td className="p-3 text-center">
-                                  <Switch
-                                    checked={formData.status?.[idx] === "Active"}
-                                    onCheckedChange={(checked) => {
-                                      const updated = [...(formData.status || [])];
-                                      updated[idx] = checked ? "Active" : "Inactive";
-                                      setFormData({
-                                        ...formData,
-                                        status: updated,
-                                      });
-                                    }}
-                                  />
-                                </td>
-                                <td className="p-3 text-center w-12">
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      const updatedValues = (formData.MealValue || []).filter(
-                                        (_: any, i: number) => i !== idx
-                                      );
-                                      const updatedPrices = (formData.MealPrice || []).filter(
-                                        (_: any, i: number) => i !== idx
-                                      );
-                                      const updatedOverRide = (formData.OverRide || []).filter(
-                                        (_: any, i: number) => i !== idx
-                                      );
-                                      const updatedStatus = (formData.status || []).filter(
-                                        (_: any, i: number) => i !== idx
-                                      );
-                                      setFormData({
-                                        ...formData,
-                                        MealValue: updatedValues,
-                                        MealPrice: updatedPrices,
-                                        OverRide: updatedOverRide,
-                                        status: updatedStatus,
-                                      });
-                                    }}
-                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors px-2 py-1 rounded h-auto w-auto"
-                                  >
-                                    <X size={16} />
-                                  </Button>
-                                </td>
-                              </tr>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </tbody>
-                    </table>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            </div>
+            <DragTable
+              data={tableData}
+              columns={tableColumns}
+              onReorder={handleMealReorder}
+              onDelete={handleRemoveMealItem}
+              droppableId="meal-items"
+              emptyMessage="No meal items added"
+            />
           </div>
 
           {/* Mobile Card View */}
@@ -251,34 +231,13 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                     <Grip size={16} className="text-gray-400" />
                     <div>
                       <div className="font-medium text-gray-800">{itemName}</div>
-                      <div className="text-xs text-gray-500">Menu item component</div>
-                    </div>
+                                </div>
                   </div>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => {
-                      const updatedValues = (formData.MealValue || []).filter(
-                        (_: any, i: number) => i !== idx
-                      );
-                      const updatedPrices = (formData.MealPrice || []).filter(
-                        (_: any, i: number) => i !== idx
-                      );
-                      const updatedOverRide = (formData.OverRide || []).filter(
-                        (_: any, i: number) => i !== idx
-                      );
-                      const updatedStatus = (formData.status || []).filter(
-                        (_: any, i: number) => i !== idx
-                      );
-                      setFormData({
-                        ...formData,
-                        MealValue: updatedValues,
-                        MealPrice: updatedPrices,
-                        OverRide: updatedOverRide,
-                        status: updatedStatus,
-                      });
-                    }}
+                    onClick={() => handleRemoveMealItem(idx)}
                     className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
                   >
                     <X size={16} />
@@ -291,14 +250,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                       type="number"
                       step="0.01"
                       value={formData.MealPrice?.[idx] || 0}
-                      onChange={(e) => {
-                        const updated = [...(formData.MealPrice || [])];
-                        updated[idx] = Number(e.target.value) || 0;
-                        setFormData({
-                          ...formData,
-                          MealPrice: updated,
-                        });
-                      }}
+                      onChange={(e) => handleUpdateField(idx, 'price', e.target.value)}
                       placeholder="0.00"
                       className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                     />
@@ -308,28 +260,14 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                       <Label className="text-xs font-medium text-gray-700">Override</Label>
                       <Switch
                         checked={formData.OverRide?.[idx] === "Active"}
-                        onCheckedChange={(checked) => {
-                          const updated = [...(formData.OverRide || [])];
-                          updated[idx] = checked ? "Active" : "Inactive";
-                          setFormData({
-                            ...formData,
-                            OverRide: updated,
-                          });
-                        }}
+                        onCheckedChange={(checked) => handleUpdateField(idx, 'override', checked)}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <Label className="text-xs font-medium text-gray-700">Active</Label>
                       <Switch
                         checked={formData.status?.[idx] === "Active"}
-                        onCheckedChange={(checked) => {
-                          const updated = [...(formData.status || [])];
-                          updated[idx] = checked ? "Active" : "Inactive";
-                          setFormData({
-                            ...formData,
-                            status: updated,
-                          });
-                        }}
+                        onCheckedChange={(checked) => handleUpdateField(idx, 'status', checked)}
                       />
                     </div>
                   </div>

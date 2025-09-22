@@ -1,6 +1,7 @@
 // components/LogoHoursCard.tsx
 import React from 'react';
 import { Image } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LogoUpload } from './logo-upload';
 import { OperatingHours } from './operating-hours';
 import { RestaurantData } from '@/lib/types';
@@ -21,13 +22,14 @@ export const LogoHoursCard: React.FC<LogoHoursCardProps> = ({
     onRemoveLogo,
 }) => {
     return (
-        <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
-            <div className="flex items-center gap-2 mb-8">
-                <Image className="text-black" size={24} />
-                <h2 className="text-xl font-semibold">Logo & Hours</h2>
-            </div>
-
-            <div className="space-y-6 flex-grow">
+        <Card className="shadow-sm min-h-[600px] flex flex-col">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Image size={24} />
+                    Logo & Hours
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6 flex-grow">
                 <LogoUpload
                     previewUrl={previewUrl}
                     onLogoChange={onLogoChange}
@@ -39,7 +41,7 @@ export const LogoHoursCard: React.FC<LogoHoursCardProps> = ({
                     closingTime={formData.closingTime}
                     onInputChange={onInputChange}
                 />
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 };

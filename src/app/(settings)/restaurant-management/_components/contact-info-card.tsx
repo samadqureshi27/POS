@@ -1,6 +1,7 @@
 // components/ContactInfoCard.tsx
 import React from 'react';
 import { Phone } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SimpleInput } from './simple-input';
 import { SimpleTextarea } from './simple-textarea';
 import { RestaurantData } from '@/lib/types';
@@ -15,13 +16,14 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({
     onInputChange,
 }) => {
     return (
-        <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[600px] flex flex-col">
-            <div className="flex items-center gap-2 mb-8">
-                <Phone className="text-black" size={24} />
-                <h2 className="text-xl font-semibold">Contact Information</h2>
-            </div>
-
-            <div className="space-y-6 flex-grow">
+        <Card className="shadow-sm min-h-[600px] flex flex-col">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Phone size={24} />
+                    Contact Information
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6 flex-grow">
                 <SimpleInput
                     label="Contact Number"
                     required
@@ -51,7 +53,7 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({
                     placeholder="Enter your address"
                     rows={3}
                 />
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 };

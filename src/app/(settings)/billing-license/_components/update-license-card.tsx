@@ -1,5 +1,6 @@
 import React from "react";
 import { CreditCard, Save } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,17 +19,19 @@ export const UpdateLicenseCard: React.FC<UpdateLicenseCardProps> = ({
     updating
 }) => {
     return (
-        <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-200 min-h-[500px]">
-            <div className="flex items-center gap-2 mb-8">
-                <CreditCard className="text-black" size={24} />
-                <h2 className="text-xl font-semibold">Update License</h2>
-            </div>
+        <Card className="shadow-sm min-h-[500px]">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <CreditCard size={24} />
+                    Update License
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-sm text-muted-foreground mb-8">
+                    To update and activate the license, enter the license key here.
+                </p>
 
-            <p className="text-sm text-gray-600 mb-8">
-                To update and activate the license, enter the license key here.
-            </p>
-
-            <form onSubmit={handleUpdateLicense} className="space-y-6">
+                <form onSubmit={handleUpdateLicense} className="space-y-6">
                 <div>
                     <Label className="text-sm font-medium text-gray-700 mb-3">
                         License Key
@@ -63,7 +66,8 @@ export const UpdateLicenseCard: React.FC<UpdateLicenseCardProps> = ({
                         </>
                     )}
                 </Button>
-            </form>
-        </div>
+                </form>
+            </CardContent>
+        </Card>
     );
 };
