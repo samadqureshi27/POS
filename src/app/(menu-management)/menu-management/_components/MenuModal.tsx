@@ -10,7 +10,7 @@ import MealTab from "./meal-tab";
 import SpecialsTab from "./specials-tab";
 import PriceTab from "./price-table";
 
-import {MenuModalProps,MenuItem} from "@/lib/types/menum";
+import { MenuModalProps, MenuItem } from "@/lib/types/menum";
 
 const MenuModal: React.FC<MenuModalProps> = ({
     isOpen,
@@ -32,6 +32,17 @@ const MenuModal: React.FC<MenuModalProps> = ({
     handleFormFieldChange,
     handleStatusChange,
 }) => {
+    // Determine if Price tab should be accessible
+    const isPriceTabAccessible = formData.Displaycat === "Var";
+
+    // Handle tab change with validation
+    const handleTabChange = (value: string) => {
+        if (value === "Price" && !isPriceTabAccessible) {
+            return; // Prevent switching to Price tab if not accessible
+        }
+        setActiveTab(value);
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent
@@ -44,14 +55,23 @@ const MenuModal: React.FC<MenuModalProps> = ({
                     </DialogTitle>
                 </DialogHeader>
 
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
+                <Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 flex flex-col overflow-hidden">
                     <TabsList className="grid w-full grid-cols-6 flex-shrink-0">
                         <TabsTrigger value="Menu Items">Menu Item</TabsTrigger>
                         <TabsTrigger value="Details">Details</TabsTrigger>
                         <TabsTrigger value="Options">Options</TabsTrigger>
                         <TabsTrigger value="Meal">Meal</TabsTrigger>
                         <TabsTrigger value="Specials">Specials</TabsTrigger>
-                        <TabsTrigger value="Price">Price</TabsTrigger>
+                        <TabsTrigger
+                            value="Price"
+                            disabled={!isPriceTabAccessible}
+                            className={!isPriceTabAccessible ?
+                                "opacity-50 cursor-not-allowed text-gray-400 bg-gray-100" :
+                                ""
+                            }
+                        >
+                            Price
+                        </TabsTrigger>
                     </TabsList>
 
                     <div className="flex-1 overflow-y-auto mt-4">
@@ -104,10 +124,26 @@ const MenuModal: React.FC<MenuModalProps> = ({
                         </TabsContent>
 
                         <TabsContent value="Price" className="mt-0">
-                            <PriceTab
-                                formData={formData}
-                                setFormData={updateFormData}
-                            />
+                            {isPriceTabAccessible ? (
+                                <PriceTab
+                                    formData={formData}
+                                    setFormData={updateFormData}
+                                />
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <div className="text-gray-400 mb-3">
+                                        <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                        </svg>
+                                    </div>
+                                    <h4 className="text-sm font-medium text-gray-600 mb-2">
+                                        Price Variations Unavailable
+                                    </h4>
+                                    <p className="text-xs text-gray-500 max-w-sm">
+                                        Select "Var (Variations)" as the Display Type in the Menu Item tab to access price variations.
+                                    </p>
+                                </div>
+                            )}
                         </TabsContent>
                     </div>
 
@@ -124,7 +160,6 @@ const MenuModal: React.FC<MenuModalProps> = ({
     );
 };
 
-
 const ModalFooter: React.FC<{
     editingItem: MenuItem | null;
     onClose: () => void;
@@ -132,7 +167,7 @@ const ModalFooter: React.FC<{
     actionLoading: boolean;
     isFormValid: () => boolean;
 }> = ({ editingItem, onClose, onSubmit, actionLoading, isFormValid }) => (
-    <div className="flex-shrink-0 flex flex-col sm:flex-row justify-end gap-3 p-6 border-t border-gray-200 bg-white">
+    <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
         <Button
             variant="outline"
             onClick={onClose}

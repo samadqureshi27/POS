@@ -29,7 +29,7 @@ interface MenuItem {
   Displaycat?: string;
   SpecialStartDate?: string;
   SpecialEndDate?: string;
-  SpecialPrice?: number;
+  SpecialPrice?: number | string;
   OverRide?: any[];
   OptionValue?: string[];
   OptionPrice?: number[];
@@ -73,7 +73,7 @@ export const useMenuManagement = () => {
     Displaycat: "",
     SpecialStartDate: "",
     SpecialEndDate: "",
-    SpecialPrice: 0,
+    SpecialPrice: "",
     OverRide: [],
     OptionValue: [],
     OptionPrice: [],
@@ -152,7 +152,7 @@ export const useMenuManagement = () => {
       Displaycat: "",
       SpecialStartDate: "",
       SpecialEndDate: "",
-      SpecialPrice: 0,
+      SpecialPrice: "",
       OptionValue: [],
       OptionPrice: [],
       OverRide: [],
@@ -196,7 +196,7 @@ export const useMenuManagement = () => {
         Displaycat: editingItem.Displaycat || "",
         SpecialStartDate: editingItem.SpecialStartDate || "",
         SpecialEndDate: editingItem.SpecialEndDate || "",
-        SpecialPrice: editingItem.SpecialPrice || 0,
+        SpecialPrice: editingItem.SpecialPrice || "",
         OverRide: editingItem.OverRide || [],
         OptionValue: editingItem.OptionValue || [],
         OptionPrice: editingItem.OptionPrice || [],
@@ -340,6 +340,9 @@ export const useMenuManagement = () => {
     field: keyof typeof formData,
     isActive: boolean
   ) => {
+    console.log(`Status change: ${field} = ${isActive ? "Active" : "Inactive"}`); // Debug log
+    console.log("Current formData before change:", formData); // Debug log
+
     setFormData({
       ...formData,
       [field]: isActive ? "Active" : "Inactive",
@@ -390,18 +393,18 @@ export const useMenuManagement = () => {
     preview,
     formData,
     fileInputRef,
-    
+
     // Computed values
     filteredItems,
     isFormValid,
     isAllSelected,
-    
+
     // Toast
     toast,
     toastVisible,
     showToast,
     hideToast,
-    
+
     // Handlers
     handleCreateItem,
     handleUpdateItem,
@@ -416,7 +419,7 @@ export const useMenuManagement = () => {
     handleAddItem,
     updateFormData,
     handleFormFieldChange,
-    
+
     // Setters
     setSearchTerm,
     setCategoryFilter,

@@ -25,7 +25,7 @@ const CustomerSummaryCards: React.FC<CustomerSummaryCardsProps> = ({ summaryData
                 value={totalOrders.toString()}
             />
 
-            <div className="flex items-center justify-start gap-2 min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+            <div className="flex items-center justify-start gap-2 min-h-[100px] border  rounded-sm p-4 bg-white shadow-sm hover:shadow-lg transition-shadow duration-200">
                 <div className="w-full">
                     {bestCustomer ? (
                         <div className="flex items-center gap-3 mb-2">
@@ -47,7 +47,7 @@ const CustomerSummaryCards: React.FC<CustomerSummaryCardsProps> = ({ summaryData
                 </div>
             </div>
 
-            <div className="flex items-center justify-start min-h-[100px] border border-gray-300 rounded-sm p-4 bg-white shadow-sm">
+            <div className="flex items-center justify-start min-h-[100px] border  rounded-sm p-4 bg-white shadow-sm hover:shadow-lg transition-shadow duration-200">
                 <div>
                     <div className="flex items-center justify-start mb-2">
                         <LargeStarRating rating={Math.round(averageRating)} />

@@ -36,9 +36,9 @@ const VendorModal: React.FC<VendorModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+            <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col gap-0">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-semibold">
+                    <DialogTitle className="text-2xl font-semibold mb-2">
                         {editingItem ? "Edit Vendor" : `Add New Vendor - Branch #${branchId}`}
                     </DialogTitle>
                 </DialogHeader>
@@ -139,7 +139,7 @@ const VendorModal: React.FC<VendorModalProps> = ({
                 </div>
 
                 {/* Fixed Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
+                <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
                     <Button
                         type="button"
                         variant="outline"
