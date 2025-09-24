@@ -44,33 +44,36 @@ const NewPasswordOverlay: React.FC = () => {
     if (isValid) {
       console.log("Updating password:", newPassword);
 
-      // Hide all overlays and reset to show first login container
-      setShowNewPasswordContainer(false);
-      setShowNewPassword(false);
+      // First, hide all other overlays immediately
       setShowVerification(false);
       setShowVerificationContainer(false);
       setShowForgotPassword(false);
       setShowForgotContainer(false);
-      setShowLoginContainer(false);
-      setShowLine(false);
 
       // Reset all form data
       setEmail("");
       setPassword("");
       setResetEmail("");
       setOtpCode(["", "", "", "", ""]);
-      setNewPassword("");
-      setConfirmPassword("");
-      setValidationErrors({});
       setResetEmailError("");
 
-      // Show the first login container sliding up from bottom
+      // Set up the login container to be revealed underneath
+      setShowLoginContainer(true);
+      
+      // Small delay to ensure login container is ready, then start animations
       setTimeout(() => {
-        setShowLoginContainer(true);
-        setTimeout(() => {
-          setShowLine(true);
-        }, 200);
-      }, 100);
+        setShowLine(true);
+        // Start the slide down animation
+        setShowNewPasswordContainer(false);
+      }, 50);
+
+      // After the animation completes, clean up the new password overlay
+      setTimeout(() => {
+        setShowNewPassword(false);
+        setNewPassword("");
+        setConfirmPassword("");
+        setValidationErrors({});
+      }, 1000); // Wait for the slide down animation to complete
     }
   };
 
