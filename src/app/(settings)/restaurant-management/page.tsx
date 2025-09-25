@@ -36,7 +36,7 @@ const RestaurantProfilePage = () => {
     <div className="p-6 min-h-screen bg-background w-full">
       <Toaster position="top-right" />
 
-      <div className="flex-1 justify-center items-center w-full px-6">
+      <div className="flex-1 justify-center items-center w-full ">
         <div className="mt-20">
           {/* Header */}
           <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
