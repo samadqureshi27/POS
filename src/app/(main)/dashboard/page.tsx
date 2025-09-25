@@ -200,7 +200,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-background p-4 sm:p-6 lg:p-8">
+    <div className="w-full min-h-screen bg-background p-4 sm:p-6 lg:p-6">
       <Toaster position="top-right" />
 
       <div className="w-full">
