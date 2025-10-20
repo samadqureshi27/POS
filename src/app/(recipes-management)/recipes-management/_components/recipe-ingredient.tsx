@@ -131,6 +131,9 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
   // Track selected units for each ingredient (only for ingredients, not options)
   const [selectedUnits, setSelectedUnits] = useState<Record<number, string>>({});
 
+  // Use real data from management tables
+  const dataToUse = ingredients || [];
+
   // Update unit for specific ingredient
   const updateUnit = (index: number, unit: string) => {
     setSelectedUnits(prev => ({ ...prev, [index]: unit }));
@@ -228,9 +231,6 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
 
   const title = isOption ? "Recipe Options" : "Ingredients";
   const priceLabel = isOption ? "Price" : "Amount";
-
-  // Use real data from management tables
-  const dataToUse = ingredients || [];
 
   // Initialize units when values change
   useEffect(() => {
