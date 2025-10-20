@@ -9,9 +9,10 @@ export function ConditionalLayoutWrapper({ children }: { children: React.ReactNo
   // Define auth routes that should NOT show navbar/sidebar
   const authRoutes = [
     '/login',
-    '/forgot-password', 
+    '/forgot-password',
     '/reset-password',
     '/verify-password',
+    '/set-password',
     '/signup',
     '/register'
   ]
