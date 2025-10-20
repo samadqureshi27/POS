@@ -349,6 +349,9 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
                         {isOption && ingredient.price !== undefined && (
                           <div className="text-xs text-green-600 truncate">Price: ${ingredient.price}</div>
                         )}
+                        {isOption && ingredient.price !== undefined && (
+                          <div className="text-xs text-green-600">Price: ${ingredient.price}</div>
+                        )}
                       </div>
                     </SelectItem>
                   ))
@@ -467,7 +470,6 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
             Select {title.toLowerCase()} from the dropdown above to add them to this recipe
           </p>
         </div>
-      )}
     </div>
   );
 };
