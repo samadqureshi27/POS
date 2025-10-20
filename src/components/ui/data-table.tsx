@@ -1,7 +1,7 @@
 "use client";
 // Reusable Data Table Component following shadcn/ui patterns
 import React from "react";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Edit, Edit2 } from 'lucide-react';
 import { Button } from "./button";
 import {
   DropdownMenu,
@@ -31,6 +31,7 @@ export interface DataTableAction<T> {
   icon?: React.ReactNode;
   onClick: (record: T) => void;
   variant?: "default" | "destructive";
+  showOnMobile?: boolean; // New property to control mobile visibility
 }
 
 export interface DataTableProps<T> {
@@ -49,6 +50,7 @@ export interface DataTableProps<T> {
   onRowClick?: (record: T) => void;
   mobileResponsive?: boolean;
   nameColumn?: string;
+  multipleMobileButtons?: boolean; // New property to enable multiple mobile buttons
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -66,7 +68,8 @@ export function DataTable<T extends Record<string, any>>({
   loading = false,
   onRowClick,
   mobileResponsive = false,
-  nameColumn = "name"
+  nameColumn = "name",
+  multipleMobileButtons = false
 
 }: DataTableProps<T>) {
   const isAllSelected = selectable && data.length > 0 && selectedItems.length === data.length;
@@ -144,6 +147,7 @@ export function DataTable<T extends Record<string, any>>({
                         if (el) el.indeterminate = isIndeterminate;
                       }}
                       onChange={(e) => onSelectAll?.(e.target.checked)}
+                      onClick={(e) => e.stopPropagation()}
                       className="h-4 w-4 rounded border border-input bg-background"
                     />
                   </th>
@@ -202,8 +206,13 @@ export function DataTable<T extends Record<string, any>>({
                   const rowId = getRowId(record);
                   const isSelected = selectedItems.includes(rowId);
 
+                  // Filter actions for mobile buttons
+                  const mobileActions = actions.filter(action => 
+                    action.showOnMobile !== false || multipleMobileButtons
+                  );
+
                   return (
-                    <tr 
+                    <tr
                       key={`${rowId}-${index}`}
                       className={cn(
                         "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
@@ -221,7 +230,11 @@ export function DataTable<T extends Record<string, any>>({
                           <input
                             type="checkbox"
                             checked={isSelected}
-                            onChange={(e) => onSelectItem?.(rowId, e.target.checked)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              onSelectItem?.(rowId, e.target.checked);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
                             className="h-4 w-4 rounded border border-input bg-background"
                           />
                         </td>
@@ -254,12 +267,17 @@ export function DataTable<T extends Record<string, any>>({
                           "p-4 align-middle",
                           mobileResponsive && "card-actions-cell"
                         )}>
+                          {/* Desktop dropdown */}
                           <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className={cn(
-                                "h-8 w-8 p-0",
-                                mobileResponsive && "desktop-edit-icon"
-                              )}>
+                              <Button
+                                variant="ghost"
+                                className={cn(
+                                  "h-8 w-8 p-0",
+                                  mobileResponsive && "desktop-edit-icon"
+                                )}
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 <span className="sr-only">Open menu</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
@@ -268,10 +286,15 @@ export function DataTable<T extends Record<string, any>>({
                               {actions.map((action) => (
                                 <DropdownMenuItem
                                   key={`${action.key}-${index}`}
-                                  onClick={() => action.onClick(record)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    action.onClick(record);
+                                  }}
                                   className={cn(
                                     "cursor-pointer",
-                                    action.variant === "destructive" && "text-destructive focus:text-destructive"
+                                    action.variant === "destructive" && "text-destructive focus:text-destructive",
+                                    // Hide actions that shouldn't show on mobile when multipleMobileButtons is true
+                                    mobileResponsive && multipleMobileButtons && action.showOnMobile === false && "md:block hidden"
                                   )}
                                 >
                                   {action.icon && <span className="mr-2 h-4 w-4">{action.icon}</span>}
@@ -280,17 +303,45 @@ export function DataTable<T extends Record<string, any>>({
                               ))}
                             </DropdownMenuContent>
                           </DropdownMenu>
-                          {mobileResponsive && actions.length > 0 && (
-                            <Button
-                              variant="outline"
-                              className="mobile-edit-button w-full"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                actions[0].onClick(record);
-                              }}
-                            >
-                              {actions[0].label || "Edit"}
-                            </Button>
+
+                          {/* Mobile buttons */}
+                          {mobileResponsive && (
+                            <div className="mobile-buttons-container w-full">
+                              {multipleMobileButtons ? (
+                                // Multiple buttons mode for BranchTable
+                                <div className="flex flex-col  w-full gap-1">
+                                  {mobileActions.map((action, actionIndex) => (
+                                    <Button
+                                      key={`mobile-${action.key}-${index}`}
+                                      variant={action.variant === "destructive" ? "destructive" : "outline"}
+                                      className="mobile-edit-button w-full text-xs py-1 h-8 bg-[#2c2c2c] text-white"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        action.onClick(record);
+                                      }}
+                                    >
+                                      {action.icon && <span className="mr-1 h-3 w-3">{action.icon}</span>}
+                                      {action.label}
+                                    </Button>
+                                  ))}
+                                </div>
+                              ) : (
+                                // Single button mode (default behavior)
+                                mobileActions.length > 0 && (
+                                  <Button
+                                    variant="outline"
+                                    className="mobile-edit-button w-full bg-[#2c2c2c] text-white"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      mobileActions[0].onClick(record);
+                                    }}
+                                  >
+                                    {mobileActions[0].icon && <span className="mr-1 h-3 w-3">{mobileActions[0].icon}</span>}
+                                    {mobileActions[0].label || "Edit"}
+                                  </Button>
+                                )
+                              )}
+                            </div>
                           )}
                         </td>
                       )}

@@ -5,11 +5,11 @@ import ActionBar from "@/components/ui/action-bar";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 // Import all our new components
-import {Toast} from "@/components/ui/toast";
+import { Toast } from "@/components/ui/toast";
 import { PeriodSelector } from "@/components/ui/period-selector";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { DashboardSection } from "@/components/ui/dashboard-section";
-import OrderTypeChart from "./_components/order-type-chart"; 
+import OrderTypeChart from "./_components/order-type-chart";
 import ModernOrderChart from "./_components/modern-order-chart";
 import ModernTopItems from "./_components/modern-top-items";
 import OrderTable from "./_components/order-table";

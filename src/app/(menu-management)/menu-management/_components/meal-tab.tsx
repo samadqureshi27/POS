@@ -106,7 +106,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
           step="0.01"
           value={value}
           onChange={(e) => handleUpdateField(index, 'price', e.target.value)}
-          className="w-20 text-center mx-auto transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+          className="w-20 text-center mx-auto transition-all duration-200 focus:ring-2 focus:ring-gray-500/20"
           placeholder="0.00"
         />
       )
@@ -140,7 +140,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
+    <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6 pl-1">
       {/* Header Section */}
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-gray-800 mb-2">
@@ -167,7 +167,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                 });
               }
             }}>
-              <SelectTrigger className="mt-1 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20">
+              <SelectTrigger className="mt-1 transition-all duration-200 focus:ring-2 focus:ring-gray-500/20">
                 <SelectValue placeholder="Select menu item to add..." />
               </SelectTrigger>
               <SelectContent className="max-h-60 z-[100]">
@@ -252,7 +252,7 @@ const MealTab: React.FC<MealTabProps> = ({ formData, setFormData, handleStatusCh
                       value={formData.MealPrice?.[idx] || 0}
                       onChange={(e) => handleUpdateField(idx, 'price', e.target.value)}
                       placeholder="0.00"
-                      className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                      className="transition-all duration-200 focus:ring-2 focus:ring-gray-500/20"
                     />
                   </div>
                   <div className="space-y-2">

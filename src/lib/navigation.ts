@@ -20,6 +20,11 @@ export const navigationConfig: NavigationItem[] = [
     href: "/dashboard",
     group: "main",
   },
+    {
+        name: "Notifications",
+        href: "/Notification",
+        group: "Notification",
+    },
   {
     name: "Restaurant Management",
     href: "/restaurant-management",

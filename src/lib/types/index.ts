@@ -96,6 +96,7 @@ export interface ButtonPageProps {
 export interface RestaurantData {
   name: string;
   type: string;
+  ownerName:string;
   contact: string;
   email: string;
   address: string;

@@ -11,10 +11,22 @@ interface ContactInfoCardProps {
     onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
+// Default contact data - export it so parent can use it
+export const defaultContactData: Partial<RestaurantData> = {
+    contact: "+1 (555) 987-6543",
+    email: "contact@bellavista-kitchen.com",
+    address: "456 Culinary Boulevard, Food District, Downtown, NY 10002"
+};
+
 export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({
     formData,
     onInputChange,
 }) => {
+    // Use default data when formData fields are empty or undefined
+    const getFieldValue = (fieldName: keyof typeof defaultContactData) => {
+        return formData[fieldName] || defaultContactData[fieldName] || '';
+    };
+
     return (
         <Card className="shadow-sm min-h-[600px] flex flex-col">
             <CardHeader>
@@ -29,7 +41,7 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({
                     required
                     type="tel"
                     name="contact"
-                    value={formData.contact}
+                    value={getFieldValue('contact')}
                     onChange={onInputChange}
                     placeholder="Enter contact number"
                 />
@@ -39,7 +51,7 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({
                     required
                     type="email"
                     name="email"
-                    value={formData.email}
+                    value={getFieldValue('email')}
                     onChange={onInputChange}
                     placeholder="Enter email address"
                 />
@@ -48,7 +60,7 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({
                     label="Address"
                     required
                     name="address"
-                    value={formData.address}
+                    value={getFieldValue('address')}
                     onChange={onInputChange}
                     placeholder="Enter your address"
                     rows={3}

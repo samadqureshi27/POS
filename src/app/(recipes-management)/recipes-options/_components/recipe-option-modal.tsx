@@ -67,7 +67,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+      <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col gap-0">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">
             {editingItem ? "Edit Option" : "Add Option"}
@@ -75,7 +75,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
         </DialogHeader>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto pr-1 py-4 space-y-6 pl-1">
           {/* Header Section */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-800 mb-2">
@@ -152,7 +152,7 @@ const RecipeModal: React.FC<RecipeModalProps> = ({
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 pt-6 sm:justify-end border-t border-gray-200 mt-auto">
+        <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
           <Button
             type="button"
             variant="outline"
