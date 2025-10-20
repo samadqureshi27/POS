@@ -470,6 +470,7 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
             Select {title.toLowerCase()} from the dropdown above to add them to this recipe
           </p>
         </div>
+      )}
     </div>
   );
 };
