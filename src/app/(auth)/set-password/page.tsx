@@ -1,12 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Lock, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const SetPasswordPage: React.FC = () => {
+const SetPasswordContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -339,6 +339,26 @@ const SetPasswordPage: React.FC = () => {
         </p>
       </div>
     </div>
+  );
+};
+
+const SetPasswordPage: React.FC = () => {
+  return (
+    <Suspense fallback={
+      <div
+        className="relative h-screen w-full overflow-hidden flex items-center justify-center"
+        style={{ background: "#d1ab35" }}
+      >
+        <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-12 md:p-16 max-w-md w-full mx-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="text-gray-600 mt-4">Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <SetPasswordContent />
+    </Suspense>
   );
 };
 
