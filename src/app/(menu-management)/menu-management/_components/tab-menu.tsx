@@ -10,7 +10,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
   const tabs = ["Menu Items", "Details", "Options", "Meal", "Specials", "Price"];
 
   return (
-    <div className="flex w-full items-center justify-center border-b border-gray-200 mt-2 overflow-x-auto">
+    <div className="flex w-full items-center justify-center border-b border-gray-200 mt-2 overflow-x-auto pl-1">
       {tabs.map((tab) => (
         <button
           key={tab}

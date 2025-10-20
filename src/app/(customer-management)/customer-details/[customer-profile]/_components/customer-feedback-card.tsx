@@ -12,7 +12,7 @@ export const CustomerFeedbackCard: React.FC<CustomerFeedbackCardProps> = ({
 }) => {
     return (
         <Card className="shadow-sm">
-            <CardContent className="p-6 flex items-center justify-start h-[140px]">
+            <CardContent className="p-6 flex items-center justify-start h-[96px]">
                 <div className="text-start">
                     <div className="mb-3">
                         <StarRating rating={rating} size="large" />

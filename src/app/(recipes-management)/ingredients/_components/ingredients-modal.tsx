@@ -119,7 +119,7 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
                     setFormData({ ...formData, Unit: value })
                   }
                 >
-                  <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20">
+                  <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-gray-500/20">
                     <SelectValue placeholder="Select unit of measurement..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -233,7 +233,7 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 pt-6 justify-end border-t border-gray-200 mt-auto">
+        <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
           <Button
             type="button"
             variant="outline"

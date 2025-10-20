@@ -60,7 +60,7 @@ const PaymentManagementPage = () => {
   }
 
   return (
-    <div className="p-6 px-4 bg-background min-h-screen">
+    <div className="p-6  bg-background min-h-screen">
       <Toaster position="top-right" />
 
       <h1 className="text-3xl font-semibold mb-8 mt-20">

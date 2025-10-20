@@ -1,8 +1,7 @@
-// _components/BranchTable.tsx
 "use client";
 
 import React from "react";
-import { Edit } from "lucide-react";
+import { Edit, Eye } from "lucide-react";
 import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import FilterDropdown from "@/components/ui/filter-dropdown";
@@ -72,10 +71,18 @@ const BranchTable: React.FC<BranchTableProps> = ({
 
     const actions: DataTableAction<any>[] = [
         {
+            key: "view",
+            label: "View Details",
+            icon: <Eye className="h-4 w-4" />,
+            onClick: (record) => onItemClick(record["Branch-ID"]),
+            showOnMobile: true // This will show as a mobile button
+        },
+        {
             key: "edit",
             label: "Edit",
             icon: <Edit className="h-4 w-4" />,
-            onClick: onEditItem
+            onClick: onEditItem,
+            showOnMobile: true // This will show as a mobile button
         }
     ];
 
@@ -95,9 +102,9 @@ const BranchTable: React.FC<BranchTableProps> = ({
             getRowId={(item) => item["Branch-ID"]}
             maxHeight="600px"
             emptyMessage={emptyMessage}
-            onRowClick={(record) => onItemClick(record["Branch-ID"])}
             mobileResponsive={true}
             nameColumn="branchName"
+            multipleMobileButtons={true} // Enable multiple mobile buttons
         />
     );
 };

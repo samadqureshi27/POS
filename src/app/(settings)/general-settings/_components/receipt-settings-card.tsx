@@ -79,8 +79,8 @@ const ReceiptSettingsCard: React.FC<ReceiptSettingsCardProps> = ({ settings, onS
                             </p>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-700">Paper Size</Label>
+                        <div className="space-y-2" >
+                            <Label className="text-sm font-medium text-gray-700" >Paper Size</Label>
                             <Select
                                 value={settings.paperSize || "80mm"}
                                 onValueChange={(value) => onSettingChange("paperSize", value)}

@@ -113,7 +113,7 @@ const BranchModal: React.FC<BranchModalProps> = ({
                 </div>
 
                 {/* Fixed Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 justify-end border-t border-gray-200 mt-auto">
+                <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
                     <Button
                         type="button"
                         variant="outline"
