@@ -39,7 +39,7 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/auth';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 class AuthService {
   private token: string | null = null;
@@ -62,7 +62,7 @@ class AuthService {
     try {
       console.log('Attempting login with role:', role);
       
-      const response = await fetch(`${API_BASE_URL}/login/`, {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,19 +75,25 @@ class AuthService {
       });
       
       console.log('Admin login response status:', response.status);
-    const data: LoginResponse = await response.json();
+    const data: any = await response.json();
     console.log('Admin login response data:', data);
-    
-    if (data.success && data.user && data.tokens) {
-      this.setTokens(data.tokens.access, data.tokens.refresh);
-      this.setUser(data.user);
-      return { success: true, user: data.user };
+
+    // Handle backend response format: {status, message, result: {token, user}}
+    if (response.ok && data.result && data.result.token) {
+      const token = data.result.token;
+      const user = data.result.user || data.result;
+
+      // Store token (your backend uses single token, not access/refresh)
+      this.setTokens(token, token); // Using same token for both
+      this.setUser(user);
+
+      return { success: true, user: user };
     } else {
-      return { 
-        success: false, 
-        errors: data.errors, 
+      return {
+        success: false,
+        errors: data.errors,
         error: data.error,
-        message: data.message 
+        message: data.message
       };
     }
   } catch (error: unknown) {
@@ -111,7 +117,7 @@ class AuthService {
       requestBody.role = role;
     }
     
-    const response = await fetch(`${API_BASE_URL}/pin-login/`, {
+    const response = await fetch(`${API_BASE_URL}/auth/pin-login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -120,16 +126,22 @@ class AuthService {
     });
 
     console.log('PIN Login response status:', response.status);
-    const data: LoginResponse = await response.json();
+    const data: any = await response.json();
     console.log('PIN Login response data:', data);
-    
-    if (data.success && data.user && data.tokens) {
-      this.setTokens(data.tokens.access, data.tokens.refresh);
-      this.setUser(data.user);
-      return { success: true, user: data.user };
+
+    // Handle backend response format: {status, message, result: {token, user}}
+    if (response.ok && data.result && data.result.token) {
+      const token = data.result.token;
+      const user = data.result.user || data.result;
+
+      // Store token
+      this.setTokens(token, token);
+      this.setUser(user);
+
+      return { success: true, user: user };
     } else {
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: data.message,
         error: data.error,
         errors: data.errors
@@ -145,7 +157,7 @@ class AuthService {
   // Rest of the methods remain the same...
   async createStaff(staffData: CreateStaffData): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/create-staff/`, {
+      const response = await fetch(`${API_BASE_URL}/auth/create-staff`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +176,7 @@ class AuthService {
 
   async resetUserPassword(userId: string, newPassword: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}/reset-password/`, {
+      const response = await fetch(`${API_BASE_URL}/auth/users/${userId}/reset-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +195,7 @@ class AuthService {
 
   async getUsers(): Promise<ApiResponse<User[]>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/`, {
+      const response = await fetch(`${API_BASE_URL}/auth/users`, {
         headers: {
           'Authorization': `Bearer ${this.token}`
         }
@@ -199,7 +211,7 @@ class AuthService {
 
   async updateUserPin(userId: string, newPin: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}/update-pin/`, {
+      const response = await fetch(`${API_BASE_URL}/auth/users/${userId}/update-pin`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -218,7 +230,7 @@ class AuthService {
 
   async toggleUserStatus(userId: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}/toggle-status/`, {
+      const response = await fetch(`${API_BASE_URL}/auth/users/${userId}/toggle-status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${this.token}`
@@ -233,9 +245,49 @@ class AuthService {
     }
   }
 
+  async forgotPassword(email: string): Promise<ApiResponse> {
+    try {
+      console.log('Requesting password reset for:', email);
+      const response = await fetch(`${API_BASE_URL}/auth/forgotPassword`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data: ApiResponse = await response.json();
+      console.log('Forgot password response:', data);
+      return data;
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      return { success: false, error: 'Network error' };
+    }
+  }
+
+  async resetPassword(token: string, password: string): Promise<ApiResponse> {
+    try {
+      console.log('Resetting password with token');
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, password })
+      });
+
+      const data: ApiResponse = await response.json();
+      console.log('Reset password response:', data);
+      return data;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { success: false, error: 'Network error' };
+    }
+  }
+
   async getProfile(): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/profile/`, {
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         headers: {
           'Authorization': `Bearer ${this.token}`
         }
@@ -253,7 +305,7 @@ class AuthService {
     if (!this.refreshToken) return false;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/token/refresh/`, {
+      const response = await fetch(`${API_BASE_URL}/auth/token/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -280,7 +332,7 @@ class AuthService {
   async logout(): Promise<void> {
     try {
       if (this.refreshToken) {
-        await fetch(`${API_BASE_URL}/logout/`, {
+        await fetch(`${API_BASE_URL}/auth/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

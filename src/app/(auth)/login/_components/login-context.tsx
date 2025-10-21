@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import authService from "@/lib/auth-service";
+import { toast } from "sonner";
 import {
   validateAdminLoginForm,
   validateManagerPinForm,
@@ -190,21 +191,39 @@ export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       if (response.success && response.user) {
         console.log("Admin login successful:", response.user);
-        if (
-          response.user.role === "admin" ||
-          response.user.role === "superadmin"
-        ) {
-          router.push("/dashboard");
-        } else {
-          router.push("/dashboard");
-        }
+        toast.success("Login successful! Redirecting...");
+
+        // Small delay to show toast before redirect
+        setTimeout(() => {
+          if (
+            response.user.role === "admin" ||
+            response.user.role === "superadmin"
+          ) {
+            router.push("/dashboard");
+          } else {
+            router.push("/dashboard");
+          }
+        }, 500);
       } else {
         console.log("Admin login failed:", response);
-        setError(response.error || response.message || "Login failed");
-        if (response.errors) {
+
+        // Handle error message safely
+        let errorMessage = "Login failed";
+
+        if (response.errors && typeof response.errors === 'object') {
           const fieldErrors = Object.values(response.errors).flat().join(", ");
-          setError(fieldErrors);
+          errorMessage = fieldErrors;
+        } else if (typeof response.error === 'string') {
+          errorMessage = response.error;
+        } else if (typeof response.message === 'string') {
+          errorMessage = response.message;
+        } else if (response.error && typeof response.error === 'object' && response.error.message) {
+          errorMessage = response.error.message;
+        } else if (response.message && typeof response.message === 'object' && response.message.message) {
+          errorMessage = response.message.message;
         }
+
+        setError(errorMessage);
       }
     } catch (error: any) {
       console.error("Admin login error:", error);
@@ -228,22 +247,41 @@ export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       if (response.success && response.user) {
         console.log("Manager login successful:", response.user);
-        switch (response.user.role) {
-          case "manager":
-            router.push("/dashboard");
-            break;
-          case "cashier":
-            router.push("/pos");
-            break;
-          case "waiter":
-            router.push("/orders");
-            break;
-          default:
-            router.push("/dashboard");
-        }
+        toast.success("Login successful! Redirecting...");
+
+        // Small delay to show toast before redirect
+        setTimeout(() => {
+          switch (response.user.role) {
+            case "manager":
+              router.push("/dashboard");
+              break;
+            case "cashier":
+              router.push("/pos");
+              break;
+            case "waiter":
+              router.push("/orders");
+              break;
+            default:
+              router.push("/dashboard");
+          }
+        }, 500);
       } else {
         console.log("Manager login failed:", response);
-        setError(response.error || response.message || "Invalid PIN");
+
+        // Handle error message safely
+        let errorMessage = "Invalid PIN";
+
+        if (typeof response.error === 'string') {
+          errorMessage = response.error;
+        } else if (typeof response.message === 'string') {
+          errorMessage = response.message;
+        } else if (response.error && typeof response.error === 'object' && response.error.message) {
+          errorMessage = response.error.message;
+        } else if (response.message && typeof response.message === 'object' && response.message.message) {
+          errorMessage = response.message.message;
+        }
+
+        setError(errorMessage);
       }
     } catch (error: any) {
       console.error("Manager login error:", error);
