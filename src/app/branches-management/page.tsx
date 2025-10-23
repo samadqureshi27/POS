@@ -3,6 +3,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useRequireAuth } from "@/lib/hooks/useAuth";
 import StatCard from "@/components/ui/summary-card";
 import ActionBar from "@/components/ui/action-bar";
 import { Toast } from '@/components/ui/toast';
@@ -16,6 +17,9 @@ import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 
 const BranchManagementPage = () => {
   const router = useRouter();
+  
+  // Require authentication - redirect to login if not authenticated
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth('/login');
 
   const {
     // State
@@ -51,10 +55,18 @@ const BranchManagementPage = () => {
   } = useBranchManagement();
 
   const handleCustomerClick = (branchId: number) => {
-    console.log('Navigating to branch:', branchId);
-    router.push(`/branch/${branchId}/pos`);
+    const item = branchItems.find((b) => b["Branch-ID"] === branchId);
+    const targetId = item?.backendId ?? String(branchId);
+    console.log('Navigating to branch:', targetId);
+    router.push(`/branch/${targetId}/pos`);
   };
 
+  // Show loading while checking authentication
+  if (authLoading) {
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={2} />;
+  }
+
+  // Show loading while fetching branch data
   if (loading) {
     return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={2} />;
   }

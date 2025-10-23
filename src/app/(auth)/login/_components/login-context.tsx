@@ -3,12 +3,12 @@
 import React, { createContext, useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import authService from "@/lib/auth-service";
-import {
-  validateAdminLoginForm,
-  validateManagerPinForm,
-  validateForgotPasswordForm,
-  validateResetPasswordForm,
-} from "@/lib/validations";
+// import {
+//   validateAdminLoginForm,
+//   validateManagerPinForm,
+//   validateForgotPasswordForm,
+//   validateResetPasswordForm,
+// } from "@/lib/validations";
 
 interface LoginContextType {
   // Phase management

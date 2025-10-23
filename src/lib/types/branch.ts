@@ -1,12 +1,14 @@
 // types/branch.ts
 export interface BranchItem {
-  "Branch-ID": number;
+  "Branch-ID": number; // Local sequential ID for UI
   Branch_Name: string;
   Status: "Active" | "Inactive";
   "Contact-Info": string;
   Address: string;
   email: string;
   postalCode: string;
+  // Backend identifier for navigation/API calls
+  backendId?: string;
 }
 
 export interface ApiResponse<T> {
@@ -21,7 +23,7 @@ export interface ToastProps {
   onClose: () => void;
 }
 
-export interface BranchModalFormData extends Omit<BranchItem, "Branch-ID"> {}
+export interface BranchModalFormData extends Omit<BranchItem, "Branch-ID" | "backendId"> {}
 
 export interface BranchTableProps {
   branchItems: BranchItem[];

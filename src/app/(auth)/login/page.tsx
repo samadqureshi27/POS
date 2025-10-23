@@ -91,5 +91,4 @@ const LoginPage: React.FC = () => {
     </LoginProvider>
   );
 };
-
 export default LoginPage;
