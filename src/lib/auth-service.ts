@@ -39,7 +39,8 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3222';
+const TENANT_SLUG = process.env.NEXT_PUBLIC_TENANT_SLUG || 'default-tenant';
 
 class AuthService {
   private token: string | null = null;
@@ -52,25 +53,27 @@ class AuthService {
     }
   }
 
-  // Updated admin login with proper role handling
+  // Tenant Auth Login (Owner/Admin/Manager)
   async adminLogin(
-  email: string, 
-  password: string, 
-  role: 'admin' | 'manager' = 'admin'  // default set here
+  email: string,
+  password: string,
+  role: 'admin' | 'manager' = 'admin'
 ): Promise<LoginResponse> {
 
     try {
-      console.log('Attempting login with role:', role);
-      
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      console.log('Attempting tenant login with role:', role);
+
+      const response = await fetch(`${API_BASE_URL}/t/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-tenant-id': TENANT_SLUG,
         },
-        body: JSON.stringify({ 
-          email, 
+        body: JSON.stringify({
+          email,
           password,
-          role // Use the passed role instead of hardcoding
+          posId: null,
+          defaultBranchId: null
         })
       });
       
