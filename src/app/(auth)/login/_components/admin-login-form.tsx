@@ -4,7 +4,6 @@ import React from "react";
 import { User, Lock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import ErrorMessage from "@/components/ui/error-message";
 import { useLoginContext } from "./login-context";
 import { validateAdminLoginForm } from "@/lib/validations";

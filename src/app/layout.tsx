@@ -4,6 +4,7 @@ import "./globals.css";
 import DashboardWrapper from "@/components/dashboard-wrapper";
 import { ConditionalLayoutWrapper } from '@/components/conditional-layout-wrapper';
 import { ThemeProvider } from "next-themes";
+import { AuthProvider } from "@/lib/hooks/useAuth";
 
 
 const geistSans = Geist({
@@ -51,9 +52,11 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <ConditionalLayoutWrapper>
-            {children}
-          </ConditionalLayoutWrapper>
+          <AuthProvider>
+            <ConditionalLayoutWrapper>
+              {children}
+            </ConditionalLayoutWrapper>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
