@@ -39,7 +39,48 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/auth';
+const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || 'https://api.tritechtechnologyllc.com';
+const AUTH_LOGIN_PATH = process.env.NEXT_PUBLIC_API_AUTH_LOGIN || '/t/auth/login';
+const AUTH_PIN_LOGIN_PATH = process.env.NEXT_PUBLIC_API_AUTH_PIN_LOGIN || '/t/auth/pin-login';
+const AUTH_LOGOUT_PATH = process.env.NEXT_PUBLIC_API_AUTH_LOGOUT || '/t/auth/logout';
+const AUTH_PROFILE_PATH = process.env.NEXT_PUBLIC_API_AUTH_PROFILE || '/t/auth/profile';
+const AUTH_REFRESH_PATH = process.env.NEXT_PUBLIC_API_AUTH_REFRESH || '/t/auth/token/refresh';
+
+const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || '').toLowerCase() === 'true';
+function buildUrl(path: string) {
+  return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
+}
+
+function getTenantSlug(): string | null {
+  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || '';
+  if (envSlug) return envSlug;
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('tenant_slug') || null;
+  }
+  return null;
+}
+
+function getTenantId(): string | null {
+  const envId = process.env.NEXT_PUBLIC_TENANT_ID || '';
+  if (envId) return envId;
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('tenant_id') || null;
+  }
+  return null;
+}
+
+function buildHeaders(token?: string, extra?: Record<string, string>) {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+  const slug = getTenantSlug();
+  const id = getTenantId();
+  if (slug) headers['x-tenant-slug'] = slug;
+  else if (id) headers['x-tenant-id'] = id;
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return { ...headers, ...(extra || {}) };
+}
 
 class AuthService {
   private token: string | null = null;
@@ -62,19 +103,19 @@ class AuthService {
     try {
       console.log('Attempting login with role:', role);
       
-      const response = await fetch(`${API_BASE_URL}/login/`, {
+      const response = await fetch(buildUrl(AUTH_LOGIN_PATH), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          email, 
-          password,
-          role // Use the passed role instead of hardcoding
-        })
+        headers: buildHeaders(undefined),
+        body: JSON.stringify({ email, password, role })
       });
       
       console.log('Admin login response status:', response.status);
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('Admin login non-JSON response:', text);
+      return { success: false, error: 'Unexpected response from server', message: text };
+    }
     const data: LoginResponse = await response.json();
     console.log('Admin login response data:', data);
     
@@ -111,15 +152,19 @@ class AuthService {
       requestBody.role = role;
     }
     
-    const response = await fetch(`${API_BASE_URL}/pin-login/`, {
+    const response = await fetch(buildUrl(AUTH_PIN_LOGIN_PATH), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: buildHeaders(undefined),
       body: JSON.stringify(requestBody)
     });
 
     console.log('PIN Login response status:', response.status);
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('PIN login non-JSON response:', text);
+      return { success: false, error: 'Unexpected response from server', message: text };
+    }
     const data: LoginResponse = await response.json();
     console.log('PIN Login response data:', data);
     
@@ -145,7 +190,7 @@ class AuthService {
   // Rest of the methods remain the same...
   async createStaff(staffData: CreateStaffData): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/create-staff/`, {
+      const response = await fetch(buildUrl('/t/auth/create-staff'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +209,7 @@ class AuthService {
 
   async resetUserPassword(userId: string, newPassword: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}/reset-password/`, {
+      const response = await fetch(buildUrl(`/t/auth/users/${userId}/reset-password`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +228,7 @@ class AuthService {
 
   async getUsers(): Promise<ApiResponse<User[]>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/`, {
+      const response = await fetch(buildUrl('/t/auth/users'), {
         headers: {
           'Authorization': `Bearer ${this.token}`
         }
@@ -199,7 +244,7 @@ class AuthService {
 
   async updateUserPin(userId: string, newPin: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}/update-pin/`, {
+      const response = await fetch(buildUrl(`/t/auth/users/${userId}/update-pin`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -218,7 +263,7 @@ class AuthService {
 
   async toggleUserStatus(userId: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}/toggle-status/`, {
+      const response = await fetch(buildUrl(`/t/auth/users/${userId}/toggle-status`), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${this.token}`
@@ -235,10 +280,8 @@ class AuthService {
 
   async getProfile(): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/profile/`, {
-        headers: {
-          'Authorization': `Bearer ${this.token}`
-        }
+      const response = await fetch(buildUrl(AUTH_PROFILE_PATH), {
+        headers: buildHeaders(this.token || undefined)
       });
 
       const data: ApiResponse<User> = await response.json();
@@ -253,11 +296,9 @@ class AuthService {
     if (!this.refreshToken) return false;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/token/refresh/`, {
+      const response = await fetch(buildUrl(AUTH_REFRESH_PATH), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: buildHeaders(undefined),
         body: JSON.stringify({ refresh: this.refreshToken })
       });
 
@@ -280,12 +321,9 @@ class AuthService {
   async logout(): Promise<void> {
     try {
       if (this.refreshToken) {
-        await fetch(`${API_BASE_URL}/logout/`, {
+        await fetch(buildUrl(AUTH_LOGOUT_PATH), {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.token}`
-          },
+          headers: buildHeaders(this.token || undefined),
           body: JSON.stringify({ refresh_token: this.refreshToken })
         });
       }
@@ -325,7 +363,7 @@ class AuthService {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-      localStorage.removeUser('user');
+      localStorage.removeItem('user');
     }
   }
 
@@ -349,9 +387,7 @@ class AuthService {
       const response = await fetch(url, {
         ...options,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`,
-          ...options.headers
+          ...buildHeaders(this.token || undefined, options.headers as Record<string, string>)
         }
       });
 
@@ -365,8 +401,15 @@ class AuthService {
         }
       }
 
-      const data: ApiResponse<T> = await response.json();
-      return data;
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data: ApiResponse<T> = await response.json();
+        return data;
+      } else {
+        const text = await response.text();
+        console.error('Non-JSON response for authenticated request:', text);
+        return { success: false, error: 'Unexpected non-JSON response', message: text } as ApiResponse<T>;
+      }
     } catch (error) {
       console.error('Authenticated request error:', error);
       return { success: false, error: 'Request failed' };

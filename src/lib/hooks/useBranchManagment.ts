@@ -1,10 +1,11 @@
 // lib/hooks/useBranchManagement.ts
 import { useState, useEffect, useMemo } from "react";
-import { BranchAPI } from "../util/branch-api";
+// import { BranchAPI } from "../util/branch-api";
 import { useSelection } from "./selection";
 import { useToast } from './toast';
 import { useBranchModal } from "./branchModal";
 import { BranchItem } from "@/lib/types/branch";
+import { BranchService, TenantBranch } from "@/lib/services/branch-service";
 
 export const useBranchManagement = () => {
     const [branchItems, setBranchItems] = useState<BranchItem[]>([]);
@@ -35,13 +36,32 @@ export const useBranchManagement = () => {
         updateFormData,
     } = useBranchModal();
 
+    const mapApiBranchToItem = (apiBranch: TenantBranch, index: number): BranchItem => {
+        const id = apiBranch.id || apiBranch._id || String(index + 1);
+        const status = (apiBranch.status || "inactive").toLowerCase() === "active" ? "Active" : "Inactive";
+        const addressStr = apiBranch.address
+            ? [apiBranch.address.line, apiBranch.address.city, apiBranch.address.country].filter(Boolean).join(", ")
+            : "";
+        return {
+            "Branch-ID": index + 1, // local sequential for UI selection
+            Branch_Name: apiBranch.name || "Unnamed Branch",
+            Status: status,
+            "Contact-Info": apiBranch.contactEmail || "",
+            Address: addressStr,
+            email: apiBranch.contactEmail || "",
+            postalCode: "",
+            backendId: id,
+        };
+    };
+
     // Load branch items
     const loadBranchItems = async () => {
         try {
             setLoading(true);
-            const response = await BranchAPI.getBranchItems();
-            if (response.success) {
-                setBranchItems(response.data);
+            const response = await BranchService.listBranches();
+            if (response.success && response.data) {
+                const mapped = response.data.map((b, idx) => mapApiBranchToItem(b, idx));
+                setBranchItems(mapped);
             } else {
                 throw new Error(response.message || "Failed to fetch branch items");
             }
@@ -67,15 +87,23 @@ export const useBranchManagement = () => {
     const handleCreateItem = async (itemData: Omit<BranchItem, "Branch-ID">) => {
         try {
             setActionLoading(true);
-            const response = await BranchAPI.createBranchItem(itemData);
+            const payload: Partial<TenantBranch> = {
+                name: itemData.Branch_Name,
+                status: itemData.Status === "Active" ? "active" : "inactive",
+                address: { line: itemData.Address },
+            };
+            const response = await BranchService.createBranch(payload);
             if (response.success) {
-                setBranchItems((prev) => [...prev, response.data]);
+                await loadBranchItems();
                 closeModal();
                 showToast(response.message || "Branch created successfully", "success");
+            } else {
+                showToast(response.message || "Create branch failed", "error");
+                return;
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error creating branch:", error);
-            showToast("Failed to create Branch", "error");
+            showToast(error?.message || "Failed to create Branch", "error");
         } finally {
             setActionLoading(false);
         }
@@ -83,42 +111,52 @@ export const useBranchManagement = () => {
 
     // Update item
     const handleUpdateItem = async (itemData: Omit<BranchItem, "Branch-ID">) => {
-        if (!editingItem) return;
+        if (!editingItem || !editingItem.backendId) {
+            showToast("Backend ID not found for selected branch", "error");
+            return;
+        }
         try {
             setActionLoading(true);
-            const response = await BranchAPI.updateBranchItem(
-                editingItem["Branch-ID"],
-                itemData
-            );
+            const payload: Partial<TenantBranch> = {
+                name: itemData.Branch_Name,
+                status: itemData.Status === "Active" ? "active" : "inactive",
+                address: { line: itemData.Address },
+            };
+            const response = await BranchService.updateBranch(editingItem.backendId, payload);
             if (response.success) {
-                setBranchItems((prev) =>
-                    prev.map((it) =>
-                        it["Branch-ID"] === editingItem["Branch-ID"] ? response.data : it
-                    )
-                );
+                await loadBranchItems();
                 closeModal();
                 showToast(response.message || "Branch updated successfully", "success");
+            } else {
+                throw new Error(response.message || "Update branch failed");
             }
-        } catch (error) {
-            showToast("Failed to update Branch", "error");
+        } catch (error: any) {
+            showToast(error?.message || "Failed to update Branch", "error");
         } finally {
             setActionLoading(false);
         }
     };
 
-    // Delete selected items
+    // Delete selected items (iterative - no bulk API provided)
     const handleDeleteSelected = async () => {
         if (selectedItems.length === 0) return;
         try {
             setActionLoading(true);
-            const response = await BranchAPI.bulkDeleteBranchItems(selectedItems as number[]);
-            if (response.success) {
-                // Refresh from API (IDs already re-assigned there)
-                const updated = await BranchAPI.getBranchItems();
-                setBranchItems(updated.data);
-                clearSelection();
-                showToast(response.message || "Branch deleted successfully", "success");
+            // Map local numeric IDs to backend IDs
+            const idsToDelete = selectedItems
+                .map((n) => branchItems.find((b) => b["Branch-ID"] === n)?.backendId)
+                .filter((id): id is string => typeof id === "string" && id.length > 0);
+
+            for (const id of idsToDelete) {
+                const resp = await BranchService.deleteBranch(id);
+                if (!resp.success) {
+                    throw new Error(resp.message || `Failed to delete branch ${id}`);
+                }
             }
+
+            await loadBranchItems();
+            clearSelection();
+            showToast("Branch deleted successfully", "success");
         } catch (error) {
             showToast("Failed to delete Branch", "error");
         } finally {
