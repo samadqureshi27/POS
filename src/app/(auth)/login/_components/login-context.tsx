@@ -2,6 +2,7 @@
 "use client";
 import React, { createContext, useContext, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import authService from "@/lib/auth-service";
 // import {
 //   validateAdminLoginForm,
@@ -180,8 +181,6 @@ export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setError(null);
 
     try {
-      console.log("Admin login attempt:", { email, role });
-
       const response = await authService.adminLogin(
         email,
         password,
@@ -189,44 +188,29 @@ export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       );
 
       if (response.success && response.user) {
-        console.log("Admin login successful:", response.user);
         toast.success("Login successful! Redirecting...");
 
         // Small delay to show toast before redirect
         setTimeout(() => {
-          if (
-            response.user.role === "admin" ||
-            response.user.role === "superadmin"
-          ) {
-            router.push("/dashboard");
-          } else {
-            router.push("/dashboard");
-          }
+          router.push("/dashboard");
         }, 500);
       } else {
-        console.log("Admin login failed:", response);
-
-        // Handle error message safely
-        let errorMessage = "Login failed";
-
-        if (response.errors && typeof response.errors === 'object') {
-          const fieldErrors = Object.values(response.errors).flat().join(", ");
-          errorMessage = fieldErrors;
-        } else if (typeof response.error === 'string') {
-          errorMessage = response.error;
-        } else if (typeof response.message === 'string') {
-          errorMessage = response.message;
-        } else if (response.error && typeof response.error === 'object' && response.error.message) {
-          errorMessage = response.error.message;
-        } else if (response.message && typeof response.message === 'object' && response.message.message) {
-          errorMessage = response.message.message;
-        }
+        // Extract error message
+        const errorMessage =
+          response.error ||
+          response.message ||
+          (response.errors && typeof response.errors === 'object'
+            ? Object.values(response.errors).flat().join(", ")
+            : "Login failed. Please check your credentials.");
 
         setError(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error: any) {
       console.error("Admin login error:", error);
-      setError("Network error. Please check your connection.");
+      const errorMsg = "Network error. Please check your connection.";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }

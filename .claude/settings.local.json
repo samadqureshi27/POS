@@ -5,7 +5,9 @@
       "Bash(find:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Read(//c/Users/faraz/Documents/GitHub/umt code/POS/**)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
