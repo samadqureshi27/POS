@@ -34,8 +34,11 @@ export function buildTenantHeaders(req: Request, includeAuth: boolean = false): 
   // Include auth token if provided
   if (includeAuth) {
     const authHeader = req.headers.get("Authorization");
+    console.log('🔐 buildTenantHeaders - includeAuth=true, authHeader:', authHeader ? `${authHeader.substring(0, 30)}...` : 'MISSING');
     if (authHeader) {
       headers["Authorization"] = authHeader;
+    } else {
+      console.warn('⚠️ Authorization header requested but not found in request');
     }
   }
 

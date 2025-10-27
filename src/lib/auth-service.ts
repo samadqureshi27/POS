@@ -59,7 +59,7 @@ const AUTH_USERS_BASE_PATH = process.env.NEXT_PUBLIC_API_AUTH_USERS || '/t/auth/
 // Default tenant slug - can be overridden by env var
 const DEFAULT_TENANT_SLUG = 'extraction-testt';
 
-const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || '').toLowerCase() === 'true';
+const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || 'true').toLowerCase() === 'true'; // default to proxy
 function buildUrl(path: string) {
   return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
 }
@@ -252,9 +252,10 @@ class AuthService {
   // Rest of the methods remain the same...
   async createStaff(staffData: CreateStaffData): Promise<ApiResponse<User>> {
     try {
+      const token = this.getToken();
       const response = await fetch(buildUrl(AUTH_CREATE_STAFF_PATH), {
         method: 'POST',
-        headers: buildHeaders(this.token || undefined),
+        headers: buildHeaders(token || undefined),
         body: JSON.stringify(staffData)
       });
 
@@ -268,9 +269,10 @@ class AuthService {
 
   async resetUserPassword(userId: string, newPassword: string): Promise<ApiResponse<User>> {
     try {
+      const token = this.getToken();
       const response = await fetch(buildUrl(`${AUTH_USERS_BASE_PATH}/${userId}/reset-password`), {
         method: 'PUT',
-        headers: buildHeaders(this.token || undefined),
+        headers: buildHeaders(token || undefined),
         body: JSON.stringify({ password: newPassword })
       });
 
@@ -284,8 +286,9 @@ class AuthService {
 
   async getUsers(): Promise<ApiResponse<User[]>> {
     try {
+      const token = this.getToken();
       const response = await fetch(buildUrl(AUTH_USERS_BASE_PATH), {
-        headers: buildHeaders(this.token || undefined)
+        headers: buildHeaders(token || undefined)
       });
 
       const data: ApiResponse<User[]> = await response.json();
@@ -298,9 +301,10 @@ class AuthService {
 
   async updateUserPin(userId: string, newPin: string): Promise<ApiResponse<User>> {
     try {
+      const token = this.getToken();
       const response = await fetch(buildUrl(`${AUTH_USERS_BASE_PATH}/${userId}/update-pin`), {
         method: 'PUT',
-        headers: buildHeaders(this.token || undefined),
+        headers: buildHeaders(token || undefined),
         body: JSON.stringify({ pin: newPin })
       });
 
@@ -314,9 +318,10 @@ class AuthService {
 
   async toggleUserStatus(userId: string): Promise<ApiResponse<User>> {
     try {
+      const token = this.getToken();
       const response = await fetch(buildUrl(`${AUTH_USERS_BASE_PATH}/${userId}/toggle-status`), {
         method: 'PUT',
-        headers: buildHeaders(this.token || undefined)
+        headers: buildHeaders(token || undefined)
       });
 
       const data: ApiResponse<User> = await response.json();
@@ -369,8 +374,9 @@ class AuthService {
 
   async getProfile(): Promise<ApiResponse<User>> {
     try {
+      const token = this.getToken(); // Always get fresh token from localStorage
       const response = await fetch(buildUrl(AUTH_PROFILE_PATH), {
-        headers: buildHeaders(this.token || undefined)
+        headers: buildHeaders(token || undefined)
       });
 
       const data: ApiResponse<User> = await response.json();
@@ -409,10 +415,11 @@ class AuthService {
 
   async logout(): Promise<void> {
     try {
+      const token = this.getToken();
       if (this.refreshToken) {
         await fetch(buildUrl(AUTH_LOGOUT_PATH), {
           method: 'POST',
-          headers: buildHeaders(this.token || undefined),
+          headers: buildHeaders(token || undefined),
           body: JSON.stringify({ refresh_token: this.refreshToken })
         });
       }
@@ -457,6 +464,14 @@ class AuthService {
   }
 
   isAuthenticated(): boolean {
+    // Always check localStorage for latest auth state
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        this.token = token; // Keep in-memory token in sync
+        return true;
+      }
+    }
     return !!this.token;
   }
 
@@ -465,18 +480,27 @@ class AuthService {
   }
 
   getToken(): string | null {
+    // Always read from localStorage to ensure we get the latest token
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        this.token = token; // Keep in-memory token in sync
+        return token;
+      }
+    }
     return this.token;
   }
 
   async makeAuthenticatedRequest<T = any>(
-    url: string, 
+    url: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     try {
+      const token = this.getToken();
       const response = await fetch(url, {
         ...options,
         headers: {
-          ...buildHeaders(this.token || undefined, options.headers as Record<string, string>)
+          ...buildHeaders(token || undefined, options.headers as Record<string, string>)
         }
       });
 
