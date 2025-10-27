@@ -1,17 +1,19 @@
-// API Configuration for Django Backend
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+// API Configuration for Backend
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.tritechtechnologyllc.com';
 
 export const apiEndpoints = {
   // Auth endpoints
-  login: `${API_BASE_URL}/auth/login/`,
-  logout: `${API_BASE_URL}/auth/logout/`,
-  forgotPassword: `${API_BASE_URL}/auth/forgot-password/`,
-  resetPassword: `${API_BASE_URL}/auth/reset-password/`,
-  refreshToken: `${API_BASE_URL}/auth/refresh/`,
-  
+  login: `${API_BASE_URL}/t/auth/login`,
+  logout: `${API_BASE_URL}/t/auth/logout`,
+  forgotPassword: `${API_BASE_URL}/t/auth/forgotPassword`,
+  resetPassword: `${API_BASE_URL}/t/auth/reset-password`,
+  refreshToken: `${API_BASE_URL}/t/auth/token/refresh`,
+  verifyToken: `${API_BASE_URL}/t/auth/verifyToken`,
+  register: `${API_BASE_URL}/t/auth/register`,
+
   // User endpoints
-  profile: `${API_BASE_URL}/auth/me/`,
-  updateProfile: `${API_BASE_URL}/auth/profile/`,
+  profile: `${API_BASE_URL}/auth/profile`,
+  updateProfile: `${API_BASE_URL}/auth/profile`,
 };
 
 // HTTP Client configuration for Django

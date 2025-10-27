@@ -11,6 +11,7 @@ import EmailVerificationOverlay from "./_components/email-verification";
 import NewPasswordOverlay from "./_components/new-password";
 import ManagerLoginForm from "./_components/manager-login-form";
 import ManagerForgotPinOverlay from "./_components/manager-forgot-pin";
+import { Toaster } from "sonner";
 
 const LoginPageContent: React.FC = () => {
 
@@ -87,6 +88,7 @@ const LoginPageContent: React.FC = () => {
 const LoginPage: React.FC = () => {
   return (
     <LoginProvider>
+      <Toaster position="top-right" richColors />
       <LoginPageContent />
     </LoginProvider>
   );

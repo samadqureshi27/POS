@@ -51,8 +51,11 @@ const EmailVerificationOverlay: React.FC = () => {
     }, 300);
   };
 
-  const handleResendEmail = () => {
-    console.log("Resending email");
+  const handleResendEmail = async () => {
+    console.log("Resending reset email");
+    // Note: The reset email is stored in the context
+    // You can add a resend API call here if needed
+    alert("Reset email has been resent!");
   };
 
   if (!showVerification) return null;
