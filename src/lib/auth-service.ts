@@ -1,13 +1,20 @@
 // src/lib/authService.ts
 
 export interface User {
-  id: string;
-  username: string;
+  _id?: string;
+  id?: string;
+  fullName?: string;
+  username?: string;
   email: string;
-  role: 'superadmin' | 'admin' | 'manager' | 'cashier' | 'waiter';
-  is_active: boolean;
-  created_at: string;
+  roles?: string[];
+  role?: 'superadmin' | 'admin' | 'owner' | 'manager' | 'cashier' | 'waiter';
+  branchIds?: string[];
+  is_active?: boolean;
+  isActive?: boolean;
+  created_at?: string;
+  createdAt?: string;
   created_by?: string;
+  createdBy?: string;
 }
 
 export interface AuthTokens {
@@ -43,21 +50,29 @@ const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUB
 const AUTH_LOGIN_PATH = process.env.NEXT_PUBLIC_API_AUTH_LOGIN || '/t/auth/login';
 const AUTH_PIN_LOGIN_PATH = process.env.NEXT_PUBLIC_API_AUTH_PIN_LOGIN || '/t/auth/pin-login';
 const AUTH_LOGOUT_PATH = process.env.NEXT_PUBLIC_API_AUTH_LOGOUT || '/t/auth/logout';
-const AUTH_PROFILE_PATH = process.env.NEXT_PUBLIC_API_AUTH_PROFILE || '/t/auth/profile';
+const AUTH_PROFILE_PATH = process.env.NEXT_PUBLIC_API_AUTH_PROFILE || '/t/auth/me';
 const AUTH_REFRESH_PATH = process.env.NEXT_PUBLIC_API_AUTH_REFRESH || '/t/auth/token/refresh';
+// Users & staff management (env-driven, with sensible defaults)
+const AUTH_CREATE_STAFF_PATH = process.env.NEXT_PUBLIC_API_AUTH_CREATE_STAFF || '/t/auth/create-staff';
+const AUTH_USERS_BASE_PATH = process.env.NEXT_PUBLIC_API_AUTH_USERS || '/t/auth/users';
 
-const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || '').toLowerCase() === 'true';
+// Default tenant slug - can be overridden by env var
+const DEFAULT_TENANT_SLUG = 'extraction-testt';
+
+const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || 'true').toLowerCase() === 'true'; // default to proxy
 function buildUrl(path: string) {
   return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
 }
 
-function getTenantSlug(): string | null {
+function getTenantSlug(): string {
+  // Priority: env var > localStorage > default
   const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || '';
   if (envSlug) return envSlug;
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('tenant_slug') || null;
+    const stored = localStorage.getItem('tenant_slug');
+    if (stored) return stored;
   }
-  return null;
+  return DEFAULT_TENANT_SLUG;
 }
 
 function getTenantId(): string | null {
@@ -74,10 +89,11 @@ function buildHeaders(token?: string, extra?: Record<string, string>) {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
+
+  // Always add tenant identifier - required for ALL tenant API calls
   const slug = getTenantSlug();
-  const id = getTenantId();
-  if (slug) headers['x-tenant-slug'] = slug;
-  else if (id) headers['x-tenant-id'] = id;
+  headers['x-tenant-id'] = slug; // API expects x-tenant-id header
+
   if (token) headers['Authorization'] = `Bearer ${token}`;
   return { ...headers, ...(extra || {}) };
 }
@@ -93,20 +109,34 @@ class AuthService {
     }
   }
 
-  // Updated admin login with proper role handling
+  // Tenant Auth Login (Owner/Admin/Manager)
   async adminLogin(
-  email: string, 
-  password: string, 
-  role: 'admin' | 'manager' = 'admin'  // default set here
-): Promise<LoginResponse> {
-
+    email: string,
+    password: string,
+    role: 'admin' | 'manager' = 'admin'
+  ): Promise<LoginResponse> {
     try {
-      console.log('Attempting login with role:', role);
-      
-      const response = await fetch(buildUrl(AUTH_LOGIN_PATH), {
+      const url = buildUrl(AUTH_LOGIN_PATH);
+      const headers = buildHeaders();
+
+      console.log('🔐 Login Request:', {
+        url,
+        headers,
+        body: { email, password: '***', posId: null, defaultBranchId: null }
+      });
+
+      console.log('📧 Email:', email);
+      console.log('🔑 Password length:', password.length);
+
+      const response = await fetch(url, {
         method: 'POST',
-        headers: buildHeaders(undefined),
-        body: JSON.stringify({ email, password, role })
+        headers,
+        body: JSON.stringify({
+          email,
+          password,
+          posId: null,
+          defaultBranchId: null
+        })
       });
 
       console.log('📡 Login Response Status:', response.status);
@@ -191,14 +221,20 @@ class AuthService {
     }
     const data: LoginResponse = await response.json();
     console.log('PIN Login response data:', data);
-    
-    if (data.success && data.user && data.tokens) {
-      this.setTokens(data.tokens.access, data.tokens.refresh);
-      this.setUser(data.user);
-      return { success: true, user: data.user };
+
+    // Handle backend response format: {status, message, result: {token, user}}
+    if (response.ok && data.result && data.result.token) {
+      const token = data.result.token;
+      const user = data.result.user || data.result;
+
+      // Store token
+      this.setTokens(token, token);
+      this.setUser(user);
+
+      return { success: true, user: user };
     } else {
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: data.message,
         error: data.error,
         errors: data.errors
@@ -214,12 +250,10 @@ class AuthService {
   // Rest of the methods remain the same...
   async createStaff(staffData: CreateStaffData): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(buildUrl('/t/auth/create-staff'), {
+      const token = this.getToken();
+      const response = await fetch(buildUrl(AUTH_CREATE_STAFF_PATH), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`
-        },
+        headers: buildHeaders(token || undefined),
         body: JSON.stringify(staffData)
       });
 
@@ -233,12 +267,10 @@ class AuthService {
 
   async resetUserPassword(userId: string, newPassword: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(buildUrl(`/t/auth/users/${userId}/reset-password`), {
+      const token = this.getToken();
+      const response = await fetch(buildUrl(`${AUTH_USERS_BASE_PATH}/${userId}/reset-password`), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`
-        },
+        headers: buildHeaders(token || undefined),
         body: JSON.stringify({ password: newPassword })
       });
 
@@ -252,10 +284,9 @@ class AuthService {
 
   async getUsers(): Promise<ApiResponse<User[]>> {
     try {
-      const response = await fetch(buildUrl('/t/auth/users'), {
-        headers: {
-          'Authorization': `Bearer ${this.token}`
-        }
+      const token = this.getToken();
+      const response = await fetch(buildUrl(AUTH_USERS_BASE_PATH), {
+        headers: buildHeaders(token || undefined)
       });
 
       const data: ApiResponse<User[]> = await response.json();
@@ -268,12 +299,10 @@ class AuthService {
 
   async updateUserPin(userId: string, newPin: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(buildUrl(`/t/auth/users/${userId}/update-pin`), {
+      const token = this.getToken();
+      const response = await fetch(buildUrl(`${AUTH_USERS_BASE_PATH}/${userId}/update-pin`), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`
-        },
+        headers: buildHeaders(token || undefined),
         body: JSON.stringify({ pin: newPin })
       });
 
@@ -287,11 +316,10 @@ class AuthService {
 
   async toggleUserStatus(userId: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(buildUrl(`/t/auth/users/${userId}/toggle-status`), {
+      const token = this.getToken();
+      const response = await fetch(buildUrl(`${AUTH_USERS_BASE_PATH}/${userId}/toggle-status`), {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${this.token}`
-        }
+        headers: buildHeaders(token || undefined)
       });
 
       const data: ApiResponse<User> = await response.json();
@@ -302,10 +330,51 @@ class AuthService {
     }
   }
 
+  async forgotPassword(email: string): Promise<ApiResponse> {
+    try {
+      console.log('Requesting password reset for:', email);
+      const response = await fetch(`${API_BASE_URL}/auth/forgotPassword`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data: ApiResponse = await response.json();
+      console.log('Forgot password response:', data);
+      return data;
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      return { success: false, error: 'Network error' };
+    }
+  }
+
+  async resetPassword(token: string, password: string): Promise<ApiResponse> {
+    try {
+      console.log('Resetting password with token');
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, password })
+      });
+
+      const data: ApiResponse = await response.json();
+      console.log('Reset password response:', data);
+      return data;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { success: false, error: 'Network error' };
+    }
+  }
+
   async getProfile(): Promise<ApiResponse<User>> {
     try {
+      const token = this.getToken(); // Always get fresh token from localStorage
       const response = await fetch(buildUrl(AUTH_PROFILE_PATH), {
-        headers: buildHeaders(this.token || undefined)
+        headers: buildHeaders(token || undefined)
       });
 
       const data: any = await response.json();
@@ -350,10 +419,11 @@ class AuthService {
 
   async logout(): Promise<void> {
     try {
+      const token = this.getToken();
       if (this.refreshToken) {
         await fetch(buildUrl(AUTH_LOGOUT_PATH), {
           method: 'POST',
-          headers: buildHeaders(this.token || undefined),
+          headers: buildHeaders(token || undefined),
           body: JSON.stringify({ refresh_token: this.refreshToken })
         });
       }
@@ -398,6 +468,14 @@ class AuthService {
   }
 
   isAuthenticated(): boolean {
+    // Always check localStorage for latest auth state
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        this.token = token; // Keep in-memory token in sync
+        return true;
+      }
+    }
     return !!this.token;
   }
 
@@ -406,18 +484,27 @@ class AuthService {
   }
 
   getToken(): string | null {
+    // Always read from localStorage to ensure we get the latest token
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        this.token = token; // Keep in-memory token in sync
+        return token;
+      }
+    }
     return this.token;
   }
 
   async makeAuthenticatedRequest<T = any>(
-    url: string, 
+    url: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     try {
+      const token = this.getToken();
       const response = await fetch(url, {
         ...options,
         headers: {
-          ...buildHeaders(this.token || undefined, options.headers as Record<string, string>)
+          ...buildHeaders(token || undefined, options.headers as Record<string, string>)
         }
       });
 
