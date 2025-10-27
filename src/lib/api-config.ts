@@ -5,7 +5,7 @@ export const apiEndpoints = {
   // Auth endpoints
   login: `${API_BASE_URL}/t/auth/login`,
   logout: `${API_BASE_URL}/t/auth/logout`,
-  forgotPassword: `${API_BASE_URL}/t/auth/forgotPassword`,
+  forgotPassword: `${API_BASE_URL}/t/auth/forgot-password`,
   resetPassword: `${API_BASE_URL}/t/auth/reset-password`,
   refreshToken: `${API_BASE_URL}/t/auth/token/refresh`,
   verifyToken: `${API_BASE_URL}/t/auth/verifyToken`,
