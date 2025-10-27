@@ -23,26 +23,10 @@ function buildHeaders(req: Request) {
   return headers;
 }
 
-export async function GET(req: Request) {
-  try {
-    const { search } = new URL(req.url);
-    const url = `${REMOTE_BASE}/t/branches${search}`;
-    const res = await fetch(url, { headers: buildHeaders(req) });
-    const contentType = res.headers.get("content-type") || "application/json";
-    const body = contentType.includes("application/json") ? await res.json().catch(() => ({})) : await res.text();
-    return new NextResponse(typeof body === "string" ? body : JSON.stringify(body), {
-      status: res.status,
-      headers: { "content-type": contentType },
-    });
-  } catch (err: any) {
-    return NextResponse.json({ success: false, message: err?.message || "Proxy GET /tenant/branches failed" }, { status: 500 });
-  }
-}
-
 export async function POST(req: Request) {
   try {
     const payload = await req.json().catch(() => ({}));
-    const url = `${REMOTE_BASE}/t/branches`;
+    const url = `${REMOTE_BASE}/t/auth/create-staff`;
     const res = await fetch(url, {
       method: "POST",
       headers: buildHeaders(req),
@@ -55,6 +39,6 @@ export async function POST(req: Request) {
       headers: { "content-type": contentType },
     });
   } catch (err: any) {
-    return NextResponse.json({ success: false, message: err?.message || "Proxy POST /tenant/branches failed" }, { status: 500 });
+    return NextResponse.json({ success: false, message: err?.message || "Proxy POST /t/auth/create-staff failed" }, { status: 500 });
   }
 }

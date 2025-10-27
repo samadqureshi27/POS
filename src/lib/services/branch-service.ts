@@ -26,6 +26,7 @@ export interface ApiListResponse<T> {
 // Use the user's provided env var name for base URL and support local proxy routing
 const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
 const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "").toLowerCase() === "true";
+const BRANCHES_BASE = process.env.NEXT_PUBLIC_API_BRANCHES || "/tenant/branches"; // client-side proxy path
 function buildUrl(path: string) {
   return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
 }
@@ -68,6 +69,7 @@ function buildHeaders(extra?: Record<string, string>) {
   const id = getTenantId();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    "Accept": "application/json",
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
   if (slug) headers["x-tenant-slug"] = slug;
@@ -81,7 +83,7 @@ export const BranchService = {
     const status = params?.status ?? "";
     const page = params?.page ?? 1;
     const limit = params?.limit ?? 20;
-    const url = buildUrl(`/t/branches?q=${encodeURIComponent(q)}&status=${encodeURIComponent(status)}&page=${page}&limit=${limit}`);
+    const url = buildUrl(`${BRANCHES_BASE}?q=${encodeURIComponent(q)}&status=${encodeURIComponent(status)}&page=${page}&limit=${limit}`);
     const res = await fetch(url, { headers: buildHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -93,7 +95,7 @@ export const BranchService = {
   },
 
   async getBranch(id: string): Promise<ApiListResponse<TenantBranch>> {
-    const url = buildUrl(`/t/branches/${id}`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}`);
     const res = await fetch(url, { headers: buildHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -104,7 +106,7 @@ export const BranchService = {
   },
 
   async createBranch(payload: Partial<TenantBranch>): Promise<ApiListResponse<TenantBranch>> {
-    const url = buildUrl(`/t/branches`);
+    const url = buildUrl(`${BRANCHES_BASE}`);
     const res = await fetch(url, {
       method: "POST",
       headers: buildHeaders(),
@@ -119,7 +121,7 @@ export const BranchService = {
   },
 
   async updateBranch(id: string, payload: Partial<TenantBranch>): Promise<ApiListResponse<TenantBranch>> {
-    const url = buildUrl(`/t/branches/${id}`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}`);
     const res = await fetch(url, {
       method: "PUT",
       headers: buildHeaders(),
@@ -134,7 +136,7 @@ export const BranchService = {
   },
 
   async deleteBranch(id: string): Promise<ApiListResponse<null>> {
-    const url = buildUrl(`/t/branches/${id}`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}`);
     const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -144,7 +146,7 @@ export const BranchService = {
   },
 
   async setDefault(id: string): Promise<ApiListResponse<null>> {
-    const url = buildUrl(`/t/branches/${id}/set-default`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}/set-default`);
     const res = await fetch(url, { method: "POST", headers: buildHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -154,7 +156,7 @@ export const BranchService = {
   },
 
   async getSettings(id: string): Promise<ApiListResponse<any>> {
-    const url = buildUrl(`/t/branches/${id}/settings`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}/settings`);
     const res = await fetch(url, { headers: buildHeaders({ "x-branch-id": id }) });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -164,7 +166,7 @@ export const BranchService = {
   },
 
   async updateSettings(id: string, payload: Record<string, any>): Promise<ApiListResponse<any>> {
-    const url = buildUrl(`/t/branches/${id}/settings`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}/settings`);
     const res = await fetch(url, {
       method: "PUT",
       headers: buildHeaders({ "x-branch-id": id }),
@@ -178,7 +180,7 @@ export const BranchService = {
   },
 
   async attachUser(id: string, userId: string): Promise<ApiListResponse<any>> {
-    const url = buildUrl(`/t/branches/${id}/attach-user`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}/attach-user`);
     const res = await fetch(url, {
       method: "POST",
       headers: buildHeaders({ "x-branch-id": id }),
@@ -192,7 +194,7 @@ export const BranchService = {
   },
 
   async detachUser(id: string, userId: string): Promise<ApiListResponse<any>> {
-    const url = buildUrl(`/t/branches/${id}/detach-user`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}/detach-user`);
     const res = await fetch(url, {
       method: "POST",
       headers: buildHeaders({ "x-branch-id": id }),
