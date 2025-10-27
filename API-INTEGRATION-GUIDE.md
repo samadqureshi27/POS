@@ -586,6 +586,177 @@ const status = backendEntity.isActive ? "Active" : "Inactive";
 const isActive = frontendEntity.Status === "Active";
 ```
 
+### Menu Items Integration ✅
+**Endpoint:** `/t/catalog/items`
+
+**Backend Fields:**
+- `name` (required) - Item name
+- `slug` (optional) - URL identifier, auto-generated from name
+- `categoryIds` (optional) - Array of category IDs
+- `imageUrl` (optional) - Image URL
+- `description` (optional) - Item description
+- `variants` (required) - Array of `{ name: string, price: number }`
+- `modifiers` (optional) - Array of `{ groupId: string, required?: boolean, min?: number, max?: number }`
+- `isActive` (optional) - Active status, defaults to true
+- `featured` (optional) - Featured status, defaults to false
+- `priority` (optional) - Display order, defaults to 0
+- `trackStock` (optional) - Enable stock tracking
+- `stockQty` (optional) - Current stock quantity
+- `minStockThreshold` (optional) - Minimum stock threshold
+
+**Frontend to Backend Mapping:**
+
+Frontend has complex display types ("Single" vs "Var") which map to backend variants:
+
+| Frontend Displaycat | Backend Variants |
+|-------------------|------------------|
+| Single | `[{ name: "Regular", price: formData.Price }]` |
+| Var (Multi-price) | `PName` and `PPrice` arrays → `variants` array |
+
+**Data Structure Conversion:**
+
+Frontend uses parallel arrays for variants:
+```typescript
+{
+  PName: ["Small", "Medium", "Large"],
+  PPrice: [460, 540, 620]
+}
+```
+
+Backend uses object array:
+```typescript
+{
+  variants: [
+    { name: "Small", price: 460 },
+    { name: "Medium", price: 540 },
+    { name: "Large", price: 620 }
+  ]
+}
+```
+
+**Conversion Logic:**
+```typescript
+// Frontend → Backend (Create/Update)
+const variants = [];
+if (formData.Displaycat === "Var") {
+  for (let i = 0; i < formData.PName.length; i++) {
+    variants.push({
+      name: formData.PName[i],
+      price: formData.PPrice[i],
+    });
+  }
+} else {
+  variants.push({
+    name: "Regular",
+    price: formData.Price,
+  });
+}
+
+// Backend → Frontend (List/Get)
+const price = apiItem.variants?.[0]?.price || 0;
+const pName = apiItem.variants?.map(v => v.name) || [];
+const pPrice = apiItem.variants?.map(v => v.price) || [];
+```
+
+**Category Mapping:**
+Frontend stores category as string name, backend uses array of IDs:
+```typescript
+// Frontend → Backend
+const category = categories.find(cat => cat.Name === formData.Category);
+const categoryIds = category?.backendId ? [category.backendId] : [];
+
+// Backend → Frontend
+const categoryId = apiItem.categoryIds?.[0] || "";
+const category = categories.find(cat => cat.backendId === categoryId);
+const categoryName = category?.Name || "";
+```
+
+**Frontend Fields (Stubbed):**
+- `MealType` - Not in API, stubbed as "All Day"
+- `ShowOnMenu`, `StaffPick`, `ShowOnMain`, `Deal`, `Special`, `SubTBE` - Not in API
+- `SpecialStartDate`, `SpecialEndDate`, `SpecialPrice` - Not in API (use pricing rules in future)
+- `OverRide`, `OptionValue`, `OptionPrice`, `MealValue`, `MealPrice` - Not in API
+
+**Key Learnings:**
+- Items MUST have at least one variant (use "Regular" for single-price items)
+- Frontend `Price` field maps to first variant's price
+- Frontend `Category` string must be resolved to backend category ID
+- Frontend `Displaycat` determines single vs multi-variant structure
+- Store `backendId` separately from frontend `ID` (index-based)
+- Modifiers connect via `groupId` (modifier group's backend ID)
+- Use `priority` field to control POS display order
+
+**Files Created:**
+- `/src/app/api/t/catalog/items/route.ts`
+- `/src/app/api/t/catalog/items/[id]/route.ts`
+- `/src/lib/services/menu-item-service.ts`
+- Updated `/src/lib/hooks/useMenuManagement.ts`
+
+### Combos/Meals Integration ⚠️ (Service Ready, UI Deferred)
+**Endpoint:** `/t/catalog/combos`
+
+**Backend Fields:**
+- `name` (required) - Combo name
+- `slug` (required) - URL identifier, auto-generated from name
+- `priceMode` (required) - "fixed" or "additive"
+- `basePrice` (required) - Base price for the combo
+- `currency` (optional) - Currency code, defaults to "PKR"
+- `courses` (required) - Array of combo courses:
+  - `name` - Course name (e.g., "Main", "Side", "Drink")
+  - `min` - Minimum selections
+  - `max` - Maximum selections
+  - `source` - "category" or "items"
+  - `categoryId` - If source is "category"
+  - `itemIds` - If source is "items"
+- `branchIds` (optional) - Array of branch IDs
+- `active` (optional) - Active status, defaults to true
+
+**Frontend Meal Tab Structure (Current):**
+```typescript
+{
+  MealValue: ["Burger", "Fries", "Coke"],
+  MealPrice: [500, 150, 100],
+  OverRide: ["Active", "Inactive", "Inactive"],
+  status: ["Active", "Active", "Active"]
+}
+```
+
+**Backend Combo Structure:**
+```typescript
+{
+  name: "Burger Meal",
+  priceMode: "fixed",
+  basePrice: 999,
+  courses: [
+    {name: "Main", min: 1, max: 1, source: "category", categoryId: "abc123"},
+    {name: "Side", min: 1, max: 1, source: "items", itemIds: ["fries_id"]},
+    {name: "Drink", min: 1, max: 1, source: "items", itemIds: ["coke_id"]}
+  ]
+}
+```
+
+**Status: ⚠️ Service Ready, UI Integration Deferred**
+
+**Why Deferred:**
+- Frontend Meal tab: Simple item list with individual prices
+- Backend Combo API: Course-based with min/max selections and category/item sources
+- Structural mismatch requires UI redesign to fully support combo features
+
+**What's Ready:**
+- ✅ Combo proxy routes created
+- ✅ ComboService with full CRUD operations
+- ⚠️ Meal tab keeps existing local-only functionality
+
+**Recommendation:**
+- Use ComboService directly in POS/order flow when implementing combo selection
+- Meal tab remains available for simple meal tracking (local only)
+- Future: Build new Combo UI component matching backend course structure
+
+**Files Created:**
+- `/src/app/api/t/catalog/combos/route.ts`
+- `/src/app/api/t/catalog/combos/[id]/route.ts`
+- `/src/lib/services/combo-service.ts`
+
 ---
 
 ## Next APIs to Integrate (Priority Order)
@@ -594,14 +765,15 @@ Based on POS system requirements:
 
 1. ~~**Categories**~~ ✅ - `/t/catalog/categories` (Product organization)
 2. ~~**Modifiers**~~ ✅ - `/t/catalog/modifiers` (Menu item options)
-3. **Products** - `/t/catalog/products` (Inventory management)
-4. **Orders** - `/t/orders` (Sales transactions)
-5. **Users/Staff** - `/t/auth/users` (User management)
-6. **POS Sessions** - `/t/pos-sessions` (Shift management)
-7. **Payments** - `/t/payments` (Payment processing)
-8. **Reports** - `/t/reports` (Analytics)
+3. ~~**Menu Items**~~ ✅ - `/t/catalog/items` (Products/Items)
+4. ~~**Combos**~~ ⚠️ - `/t/catalog/combos` (Service ready, UI deferred)
+5. **Orders** - `/t/orders` (Sales transactions)
+6. **Users/Staff** - `/t/auth/users` (User management)
+7. **POS Sessions** - `/t/pos-sessions` (Shift management)
+8. **Payments** - `/t/payments` (Payment processing)
+9. **Reports** - `/t/reports` (Analytics)
 
 ---
 
 **Last Updated:** 2025-01-27
-**Status:** Login ✅ | Branches ✅ | Categories ✅ | Modifiers ✅ | Next: Products
+**Status:** Login ✅ | Branches ✅ | Categories ✅ | Modifiers ✅ | Menu Items ✅ | Combos ⚠️ | Next: Orders
