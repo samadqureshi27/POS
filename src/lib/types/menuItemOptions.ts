@@ -6,6 +6,10 @@ export interface MenuItemOptions {
   Priority: number;
   OptionValue: string[];
   OptionPrice: number[];
+  backendId?: string; // Actual backend ID
+  selection?: "single" | "multiple"; // Backend selection type
+  min?: number; // Backend min selections
+  max?: number; // Backend max selections
 }
 
 export interface ApiResponse<T> {

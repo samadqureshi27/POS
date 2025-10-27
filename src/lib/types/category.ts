@@ -7,6 +7,7 @@ export interface CategoryItem {
   Parent: string;
   Priority: number;
   Image?: string;
+  backendId?: string; // Actual backend ID (_id or id)
 }
 
 export interface ApiResponse<T> {

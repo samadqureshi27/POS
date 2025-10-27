@@ -1,7 +1,40 @@
 import { useState, useEffect } from "react";
-import { MenuAPI } from "@/lib/util/menu-options-api";
+import { ModifierService, TenantModifier } from "@/lib/services/modifier-service";
 import { MenuItemOptions } from "@/lib/types/menuItemOptions";
 import { useToast } from "@/lib/hooks";
+
+// Map API Modifier to frontend MenuItemOptions
+const mapApiModifierToItem = (apiMod: TenantModifier, index: number): MenuItemOptions => {
+  const id = apiMod._id || apiMod.id || String(index + 1);
+
+  // Map selection type to DisplayType
+  // "single" + max=1 → Radio
+  // "single" + max>1 → Select
+  // "multiple" → Checkbox
+  let displayType: "Radio" | "Select" | "Checkbox" = "Radio";
+  if (apiMod.selection === "multiple") {
+    displayType = "Checkbox";
+  } else if (apiMod.selection === "single" && (apiMod.max || 1) > 1) {
+    displayType = "Select";
+  }
+
+  // Convert options array to parallel arrays
+  const optionValues = apiMod.options?.map(opt => opt.name) || [];
+  const optionPrices = apiMod.options?.map(opt => opt.price || 0) || [];
+
+  return {
+    ID: index + 1,
+    Name: apiMod.name,
+    DisplayType: displayType,
+    Priority: index + 1, // Use index as display priority
+    OptionValue: optionValues,
+    OptionPrice: optionPrices,
+    backendId: id,
+    selection: apiMod.selection,
+    min: apiMod.min,
+    max: apiMod.max,
+  };
+};
 
 export const useMenuOptions = () => {
     const { showToast } = useToast();
@@ -25,7 +58,6 @@ export const useMenuOptions = () => {
         OptionPrice: [],
     });
 
-
     useEffect(() => {
         loadMenuItemOptionss();
     }, []);
@@ -36,12 +68,14 @@ export const useMenuOptions = () => {
             setFormData({
                 Name: editingItem.Name,
                 DisplayType: editingItem.DisplayType,
-                OptionValue: [...editingItem.OptionValue], // Create new arrays to avoid reference issues
+                OptionValue: [...editingItem.OptionValue],
                 OptionPrice: [...editingItem.OptionPrice],
                 Priority: editingItem.Priority,
+                selection: editingItem.selection,
+                min: editingItem.min,
+                max: editingItem.max,
             });
         } else {
-            // When creating new item, calculate next available priority
             const maxPriority = MenuItemOptionss.length > 0
                 ? Math.max(...MenuItemOptionss.map(item => item.Priority))
                 : 0;
@@ -59,17 +93,16 @@ export const useMenuOptions = () => {
     const loadMenuItemOptionss = async () => {
         try {
             setLoading(true);
-            const response = await MenuAPI.getMenuItemOptions();
-            if (response.success) {
-                // Sort by priority
-                const sortedData = response.data.sort((a, b) => a.Priority - b.Priority);
-                setMenuItemOptionss(sortedData);
+            const response = await ModifierService.listModifiers();
+            if (response.success && response.data) {
+                const mapped = response.data.map((mod, idx) => mapApiModifierToItem(mod, idx));
+                setMenuItemOptionss(mapped.sort((a, b) => a.Priority - b.Priority));
             } else {
-                throw new Error(response.message || "Failed to fetch menu items");
+                throw new Error(response.message || "Failed to fetch modifiers");
             }
         } catch (error) {
-            console.error("Error fetching menu items:", error);
-            showToast(error instanceof Error ? error.message : "Failed to load menu items", "error");
+            console.error("Error fetching modifiers:", error);
+            showToast(error instanceof Error ? error.message : "Failed to load modifiers", "error");
         } finally {
             setLoading(false);
         }
@@ -88,48 +121,113 @@ export const useMenuOptions = () => {
     const handleCreateItem = async (itemData: Omit<MenuItemOptions, "ID">) => {
         try {
             setActionLoading(true);
-            const response = await MenuAPI.createMenuItemOptions(itemData);
+
+            // Map DisplayType to selection + min/max
+            let selection: "single" | "multiple" = "single";
+            let min = 0;
+            let max = 1;
+
+            if (itemData.DisplayType === "Checkbox") {
+                selection = "multiple";
+                min = 0;
+                max = itemData.OptionValue.length;
+            } else if (itemData.DisplayType === "Select") {
+                selection = "single";
+                min = 0;
+                max = itemData.OptionValue.length;
+            } else { // Radio
+                selection = "single";
+                min = 0;
+                max = 1;
+            }
+
+            // Convert parallel arrays to options array
+            const options = itemData.OptionValue.map((name, idx) => ({
+                name,
+                price: itemData.OptionPrice[idx] || 0,
+            }));
+
+            const payload: Partial<TenantModifier> = {
+                name: itemData.Name,
+                selection,
+                min,
+                max,
+                options,
+            };
+
+            const response = await ModifierService.createModifier(payload);
             if (response.success) {
-                setMenuItemOptionss((prevItems) => {
-                    const newItems = [...prevItems, response.data];
-                    return newItems.sort((a, b) => a.Priority - b.Priority);
-                });
+                await loadMenuItemOptionss(); // Reload list
                 setIsModalOpen(false);
                 setEditingItem(null);
                 setSearchTerm("");
                 setDisplayFilter("");
-                showToast(response.message || "Item created successfully", "success");
+                showToast(response.message || "Modifier created successfully", "success");
+            } else {
+                showToast(response.message || "Failed to create modifier", "error");
             }
         } catch (error) {
-            console.error("Error creating item:", error);
-            showToast(error instanceof Error ? error.message : "Failed to create menu item", "error");
+            console.error("Error creating modifier:", error);
+            showToast(error instanceof Error ? error.message : "Failed to create modifier", "error");
         } finally {
             setActionLoading(false);
         }
     };
 
     const handleUpdateItem = async (itemData: Omit<MenuItemOptions, "ID">) => {
-        if (!editingItem) return;
+        if (!editingItem || !editingItem.backendId) {
+            showToast("Modifier ID not found", "error");
+            return;
+        }
+
         try {
             setActionLoading(true);
-            const response = await MenuAPI.updateMenuItemOptions(
-                editingItem.ID,
-                itemData
-            );
+
+            // Map DisplayType to selection + min/max
+            let selection: "single" | "multiple" = "single";
+            let min = 0;
+            let max = 1;
+
+            if (itemData.DisplayType === "Checkbox") {
+                selection = "multiple";
+                min = 0;
+                max = itemData.OptionValue.length;
+            } else if (itemData.DisplayType === "Select") {
+                selection = "single";
+                min = 0;
+                max = itemData.OptionValue.length;
+            } else { // Radio
+                selection = "single";
+                min = 0;
+                max = 1;
+            }
+
+            // Convert parallel arrays to options array
+            const options = itemData.OptionValue.map((name, idx) => ({
+                name,
+                price: itemData.OptionPrice[idx] || 0,
+            }));
+
+            const payload: Partial<TenantModifier> = {
+                name: itemData.Name,
+                selection,
+                min,
+                max,
+                options,
+            };
+
+            const response = await ModifierService.updateModifier(editingItem.backendId, payload);
             if (response.success) {
-                setMenuItemOptionss(prev => {
-                    const updated = prev.map(item =>
-                        item.ID === editingItem.ID ? response.data : item
-                    );
-                    return updated.sort((a, b) => a.Priority - b.Priority);
-                });
+                await loadMenuItemOptionss(); // Reload list
                 setIsModalOpen(false);
                 setEditingItem(null);
-                showToast(response.message || "Item updated successfully", "success");
+                showToast(response.message || "Modifier updated successfully", "success");
+            } else {
+                showToast(response.message || "Failed to update modifier", "error");
             }
         } catch (error) {
-            console.error("Error updating item:", error);
-            showToast(error instanceof Error ? error.message : "Failed to update menu item", "error");
+            console.error("Error updating modifier:", error);
+            showToast(error instanceof Error ? error.message : "Failed to update modifier", "error");
         } finally {
             setActionLoading(false);
         }
@@ -140,19 +238,26 @@ export const useMenuOptions = () => {
 
         try {
             setActionLoading(true);
-            const response = await MenuAPI.bulkDeleteMenuItemOptions(selectedItems);
-            if (response.success) {
-                setMenuItemOptionss((prev) => {
-                    const remaining = prev.filter((i) => !selectedItems.includes(i.ID));
-                    return remaining.map((item, idx) => ({ ...item, ID: idx + 1 }))
-                        .sort((a, b) => a.Priority - b.Priority);
-                });
-                setSelectedItems([]);
-                showToast(response.message || "Items deleted successfully", "success");
+
+            // Map local IDs to backend IDs
+            const idsToDelete = selectedItems
+                .map((n) => MenuItemOptionss.find((mod) => mod.ID === n)?.backendId)
+                .filter((id): id is string => typeof id === "string" && id.length > 0);
+
+            // Delete each modifier
+            for (const id of idsToDelete) {
+                const resp = await ModifierService.deleteModifier(id);
+                if (!resp.success) {
+                    throw new Error(resp.message || `Failed to delete modifier ${id}`);
+                }
             }
+
+            await loadMenuItemOptionss();
+            setSelectedItems([]);
+            showToast("Modifiers deleted successfully", "success");
         } catch (error) {
-            console.error("Error deleting items:", error);
-            showToast(error instanceof Error ? error.message : "Failed to delete menu items", "error");
+            console.error("Error deleting modifiers:", error);
+            showToast(error instanceof Error ? error.message : "Failed to delete modifiers", "error");
         } finally {
             setActionLoading(false);
         }
@@ -174,12 +279,9 @@ export const useMenuOptions = () => {
         if (!formData.Name.trim()) return false;
         if (!formData.DisplayType.trim()) return false;
 
-        // If there are option values, validate them
         if (formData.OptionValue.length > 0) {
-            // Check that arrays have same length
             if (formData.OptionValue.length !== formData.OptionPrice.length) return false;
 
-            // Check option values (must not be empty if provided)
             for (let i = 0; i < formData.OptionValue.length; i++) {
                 if (!formData.OptionValue[i] || !formData.OptionValue[i].trim()) return false;
                 if (formData.OptionPrice[i] == null || formData.OptionPrice[i] < 0) return false;
@@ -189,7 +291,6 @@ export const useMenuOptions = () => {
         return true;
     };
 
-    // Modal form handlers
     const handleModalSubmit = () => {
         if (!isFormValid()) {
             showToast("Please fix form errors before submitting", "error");
