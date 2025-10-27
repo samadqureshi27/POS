@@ -7,7 +7,8 @@
       "Bash(ls:*)",
       "Bash(git stash:*)",
       "Read(//c/Users/faraz/Documents/GitHub/umt code/POS/**)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []
