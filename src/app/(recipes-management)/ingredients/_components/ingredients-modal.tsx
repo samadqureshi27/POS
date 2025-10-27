@@ -7,16 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { InventoryItem } from "@/lib/types/ingredients";
 
-interface InventoryItem {
-  ID: string;
-  Name: string;
-  Status: "Active" | "Inactive";
-  Description: string;
-  Unit: string;
-  Threshold: number;
-  Priority: number;
-}
+// Using global InventoryItem type aligned with backend fields (sku, uom, costPerUom)
 
 interface IngredientsModalProps {
   isOpen: boolean;
@@ -71,7 +64,7 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
             <div className="flex gap-4 items-end">
               <div className="flex-1">
                 <Label htmlFor="name" className="text-sm font-medium text-gray-700">
-                  Ingredient Name <span className="text-red-500">*</span>
+                  Ingredient Name
                 </Label>
                 <p className="text-xs text-gray-500 mb-2">
                   Name that will appear in ingredient lists and recipes
@@ -84,7 +77,6 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
                     setFormData({ ...formData, Name: e.target.value })
                   }
                   placeholder="Enter ingredient name (e.g., Tomatoes, Flour, Salt)"
-                  required
                   className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
@@ -104,38 +96,36 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
               </div>
             </div>
 
-            {/* Unit and Threshold Row */}
+            {/* UOM and Threshold Row */}
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label htmlFor="unit" className="text-sm font-medium text-gray-700">
-                  Unit of Measurement <span className="text-red-500">*</span>
+                <Label htmlFor="uom" className="text-sm font-medium text-gray-700">
+                  Unit of Measurement (UOM)
                 </Label>
                 <p className="text-xs text-gray-500 mb-2">
-                  Select the unit type from the dropdown menu
+                  Select the unit code used by backend (e.g., g, l, pc)
                 </p>
                 <Select
-                  value={formData.Unit}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, Unit: value })
-                  }
+                  value={formData.uom || ""}
+                  onValueChange={(value) => setFormData({ ...formData, uom: value })}
                 >
                   <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-gray-500/20">
-                    <SelectValue placeholder="Select unit of measurement..." />
+                    <SelectValue placeholder="Select UOM (g, l, pc)..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Weight in Grams">Weight in Grams</SelectItem>
-                    <SelectItem value="Quantity Count">Quantity Count</SelectItem>
-                    <SelectItem value="Volume in Liters">Volume in Liters</SelectItem>
+                    <SelectItem value="g">g (grams)</SelectItem>
+                    <SelectItem value="l">l (liters)</SelectItem>
+                    <SelectItem value="pc">pc (pieces)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="w-32">
                 <Label htmlFor="threshold" className="text-sm font-medium text-gray-700">
-                  Threshold
+                  Min Threshold
                 </Label>
                 <p className="text-xs text-gray-500 mb-2">
-                  Minimum stock level
+                  Minimum stock level (backend: minThreshold)
                 </p>
                 <Input
                   id="threshold"
@@ -143,14 +133,53 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
                   value={formData.Threshold || ""}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value === '' || /^\d+$/.test(value)) {
-                      setFormData({
-                        ...formData,
-                        Threshold: value === '' ? 0 : Number(value)
-                      });
-                    }
+                    setFormData({
+                      ...formData,
+                      Threshold: value === '' ? 0 : Number(value)
+                    });
                   }}
                   placeholder="0"
+                  min={0}
+                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+            </div>
+
+            {/* SKU and Cost Per UOM */}
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <Label htmlFor="sku" className="text-sm font-medium text-gray-700">
+                  SKU
+                </Label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Stock keeping unit (backend: sku)
+                </p>
+                <Input
+                  id="sku"
+                  type="text"
+                  value={formData.sku || ""}
+                  onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                  placeholder="e.g., ING-CHK-01"
+                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+              <div className="w-40">
+                <Label htmlFor="costPerUom" className="text-sm font-medium text-gray-700">
+                  Cost per UOM
+                </Label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Backend: costPerUom
+                </p>
+                <Input
+                  id="costPerUom"
+                  type="number"
+                  step="0.01"
+                  value={formData.costPerUom ?? ""}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setFormData({ ...formData, costPerUom: v === '' ? 0 : Number(v) });
+                  }}
+                  placeholder="0.00"
                   min={0}
                   className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                 />
@@ -189,7 +218,7 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
             {/* Description */}
             <div>
               <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-                Description <span className="text-red-500">*</span>
+                Description
               </Label>
               <p className="text-xs text-gray-500 mb-2">
                 Brief description of the ingredient and its uses
@@ -201,7 +230,6 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
                   setFormData({ ...formData, Description: e.target.value })
                 }
                 placeholder="Brief description of this ingredient..."
-                required
                 className="min-h-[80px] resize-none transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                 rows={3}
                 style={{
@@ -246,7 +274,7 @@ const IngredientsModal: React.FC<IngredientsModalProps> = ({
           <Button
             type="button"
             onClick={onSave}
-            disabled={!formData.Name.trim() || !formData.Description.trim() || !formData.Unit || actionLoading}
+            disabled={actionLoading}
           >
             {actionLoading ? (
               <>

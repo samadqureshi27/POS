@@ -8,6 +8,11 @@ export interface InventoryItem {
   Unit: string;
   Threshold: number;
   Priority: number;
+  backendId?: string; // Actual backend ID from API (_id or id)
+  // Backend-aligned optional fields
+  sku?: string;
+  uom?: string; // e.g., g, l, pc
+  costPerUom?: number;
 }
 
 export interface InventoryItemWithUsage extends InventoryItem {

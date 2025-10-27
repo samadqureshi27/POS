@@ -1,0 +1,3775 @@
+{
+	"info": {
+		"_postman_id": "c526d693-1dcc-4410-ac51-cf22e03ab20a",
+		"name": "Pos-Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12222084",
+		"_collection_link": "https://planetary-star-331194.postman.co/workspace/New-Team-Workspace~e46bd8d0-6848-4740-94c5-ef04ec2c9f8a/collection/12222084-c526d693-1dcc-4410-ac51-cf22e03ab20a?action=share&source=collection_link&creator=12222084"
+	},
+	"item": [
+		{
+			"name": "Bootstrap • Roles",
+			"item": [
+				{
+					"name": "Create Role: superadmin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"superadmin\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/role/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"role",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/role/all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"role",
+								"all"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth (Admin)",
+			"item": [
+				{
+					"name": "Register Admin (roleId required)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Admin One\",\n  \"email\": \"admin1@example.com\",\n  \"password\": \"Passw0rd!\",\n  \"roleId\": \"68dbed45f32b98c0e52ba46e\",\n  \"inviteCode\": \"\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3222/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3222",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login (get JWT)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const data = pm.response.json();",
+									"if (data && data.result && data.result.token) {",
+									"  pm.environment.set('token', data.result.token);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin1@example.com\",\n  \"password\": \"Passw0rd!\"\n}"
+						},
+						"url": {
+							"raw": "https://api.tritechtechnologyllc.com/auth/login",
+							"protocol": "https",
+							"host": [
+								"api",
+								"tritechtechnologyllc",
+								"com"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGRiZWQ2MGYzMmI5OGMwZTUyYmE0NzMiLCJlbWFpbCI6ImFkbWluMUBleGFtcGxlLmNvbSIsInJvbGVJZCI6IjY4ZGJlZDQ1ZjMyYjk4YzBlNTJiYTQ2ZSIsInJvbGVOYW1lIjoic3VwZXJhZG1pbiIsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwiaWF0IjoxNzU5MjQzNjQ5LCJleHAiOjE3NTk4NDg0NDl9.dLPKDnNqpg58e1ghm8alUgPv8GckwcTiwQIcyhCL0ao"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3222/auth/verifyToken",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3222",
+							"path": [
+								"auth",
+								"verifyToken"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"husnainyusufi84@gmail.com\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3222/auth/forgotPassword",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3222",
+							"path": [
+								"auth",
+								"forgotPassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"<reset-token-from-logs>\",\n  \"password\": \"NewPassw0rd!\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3222/auth/reset-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3222",
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin • Tenants",
+			"item": [
+				{
+					"name": "Create Tenant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGRiZWQ2MGYzMmI5OGMwZTUyYmE0NzMiLCJlbWFpbCI6ImFkbWluMUBleGFtcGxlLmNvbSIsInJvbGVJZCI6IjY4ZGJlZDQ1ZjMyYjk4YzBlNTJiYTQ2ZSIsInJvbGVOYW1lIjoic3VwZXJhZG1pbiIsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwiaWF0IjoxNzYwNjU3NzQxLCJleHAiOjE3NjEyNjI1NDF9.KfDdPCu-LTlGR-i5U1fxU54vqgGZkzHyxmQiBbbnhPo"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Husnain Email Testing\",\n  \"slug\": \"email-testing\",\n  \"status\": \"trial\",\n  \"planId\": \"68de8e2579c32f79f48b8cf0\",\n  \"contactEmail\": \"yusufihusnain0@gmail.com\",\n  \"contactPhone\": \"+92-300-0000000\",\n  \"website\": \"https://acme.test\",\n  \"address\": { \n    \"country\": \"PK\", \n    \"city\": \"Karachi\", \n    \"line\": \"Plot 123, Industrial Area\" \n  },\n  \"locationsCount\": 3\n}\n"
+						},
+						"url": {
+							"raw": "{{Pos-Live}}/admin/tenants",
+							"host": [
+								"{{Pos-Live}}"
+							],
+							"path": [
+								"admin",
+								"tenants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Tenants",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGRiZWQ2MGYzMmI5OGMwZTUyYmE0NzMiLCJlbWFpbCI6ImFkbWluMUBleGFtcGxlLmNvbSIsInJvbGVJZCI6IjY4ZGJlZDQ1ZjMyYjk4YzBlNTJiYTQ2ZSIsInJvbGVOYW1lIjoic3VwZXJhZG1pbiIsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwiaWF0IjoxNzYxMjUzMDU5LCJleHAiOjE3NjE4NTc4NTl9.sMPU9-uhNNLaRrDXwsfSx590PtZnMj9ScydQYwJlATk"
+							}
+						],
+						"url": {
+							"raw": "https://api.tritechtechnologyllc.com/admin/tenants?q=&status=&planId=&page=1&limit=20&sort=createdAt&order=desc",
+							"protocol": "https",
+							"host": [
+								"api",
+								"tritechtechnologyllc",
+								"com"
+							],
+							"path": [
+								"admin",
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": ""
+								},
+								{
+									"key": "planId",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tenant by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGRiZWQ2MGYzMmI5OGMwZTUyYmE0NzMiLCJlbWFpbCI6ImFkbWluMUBleGFtcGxlLmNvbSIsInJvbGVJZCI6IjY4ZGJlZDQ1ZjMyYjk4YzBlNTJiYTQ2ZSIsInJvbGVOYW1lIjoic3VwZXJhZG1pbiIsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwiaWF0IjoxNzU5MjQ0MDAxLCJleHAiOjE3NTk4NDg4MDF9.J03lJZa74lM6ZzipsLQ9hoy2Y-b13cTCe3Tq9eTFa48"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3222/admin/tenants/68dbf1c3e02f0f56aa9c4f84",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3222",
+							"path": [
+								"admin",
+								"tenants",
+								"68dbf1c3e02f0f56aa9c4f84"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tenant",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"paid\",\n  \"contactPhone\": \"+92-311-1111111\",\n  \"locationsCount\": 4\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/tenants/{{tenantId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"tenants",
+								"{{tenantId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tenant",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/tenants/{{tenantId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"tenants",
+								"{{tenantId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Tenant Plan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"planId\": \"{{planId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/tenants/{{tenantId}}/change-plan",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"tenants",
+								"{{tenantId}}",
+								"change-plan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Tenant Logo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{tenantLogoPath}}"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/tenants/{{tenantId}}/logo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"tenants",
+								"{{tenantId}}",
+								"logo"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin • Plans",
+			"item": [
+				{
+					"name": "Create Plan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGRiZWQ2MGYzMmI5OGMwZTUyYmE0NzMiLCJlbWFpbCI6ImFkbWluMUBleGFtcGxlLmNvbSIsInJvbGVJZCI6IjY4ZGJlZDQ1ZjMyYjk4YzBlNTJiYTQ2ZSIsInJvbGVOYW1lIjoic3VwZXJhZG1pbiIsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwiaWF0IjoxNzU5MjQ0MDAxLCJleHAiOjE3NTk4NDg4MDF9.J03lJZa74lM6ZzipsLQ9hoy2Y-b13cTCe3Tq9eTFa48"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Premium\",\n  \"type\": \"paid\",\n  \"status\": \"active\",\n  \"prices\": { \"monthly\": 5000, \"quarterly\": 14000, \"annual\": 54000, \"currency\": \"PKR\" },\n  \"features\": {\n    \"staff\": true,\n    \"customers\": true,\n    \"menu\": true,\n    \"orders\": true,\n    \"analytics\": true,\n    \"pos\": true,\n    \"inventory\": true,\n    \"branches\": true,\n    \"recipes\": true\n  }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3222/admin/plans",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3222",
+							"path": [
+								"admin",
+								"plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Plans",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/plans?q=&status=&type=&page=1&limit=20&sort=createdAt&order=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"plans"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": ""
+								},
+								{
+									"key": "type",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plan by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/plans/{{planId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"plans",
+								"{{planId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Plan",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"active\",\n  \"features\": { \"inventory\": true, \"analytics\": true }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/plans/{{planId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"plans",
+								"{{planId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Plan",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/plans/{{planId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"plans",
+								"{{planId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin • Communications",
+			"item": [
+				{
+					"name": "Templates",
+					"item": [
+						{
+							"name": "Create Template",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGRiZWQ2MGYzMmI5OGMwZTUyYmE0NzMiLCJlbWFpbCI6ImFkbWluMUBleGFtcGxlLmNvbSIsInJvbGVJZCI6IjY4ZGJlZDQ1ZjMyYjk4YzBlNTJiYTQ2ZSIsInJvbGVOYW1lIjoic3VwZXJhZG1pbiIsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwiaWF0IjoxNzU5MjQ0MDAxLCJleHAiOjE3NTk4NDg4MDF9.J03lJZa74lM6ZzipsLQ9hoy2Y-b13cTCe3Tq9eTFa48"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"WelcomeTenant\",\n  \"channel\": \"email\",\n  \"subject\": \"Welcome to the platform, {{tenantName}}!\",\n  \"body\": \"<h1>Hi {{tenantName}}</h1><p>Your account is ready.</p>\",\n  \"variables\": [\"tenantName\"],\n  \"status\": \"active\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3222/admin/comms/templates",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3222",
+									"path": [
+										"admin",
+										"comms",
+										"templates"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Templates",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/comms/templates?q=&status=&channel=&page=1&limit=20&sort=createdAt&order=desc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"comms",
+										"templates"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										},
+										{
+											"key": "status",
+											"value": ""
+										},
+										{
+											"key": "channel",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										},
+										{
+											"key": "sort",
+											"value": "createdAt"
+										},
+										{
+											"key": "order",
+											"value": "desc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Template by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/comms/templates/{{templateId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"comms",
+										"templates",
+										"{{templateId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Template",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"subject\": \"Welcome aboard, {{tenantName}}!\",\n  \"status\": \"active\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/comms/templates/{{templateId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"comms",
+										"templates",
+										"{{templateId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Template",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/comms/templates/{{templateId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"comms",
+										"templates",
+										"{{templateId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Announcements",
+					"item": [
+						{
+							"name": "Create Announcement",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Platform Update\",\n  \"templateId\": \"{{templateId}}\",\n  \"channels\": [\"email\", \"inapp\"],\n  \"scheduleAt\": null,\n  \"recipientsQuery\": { \"status\": \"paid\" }\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3222/admin/comms/announcements",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3222",
+									"path": [
+										"admin",
+										"comms",
+										"announcements"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Announcements",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/comms/announcements?q=&status=&page=1&limit=20&sort=createdAt&order=desc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"comms",
+										"announcements"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										},
+										{
+											"key": "status",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										},
+										{
+											"key": "sort",
+											"value": "createdAt"
+										},
+										{
+											"key": "order",
+											"value": "desc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Announcement by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/comms/announcements/{{announcementId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"comms",
+										"announcements",
+										"{{announcementId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Announcement",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Platform Update — v2\",\n  \"status\": \"draft\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/comms/announcements/{{announcementId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"comms",
+										"announcements",
+										"{{announcementId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Announcement",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/comms/announcements/{{announcementId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"comms",
+										"announcements",
+										"{{announcementId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin • Dashboard",
+			"item": [
+				{
+					"name": "Summary KPIs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGRiZWQ2MGYzMmI5OGMwZTUyYmE0NzMiLCJlbWFpbCI6ImFkbWluMUBleGFtcGxlLmNvbSIsInJvbGVJZCI6IjY4ZGJlZDQ1ZjMyYjk4YzBlNTJiYTQ2ZSIsInJvbGVOYW1lIjoic3VwZXJhZG1pbiIsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwiaWF0IjoxNzU5NDE0NjgyLCJleHAiOjE3NjAwMTk0ODJ9.9OQa7ADDJjLDJKpYHG4PzZjTpUF8jxr_Kw_xoUUWS0Y"
+							}
+						],
+						"url": {
+							"raw": "https://api.tritechtechnologyllc.com/admin/dashboard/summary",
+							"protocol": "https",
+							"host": [
+								"api",
+								"tritechtechnologyllc",
+								"com"
+							],
+							"path": [
+								"admin",
+								"dashboard",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Role",
+			"item": [
+				{
+					"name": "Add Role",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3222/role/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3222",
+							"path": [
+								"role",
+								"add"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tenant",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Register Owner (Option A - optional)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let json;",
+											"try { json = pm.response.json(); } catch(e) {}",
+											"pm.test('Status is 200', () => pm.response.code === 200);",
+											"if (json && json.result && json.result.token) {",
+											"  pm.environment.set('auth_token', json.result.token);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"fullName\": \"Owner One\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"roles\": [\"owner\"],\n  \"branchIds\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/auth/register-owner",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"auth",
+										"register-owner"
+									]
+								},
+								"description": "Creates the first owner user directly in the tenant DB. Useful if you want to bypass invite flow."
+							},
+							"response": []
+						},
+						{
+							"name": "Accept Invite (Option B - recommended)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status is 200', () => pm.response.code === 200);",
+											"pm.test('Activated', () => {",
+											"  const j = pm.response.json();",
+											"  pm.expect(j.message).to.include('activated');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "extraction-test"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"token\": \"727e4248501969c51b46bd027c96d04e2f0114ebbe1b587f\",\n  \"password\": \"pass@1234!\",\n  \"fullName\": \"Extraction\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/auth/accept-invite",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"auth",
+										"accept-invite"
+									]
+								},
+								"description": "Owner clicks email link → paste token into invite_token env var → run this to set password & activate."
+							},
+							"response": []
+						},
+						{
+							"name": "Login (Tenant)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let json;",
+											"try { json = pm.response.json(); } catch(e) {}",
+											"pm.test('Status is 200', () => pm.response.code === 200);",
+											"pm.test('Has token', () => json && json.result && json.result.token);",
+											"if (json && json.result && json.result.token) {",
+											"  pm.environment.set('auth_token', json.result.token);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"qabdulsamad18@gmail.com\",\n  \"password\": \"Qabdulsamad\",\n  \"posId\": null,\n  \"defaultBranchId\": null\n}"
+								},
+								"url": {
+									"raw": "{{Pos-Live}}/t/auth/login",
+									"host": [
+										"{{Pos-Live}}"
+									],
+									"path": [
+										"t",
+										"auth",
+										"login"
+									]
+								},
+								"description": "Tenant user login. Stores {{auth_token}} automatically for subsequent requests."
+							},
+							"response": []
+						},
+						{
+							"name": "Me (requires Bearer)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status is 200', () => pm.response.code === 200);",
+											"const j = pm.response.json();",
+											"pm.test('Has user', () => j && j.result && j.result.email);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"type": "text"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/auth/me",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"auth",
+										"me"
+									]
+								},
+								"description": "Returns the current tenant user. Requires Authorization: Bearer {{auth_token}}."
+							},
+							"response": []
+						},
+						{
+							"name": "Forgot Password",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"{{email}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/auth/forgot-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"auth",
+										"forgot-password"
+									]
+								},
+								"description": "Sends a reset token via email. Copy token into {{reset_token}} to use with Reset Password."
+							},
+							"response": []
+						},
+						{
+							"name": "Reset Password (with token)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"token\": \"{{reset_token}}\",\n  \"password\": \"{{password}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/auth/reset-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"auth",
+										"reset-password"
+									]
+								},
+								"description": "Use the token received via email to set a new password."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Tenant RBAC",
+			"item": [
+				{
+					"name": "List Roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{Pos-Live}}/t/rbac/roles",
+							"host": [
+								"{{Pos-Live}}"
+							],
+							"path": [
+								"t",
+								"rbac",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Kitchen Lead\",\n  \"key\": \"kitchen-lead\",\n  \"scope\": \"branch\",\n  \"permissions\": [\"kitchen.read\",\"kitchen.update\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/rbac/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"rbac",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/rbac/roles/{{role_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"rbac",
+								"roles",
+								"{{role_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Kitchen team lead\",\n  \"permissions\": [\"kitchen.read\",\"kitchen.update\",\"orders.read\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/rbac/roles/{{role_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"rbac",
+								"roles",
+								"{{role_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/rbac/roles/{{role_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"rbac",
+								"roles",
+								"{{role_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Role to User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"roleKey\": \"kitchen-lead\",\n  \"branchId\": \"{{branch_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/rbac/roles/assign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"rbac",
+								"roles",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unassign Role from User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"roleKey\": \"kitchen-lead\",\n  \"branchId\": \"{{branch_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/rbac/roles/unassign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"rbac",
+								"roles",
+								"unassign"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tenant Catalog",
+			"item": [
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Coffee\",\n    \"slug\": \"coffee\",\n    \"sortIndex\": 10,\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{Pos-Live}}/t/catalog/categories",
+							"host": [
+								"{{Pos-Live}}"
+							],
+							"path": [
+								"t",
+								"catalog",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/catalog/categories?q=&status=active&page=1&limit=50",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"catalog",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": "active"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Modifier Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Milk Options\",\n  \"key\": \"milk-options\",\n  \"selection\": \"single\",\n  \"min\": 0,\n  \"max\": 1,\n  \"options\": [\n    { \"name\": \"Whole Milk\" },\n    { \"name\": \"Skim Milk\" },\n    { \"name\": \"Oat Milk\", \"price\": 60 },\n    { \"name\": \"Almond Milk\", \"price\": 60 }\n  ]\n}\n"
+						},
+						"url": {
+							"raw": "{{Pos-Live}}/t/catalog/modifiers",
+							"host": [
+								"{{Pos-Live}}"
+							],
+							"path": [
+								"t",
+								"catalog",
+								"modifiers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Item (with variants & modifiers)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// {\n//   \"name\": \"Latte\",\n//   \"slug\": \"latte\",\n//   \"categoryIds\": [\"68fb6f8495797e9c43aba28c\"], //coffee category _id\n//   \"imageUrl\": \"\",\n//   \"variants\": [\n//     { \"name\": \"Small\", \"price\": 480 },\n//     { \"name\": \"Medium\", \"price\": 560 },\n//     { \"name\": \"Large\", \"price\": 640 }\n//   ],\n//   \"modifiers\": [\n//     { \"groupId\": \"68fb717a95797e9c43aba295\", \"required\": false, \"min\": 0, \"max\": 1 },\n//     { \"groupId\": \"68fb7188e863ecc60b60c975\", \"required\": false, \"min\": 0, \"max\": 3 }\n//   ],\n//   \"isActive\": true\n// }\n{\n  \"name\": \"Cappuccino\",\n  \"slug\": \"cappuccino\",\n  \"categoryIds\": [\"68fb6f8495797e9c43aba28c\"],\n  \"variants\": [\n    { \"name\": \"Small\", \"price\": 460 },\n    { \"name\": \"Medium\", \"price\": 540 },\n    { \"name\": \"Large\", \"price\": 620 }\n  ],\n  \"modifiers\": [\n    { \"groupId\": \"68fb717a95797e9c43aba295\", \"required\": false, \"min\": 0, \"max\": 1 }\n  ]\n}\n"
+						},
+						"url": {
+							"raw": "{{Pos-Live}}/t/catalog/items",
+							"host": [
+								"{{Pos-Live}}"
+							],
+							"path": [
+								"t",
+								"catalog",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upsert Recipe (BOM)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"itemId\":\"{{item_id}}\",\n  \"variantName\":\"Regular\",\n  \"yieldQty\":1,\n  \"yieldUnit\":\"pcs\",\n  \"components\":[\n    {\"name\":\"Bun\",\"qty\":1,\"unit\":\"pcs\"},\n    {\"name\":\"Patty\",\"qty\":150,\"unit\":\"g\"},\n    {\"name\":\"Lettuce\",\"qty\":20,\"unit\":\"g\"}\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/catalog/recipes/upsert",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"catalog",
+								"recipes",
+								"upsert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Menu (branch)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "x-branch-id",
+								"value": "{{branch_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"branchId\":\"{{branch_id}}\",\n  \"title\":\"Main Menu\",\n  \"status\":\"draft\",\n  \"sections\":[\n    {\"name\":\"Burgers\",\"categoryId\":\"{{category_id}}\",\"sortIndex\":0}\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/catalog/menus",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"catalog",
+								"menus"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Publish Menu",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "x-branch-id",
+								"value": "{{branch_id}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/catalog/menus/{{menu_id}}/publish",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"catalog",
+								"menus",
+								"{{menu_id}}",
+								"publish"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POS Payload for Branch",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenant_token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "x-branch-id",
+								"value": "{{branch_id}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/catalog/menus/branch/{{branch_id}}/pos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"catalog",
+								"menus",
+								"branch",
+								"{{branch_id}}",
+								"pos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tenant Advanced Catalog",
+			"item": [
+				{
+					"name": "Tenant Branch",
+					"item": [
+						{
+							"name": "Create Branch",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"DHA Phase 6\",\n  \"code\": \"dha-6\",\n  \"status\": \"active\",\n  \"address\": {\"city\":\"Karachi\",\"country\":\"PK\"},\n  \"timezone\": \"Asia/Karachi\",\n  \"currency\":\"PKR\",\n  \"tax\": {\"mode\":\"exclusive\",\"rate\": 5},\n  \"posConfig\": {\"orderPrefix\":\"DHA6\",\"enableHoldOrders\":true}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/branches",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Branches",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/branches?q=&status=active&page=1&limit=20",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										},
+										{
+											"key": "status",
+											"value": "active"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Branch by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/branches/{{branch_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										"{{branch_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Branch",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"DHA Phase 6 - Main\",\n  \"posConfig\": {\"receiptFooter\":\"Thanks for visiting!\"}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/branches/{{branch_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										"{{branch_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Set Default Branch",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/branches/{{branch_id}}/set-default",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										"{{branch_id}}",
+										"set-default"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Branch Settings",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "x-branch-id",
+										"value": "{{branch_id}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/branches/{{branch_id}}/settings",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										"{{branch_id}}",
+										"settings"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Branch Settings",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "x-branch-id",
+										"value": "{{branch_id}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"tax\": {\"mode\": \"exclusive\", \"rate\": 8},\n  \"posConfig\": {\"orderPrefix\": \"DHA6\", \"enableTableService\": true}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/branches/{{branch_id}}/settings",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										"{{branch_id}}",
+										"settings"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Attach User to Branch (optional)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "x-branch-id",
+										"value": "{{branch_id}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"userId\": \"{{user_id}}\" }"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/branches/{{branch_id}}/attach-user",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										"{{branch_id}}",
+										"attach-user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Detach User from Branch (optional)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "x-branch-id",
+										"value": "{{branch_id}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"userId\": \"{{user_id}}\" }"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/branches/{{branch_id}}/detach-user",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										"{{branch_id}}",
+										"detach-user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Branch",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/branches/{{branch_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										"{{branch_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Combos",
+					"item": [
+						{
+							"name": "Create Combo",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\":\"Burger Meal\",\n  \"slug\":\"burger-meal\",\n  \"priceMode\":\"fixed\",\n  \"basePrice\": 999,\n  \"currency\":\"PKR\",\n  \"courses\":[\n    {\"name\":\"Main\",\"min\":1,\"max\":1,\"source\":\"category\",\"categoryId\":\"<CAT_ID>\"},\n    {\"name\":\"Side\",\"min\":1,\"max\":1,\"source\":\"items\",\"itemIds\":[\"<FRIES_ID>\"]},\n    {\"name\":\"Drink\",\"min\":1,\"max\":1,\"source\":\"items\",\"itemIds\":[\"<COKE_ID>\"]}\n  ],\n  \"branchIds\":[\"{{branch_id}}\"],\n  \"active\":true\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/catalog/combos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"combos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Combos",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/catalog/combos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"combos"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Availability",
+					"item": [
+						{
+							"name": "Upsert Availability (Item breakfast window)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"targetType\":\"item\",\n  \"targetId\":\"<ITEM_ID>\",\n  \"windows\":[{\"dow\":[1,2,3,4,5],\"start\":\"08:00\",\"end\":\"11:30\"}],\n  \"includeDates\":[],\n  \"excludeDates\":[\"2025-12-25\"],\n  \"timezone\":\"Asia/Karachi\",\n  \"active\":true\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/catalog/availability",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"availability"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Availability",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/catalog/availability?targetType=item&targetId=<ITEM_ID>",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "targetType",
+											"value": "item"
+										},
+										{
+											"key": "targetId",
+											"value": "<ITEM_ID>"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Price Lists",
+					"item": [
+						{
+							"name": "Create Price List (Takeaway)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\":\"Takeaway Oct\",\n  \"channel\":\"takeaway\",\n  \"precedence\":50,\n  \"active\":true,\n  \"rules\":[\n    {\"targetType\":\"item\",\"targetId\":\"<ITEM_ID>\",\"price\":850,\"currency\":\"PKR\",\"branchId\":\"{{branch_id}}\"}\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/catalog/pricelists",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"pricelists"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Price Lists",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/catalog/pricelists",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"pricelists"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Item Extras",
+					"item": [
+						{
+							"name": "Upsert Item Extras",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"itemId\":\"<ITEM_ID>\",\n  \"allergens\":[\"gluten\",\"nuts\"],\n  \"nutrition\":{\"calories\":420,\"protein\":18},\n  \"translations\":{\"name\":{\"ar\":\"برجر\"}},\n  \"images\":[{\"url\":\"https://cdn.example.com/img1.jpg\",\"alt\":\"Burger\"}],\n  \"autoHideWhenOOS\":true,\n  \"minStockThreshold\":5\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/catalog/item-extras",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"item-extras"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Item Extras",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/catalog/item-extras/<ITEM_ID>",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"item-extras",
+										"<ITEM_ID>"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Taxes & Service Charges",
+					"item": [
+						{
+							"name": "Create Tax (VAT 16%)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"name\":\"VAT 16%\",\"code\":\"vat16\",\"rate\":0.16,\"inclusive\":false,\"country\":\"PK\",\"active\":true }"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/catalog/taxes",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"taxes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Service Charge (5% dine-in)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"name\":\"Service 5%\",\"code\":\"svc5\",\"type\":\"percentage\",\"value\":0.05,\"applyOn\":[\"dinein\"],\"branchIds\":[\"{{branch_id}}\"],\"active\":true }"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/catalog/service-charges",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"service-charges"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Menu Versions & POS",
+					"item": [
+						{
+							"name": "Create Menu Draft",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"menuId\":\"<MENU_ID>\", \"name\":\"Oct v2\", \"payload\": { \"sections\": [ { \"title\":\"Burgers\", \"itemIds\":[\"<ITEM_ID>\"] } ] } }"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/catalog/menu-versions",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"menu-versions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Publish Menu Version (now)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"branchId\": \"{{branch_id}}\" }"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/catalog/menu-versions/<VERSION_ID>/publish",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"menu-versions",
+										"<VERSION_ID>",
+										"publish"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get POS Payload (cached)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/t/catalog/pos-payload?branchId={{branch_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"pos-payload"
+									],
+									"query": [
+										{
+											"key": "branchId",
+											"value": "{{branch_id}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalidate POS Cache",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tenant_token}}"
+									},
+									{
+										"key": "x-tenant-slug",
+										"value": "{{tenant_slug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"branchId\": \"{{branch_id}}\" }"
+								},
+								"url": {
+									"raw": "{{base_url}}/t/catalog/cache/invalidate",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"t",
+										"catalog",
+										"cache",
+										"invalidate"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "POS Orders & KDS",
+			"item": [
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"branchId\": \"{{branch_id}}\",\n  \"serviceType\": \"dine_in\",\n  \"channel\": \"pos\",\n  \"tableNo\": \"A1\",\n  \"customer\": {\"name\": \"John\", \"phone\": \"+92-300-0000000\"},\n  \"lines\": [\n    {\n      \"itemId\": \"6530aaaa0000000000000001\",\n      \"variantId\": \"6530bbbb0000000000000001\",\n      \"name\": \"Zinger Burger\",\n      \"sku\": \"ZNGR-01\",\n      \"quantity\": 2,\n      \"basePrice\": {\"amount\": 450, \"currency\": \"PKR\"},\n      \"modifiers\": [\n        { \"name\": \"Cheese\", \"sku\": \"ADD-CHS\", \"priceAdj\": {\"amount\": 50, \"currency\": \"PKR\"}, \"qty\": 2 }\n      ]\n    }\n  ],\n  \"amounts\": {\"currency\":\"PKR\",\"discount\": 0, \"serviceCharge\": 0, \"tax\": 0}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/orders?branchId={{branch_id}}&status=pending&page=1&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "branchId",
+									"value": "{{branch_id}}"
+								},
+								{
+									"key": "status",
+									"value": "pending"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/orders/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"orders",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Status → preparing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"status\": \"preparing\", \"note\": \"KOT printed\" }"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/orders/:id/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"orders",
+								":id",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Record Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"method\": \"cash\", \"amount\": 950, \"currency\": \"PKR\", \"txRef\": \"POS-123\" }"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/orders/:id/pay",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"orders",
+								":id",
+								"pay"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel (soft delete)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/orders/:id?note=customer_cancelled",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"orders",
+								":id"
+							],
+							"query": [
+								{
+									"key": "note",
+									"value": "customer_cancelled"
+								}
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "KDS Board",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/kds/board?branchId={{branch_id}}&statuses=accepted,preparing,ready",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"kds",
+								"board"
+							],
+							"query": [
+								{
+									"key": "branchId",
+									"value": "{{branch_id}}"
+								},
+								{
+									"key": "statuses",
+									"value": "accepted,preparing,ready"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POS Inventory & Receipies",
+			"item": [
+				{
+					"name": "Create Ingredient Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"name\":\"Chicken Breast\", \"sku\":\"ING-CHK-01\", \"uom\":\"g\", \"minThreshold\": 500, \"costPerUom\": 0.9 }"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/inventory/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"inventory",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Items (with branch stock)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/inventory/items?branchId={{branch_id}}&q=chicken",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"inventory",
+								"items"
+							],
+							"query": [
+								{
+									"key": "branchId",
+									"value": "{{branch_id}}"
+								},
+								{
+									"key": "q",
+									"value": "chicken"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Adjust Stock (+500g)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"itemId\": \"{{item_id}}\", \"branchId\": \"{{branch_id}}\", \"uom\":\"g\", \"qty\": 500, \"reason\":\"opening-balance\" }"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/inventory/items/adjust",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"inventory",
+								"items",
+								"adjust"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upsert Recipe (Burger → 150g chicken)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"catalogItemId\": \"{{catalog_item_id}}\",\n  \"catalogVariantId\": \"{{catalog_variant_id}}\",\n  \"yieldQty\": 1,\n  \"ingredients\": [ { \"itemId\": \"{{item_id}}\", \"uom\": \"g\", \"qty\": 150 } ],\n  \"notes\": \"standard patty\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/inventory/recipes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"inventory",
+								"recipes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recipe",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/inventory/recipes?catalogItemId={{catalog_item_id}}&catalogVariantId={{catalog_variant_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"inventory",
+								"recipes"
+							],
+							"query": [
+								{
+									"key": "catalogItemId",
+									"value": "{{catalog_item_id}}"
+								},
+								{
+									"key": "catalogVariantId",
+									"value": "{{catalog_variant_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create PO",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"supplierName\":\"Metro\",\n  \"branchId\":\"{{branch_id}}\",\n  \"lines\":[{\"itemId\":\"{{item_id}}\",\"uom\":\"g\",\"qty\":1000,\"unitCost\":{\"amount\":0.8,\"currency\":\"PKR\"}}]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/t/inventory/purchase-orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"inventory",
+								"purchase-orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PO Receive",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Tenant-Id",
+								"value": "{{tenant_slug}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/t/inventory/purchase-orders/{{po_id}}/receive",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t",
+								"inventory",
+								"purchase-orders",
+								"{{po_id}}",
+								"receive"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POS Branches (Quickstart)",
+			"item": [
+				{
+					"name": "Auth (Tenant) / Register Owner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Owner\",\n  \"email\": \"owner@demo.local\",\n  \"password\": \"P@ssw0rd123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/auth/register-owner",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"auth",
+								"register-owner"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Auth (Tenant) / Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {",
+									"  const json = pm.response.json();",
+									"  const token = json.result && json.result.token;",
+									"  if (token) {",
+									"    pm.collectionVariables.set('tenantToken', token);",
+									"    console.log('Saved tenantToken');",
+									"  }",
+									"} catch(e) { console.log('No token parsed:', e.message); }"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"owner@demo.local\",\n  \"password\": \"P@ssw0rd123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {",
+									"  const json = pm.response.json();",
+									"  const id = json.result && json.result._id;",
+									"  if (id) { pm.collectionVariables.set('branchId', id); console.log('Saved branchId', id); }",
+									"} catch(e) { console.log('Parse error', e.message); }"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Extraction – Gulberg\",\n  \"code\": \"gulberg\",\n  \"timezone\": \"Asia/Karachi\",\n  \"currency\": \"PKR\",\n  \"address\": { \"city\": \"Lahore\" }\n}\n"
+						},
+						"url": {
+							"raw": "{{Pos-Live}}/t/branches",
+							"host": [
+								"{{Pos-Live}}"
+							],
+							"path": [
+								"t",
+								"branches"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/branches?page=1&limit=50",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Get One",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/branches/{{branchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches",
+								"{{branchId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"contact\": { \"phone\": \"+92-300-0000000\" },\n  \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/branches/{{branchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches",
+								"{{branchId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Set Default",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/branches/{{branchId}}/set-default",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches",
+								"{{branchId}}",
+								"set-default"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Get Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/branches/{{branchId}}/settings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches",
+								"{{branchId}}",
+								"settings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Update Settings",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tax\": { \"mode\": \"exclusive\", \"rate\": 16 },\n  \"posConfig\": { \"orderPrefix\": \"ORD\", \"enableHoldOrders\": true }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/branches/{{branchId}}/settings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches",
+								"{{branchId}}",
+								"settings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Attach User to Branch",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"userId\": \"{{userId}}\" }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/branches/{{branchId}}/attach-user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches",
+								"{{branchId}}",
+								"attach-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Detach User from Branch",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"userId\": \"{{userId}}\" }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/branches/{{branchId}}/detach-user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches",
+								"{{branchId}}",
+								"detach-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/branches/{{branchId}}/summary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches",
+								"{{branchId}}",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Branches / Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tenantToken}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantSlug}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/branches/{{branchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"branches",
+								"{{branchId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "Pos-Live",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "base_url",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "branchId",
+			"value": ""
+		}
+	]
+}
