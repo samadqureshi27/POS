@@ -34,14 +34,13 @@ function buildUrl(path: string) {
 function getToken(): string | null {
   // Try AuthService first, then common localStorage keys
   const t = AuthService.getToken();
-  console.log('🔍 getToken - AuthService.getToken():', t ? `${t.substring(0, 20)}...` : 'null');
   if (t) return t;
   if (typeof window !== "undefined") {
-    const token1 = localStorage.getItem("token");
-    const token2 = localStorage.getItem("accessToken");
-    console.log('🔍 getToken - localStorage.token:', token1 ? `${token1.substring(0, 20)}...` : 'null');
-    console.log('🔍 getToken - localStorage.accessToken:', token2 ? `${token2.substring(0, 20)}...` : 'null');
-    return token1 || token2 || null;
+    return (
+      localStorage.getItem("token") ||
+      localStorage.getItem("accessToken") ||
+      null
+    );
   }
   return null;
 }
@@ -69,13 +68,6 @@ function buildHeaders(extra?: Record<string, string>) {
   const slug = getTenantSlug();
   const id = getTenantId();
 
-  console.log('🔍 Branch Service - buildHeaders:', {
-    hasToken: !!token,
-    tokenPreview: token ? `${token.substring(0, 20)}...` : 'null',
-    slug,
-    id
-  });
-
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "Accept": "application/json",
@@ -84,8 +76,6 @@ function buildHeaders(extra?: Record<string, string>) {
   // Always use x-tenant-id (slug or id value)
   if (id) headers["x-tenant-id"] = id;
   else if (slug) headers["x-tenant-id"] = slug;
-
-  console.log('📤 Final headers:', headers);
 
   return { ...headers, ...(extra || {}) };
 }
@@ -100,19 +90,11 @@ export const BranchService = {
     const res = await fetch(url, { headers: buildHeaders() });
     const data = await res.json().catch(() => ({}));
 
-    console.log('📦 List Branches Response:', { status: res.status, ok: res.ok, data });
-    console.log('📦 Response keys:', Object.keys(data));
-    console.log('📦 data.data:', data?.data);
-    console.log('📦 data.result:', data?.result);
-    console.log('📦 data.result.items:', data?.result?.items);
-
     if (!res.ok) {
       return { success: false, message: data?.message || `List branches failed (${res.status})` };
     }
     // Backend returns: { status, message, items: [...], count, page, limit }
     const items: TenantBranch[] = data?.items ?? data?.data ?? data?.result?.items ?? data?.result ?? [];
-    console.log('📋 Parsed branches count:', items.length);
-    console.log('📋 Parsed branches:', items);
     return { success: true, data: items };
   },
 

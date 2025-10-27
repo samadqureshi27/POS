@@ -57,13 +57,7 @@ const BranchManagementPage = () => {
 
   // Load branches after auth is ready
   React.useEffect(() => {
-    console.log('🔐 Auth state:', { authLoading, isAuthenticated });
     if (!authLoading && isAuthenticated) {
-      console.log('✅ Auth ready, loading branches...');
-      loadBranchItems();
-    } else if (!authLoading && !isAuthenticated) {
-      console.log('⚠️ Not authenticated, skipping branch load');
-      // Load anyway for testing - remove this in production
       loadBranchItems();
     }
   }, [authLoading, isAuthenticated]);
@@ -77,17 +71,13 @@ const BranchManagementPage = () => {
 
   // Show loading while checking authentication
   if (authLoading) {
-    console.log('⏳ Auth loading...');
     return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={2} />;
   }
 
   // Show loading while fetching branch data
   if (loading) {
-    console.log('⏳ Branch data loading...');
     return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={2} />;
   }
-
-  console.log('✅ Rendering page with branches:', branchItems.length);
 
   return (
     <div className="p-6 bg-background min-h-screen mt-6 w-full px-4">
