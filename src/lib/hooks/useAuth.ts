@@ -24,19 +24,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const initializeAuth = useCallback(async () => {
     try {
       setIsLoading(true);
-      
+
       if (authService.isAuthenticated()) {
         const currentUser = authService.getCurrentUser();
-        
+
         if (currentUser) {
           const profileResponse = await authService.getProfile();
-          
+
           if (profileResponse.success && profileResponse.data) {
             setUser(profileResponse.data);
             setIsAuthenticated(true);
           } else {
             const refreshed = await authService.refreshAccessToken();
-            
+
             if (refreshed) {
               const retryProfile = await authService.getProfile();
               if (retryProfile.success && retryProfile.data) {

@@ -108,37 +108,61 @@ class AuthService {
         headers: buildHeaders(undefined),
         body: JSON.stringify({ email, password, role })
       });
-      
-      console.log('Admin login response status:', response.status);
-    const contentType = response.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      const text = await response.text();
-      console.error('Admin login non-JSON response:', text);
-      return { success: false, error: 'Unexpected response from server', message: text };
+
+      console.log('📡 Login Response Status:', response.status);
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('❌ Non-JSON response:', text.substring(0, 200));
+        return { success: false, error: 'Server returned invalid response' };
+      }
+
+      const data: any = await response.json();
+
+      // Handle backend response: { status, message, result: { token, user } }
+      if (response.ok && data.result && data.result.token) {
+        const token = data.result.token;
+        const user = data.result.user || data.result;
+
+        // Store authentication data
+        this.setTokens(token, token);
+        this.setUser(user);
+
+        // Store tenant slug in localStorage for future requests
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('tenant_slug', getTenantSlug());
+        }
+
+        return { success: true, user };
+      } else {
+        console.error('❌ Login failed:', data);
+
+        // Extract error message from various possible formats
+        let errorMessage = 'Invalid credentials';
+
+        if (typeof data.error === 'string') {
+          errorMessage = data.error;
+        } else if (data.error && typeof data.error === 'object' && data.error.message) {
+          errorMessage = data.error.message;
+        } else if (typeof data.message === 'string') {
+          errorMessage = data.message;
+        }
+
+        return {
+          success: false,
+          error: errorMessage,
+          errors: data.errors
+        };
+      }
+    } catch (error: unknown) {
+      console.error('💥 Login error:', error);
+      if (error instanceof Error) {
+        return { success: false, error: `Network error: ${error.message}` };
+      }
+      return { success: false, error: 'Network connection failed' };
     }
-    const data: LoginResponse = await response.json();
-    console.log('Admin login response data:', data);
-    
-    if (data.success && data.user && data.tokens) {
-      this.setTokens(data.tokens.access, data.tokens.refresh);
-      this.setUser(data.user);
-      return { success: true, user: data.user };
-    } else {
-      return { 
-        success: false, 
-        errors: data.errors, 
-        error: data.error,
-        message: data.message 
-      };
-    }
-  } catch (error: unknown) {
-    console.error('Admin login error:', error);
-    if (error instanceof Error) {
-      return { success: false, error: error.message };
-    }
-    return { success: false, error: 'Unknown network error' };
   }
-}
 
   // PIN login for staff (no changes needed here)
   async pinLogin(pin: string, role?: string): Promise<LoginResponse> {
@@ -284,8 +308,14 @@ class AuthService {
         headers: buildHeaders(this.token || undefined)
       });
 
-      const data: ApiResponse<User> = await response.json();
-      return data;
+      const data: any = await response.json();
+
+      // Backend returns: { status, message, result: { user } }
+      if (response.ok && data.result) {
+        return { success: true, data: data.result };
+      } else {
+        return { success: false, error: data.message || 'Profile fetch failed' };
+      }
     } catch (error) {
       console.error('Get profile error:', error);
       return { success: false, error: 'Network error' };
