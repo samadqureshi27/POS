@@ -149,7 +149,6 @@ class AuthService {
       }
 
       const data: any = await response.json();
-      console.log('📦 Login Response Data:', data);
 
       // Handle backend response: { status, message, result: { token, user } }
       if (response.ok && data.result && data.result.token) {
@@ -165,7 +164,6 @@ class AuthService {
           localStorage.setItem('tenant_slug', getTenantSlug());
         }
 
-        console.log('✅ Login successful:', { userId: user._id || user.id, email: user.email });
         return { success: true, user };
       } else {
         console.error('❌ Login failed:', data);
@@ -379,8 +377,14 @@ class AuthService {
         headers: buildHeaders(token || undefined)
       });
 
-      const data: ApiResponse<User> = await response.json();
-      return data;
+      const data: any = await response.json();
+
+      // Backend returns: { status, message, result: { user } }
+      if (response.ok && data.result) {
+        return { success: true, data: data.result };
+      } else {
+        return { success: false, error: data.message || 'Profile fetch failed' };
+      }
     } catch (error) {
       console.error('Get profile error:', error);
       return { success: false, error: 'Network error' };

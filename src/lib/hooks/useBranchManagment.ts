@@ -58,9 +58,7 @@ export const useBranchManagement = () => {
     const loadBranchItems = async () => {
         try {
             setLoading(true);
-            console.log('🔄 Loading branch items...');
             const response = await BranchService.listBranches();
-            console.log('📥 Load response:', response);
             if (response.success && response.data) {
                 const mapped = response.data.map((b, idx) => mapApiBranchToItem(b, idx));
                 setBranchItems(mapped);
