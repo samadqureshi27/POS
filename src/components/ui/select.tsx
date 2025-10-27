@@ -152,17 +152,6 @@ function SelectContent({
           className
         )}
         position={position}
-        onOpenAutoFocus={(e) => {
-          e.preventDefault();
-          // Only ensure scrollbar stays visible if we're NOT inside an overlay
-          const insideOverlay = isInsideOverlay(e.currentTarget);
-
-          if (!insideOverlay) {
-            document.body.style.overflow = 'visible';
-            document.body.style.paddingRight = '0px';
-            document.body.removeAttribute('data-scroll-locked');
-          }
-        }}
         {...props}
       >
         <SelectScrollUpButton />

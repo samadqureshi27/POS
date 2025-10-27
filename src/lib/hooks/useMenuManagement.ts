@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/lib/hooks";
-import MenuAPI from "@/lib/util/menu1-api";
-import { MenuAPI as MenuOptionsAPI } from "@/lib/util/menu-options-api";
-import { MenuAPI as CategoryAPI } from "@/lib/util/category-api";
+import { MenuItemService, TenantMenuItem } from "@/lib/services/menu-item-service";
+import { useMenuOptions } from "@/lib/hooks/useMenuOptions";
+import { useCategory } from "@/lib/hooks/useCategory";
 import { MenuItemOptions } from "@/lib/types/menuItemOptions";
 import { CategoryItem } from "@/lib/types/category";
 
-// Define MenuItem interface
+// Frontend MenuItem interface (existing structure)
 interface MenuItem {
   ID: number;
   Name: string;
@@ -37,13 +37,86 @@ interface MenuItem {
   MealPrice?: number[];
   PName?: string[];
   PPrice?: number[];
+  backendId?: string; // Store backend ID
 }
+
+// Map API Item to frontend MenuItem
+const mapApiItemToMenuItem = (apiItem: TenantMenuItem, index: number, categories: CategoryItem[], modifierGroups: MenuItemOptions[]): MenuItem => {
+  const id = apiItem._id || apiItem.id || String(index + 1);
+
+  // Get first variant price as the main price (if variants exist)
+  const price = apiItem.variants && apiItem.variants.length > 0
+    ? apiItem.variants[0].price
+    : 0;
+
+  // Map first categoryId to category name
+  const categoryId = apiItem.categoryIds && apiItem.categoryIds.length > 0
+    ? apiItem.categoryIds[0]
+    : "";
+  const category = categories.find(cat => cat.backendId === categoryId);
+  const categoryName = category?.Name || "";
+
+  // Map modifiers from backend to frontend format
+  // Backend: modifiers = [{ groupId: "abc", required: false, min: 0, max: 1 }]
+  // Frontend: OptionValue = ["Milk Options", "Size"] (modifier group names)
+  const optionValue: string[] = [];
+  const optionPrice: number[] = [];
+
+  if (apiItem.modifiers && apiItem.modifiers.length > 0) {
+    apiItem.modifiers.forEach(mod => {
+      const modGroup = modifierGroups.find(mg => mg.backendId === mod.groupId);
+      if (modGroup) {
+        optionValue.push(modGroup.Name);
+        optionPrice.push(0); // Prices are in the modifier group options, not here
+      }
+    });
+  }
+
+  // Determine display type based on variants
+  // Multiple variants = "Var" (multi-price)
+  // Single variant = "Qty" (quantity-based, simple pricing)
+  // Weight/Units not supported in backend yet, so ignoring "Weight" option
+  const displaycat = apiItem.variants && apiItem.variants.length > 1 ? "Var" : "Qty";
+
+  return {
+    ID: index + 1,
+    Name: apiItem.name,
+    Price: price,
+    Category: categoryName,
+    StockQty: apiItem.stockQty?.toString() || "0",
+    Status: apiItem.isActive ? "Active" : "Inactive",
+    Description: apiItem.description || "",
+    Priority: apiItem.priority || index + 1,
+    Featured: apiItem.featured ? "Active" : "Inactive",
+    MinimumQuantity: apiItem.minStockThreshold || 0,
+    backendId: id,
+
+    // Stubbed fields (not in API)
+    MealType: "All Day",
+    ShowOnMenu: "Active",
+    StaffPick: "Inactive",
+    ShowOnMain: "Active",
+    Deal: "Inactive",
+    Special: "Inactive",
+    SubTBE: "Inactive",
+    DisplayType: "Select a type",
+    Displaycat: displaycat,
+    SpecialStartDate: "",
+    SpecialEndDate: "",
+    SpecialPrice: "",
+    OverRide: [],
+    OptionValue: optionValue,
+    OptionPrice: optionPrice,
+    MealValue: [],
+    MealPrice: [],
+    PName: apiItem.variants?.map(v => v.name) || [],
+    PPrice: apiItem.variants?.map(v => v.price) || [],
+  };
+};
 
 export const useMenuManagement = () => {
   // State management
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [menuOptions, setMenuOptions] = useState<MenuItemOptions[]>([]);
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
@@ -55,6 +128,7 @@ export const useMenuManagement = () => {
   const [activeTab, setActiveTab] = useState("Menu Items");
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   const [formData, setFormData] = useState<Omit<MenuItem, "ID">>({
     Name: "",
@@ -90,44 +164,23 @@ export const useMenuManagement = () => {
   // Utility functions
   const { toast, toastVisible, showToast, hideToast } = useToast();
 
-  const loadMenuOptions = async () => {
-    try {
-      const response = await MenuOptionsAPI.getMenuItemOptions();
-      if (response.success) {
-        setMenuOptions(response.data);
-      }
-    } catch (error) {
-      console.error("Error loading menu options:", error);
-    }
-  };
-
-  const loadCategories = async () => {
-    try {
-      const response = await CategoryAPI.getCategoryItems();
-      if (response.success) {
-        setCategories(response.data);
-      }
-    } catch (error) {
-      console.error("Error loading categories:", error);
-    }
-  };
+  // Load menu options and categories using existing hooks
+  const { MenuItemOptionss: menuOptions } = useMenuOptions();
+  const { categoryItems: categories } = useCategory();
 
   const loadMenuItems = async () => {
     try {
       setLoading(true);
-      const [menuResponse] = await Promise.all([
-        MenuAPI.getMenuItems(),
-        loadMenuOptions(),
-        loadCategories()
-      ]);
-      if (menuResponse.success) {
-        setMenuItems(menuResponse.data);
+      const response = await MenuItemService.listItems();
+      if (response.success && response.data) {
+        const mapped = response.data.map((item, idx) => mapApiItemToMenuItem(item, idx, categories, menuOptions));
+        setMenuItems(mapped.sort((a, b) => (a.Priority || 0) - (b.Priority || 0)));
       } else {
-        throw new Error(menuResponse.message || "Failed to fetch menu items");
+        throw new Error(response.message || "Failed to fetch menu items");
       }
     } catch (error) {
       console.error("Error fetching menu items:", error);
-      showToast("Failed to load menu items", "error");
+      showToast(error instanceof Error ? error.message : "Failed to load menu items", "error");
     } finally {
       setLoading(false);
     }
@@ -168,10 +221,14 @@ export const useMenuManagement = () => {
     setPreview(null);
   };
 
-  // Effects
+  // Effects - wait for categories and modifiers to load before loading items
   useEffect(() => {
-    loadMenuItems();
-  }, []);
+    // Only load items once categories are available (they're needed for mapping)
+    if (!hasLoadedOnce && categories.length > 0) {
+      loadMenuItems();
+      setHasLoadedOnce(true);
+    }
+  }, [categories.length, hasLoadedOnce]);
 
   useEffect(() => {
     if (editingItem) {
@@ -233,11 +290,13 @@ export const useMenuManagement = () => {
       const matchesCategory = categoryFilter === "" || item.Category === categoryFilter;
       return matchesSearch && matchesStatus && matchesCategory;
     })
-    .sort((a, b) => (a.Priority || 0) - (b.Priority || 0)); // Sort by Priority for POS app display order
+    .sort((a, b) => (a.Priority || 0) - (b.Priority || 0));
 
   const isFormValid = () => {
-    // Only require price when display type is selected and it's not Var
-    const isPriceValid = !formData.Displaycat || formData.Displaycat === "Var" || formData.Price > 0;
+    // For "Var" (multi-variant), price validation happens in Price tab
+    // For "Qty" and other single-variant types, require price
+    // "Weight" is ignored for now (not in backend)
+    const isPriceValid = formData.Displaycat === "Var" || formData.Price > 0;
 
     return (
       formData.Name?.trim() &&
@@ -254,38 +313,141 @@ export const useMenuManagement = () => {
   const handleCreateItem = async (itemData: Omit<MenuItem, "ID">) => {
     try {
       setActionLoading(true);
-      const response = await MenuAPI.createMenuItem(itemData);
+
+      // Find category ID from name
+      const category = categories.find(cat => cat.Name === itemData.Category);
+      const categoryIds = category?.backendId ? [category.backendId] : [];
+
+      // Build variants array
+      const variants = [];
+      if (itemData.Displaycat === "Var" && itemData.PName && itemData.PPrice) {
+        for (let i = 0; i < itemData.PName.length; i++) {
+          if (itemData.PName[i] && itemData.PPrice[i] !== undefined) {
+            variants.push({
+              name: itemData.PName[i],
+              price: itemData.PPrice[i],
+            });
+          }
+        }
+      } else {
+        // Single price item - create one default variant
+        variants.push({
+          name: "Regular",
+          price: itemData.Price,
+        });
+      }
+
+      // Map modifiers from frontend to backend
+      // Frontend: OptionValue = ["Milk Options", "Size"] (modifier group names)
+      // Backend: modifiers = [{ groupId: "abc", required: false, min: 0, max: 1 }]
+      const modifiers = (itemData.OptionValue || []).map(optionName => {
+        const modGroup = menuOptions.find(mg => mg.Name === optionName);
+        return {
+          groupId: modGroup?.backendId || "",
+          required: false,
+          min: modGroup?.min || 0,
+          max: modGroup?.max || 1,
+        };
+      }).filter(mod => mod.groupId); // Remove any that didn't find a match
+
+      const payload: Partial<TenantMenuItem> = {
+        name: itemData.Name,
+        categoryIds,
+        description: itemData.Description || "",
+        variants,
+        modifiers,
+        isActive: itemData.Status === "Active",
+        featured: itemData.Featured === "Active",
+        priority: itemData.Priority || 1,
+        trackStock: false,
+        stockQty: parseInt(itemData.StockQty) || 0,
+        minStockThreshold: itemData.MinimumQuantity || 0,
+      };
+
+      const response = await MenuItemService.createItem(payload);
       if (response.success) {
-        setMenuItems((prevItems) => [...prevItems, response.data]);
+        await loadMenuItems(); // Reload list
         setIsModalOpen(false);
         setSearchTerm("");
         showToast(response.message || "Item created successfully", "success");
+      } else {
+        showToast(response.message || "Failed to create item", "error");
       }
     } catch (error) {
       console.error("Error creating item:", error);
-      showToast("Failed to create menu item", "error");
+      showToast(error instanceof Error ? error.message : "Failed to create menu item", "error");
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleUpdateItem = async (itemData: Omit<MenuItem, "ID">) => {
-    if (!editingItem) return;
+    if (!editingItem || !editingItem.backendId) {
+      showToast("Menu item ID not found", "error");
+      return;
+    }
+
     try {
       setActionLoading(true);
-      const response = await MenuAPI.updateMenuItem(editingItem.ID, itemData);
+
+      // Find category ID from name
+      const category = categories.find(cat => cat.Name === itemData.Category);
+      const categoryIds = category?.backendId ? [category.backendId] : [];
+
+      // Build variants array
+      const variants = [];
+      if (itemData.Displaycat === "Var" && itemData.PName && itemData.PPrice) {
+        for (let i = 0; i < itemData.PName.length; i++) {
+          if (itemData.PName[i] && itemData.PPrice[i] !== undefined) {
+            variants.push({
+              name: itemData.PName[i],
+              price: itemData.PPrice[i],
+            });
+          }
+        }
+      } else {
+        variants.push({
+          name: "Regular",
+          price: itemData.Price,
+        });
+      }
+
+      // Map modifiers from frontend to backend
+      const modifiers = (itemData.OptionValue || []).map(optionName => {
+        const modGroup = menuOptions.find(mg => mg.Name === optionName);
+        return {
+          groupId: modGroup?.backendId || "",
+          required: false,
+          min: modGroup?.min || 0,
+          max: modGroup?.max || 1,
+        };
+      }).filter(mod => mod.groupId);
+
+      const payload: Partial<TenantMenuItem> = {
+        name: itemData.Name,
+        categoryIds,
+        description: itemData.Description || "",
+        variants,
+        modifiers,
+        isActive: itemData.Status === "Active",
+        featured: itemData.Featured === "Active",
+        priority: itemData.Priority || 1,
+        stockQty: parseInt(itemData.StockQty) || 0,
+        minStockThreshold: itemData.MinimumQuantity || 0,
+      };
+
+      const response = await MenuItemService.updateItem(editingItem.backendId, payload);
       if (response.success) {
-        setMenuItems(
-          menuItems.map((item) =>
-            item.ID === editingItem.ID ? response.data : item
-          )
-        );
+        await loadMenuItems(); // Reload list
         setIsModalOpen(false);
         setEditingItem(null);
         showToast(response.message || "Item updated successfully", "success");
+      } else {
+        showToast(response.message || "Failed to update item", "error");
       }
     } catch (error) {
-      showToast("Failed to update menu item", "error");
+      console.error("Error updating item:", error);
+      showToast(error instanceof Error ? error.message : "Failed to update menu item", "error");
     } finally {
       setActionLoading(false);
     }
@@ -293,19 +455,29 @@ export const useMenuManagement = () => {
 
   const handleDeleteSelected = async () => {
     if (selectedItems.length === 0) return;
+
     try {
       setActionLoading(true);
-      const response = await MenuAPI.bulkDeleteMenuItem(selectedItems);
-      if (response.success) {
-        setMenuItems((prev) => {
-          const remaining = prev.filter((i) => !selectedItems.includes(i.ID));
-          return remaining.map((it, idx) => ({ ...it, ID: idx + 1 }));
-        });
-        setSelectedItems([]);
-        showToast(response.message || "Items deleted successfully", "success");
+
+      // Map local IDs to backend IDs
+      const idsToDelete = selectedItems
+        .map((n) => menuItems.find((item) => item.ID === n)?.backendId)
+        .filter((id): id is string => typeof id === "string" && id.length > 0);
+
+      // Delete each item
+      for (const id of idsToDelete) {
+        const resp = await MenuItemService.deleteItem(id);
+        if (!resp.success) {
+          throw new Error(resp.message || `Failed to delete item ${id}`);
+        }
       }
+
+      await loadMenuItems();
+      setSelectedItems([]);
+      showToast("Items deleted successfully", "success");
     } catch (error) {
-      showToast("Failed to delete menu items", "error");
+      console.error("Error deleting items:", error);
+      showToast(error instanceof Error ? error.message : "Failed to delete menu items", "error");
     } finally {
       setActionLoading(false);
     }
@@ -340,9 +512,6 @@ export const useMenuManagement = () => {
     field: keyof typeof formData,
     isActive: boolean
   ) => {
-    console.log(`Status change: ${field} = ${isActive ? "Active" : "Inactive"}`); // Debug log
-    console.log("Current formData before change:", formData); // Debug log
-
     setFormData({
       ...formData,
       [field]: isActive ? "Active" : "Inactive",
@@ -352,10 +521,7 @@ export const useMenuManagement = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
-  };
-
-  const handleStatusFilterChange = (value: string) => {
-    setStatusFilter(value as "" | "Active" | "Inactive");
+    initializeFormData();
   };
 
   const handleEditItem = (item: MenuItem) => {
@@ -364,7 +530,12 @@ export const useMenuManagement = () => {
   };
 
   const handleAddItem = () => {
+    setEditingItem(null);
     setIsModalOpen(true);
+  };
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value as "" | "Active" | "Inactive");
   };
 
   // Form data handlers
@@ -391,19 +562,21 @@ export const useMenuManagement = () => {
     isModalOpen,
     activeTab,
     preview,
-    formData,
     fileInputRef,
-
-    // Computed values
+    formData,
     filteredItems,
-    isFormValid,
     isAllSelected,
-
-    // Toast
     toast,
     toastVisible,
-    showToast,
-    hideToast,
+
+    // Setters
+    setSearchTerm,
+    setStatusFilter,
+    setCategoryFilter,
+    setFormData,
+    setIsModalOpen,
+    setActiveTab,
+    setPreview,
 
     // Handlers
     handleCreateItem,
@@ -414,17 +587,15 @@ export const useMenuManagement = () => {
     handleModalSubmit,
     handleStatusChange,
     handleCloseModal,
-    handleStatusFilterChange,
     handleEditItem,
     handleAddItem,
+    handleStatusFilterChange,
     updateFormData,
     handleFormFieldChange,
+    hideToast,
 
-    // Setters
-    setSearchTerm,
-    setCategoryFilter,
-    setActiveTab,
-    setPreview,
+    // Utils
+    isFormValid,
     loadMenuItems,
   };
 };
