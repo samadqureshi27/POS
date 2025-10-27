@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLoginContext } from "./login-context";
 import { validateForgotPasswordForm } from "@/lib/validations";
+import authService from "@/lib/auth-service";
 
 const ForgotPasswordOverlay: React.FC = () => {
   const {
@@ -18,23 +19,49 @@ const ForgotPasswordOverlay: React.FC = () => {
     resetEmailError,
     setResetEmailError,
     isLoading,
+    setIsLoading,
     setShowVerification,
     setShowVerificationContainer,
+    setError,
   } = useLoginContext();
 
-  const handleResetPassword = () => {
+  const handleResetPassword = async () => {
     const { isValid, error } = validateForgotPasswordForm(resetEmail);
 
-    if (isValid) {
-      setResetEmailError("");
-      console.log("Reset password for:", resetEmail);
-
-      setShowVerification(true);
-      setTimeout(() => {
-        setShowVerificationContainer(true);
-      }, 100);
-    } else {
+    if (!isValid) {
       setResetEmailError(error || "");
+      return;
+    }
+
+    setResetEmailError("");
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      console.log("Requesting password reset for:", resetEmail);
+      const response = await authService.forgotPassword(resetEmail);
+
+      if (response.success) {
+        console.log("Password reset email sent successfully");
+        // Show verification screen
+        setShowVerification(true);
+        setTimeout(() => {
+          setShowVerificationContainer(true);
+        }, 100);
+      } else {
+        // Ensure error is a string
+        const errorMessage = typeof response.error === 'string'
+          ? response.error
+          : typeof response.message === 'string'
+          ? response.message
+          : "Failed to send reset email";
+        setResetEmailError(errorMessage);
+      }
+    } catch (error: any) {
+      console.error("Password reset request error:", error);
+      setResetEmailError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 

@@ -25,8 +25,8 @@ export interface ApiListResponse<T> {
 
 // Use the user's provided env var name for base URL and support local proxy routing
 const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
-const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "").toLowerCase() === "true";
-const BRANCHES_BASE = process.env.NEXT_PUBLIC_API_BRANCHES || "/tenant/branches"; // client-side proxy path
+const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "true").toLowerCase() === "true"; // default to proxy
+const BRANCHES_BASE = "/t/branches"; // client-side proxy path
 function buildUrl(path: string) {
   return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
 }
@@ -34,13 +34,14 @@ function buildUrl(path: string) {
 function getToken(): string | null {
   // Try AuthService first, then common localStorage keys
   const t = AuthService.getToken();
+  console.log('🔍 getToken - AuthService.getToken():', t ? `${t.substring(0, 20)}...` : 'null');
   if (t) return t;
   if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken") ||
-      null
-    );
+    const token1 = localStorage.getItem("token");
+    const token2 = localStorage.getItem("accessToken");
+    console.log('🔍 getToken - localStorage.token:', token1 ? `${token1.substring(0, 20)}...` : 'null');
+    console.log('🔍 getToken - localStorage.accessToken:', token2 ? `${token2.substring(0, 20)}...` : 'null');
+    return token1 || token2 || null;
   }
   return null;
 }
@@ -67,13 +68,25 @@ function buildHeaders(extra?: Record<string, string>) {
   const token = getToken();
   const slug = getTenantSlug();
   const id = getTenantId();
+
+  console.log('🔍 Branch Service - buildHeaders:', {
+    hasToken: !!token,
+    tokenPreview: token ? `${token.substring(0, 20)}...` : 'null',
+    slug,
+    id
+  });
+
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "Accept": "application/json",
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (slug) headers["x-tenant-slug"] = slug;
-  else if (id) headers["x-tenant-id"] = id;
+  // Always use x-tenant-id (slug or id value)
+  if (id) headers["x-tenant-id"] = id;
+  else if (slug) headers["x-tenant-id"] = slug;
+
+  console.log('📤 Final headers:', headers);
+
   return { ...headers, ...(extra || {}) };
 }
 
@@ -86,11 +99,20 @@ export const BranchService = {
     const url = buildUrl(`${BRANCHES_BASE}?q=${encodeURIComponent(q)}&status=${encodeURIComponent(status)}&page=${page}&limit=${limit}`);
     const res = await fetch(url, { headers: buildHeaders() });
     const data = await res.json().catch(() => ({}));
+
+    console.log('📦 List Branches Response:', { status: res.status, ok: res.ok, data });
+    console.log('📦 Response keys:', Object.keys(data));
+    console.log('📦 data.data:', data?.data);
+    console.log('📦 data.result:', data?.result);
+    console.log('📦 data.result.items:', data?.result?.items);
+
     if (!res.ok) {
       return { success: false, message: data?.message || `List branches failed (${res.status})` };
     }
-    // Some APIs return { result: { items: [] } } or { data: [] }
-    const items: TenantBranch[] = data?.data ?? data?.result?.items ?? data?.result ?? [];
+    // Backend returns: { status, message, items: [...], count, page, limit }
+    const items: TenantBranch[] = data?.items ?? data?.data ?? data?.result?.items ?? data?.result ?? [];
+    console.log('📋 Parsed branches count:', items.length);
+    console.log('📋 Parsed branches:', items);
     return { success: true, data: items };
   },
 
@@ -101,7 +123,8 @@ export const BranchService = {
     if (!res.ok) {
       return { success: false, message: data?.message || `Get branch failed (${res.status})` };
     }
-    const branch: TenantBranch = data?.data ?? data?.result ?? data;
+    // Backend likely returns: { status, message, result: {...} } or { status, message, ...branch }
+    const branch: TenantBranch = data?.result ?? data?.data ?? data;
     return { success: true, data: branch };
   },
 
@@ -116,7 +139,8 @@ export const BranchService = {
     if (!res.ok) {
       return { success: false, message: data?.message || `Create branch failed (${res.status})` };
     }
-    const branch: TenantBranch = data?.data ?? data?.result ?? data;
+    // Backend returns: { status, message, result: {...} }
+    const branch: TenantBranch = data?.result ?? data?.data ?? data;
     return { success: true, data: branch };
   },
 
@@ -131,7 +155,8 @@ export const BranchService = {
     if (!res.ok) {
       return { success: false, message: data?.message || `Update branch failed (${res.status})` };
     }
-    const branch: TenantBranch = data?.data ?? data?.result ?? data;
+    // Backend returns: { status, message, result: {...} }
+    const branch: TenantBranch = data?.result ?? data?.data ?? data;
     return { success: true, data: branch };
   },
 
@@ -146,8 +171,8 @@ export const BranchService = {
   },
 
   async setDefault(id: string): Promise<ApiListResponse<null>> {
-    const url = buildUrl(`${BRANCHES_BASE}/${id}/set-default`);
-    const res = await fetch(url, { method: "POST", headers: buildHeaders() });
+    const url = buildUrl(`${BRANCHES_BASE}/${id}/default`);
+    const res = await fetch(url, { method: "PUT", headers: buildHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       return { success: false, message: data?.message || `Set default branch failed (${res.status})` };
@@ -162,7 +187,7 @@ export const BranchService = {
     if (!res.ok) {
       return { success: false, message: data?.message || `Get branch settings failed (${res.status})` };
     }
-    return { success: true, data: data?.data ?? data?.result ?? data };
+    return { success: true, data: data?.result ?? data?.data ?? data };
   },
 
   async updateSettings(id: string, payload: Record<string, any>): Promise<ApiListResponse<any>> {
@@ -176,34 +201,32 @@ export const BranchService = {
     if (!res.ok) {
       return { success: false, message: data?.message || `Update branch settings failed (${res.status})` };
     }
-    return { success: true, data: data?.data ?? data?.result ?? data };
+    return { success: true, data: data?.result ?? data?.data ?? data };
   },
 
   async attachUser(id: string, userId: string): Promise<ApiListResponse<any>> {
-    const url = buildUrl(`${BRANCHES_BASE}/${id}/attach-user`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}/users/${userId}`);
     const res = await fetch(url, {
       method: "POST",
-      headers: buildHeaders({ "x-branch-id": id }),
-      body: JSON.stringify({ userId }),
+      headers: buildHeaders(),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       return { success: false, message: data?.message || `Attach user failed (${res.status})` };
     }
-    return { success: true, data: data?.data ?? data?.result ?? data };
+    return { success: true, data: data?.result ?? data?.data ?? data };
   },
 
   async detachUser(id: string, userId: string): Promise<ApiListResponse<any>> {
-    const url = buildUrl(`${BRANCHES_BASE}/${id}/detach-user`);
+    const url = buildUrl(`${BRANCHES_BASE}/${id}/users/${userId}`);
     const res = await fetch(url, {
-      method: "POST",
-      headers: buildHeaders({ "x-branch-id": id }),
-      body: JSON.stringify({ userId }),
+      method: "DELETE",
+      headers: buildHeaders(),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       return { success: false, message: data?.message || `Detach user failed (${res.status})` };
     }
-    return { success: true, data: data?.data ?? data?.result ?? data };
+    return { success: true, data: data?.result ?? data?.data ?? data };
   },
 };

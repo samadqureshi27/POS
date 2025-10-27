@@ -58,7 +58,9 @@ export const useBranchManagement = () => {
     const loadBranchItems = async () => {
         try {
             setLoading(true);
+            console.log('🔄 Loading branch items...');
             const response = await BranchService.listBranches();
+            console.log('📥 Load response:', response);
             if (response.success && response.data) {
                 const mapped = response.data.map((b, idx) => mapApiBranchToItem(b, idx));
                 setBranchItems(mapped);
@@ -87,10 +89,19 @@ export const useBranchManagement = () => {
     const handleCreateItem = async (itemData: Omit<BranchItem, "Branch-ID">) => {
         try {
             setActionLoading(true);
+            // Generate code from branch name (lowercase, hyphenated)
+            const code = itemData.Branch_Name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
             const payload: Partial<TenantBranch> = {
                 name: itemData.Branch_Name,
+                code: code,
+                timezone: "Asia/Karachi", // TODO: Make this configurable
+                currency: "PKR", // TODO: Make this configurable
                 status: itemData.Status === "Active" ? "active" : "inactive",
-                address: { line: itemData.Address },
+                address: {
+                    line: itemData.Address,
+                    city: itemData.Address // Use address as city for now
+                },
             };
             const response = await BranchService.createBranch(payload);
             if (response.success) {
@@ -117,10 +128,14 @@ export const useBranchManagement = () => {
         }
         try {
             setActionLoading(true);
+            // For updates, code/timezone/currency are optional (only update what changed)
             const payload: Partial<TenantBranch> = {
                 name: itemData.Branch_Name,
                 status: itemData.Status === "Active" ? "active" : "inactive",
-                address: { line: itemData.Address },
+                address: {
+                    line: itemData.Address,
+                    city: itemData.Address
+                },
             };
             const response = await BranchService.updateBranch(editingItem.backendId, payload);
             if (response.success) {
@@ -186,10 +201,10 @@ export const useBranchManagement = () => {
         activeBranches: branchItems.filter((item) => item.Status === "Active").length,
     };
 
-    // Load data on mount
-    useEffect(() => {
-        loadBranchItems();
-    }, []);
+    // Don't load on mount - let the page component trigger load after auth is ready
+    // useEffect(() => {
+    //     loadBranchItems();
+    // }, []);
 
     return {
         // State

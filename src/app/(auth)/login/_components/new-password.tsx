@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLoginContext } from "./login-context";
 import { validateResetPasswordForm } from "@/lib/validations";
+import authService from "@/lib/auth-service";
 
 const NewPasswordOverlay: React.FC = () => {
   const {
@@ -21,6 +22,7 @@ const NewPasswordOverlay: React.FC = () => {
     validationErrors,
     setValidationErrors,
     isLoading,
+    setIsLoading,
     setShowLoginContainer,
     setShowLine,
     setEmail,
@@ -32,48 +34,82 @@ const NewPasswordOverlay: React.FC = () => {
     setShowVerificationContainer,
     setShowForgotPassword,
     setShowForgotContainer,
+    setError,
+    otpCode,
   } = useLoginContext();
 
-  const handleUpdatePassword = () => {
+  const handleUpdatePassword = async () => {
     const { isValid, errors } = validateResetPasswordForm(
       newPassword,
       confirmPassword
     );
     setValidationErrors(errors);
 
-    if (isValid) {
-      console.log("Updating password:", newPassword);
+    if (!isValid) {
+      return;
+    }
 
-      // First, hide all other overlays immediately
-      setShowVerification(false);
-      setShowVerificationContainer(false);
-      setShowForgotPassword(false);
-      setShowForgotContainer(false);
+    setIsLoading(true);
+    setError(null);
 
-      // Reset all form data
-      setEmail("");
-      setPassword("");
-      setResetEmail("");
-      setOtpCode(["", "", "", "", ""]);
-      setResetEmailError("");
+    try {
+      // Convert OTP array to string to use as token
+      const token = otpCode.join("");
+      console.log("Resetting password with token:", token);
 
-      // Set up the login container to be revealed underneath
-      setShowLoginContainer(true);
-      
-      // Small delay to ensure login container is ready, then start animations
-      setTimeout(() => {
-        setShowLine(true);
-        // Start the slide down animation
-        setShowNewPasswordContainer(false);
-      }, 50);
+      const response = await authService.resetPassword(token, newPassword);
 
-      // After the animation completes, clean up the new password overlay
-      setTimeout(() => {
-        setShowNewPassword(false);
-        setNewPassword("");
-        setConfirmPassword("");
-        setValidationErrors({});
-      }, 1000); // Wait for the slide down animation to complete
+      if (response.success) {
+        console.log("Password reset successful");
+
+        // First, hide all other overlays immediately
+        setShowVerification(false);
+        setShowVerificationContainer(false);
+        setShowForgotPassword(false);
+        setShowForgotContainer(false);
+
+        // Reset all form data
+        setEmail("");
+        setPassword("");
+        setResetEmail("");
+        setOtpCode(["", "", "", "", ""]);
+        setResetEmailError("");
+
+        // Set up the login container to be revealed underneath
+        setShowLoginContainer(true);
+
+        // Small delay to ensure login container is ready, then start animations
+        setTimeout(() => {
+          setShowLine(true);
+          // Start the slide down animation
+          setShowNewPasswordContainer(false);
+        }, 50);
+
+        // After the animation completes, clean up the new password overlay
+        setTimeout(() => {
+          setShowNewPassword(false);
+          setNewPassword("");
+          setConfirmPassword("");
+          setValidationErrors({});
+        }, 1000); // Wait for the slide down animation to complete
+      } else {
+        // Ensure error is a string
+        const errorMessage = typeof response.error === 'string'
+          ? response.error
+          : typeof response.message === 'string'
+          ? response.message
+          : "Failed to reset password";
+        setValidationErrors({
+          confirmPassword: errorMessage
+        });
+      }
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      setValidationErrors({
+        confirmPassword: "Network error. Please try again."
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 

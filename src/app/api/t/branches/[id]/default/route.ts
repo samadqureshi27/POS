@@ -1,21 +1,15 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function POST(req: Request) {
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    const payload = await req.json().catch(() => ({}));
-    const url = `${getRemoteBase()}/t/auth/login`;
+    const url = `${getRemoteBase()}/t/branches/${params.id}/default`;
 
-    console.log('🔄 Proxy: /t/auth/login', {
-      url,
-      headers: buildTenantHeaders(req),
-      body: { ...payload, password: '***' }
-    });
+    console.log('🔄 Proxy: PUT /t/branches/:id/default', { url });
 
     const res = await fetch(url, {
-      method: "POST",
-      headers: buildTenantHeaders(req),
-      body: JSON.stringify(payload)
+      method: "PUT",
+      headers: buildTenantHeaders(req, true)
     });
 
     const contentType = res.headers.get("content-type") || "application/json";
@@ -35,7 +29,7 @@ export async function POST(req: Request) {
   } catch (err: any) {
     console.error('❌ Proxy Error:', err);
     return NextResponse.json(
-      { success: false, message: err?.message || "Proxy POST /t/auth/login failed" },
+      { success: false, message: err?.message || "Proxy PUT /t/branches/:id/default failed" },
       { status: 500 }
     );
   }
