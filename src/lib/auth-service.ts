@@ -52,6 +52,8 @@ const AUTH_PIN_LOGIN_PATH = process.env.NEXT_PUBLIC_API_AUTH_PIN_LOGIN || '/t/au
 const AUTH_LOGOUT_PATH = process.env.NEXT_PUBLIC_API_AUTH_LOGOUT || '/t/auth/logout';
 const AUTH_PROFILE_PATH = process.env.NEXT_PUBLIC_API_AUTH_PROFILE || '/t/auth/me';
 const AUTH_REFRESH_PATH = process.env.NEXT_PUBLIC_API_AUTH_REFRESH || '/t/auth/token/refresh';
+const AUTH_FORGOT_PASSWORD_PATH = process.env.NEXT_PUBLIC_API_AUTH_FORGOT_PASSWORD || '/t/auth/forgot-password';
+const AUTH_RESET_PASSWORD_PATH = process.env.NEXT_PUBLIC_API_AUTH_RESET_PASSWORD || '/t/auth/reset-password';
 // Users & staff management (env-driven, with sensible defaults)
 const AUTH_CREATE_STAFF_PATH = process.env.NEXT_PUBLIC_API_AUTH_CREATE_STAFF || '/t/auth/create-staff';
 const AUTH_USERS_BASE_PATH = process.env.NEXT_PUBLIC_API_AUTH_USERS || '/t/auth/users';
@@ -333,17 +335,26 @@ class AuthService {
   async forgotPassword(email: string): Promise<ApiResponse> {
     try {
       console.log('Requesting password reset for:', email);
-      const response = await fetch(`${API_BASE_URL}/auth/forgotPassword`, {
+      const url = buildUrl(AUTH_FORGOT_PASSWORD_PATH);
+      const res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: buildHeaders(undefined),
         body: JSON.stringify({ email })
       });
 
-      const data: ApiResponse = await response.json();
-      console.log('Forgot password response:', data);
-      return data;
+      const contentType = res.headers.get('content-type') || 'application/json';
+      const raw = contentType.includes('application/json') ? await res.json() : await res.text();
+      console.log('Forgot password response:', raw);
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          return { success: parsed.success ?? parsed.status ?? res.ok, message: parsed.message, data: parsed.result };
+        } catch {
+          return { success: res.ok };
+        }
+      }
+      const obj = raw as any;
+      return { success: obj.success ?? obj.status ?? res.ok, message: obj.message, data: obj.result };
     } catch (error) {
       console.error('Forgot password error:', error);
       return { success: false, error: 'Network error' };
@@ -353,17 +364,26 @@ class AuthService {
   async resetPassword(token: string, password: string): Promise<ApiResponse> {
     try {
       console.log('Resetting password with token');
-      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+      const url = buildUrl(AUTH_RESET_PASSWORD_PATH);
+      const res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: buildHeaders(undefined),
         body: JSON.stringify({ token, password })
       });
 
-      const data: ApiResponse = await response.json();
-      console.log('Reset password response:', data);
-      return data;
+      const contentType = res.headers.get('content-type') || 'application/json';
+      const raw = contentType.includes('application/json') ? await res.json() : await res.text();
+      console.log('Reset password response:', raw);
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          return { success: parsed.success ?? parsed.status ?? res.ok, message: parsed.message, data: parsed.result };
+        } catch {
+          return { success: res.ok };
+        }
+      }
+      const obj = raw as any;
+      return { success: obj.success ?? obj.status ?? res.ok, message: obj.message, data: obj.result };
     } catch (error) {
       console.error('Reset password error:', error);
       return { success: false, error: 'Network error' };

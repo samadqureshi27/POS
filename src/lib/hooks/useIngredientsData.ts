@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { ingredientsApi } from "@/lib/util/ingredientsApi";
+import { IngredientService, TenantIngredient } from "@/lib/services/ingredient-service";
 import {
   InventoryItem,
   ToastMessage,
@@ -32,6 +32,9 @@ export const useIngredientsData = () => {
     Unit: "",
     Threshold: 0,
     Priority: 0,
+    sku: "",
+    uom: "",
+    costPerUom: 0,
   });
 
 
@@ -41,55 +44,62 @@ export const useIngredientsData = () => {
     setTimeout(() => setToast(null), 3000);
   }, []);
 
-  // Initialize data - simulate API call
-  useEffect(() => {
-    const loadInitialData = () => {
-      setTimeout(() => {
-        setItems([
-          {
-            ID: "#001",
-            Name: "Bread",
-            Status: "Active",
-            Description: "Fresh bread for daily use",
-            Unit: "Weight in Grams",
-            Threshold: 500,
-            Priority: 1,
-          },
-          {
-            ID: "#002",
-            Name: "Oat Bread",
-            Status: "Active",
-            Description: "Healthy oat bread option",
-            Unit: "Weight in Grams",
-            Threshold: 300,
-            Priority: 2,
-          },
-          {
-            ID: "#003",
-            Name: "French Bread",
-            Status: "Inactive",
-            Description: "Traditional French bread",
-            Unit: "Quantity Count",
-            Threshold: 10,
-            Priority: 3,
-          },
-        ]);
-        setLoading(false);
-      }, 800);
-    };
-
-    loadInitialData();
+  // Map API Ingredient to frontend InventoryItem
+  const toUom = useCallback((uiUnit: string): string => {
+    switch (uiUnit) {
+      case "Weight in Grams":
+        return "g";
+      case "Volume in Liters":
+        return "l";
+      case "Quantity Count":
+      default:
+        return "pc";
+    }
   }, []);
 
-  // Load ingredients from API
+  const fromUom = useCallback((uom?: string): string => {
+    switch ((uom || "").toLowerCase()) {
+      case "g":
+        return "Weight in Grams";
+      case "l":
+        return "Volume in Liters";
+      case "pc":
+      case "qty":
+      case "count":
+        return "Quantity Count";
+      default:
+        return "Quantity Count";
+    }
+  }, []);
+
+  const mapApiIngredientToItem = useCallback((apiIng: TenantIngredient, index: number): InventoryItem => {
+    const backendId = (apiIng as any)._id || (apiIng as any).id || String(index + 1);
+    const status: "Active" | "Inactive" = apiIng.isActive ? "Active" : "Inactive";
+    return {
+      ID: `#${String(index + 1).padStart(3, "0")}`,
+      Name: apiIng.name,
+      Status: status,
+      Description: apiIng.description || (apiIng as any).notes || "",
+      Unit: fromUom((apiIng as any).uom),
+      Threshold: (apiIng as any).minThreshold ?? 0,
+      Priority: (apiIng as any).priority ?? index + 1,
+      backendId,
+      sku: (apiIng as any).sku,
+      uom: (apiIng as any).uom,
+      costPerUom: (apiIng as any).costPerUom ?? 0,
+    };
+  }, [fromUom]);
+
+  // Load ingredients from API (remote backend via Next.js proxy)
   const loadIngredients = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await ingredientsApi.getIngredients();
-      if (response.success) {
-        setItems(response.data);
+      const response = await IngredientService.listIngredients();
+      if (response.success && response.data) {
+        const mapped = response.data.map((ing, idx) => mapApiIngredientToItem(ing, idx));
+        setItems(mapped);
       } else {
-        showToast("Failed to load ingredients", "error");
+        showToast(response.message || "Failed to load ingredients", "error");
       }
     } catch (error) {
       console.error("Error loading ingredients:", error);
@@ -97,7 +107,7 @@ export const useIngredientsData = () => {
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, mapApiIngredientToItem]);
 
   // Initialize data - load from API
   useEffect(() => {
@@ -157,12 +167,21 @@ export const useIngredientsData = () => {
   const addItem = useCallback(async (newItem: Omit<InventoryItem, "ID">) => {
     try {
       setActionLoading(true);
-      const response = await ingredientsApi.createIngredient(newItem);
+      const payload: Partial<TenantIngredient> = {
+        name: newItem.Name,
+        sku: newItem.sku,
+        uom: newItem.uom || toUom(newItem.Unit),
+        isActive: newItem.Status === "Active",
+        description: newItem.Description,
+        minThreshold: newItem.Threshold as any,
+        costPerUom: newItem.costPerUom ?? 0,
+      };
+      const response = await IngredientService.createIngredient(payload);
       if (response.success) {
-        setItems((prev) => [...prev, response.data]);
+        await loadIngredients();
         showToast(response.message || "Ingredient added successfully", "success");
       } else {
-        showToast("Failed to add ingredient", "error");
+        showToast(response.message || "Failed to add ingredient", "error");
       }
     } catch (error) {
       console.error("Error adding ingredient:", error);
@@ -170,20 +189,29 @@ export const useIngredientsData = () => {
     } finally {
       setActionLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, loadIngredients]);
 
   const updateItem = useCallback(async (updatedItem: InventoryItem) => {
     try {
       setActionLoading(true);
-      const { ID, ...updates } = updatedItem;
-      const response = await ingredientsApi.updateIngredient(ID, updates);
+      if (!updatedItem.backendId) {
+        showToast("Ingredient ID not found", "error");
+        return;
+      }
+      const payload: Partial<TenantIngredient> = {
+        name: updatedItem.Name,
+        uom: updatedItem.uom || toUom(updatedItem.Unit),
+        isActive: updatedItem.Status === "Active",
+        description: updatedItem.Description,
+        minThreshold: updatedItem.Threshold as any,
+        costPerUom: updatedItem.costPerUom ?? undefined,
+      };
+      const response = await IngredientService.updateIngredient(updatedItem.backendId, payload);
       if (response.success) {
-        setItems((prev) =>
-          prev.map((item) => (item.ID === ID ? response.data : item))
-        );
+        await loadIngredients();
         showToast(response.message || "Ingredient updated successfully", "success");
       } else {
-        showToast("Failed to update ingredient", "error");
+        showToast(response.message || "Failed to update ingredient", "error");
       }
     } catch (error) {
       console.error("Error updating ingredient:", error);
@@ -191,29 +219,34 @@ export const useIngredientsData = () => {
     } finally {
       setActionLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, loadIngredients, toUom]);
 
   const deleteItems = useCallback(async () => {
     if (selectedItems.length === 0) return;
 
     try {
       setActionLoading(true);
-      const response = await ingredientsApi.deleteIngredients(selectedItems);
-      if (response.success) {
-        // Reload data to get updated list with reassigned IDs
-        await loadIngredients();
-        setSelectedItems([]);
-        showToast(response.message || "Ingredients deleted successfully", "success");
-      } else {
-        showToast("Failed to delete ingredients", "error");
+      const idsToDelete = selectedItems
+        .map((dispId) => items.find((i) => i.ID === dispId)?.backendId)
+        .filter((id): id is string => typeof id === "string" && id.length > 0);
+
+      for (const id of idsToDelete) {
+        const resp = await IngredientService.deleteIngredient(id);
+        if (!resp.success) {
+          throw new Error(resp.message || `Failed to delete ingredient ${id}`);
+        }
       }
+
+      await loadIngredients();
+      setSelectedItems([]);
+      showToast("Ingredients deleted successfully", "success");
     } catch (error) {
       console.error("Error deleting ingredients:", error);
       showToast("Failed to delete ingredients", "error");
     } finally {
       setActionLoading(false);
     }
-  }, [selectedItems, showToast, loadIngredients]);
+  }, [selectedItems, showToast, loadIngredients, items]);
 
   // Selection handlers
   const handleSelectItem = useCallback((id: string, checked: boolean) => {
@@ -243,6 +276,9 @@ export const useIngredientsData = () => {
       Unit: "",
       Threshold: 0,
       Priority: 0,
+      sku: "",
+      uom: "",
+      costPerUom: 0,
     });
     setModalOpen(true);
   }, [selectedItems.length, generateNextId]);
@@ -259,17 +295,6 @@ export const useIngredientsData = () => {
   }, []);
 
   const handleSaveItem = useCallback(() => {
-    // Validation
-    if (!formData.Name.trim()) {
-      showToast("Please enter a Name.", "error");
-      return;
-    }
-
-    if (!formData.Unit) {
-      showToast("Please select a Unit.", "error");
-      return;
-    }
-
     if (editItem) {
       updateItem(formData);
     } else {
