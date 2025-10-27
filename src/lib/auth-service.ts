@@ -52,6 +52,9 @@ const AUTH_PIN_LOGIN_PATH = process.env.NEXT_PUBLIC_API_AUTH_PIN_LOGIN || '/t/au
 const AUTH_LOGOUT_PATH = process.env.NEXT_PUBLIC_API_AUTH_LOGOUT || '/t/auth/logout';
 const AUTH_PROFILE_PATH = process.env.NEXT_PUBLIC_API_AUTH_PROFILE || '/t/auth/me';
 const AUTH_REFRESH_PATH = process.env.NEXT_PUBLIC_API_AUTH_REFRESH || '/t/auth/token/refresh';
+// Users & staff management (env-driven, with sensible defaults)
+const AUTH_CREATE_STAFF_PATH = process.env.NEXT_PUBLIC_API_AUTH_CREATE_STAFF || '/t/auth/create-staff';
+const AUTH_USERS_BASE_PATH = process.env.NEXT_PUBLIC_API_AUTH_USERS || '/t/auth/users';
 
 // Default tenant slug - can be overridden by env var
 const DEFAULT_TENANT_SLUG = 'extraction-testt';
@@ -249,12 +252,9 @@ class AuthService {
   // Rest of the methods remain the same...
   async createStaff(staffData: CreateStaffData): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(buildUrl('/t/auth/create-staff'), {
+      const response = await fetch(buildUrl(AUTH_CREATE_STAFF_PATH), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`
-        },
+        headers: buildHeaders(this.token || undefined),
         body: JSON.stringify(staffData)
       });
 
@@ -268,12 +268,9 @@ class AuthService {
 
   async resetUserPassword(userId: string, newPassword: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(buildUrl(`/t/auth/users/${userId}/reset-password`), {
+      const response = await fetch(buildUrl(`${AUTH_USERS_BASE_PATH}/${userId}/reset-password`), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`
-        },
+        headers: buildHeaders(this.token || undefined),
         body: JSON.stringify({ password: newPassword })
       });
 
@@ -287,10 +284,8 @@ class AuthService {
 
   async getUsers(): Promise<ApiResponse<User[]>> {
     try {
-      const response = await fetch(buildUrl('/t/auth/users'), {
-        headers: {
-          'Authorization': `Bearer ${this.token}`
-        }
+      const response = await fetch(buildUrl(AUTH_USERS_BASE_PATH), {
+        headers: buildHeaders(this.token || undefined)
       });
 
       const data: ApiResponse<User[]> = await response.json();
@@ -303,12 +298,9 @@ class AuthService {
 
   async updateUserPin(userId: string, newPin: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(buildUrl(`/t/auth/users/${userId}/update-pin`), {
+      const response = await fetch(buildUrl(`${AUTH_USERS_BASE_PATH}/${userId}/update-pin`), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`
-        },
+        headers: buildHeaders(this.token || undefined),
         body: JSON.stringify({ pin: newPin })
       });
 
@@ -322,11 +314,9 @@ class AuthService {
 
   async toggleUserStatus(userId: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(buildUrl(`/t/auth/users/${userId}/toggle-status`), {
+      const response = await fetch(buildUrl(`${AUTH_USERS_BASE_PATH}/${userId}/toggle-status`), {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${this.token}`
-        }
+        headers: buildHeaders(this.token || undefined)
       });
 
       const data: ApiResponse<User> = await response.json();

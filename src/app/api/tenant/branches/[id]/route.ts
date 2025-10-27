@@ -13,6 +13,7 @@ function pickTenant(req: Request): { slug?: string; id?: string } {
 function buildHeaders(req: Request) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    "Accept": "application/json",
   };
   const auth = req.headers.get("authorization");
   if (auth) headers["Authorization"] = auth;
