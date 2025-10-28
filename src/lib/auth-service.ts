@@ -26,9 +26,12 @@ export interface LoginResponse {
   success: boolean;
   user?: User;
   tokens?: AuthTokens;
-  message?: string;
+  // Backend may return string or object envelopes; allow both
+  message?: string | { message?: string } | any;
   errors?: any;
-  error?: string;
+  error?: string | { message?: string } | any;
+  // Some endpoints use `result` with nested token/user
+  result?: any;
 }
 
 export interface CreateStaffData {

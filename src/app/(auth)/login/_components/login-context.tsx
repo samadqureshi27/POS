@@ -1,7 +1,7 @@
 // contexts/LoginContext.tsx
 "use client";
 import React, { createContext, useContext, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import authService from "@/lib/auth-service";
 // import {
@@ -98,6 +98,7 @@ export const useLoginContext = () => {
 
 export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const transitionMs = 900;
 
   // Phase management
@@ -192,7 +193,8 @@ export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         // Small delay to show toast before redirect
         setTimeout(() => {
-          router.push("/dashboard");
+          const next = searchParams.get('next');
+          router.push(next || "/dashboard");
         }, 500);
       } else {
         // Extract error message
@@ -234,6 +236,11 @@ export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         // Small delay to show toast before redirect
         setTimeout(() => {
+          const next = searchParams.get('next');
+          if (next) {
+            router.push(next);
+            return;
+          }
           switch (response.user.role) {
             case "manager":
               router.push("/dashboard");
