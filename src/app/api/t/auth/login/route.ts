@@ -25,13 +25,35 @@ export async function POST(req: Request) {
 
     console.log('📡 Proxy Response:', { status: res.status, ok: res.ok });
 
-    return new NextResponse(
+    // Attempt to set httpOnly session cookie when login succeeds
+    let token: string | undefined;
+    try {
+      const obj = typeof body === 'string' ? JSON.parse(body) : body;
+      token = obj?.result?.token || obj?.token;
+    } catch {
+      // Non-JSON body, ignore
+    }
+
+    const response = new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),
       {
         status: res.status,
         headers: { "content-type": contentType },
       }
     );
+
+    if (res.ok && token) {
+      const isProd = process.env.NODE_ENV === 'production';
+      response.cookies.set('accessToken', token, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60, // 1 hour default
+      });
+    }
+
+    return response;
   } catch (err: any) {
     console.error('❌ Proxy Error:', err);
     return NextResponse.json(
