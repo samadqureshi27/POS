@@ -292,9 +292,9 @@ const MenuItemTab: React.FC<MenuItemTabProps> = ({
                                             </SelectItem>
                                         ))
                                 ) : (
-                                    <SelectItem key="no-data" value="" disabled>
+                                    <div className="px-2 py-4 text-center text-sm text-gray-500">
                                         No categories available
-                                    </SelectItem>
+                                    </div>
                                 )}
                             </SelectContent>
                         </Select>

@@ -113,7 +113,7 @@ const OptionsTab: React.FC<OptionsTabProps> = ({
                 </p>
 
                 <div className="flex items-center gap-2">
-                    <Select onValueChange={(value) => handleAddOption(value)} value="">
+                    <Select onValueChange={(value) => handleAddOption(value)}>
                         <SelectTrigger className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20">
                             <SelectValue placeholder="Select an add-on option..." />
                         </SelectTrigger>
@@ -132,9 +132,9 @@ const OptionsTab: React.FC<OptionsTabProps> = ({
                                         </SelectItem>
                                     ))
                             ) : (
-                                <SelectItem key="no-data" value="" disabled>
+                                <div className="px-2 py-4 text-center text-sm text-gray-500">
                                     No menu options available
-                                </SelectItem>
+                                </div>
                             )}
                         </SelectContent>
                     </Select>
