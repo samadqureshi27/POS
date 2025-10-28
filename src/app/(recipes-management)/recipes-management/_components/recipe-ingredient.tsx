@@ -356,9 +356,9 @@ const RecipeIngredientsTab: React.FC<RecipeIngredientsTabProps> = ({
                     </SelectItem>
                   ))
               ) : (
-                <SelectItem key="no-data" value="" disabled>
+                <div className="px-2 py-4 text-center text-sm text-gray-500">
                   No {title.toLowerCase()} available
-                </SelectItem>
+                </div>
               )}
             </SelectContent>
           </Select>
