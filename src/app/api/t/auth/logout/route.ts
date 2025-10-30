@@ -30,10 +30,13 @@ export async function POST(req: Request) {
     const res = await fetch(url, { method: "POST", headers: buildHeaders(req), body: JSON.stringify(payload) });
     const contentType = res.headers.get("content-type") || "application/json";
     const body = contentType.includes("application/json") ? await res.json().catch(() => ({})) : await res.text();
-    return new NextResponse(typeof body === "string" ? body : JSON.stringify(body), {
+    const response = new NextResponse(typeof body === "string" ? body : JSON.stringify(body), {
       status: res.status,
       headers: { "content-type": contentType },
     });
+    // Clear session cookie on logout
+    response.cookies.delete('accessToken');
+    return response;
   } catch (err: any) {
     return NextResponse.json({ success: false, message: err?.message || "Proxy POST /t/auth/logout failed" }, { status: 500 });
   }
