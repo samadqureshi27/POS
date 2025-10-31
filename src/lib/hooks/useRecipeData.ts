@@ -65,7 +65,7 @@ export const useRecipeData = () => {
         }));
         setAvailableRecipeOptions(optionsWithDefaults);
       } else {
-        throw new Error(response.message || "Failed to fetch recipe options");
+        throw new Error((response as any).message || "Failed to fetch recipe options");
       }
     } catch (error) {
       console.error("Error fetching available recipe options:", error);

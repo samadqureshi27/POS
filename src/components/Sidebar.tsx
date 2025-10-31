@@ -13,6 +13,7 @@ import {
   DollarSign,
   Package2,
   AlignJustify,
+  Package,
 } from 'lucide-react';
 import { navigationConfig, findNavigationItem, type NavigationItem } from '@/lib/navigation';
 import { group } from 'console';
@@ -26,6 +27,12 @@ export default function Sidebar() {
       label: 'Home',
       link: '/dashboard',
       group: 'main'
+    },
+    {
+      icon: <Package className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Items',
+      link: '/items',
+      group: 'items'
     },
     {
       icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
@@ -97,6 +104,9 @@ export default function Sidebar() {
     }
     if (item.group === 'analytics') {
       return currentNavItem.group === 'analytics';
+    }
+    if (item.group === 'items') {
+      return currentNavItem.group === 'items';
     }
     if (item.group === 'menu') {
       return currentNavItem.group === 'menu';

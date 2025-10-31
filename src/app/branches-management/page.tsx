@@ -11,7 +11,6 @@ import { Toaster } from '@/components/ui/sonner';
 import { toast as sonnerToast } from 'sonner';
 import BranchModal from "./_components/branch-modal";
 import BranchTable from "./_components/branch-table";
-import LoadingSpinner from '@/components/ui/loader';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 
