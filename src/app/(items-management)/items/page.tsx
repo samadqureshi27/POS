@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Package, Plus, Settings2, Search, Grid3x3, List, TrendingUp, AlertTriangle, Zap, Upload, Download } from "lucide-react";
+import { Package, Plus, Settings2, Search, Grid3x3, List, TrendingUp, AlertTriangle, Zap, Upload, Download, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
@@ -9,7 +9,6 @@ import UnitsManagementModal from "./_components/units-management-modal";
 import InventoryItemModal from "./_components/inventory-item-modal";
 import InventoryGrid from "./_components/inventory-grid";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
-import { exportToCSV, importFromCSV } from "@/lib/util/csvUtil";
 
 export default function ItemsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -120,9 +119,53 @@ export default function ItemsPage() {
     }
   };
 
-  // CSV Import/Export Handlers
-  const handleExport = () => {
-    exportToCSV(items, "inventory");
+  // API Import/Export Handlers
+  const handleDownloadTemplate = async () => {
+    try {
+      const response = await InventoryService.downloadImportTemplate(true);
+      if (response.success && response.data) {
+        // Create download link
+        const url = window.URL.createObjectURL(response.data);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'inventory_items_template.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert(`Failed to download template: ${response.message}`);
+      }
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      alert('Failed to download template. Please try again.');
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const response = await InventoryService.exportItems({
+        q: searchQuery,
+        // Add categoryId filter if needed
+      });
+      
+      if (response.success && response.data) {
+        // Create download link
+        const url = window.URL.createObjectURL(response.data);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `inventory_items_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert(`Failed to export items: ${response.message}`);
+      }
+    } catch (error) {
+      console.error('Error exporting items:', error);
+      alert('Failed to export items. Please try again.');
+    }
   };
 
   const handleImportClick = () => {
@@ -133,32 +176,41 @@ export default function ItemsPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
+    const allowedTypes = ['.csv', '.xlsx'];
+    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+    if (!allowedTypes.includes(fileExtension)) {
+      alert('Please select a CSV or XLSX file.');
+      return;
+    }
+
     try {
-      const importedItems = await importFromCSV(file);
+      const duplicatePolicy = window.confirm(
+        'How would you like to handle duplicate items?\n\nOK = Update existing items\nCancel = Skip duplicates'
+      ) ? 'update' : 'skip';
 
-      if (window.confirm(`Import ${importedItems.length} items? This will create new inventory items.`)) {
-        let successCount = 0;
-        let failCount = 0;
+      const response = await InventoryService.importItems(file, duplicatePolicy);
 
-        for (const item of importedItems) {
-          const response = await InventoryService.createItem({
-            ...item,
-            isActive: item.isActive ?? true,
-          } as any);
-
-          if (response.success) {
-            successCount++;
-          } else {
-            failCount++;
-            console.error(`Failed to import item:`, item.name, response.message);
-          }
+      if (response.success) {
+        const result = response.data;
+        let message = 'Import completed successfully!';
+        
+        if (result?.summary) {
+          message = `Import Summary:
+• Created: ${result.summary.created || 0} items
+• Updated: ${result.summary.updated || 0} items
+• Skipped: ${result.summary.skipped || 0} items
+• Failed: ${result.summary.failed || 0} items`;
         }
 
-        loadItems();
-        alert(`Import complete!\nSuccess: ${successCount}\nFailed: ${failCount}`);
+        alert(message);
+        loadItems(); // Refresh the items list
+      } else {
+        alert(`Import failed: ${response.message}`);
       }
     } catch (error) {
-      alert("Failed to import CSV. Please check the file format.");
+      console.error('Error importing items:', error);
+      alert('Failed to import file. Please check the file format and try again.');
     }
 
     // Reset file input
@@ -186,17 +238,25 @@ export default function ItemsPage() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv"
+                accept=".csv,.xlsx"
                 onChange={handleImport}
                 className="hidden"
               />
+              <Button
+                onClick={handleDownloadTemplate}
+                variant="outline"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                <FileDown className="h-4 w-4 mr-2" />
+                Template
+              </Button>
               <Button
                 onClick={handleImportClick}
                 variant="outline"
                 className="border-gray-300 text-gray-700 hover:bg-gray-50"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Import CSV
+                Import
               </Button>
               <Button
                 onClick={handleExport}
@@ -205,7 +265,7 @@ export default function ItemsPage() {
                 disabled={items.length === 0}
               >
                 <Download className="h-4 w-4 mr-2" />
-                Export CSV
+                Export
               </Button>
             </div>
           </div>
