@@ -176,21 +176,21 @@ export default function InventoryItemModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl h-[85vh] overflow-hidden bg-white border border-gray-200 text-gray-900 p-0 flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 bg-white flex-shrink-0">
+        <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
               {editingItem ? "Edit Item" : "Add New Item"}
             </h2>
-            <p className="text-gray-600 text-sm mt-1">
+            <p className="text-gray-600 text-sm">
               {editingItem ? "Update item details" : "Add a new item to your inventory"}
             </p>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="p-4 overflow-y-auto flex-1 hide-scrollbar">
           <Tabs defaultValue="basic" className="w-full h-full">
-            <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="basic">Basic</TabsTrigger>
               <TabsTrigger value="stock">Stock</TabsTrigger>
               <TabsTrigger value="vendors">Vendors</TabsTrigger>
@@ -209,7 +209,7 @@ export default function InventoryItemModal({
                   value={formData.name}
                   onChange={(e) => handleFieldChange("name", e.target.value)}
                   placeholder="e.g., Chicken Breast"
-                  className="bg-white border-gray-300 h-11"
+                  className="bg-white border-gray-300 h-9 rounded-md"
                 />
               </div>
 
@@ -221,7 +221,7 @@ export default function InventoryItemModal({
                     value={formData.sku}
                     onChange={(e) => handleFieldChange("sku", e.target.value)}
                     placeholder="e.g., CHICK-BRST"
-                    className="bg-white border-gray-300"
+                    className="bg-white border-gray-300 h-9 rounded-md"
                   />
                 </div>
 
@@ -267,7 +267,7 @@ export default function InventoryItemModal({
                     value={formData.category}
                     onChange={(e) => handleFieldChange("category", e.target.value)}
                     placeholder="Or type custom category"
-                    className="bg-white border-gray-300"
+                    className="bg-white border-gray-300 h-9 rounded-md"
                   />
                 </div>
                 <p className="text-gray-500 text-xs mt-1">
@@ -276,7 +276,7 @@ export default function InventoryItemModal({
               </div>
 
               {/* Active Status */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-gray-700 font-medium">Active Status</Label>
@@ -292,19 +292,6 @@ export default function InventoryItemModal({
 
             {/* Stock & Units Tab */}
             <TabsContent value="stock" className="space-y-4">
-              {/* Track Stock */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label className="text-gray-700 font-medium">Track Stock</Label>
-                    <p className="text-gray-500 text-xs mt-1">Monitor inventory levels for this item</p>
-                  </div>
-                  <Switch
-                    checked={formData.trackStock}
-                    onCheckedChange={(checked) => handleFieldChange("trackStock", checked)}
-                  />
-                </div>
-              </div>
 
               {/* Base Unit */}
               <div>
@@ -386,7 +373,7 @@ export default function InventoryItemModal({
 
                   {/* Reorder Point */}
                   <div>
-                    <Label className="text-gray-700 text-sm mb-2">Reorder Point</Label>
+                    <Label className="text-gray-700 text-sm  h-9 rounded-md">Reorder Point</Label>
                     <Input
                       type="number"
                       value={formData.reorderPoint}
@@ -400,6 +387,19 @@ export default function InventoryItemModal({
                   </div>
                 </>
               )}
+              {/* Track Stock */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-gray-700 font-medium">Track Stock</Label>
+                    <p className="text-gray-500 text-xs mt-1">Monitor inventory levels for this item</p>
+                  </div>
+                  <Switch
+                    checked={formData.trackStock}
+                    onCheckedChange={(checked) => handleFieldChange("trackStock", checked)}
+                  />
+                </div>
+              </div>
             </TabsContent>
 
             {/* Vendors Tab */}

@@ -8,7 +8,10 @@
       "Bash(git stash:*)",
       "Read(//c/Users/faraz/Documents/GitHub/umt code/POS/**)",
       "Bash(cat:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node -c:*)"
     ],
     "deny": [],
     "ask": []
