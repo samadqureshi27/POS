@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Package, Plus, Settings2, Search, Grid3x3, List, TrendingUp, AlertTriangle, Zap, Upload, Download, FileDown } from "lucide-react";
+import { Package, Plus, Search, Grid3x3, List, TrendingUp, AlertTriangle, Zap, Upload, Download, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
-import UnitsManagementModal from "./_components/units-management-modal";
 import InventoryItemModal from "./_components/inventory-item-modal";
 import InventoryGrid from "./_components/inventory-grid";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
@@ -20,7 +19,6 @@ export default function ItemsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Modals
-  const [isUnitsModalOpen, setIsUnitsModalOpen] = useState(false);
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
 
@@ -32,18 +30,28 @@ export default function ItemsPage() {
     outOfStock: 0,
   });
 
-  // Load items
+  // Load items and stats
   const loadItems = async () => {
     setLoading(true);
-    const params: any = { q: searchQuery, limit: 1000 };
+    const params: any = {
+      limit: 200,
+      sort: "createdAt",
+      order: "desc"
+    };
+    if (searchQuery) params.q = searchQuery;
     if (filterType !== "all") params.type = filterType;
-    // Note: API doesn't have status filter, we'll filter client-side if needed
 
     const response = await InventoryService.listItems(params);
+
     if (response.success && response.data) {
       let filteredItems = response.data;
 
-      // Client-side status filtering if needed
+      // Client-side type filtering (backend not filtering correctly)
+      if (filterType !== "all") {
+        filteredItems = filteredItems.filter(item => item.type === filterType);
+      }
+
+      // Client-side status filtering
       if (filterStatus !== "all") {
         filteredItems = filteredItems.filter(item =>
           filterStatus === "Active" ? item.isActive !== false : item.isActive === false
@@ -51,7 +59,21 @@ export default function ItemsPage() {
       }
 
       setItems(filteredItems);
-      calculateStats(filteredItems);
+
+      // Load stats from dedicated API endpoint
+      const statsResponse = await InventoryService.getStats();
+
+      if (statsResponse.success && statsResponse.data) {
+        setStats({
+          totalItems: statsResponse.data.totalItems,
+          stockItems: statsResponse.data.stockItems,
+          lowStock: statsResponse.data.lowStock,
+          outOfStock: statsResponse.data.outOfStock,
+        });
+      } else {
+        // Fallback to client-side calculation if API fails
+        calculateStats(filteredItems);
+      }
     } else {
       console.error("Failed to load items:", response.message);
     }
@@ -420,14 +442,6 @@ export default function ItemsPage() {
 
               {/* Primary Actions */}
               <Button
-                onClick={() => setIsUnitsModalOpen(true)}
-                className="bg-gray-700 hover:bg-gray-800 text-white"
-              >
-                <Settings2 className="h-5 w-5 mr-2" />
-                Units
-              </Button>
-
-              <Button
                 onClick={handleAddItem}
                 className="bg-gray-900 hover:bg-black text-white"
               >
@@ -447,13 +461,6 @@ export default function ItemsPage() {
           onDelete={handleDeleteItem}
         />
       </div>
-
-      {/* Modals */}
-      <UnitsManagementModal
-        isOpen={isUnitsModalOpen}
-        onClose={() => setIsUnitsModalOpen(false)}
-        onRefresh={loadItems}
-      />
 
       <InventoryItemModal
         isOpen={isItemModalOpen}

@@ -43,8 +43,15 @@ export default function InventoryGrid({
     );
   }
 
+  const getItemStatus = (item: InventoryItem) => {
+    if (item.isActive === false) {
+      return { label: "Inactive", color: "text-red-600 bg-red-50", icon: AlertCircle };
+    }
+    return { label: "Active", color: "text-green-600 bg-green-50", icon: CheckCircle2 };
+  };
+
   const getStockStatus = (item: InventoryItem) => {
-    if (!item.trackStock) return { label: "Service", color: "text-purple-600 bg-purple-50", icon: CheckCircle2 };
+    if (!item.trackStock) return { label: "Not Tracked", color: "text-gray-600 bg-gray-50", icon: CheckCircle2 };
     if (item.currentStock === 0) return { label: "Out of Stock", color: "text-red-600 bg-red-50", icon: AlertCircle };
     if (item.reorderPoint && item.currentStock && item.currentStock <= item.reorderPoint) {
       return { label: "Low Stock", color: "text-yellow-600 bg-yellow-50", icon: AlertCircle };
@@ -70,8 +77,8 @@ export default function InventoryGrid({
             </thead>
             <tbody className="divide-y divide-gray-200">
               {items.map((item) => {
-                const status = getStockStatus(item);
-                const StatusIcon = status.icon;
+                const itemStatus = getItemStatus(item);
+                const StatusIcon = itemStatus.icon;
 
                 return (
                   <tr key={item._id || item.id} className="hover:shadow-lg transition-shadow duration-200">
@@ -83,7 +90,11 @@ export default function InventoryGrid({
                         <div>
                           <div className="font-medium text-gray-900">{item.name}</div>
                           {item.categoryId && (
-                            <div className="text-xs text-gray-500">{item.categoryId}</div>
+                            <div className="text-xs text-gray-500">
+                              {typeof item.categoryId === 'object' && item.categoryId.name
+                                ? item.categoryId.name
+                                : typeof item.categoryId === 'string' ? item.categoryId : ''}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -112,8 +123,8 @@ export default function InventoryGrid({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <StatusIcon className={`h-4 w-4 ${status.color.split(' ')[0]}`} />
-                        <span className={`text-sm ${status.color.split(' ')[0]}`}>{status.label}</span>
+                        <StatusIcon className={`h-4 w-4 ${itemStatus.color.split(' ')[0]}`} />
+                        <span className={`text-sm ${itemStatus.color.split(' ')[0]}`}>{itemStatus.label}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
@@ -150,8 +161,8 @@ export default function InventoryGrid({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {items.map((item) => {
-        const status = getStockStatus(item);
-        const StatusIcon = status.icon;
+        const itemStatus = getItemStatus(item);
+        const stockStatus = getStockStatus(item);
 
         return (
           <div
@@ -162,10 +173,13 @@ export default function InventoryGrid({
             <div className="relative h-32 bg-gray-50 flex items-center justify-center border-b border-gray-200">
               <Package className="h-12 w-12 text-gray-300" />
 
-              {/* Status Badge */}
-              <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${status.color}`}>
-                <StatusIcon className="h-3 w-3 inline mr-1" />
-                {status.label}
+              {/* Type Badge */}
+              <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${
+                item.type === "stock"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-purple-100 text-purple-700"
+              }`}>
+                {item.type}
               </div>
 
               {/* Hover Actions Overlay */}
@@ -198,56 +212,92 @@ export default function InventoryGrid({
 
               {/* Info Grid */}
               <div className="space-y-2 mb-4">
+                {/* Item Status */}
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Type:</span>
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                    item.type === "stock"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-purple-100 text-purple-700"
-                  }`}>
-                    {item.type}
+                  <span className="text-gray-600">Status:</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${itemStatus.color}`}>
+                    {itemStatus.label}
                   </span>
                 </div>
 
+                {/* Stock Status */}
+                {item.trackStock && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Stock Status:</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${stockStatus.color}`}>
+                      {stockStatus.label}
+                    </span>
+                  </div>
+                )}
+
+                {/* Category */}
+                {item.categoryId && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Category:</span>
+                    <span className="text-gray-700 text-xs truncate max-w-[120px]">
+                      {typeof item.categoryId === 'object' && item.categoryId.name
+                        ? item.categoryId.name
+                        : typeof item.categoryId === 'string' ? item.categoryId : ''}
+                    </span>
+                  </div>
+                )}
+
+                {/* Unit */}
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Unit:</span>
                   <span className="text-gray-900 font-medium">{item.baseUnit}</span>
                 </div>
 
+                {/* Current Stock Quantity */}
                 {item.trackStock && (
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Stock:</span>
-                    <span className="text-gray-900 font-bold text-lg">{item.currentStock || 0}</span>
-                  </div>
-                )}
-
-                {item.categoryId && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Category:</span>
-                    <span className="text-gray-700 text-xs truncate max-w-[120px]">{item.categoryId}</span>
+                    <span className="text-gray-600">Quantity:</span>
+                    <span className="text-gray-900 font-bold text-lg">{item.currentStock || 0} {item.baseUnit}</span>
                   </div>
                 )}
               </div>
 
-              {/* Reorder Point Indicator */}
-              {item.trackStock && item.reorderPoint && (
+              {/* Reorder Point Info - Show if tracking stock */}
+              {item.trackStock && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
-                    <span>Reorder Point</span>
-                    <span className="font-medium">{item.reorderPoint}</span>
+                  <div className="flex items-center justify-between text-xs mb-2">
+                    <span className="text-gray-600">
+                      {item.reorderPoint ? 'Stock Level' : 'Current Stock'}
+                    </span>
+                    <span className="text-gray-900 font-medium">
+                      {item.currentStock !== undefined ? item.currentStock : 'N/A'} {item.baseUnit}
+                      {item.reorderPoint && ` / ${item.reorderPoint} (threshold)`}
+                    </span>
                   </div>
-                  <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full transition-all ${
-                        (item.currentStock || 0) <= item.reorderPoint
-                          ? "bg-red-500"
-                          : "bg-green-500"
-                      }`}
-                      style={{
-                        width: `${Math.min(((item.currentStock || 0) / (item.reorderPoint * 2)) * 100, 100)}%`,
-                      }}
-                    ></div>
-                  </div>
+
+                  {/* Show progress bar only if reorderPoint is set */}
+                  {item.reorderPoint && (
+                    <>
+                      <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                        {/* Progress bar */}
+                        <div
+                          className={`h-full transition-all ${
+                            (item.currentStock || 0) <= item.reorderPoint
+                              ? "bg-red-500"
+                              : "bg-green-500"
+                          }`}
+                          style={{
+                            width: `${Math.min(((item.currentStock || 0) / (item.reorderPoint * 2)) * 100, 100)}%`,
+                          }}
+                        ></div>
+                        {/* Threshold marker */}
+                        <div
+                          className="absolute top-0 bottom-0 w-0.5 bg-yellow-500"
+                          style={{ left: '50%' }}
+                        ></div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
+                        <span>0</span>
+                        <span className="text-yellow-600">← Threshold</span>
+                        <span>{item.reorderPoint * 2}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
