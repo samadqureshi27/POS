@@ -100,15 +100,20 @@ function getTenantId(): string | null {
   return null;
 }
 
-function buildHeaders(extra?: Record<string, string>) {
+function buildHeaders(extra?: Record<string, string>, skipContentType?: boolean) {
   const token = getToken();
   const slug = getTenantSlug();
   const id = getTenantId();
 
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     "Accept": "application/json",
   };
+  
+  // Only add Content-Type if not skipped (for FormData)
+  if (!skipContentType) {
+    headers["Content-Type"] = "application/json";
+  }
+  
   if (token) headers["Authorization"] = `Bearer ${token}`;
   if (id) headers["x-tenant-id"] = id;
   else if (slug) headers["x-tenant-id"] = slug;
@@ -246,20 +251,136 @@ export const InventoryService = {
 
   // Adjust stock
   async adjustStock(payload: StockAdjustment): Promise<ApiResponse<any>> {
-    const url = buildUrl(`/t/inventory/txns`);
+    try {
+      const response = await fetch(buildUrl("/t/inventory/stock/adjust"), {
+        method: "POST",
+        headers: buildHeaders(),
+        body: JSON.stringify(payload),
+      });
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: buildHeaders(),
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Stock adjustment failed (${res.status})` };
+      const data = await response.json();
+      return { success: true, data };
+    } catch (error: any) {
+      console.error("Error adjusting stock:", error);
+      return { success: false, message: error.message };
     }
+  },
 
-    return { success: true, data: data?.result ?? data };
+  // ==================== Import/Export Methods ====================
+
+  /**
+   * Download CSV template for importing items
+   * @param includeSample - Whether to include sample data in the template
+   */
+  async downloadImportTemplate(includeSample: boolean = true): Promise<ApiResponse<Blob>> {
+    try {
+      const url = buildUrl(`/t/inventory/items/import/template${includeSample ? '?sample=true' : ''}`);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: buildHeaders({
+          'Accept': 'text/csv, application/json'
+        }),
+      });
+
+      if (!response.ok) {
+        // Try to parse as JSON first (for error responses from proxy)
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      }
+
+      const blob = await response.blob();
+      return { success: true, data: blob };
+    } catch (error: any) {
+      console.error("Error downloading import template:", error);
+      return { success: false, message: error.message };
+    }
+  },
+
+  /**
+   * Import items from CSV/XLSX file
+   * @param file - The CSV or XLSX file to import
+   * @param duplicatePolicy - How to handle duplicate items ('skip' or 'update')
+   */
+  async importItems(file: File, duplicatePolicy: 'skip' | 'update' = 'skip'): Promise<ApiResponse<any>> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('duplicatePolicy', duplicatePolicy);
+
+      const response = await fetch(buildUrl("/t/inventory/items/import"), {
+        method: "POST",
+        headers: buildHeaders({}, true), // Skip Content-Type for FormData
+        body: formData,
+      });
+
+      if (!response.ok) {
+        // Try to parse as JSON first (for error responses from proxy)
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      }
+
+      const data = await response.json();
+      return { success: true, data };
+    } catch (error: any) {
+      console.error("Error importing items:", error);
+      return { success: false, message: error.message };
+    }
+  },
+
+  /**
+   * Export items to CSV
+   * @param params - Optional filters for export
+   */
+  async exportItems(params?: {
+    q?: string;
+    categoryId?: string;
+  }): Promise<ApiResponse<Blob>> {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params?.q) searchParams.append('q', params.q);
+      if (params?.categoryId) searchParams.append('categoryId', params.categoryId);
+
+      const queryString = searchParams.toString();
+      const url = buildUrl(`/t/inventory/items/export.csv${queryString ? `?${queryString}` : ''}`);
+      
+      const response = await fetch(url, {
+        method: "GET",
+        headers: buildHeaders({
+          'Accept': 'text/csv, application/json'
+        }),
+      });
+
+      if (!response.ok) {
+        // Try to parse as JSON first (for error responses from proxy)
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      }
+
+      const blob = await response.blob();
+      return { success: true, data: blob };
+    } catch (error: any) {
+      console.error("Error exporting items:", error);
+      return { success: false, message: error.message };
+    }
   },
 };
 

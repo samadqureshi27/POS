@@ -1,0 +1,183 @@
+{
+	"info": {
+		"_postman_id": "35ecb3f1-09f0-4324-8bc3-bf5b261a3653",
+		"name": "POS — Inventory Categories & Import/Export",
+		"description": "This collection covers:\n1) Inventory Category CRUD (enterprise-ready, hierarchical)\n2) Inventory Items Import/Export (CSV/XLSX) with auto-SKU and Category-by-Name matching\n\nHeaders assumed:\n- Authorization: Bearer {{token}}\n- X-Tenant-Slug: {{tenant_slug}}   (adjust to whatever your tenantContext expects)\n\nVariables:\n- base_url: e.g., https://api.yourdomain.com\n- token: JWT\n- tenant_slug: your-tenant\n\nNotes:\n- For Import Items, the backend matches \"Category Name\" (case-insensitive) to existing Inventory Categories.\n- For SKUs, the backend auto-generates using tenant slug prefix if SKU field is empty.\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48917537",
+		"_collection_link": "https://dkay042-3274752.postman.co/workspace/Faraz's-Workspace~976616b6-c854-4493-86ae-6b6ff1d9e4fc/collection/48917537-35ecb3f1-09f0-4324-8bc3-bf5b261a3653?action=share&source=collection_link&creator=48917537"
+	},
+	"item": [
+		{
+			"name": "Inventory Items — Import/Export",
+			"item": [
+				{
+					"name": "Export Empty Template (CSV)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3297/t/inventory/items/import/template?sample=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3297",
+							"path": [
+								"t",
+								"inventory",
+								"items",
+								"import",
+								"template"
+							],
+							"query": [
+								{
+									"key": "sample",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Downloads a CSV header template (optionally with a sample row)."
+					},
+					"response": []
+				},
+				{
+					"name": "Import Items (CSV/XLSX)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant_slug}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"description": "Upload .csv or .xlsx generated from the template",
+									"type": "file",
+									"src": "/C:/Users/Ghalzai/Downloads/inventory_items_populated.csv"
+								},
+								{
+									"key": "duplicatePolicy",
+									"value": "skip",
+									"description": "skip | update",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3297/t/inventory/items/import",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3297",
+							"path": [
+								"t",
+								"inventory",
+								"items",
+								"import"
+							]
+						},
+						"description": "Bulk import items. Category matched by 'Category Name'. Auto-SKU for blank values."
+					},
+					"response": []
+				},
+				{
+					"name": "Export Items (CSV)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Tenant-Slug",
+								"value": "{{tenant_slug}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory/items/export.csv?q={{q}}&categoryId={{category_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory",
+								"items",
+								"export.csv"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{q}}"
+								},
+								{
+									"key": "categoryId",
+									"value": "{{category_id}}"
+								}
+							]
+						},
+						"description": "Exports existing items as CSV with the same columns as the template."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3297"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "tenant_slug",
+			"value": "demo-tenant"
+		},
+		{
+			"key": "q",
+			"value": ""
+		},
+		{
+			"key": "category_id",
+			"value": ""
+		}
+	]
+}
