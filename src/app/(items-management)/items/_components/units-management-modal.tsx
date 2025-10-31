@@ -135,7 +135,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
             {/* Units Tab */}
             <TabsContent value="units" className="space-y-6">
               {/* Add New Unit Form */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Plus className="h-5 w-5 text-gray-600" />
                   Add New Unit
@@ -148,7 +148,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                       value={newUnit.name}
                       onChange={(e) => setNewUnit({ ...newUnit, name: e.target.value })}
                       placeholder="e.g., Kilogram"
-                      className="bg-white border-gray-300"
+                      className="bg-white border-gray-300 h-9 rounded-md"
                     />
                   </div>
 
@@ -158,7 +158,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                       value={newUnit.symbol}
                       onChange={(e) => setNewUnit({ ...newUnit, symbol: e.target.value })}
                       placeholder="e.g., kg"
-                      className="bg-white border-gray-300"
+                      className="bg-white border-gray-300 h-9 rounded-md"
                     />
                   </div>
 
@@ -180,7 +180,6 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                       </SelectContent>
                     </Select>
                   </div>
-
                   <div className="flex items-end">
                     <Button
                       onClick={handleAddUnit}
@@ -234,7 +233,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-gray-600 text-sm">Symbol:</span>
-                            <span className="text-gray-900 font-bold text-lg">{unit.symbol}</span>
+                            <span className="text-gray-900 font-bold text-lg h-9">{unit.symbol}</span>
                           </div>
                         </div>
                       </div>
@@ -260,7 +259,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                       value={newConversion.fromUnit}
                       onValueChange={(value) => setNewConversion({ ...newConversion, fromUnit: value })}
                     >
-                      <SelectTrigger className="bg-white border-gray-300">
+                      <SelectTrigger className="bg-white border-gray-300 h-9 rounded-md">
                         <SelectValue placeholder="Select unit" />
                       </SelectTrigger>
                       <SelectContent>
@@ -279,7 +278,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                       value={newConversion.toUnit}
                       onValueChange={(value) => setNewConversion({ ...newConversion, toUnit: value })}
                     >
-                      <SelectTrigger className="bg-white border-gray-300">
+                      <SelectTrigger className="bg-white border-gray-300 h-9 rounded-md">
                         <SelectValue placeholder="Select unit" />
                       </SelectTrigger>
                       <SelectContent>
@@ -300,14 +299,14 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                       value={newConversion.factor}
                       onChange={(e) => setNewConversion({ ...newConversion, factor: e.target.value })}
                       placeholder="e.g., 1000"
-                      className="bg-white border-gray-300"
+                      className="bg-white border-gray-300 h-9 rounded-md"
                     />
                   </div>
 
                   <div className="flex items-end">
                     <Button
                       onClick={handleAddConversion}
-                      className="w-full bg-gray-900 hover:bg-black text-white"
+                      className="w-full bg-gray-900 hover:bg-black text-white h-9 rounded-md"
                       disabled={!newConversion.fromUnit || !newConversion.toUnit || !newConversion.factor}
                     >
                       <Plus className="h-4 w-4 mr-2" />

@@ -218,7 +218,7 @@ export default function ItemsPage() {
         </div>
 
         {/* Action Bar */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6 shadow-sm">
+        <div className="bg-white border border-grey rounded-lg p-4 mb-6 hover:shadow-lg transition-shadow duration-200">
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             {/* Search */}
             <div className="relative flex-1 w-full lg:max-w-md">
