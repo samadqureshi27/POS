@@ -1569,1727 +1569,6 @@
 			]
 		},
 		{
-			"name": "Tenant Catalog",
-			"item": [
-				{
-					"name": "Create Category",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{tenant_token}}"
-							},
-							{
-								"key": "x-tenant-id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Coffee\",\n    \"slug\": \"coffee\",\n    \"sortIndex\": 10,\n    \"isActive\": true\n}"
-						},
-						"url": {
-							"raw": "{{Pos-Live}}/t/catalog/categories",
-							"host": [
-								"{{Pos-Live}}"
-							],
-							"path": [
-								"t",
-								"catalog",
-								"categories"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List Categories",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{tenant_token}}"
-							},
-							{
-								"key": "x-tenant-id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/catalog/categories?q=&status=active&page=1&limit=50",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"catalog",
-								"categories"
-							],
-							"query": [
-								{
-									"key": "q",
-									"value": ""
-								},
-								{
-									"key": "status",
-									"value": "active"
-								},
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "50"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Modifier Group",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{tenant_token}}"
-							},
-							{
-								"key": "x-tenant-id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Milk Options\",\n  \"key\": \"milk-options\",\n  \"selection\": \"single\",\n  \"min\": 0,\n  \"max\": 1,\n  \"options\": [\n    { \"name\": \"Whole Milk\" },\n    { \"name\": \"Skim Milk\" },\n    { \"name\": \"Oat Milk\", \"price\": 60 },\n    { \"name\": \"Almond Milk\", \"price\": 60 }\n  ]\n}\n"
-						},
-						"url": {
-							"raw": "{{Pos-Live}}/t/catalog/modifiers",
-							"host": [
-								"{{Pos-Live}}"
-							],
-							"path": [
-								"t",
-								"catalog",
-								"modifiers"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Item (with variants & modifiers)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{tenant_token}}"
-							},
-							{
-								"key": "x-tenant-id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "// {\n//   \"name\": \"Latte\",\n//   \"slug\": \"latte\",\n//   \"categoryIds\": [\"68fb6f8495797e9c43aba28c\"], //coffee category _id\n//   \"imageUrl\": \"\",\n//   \"variants\": [\n//     { \"name\": \"Small\", \"price\": 480 },\n//     { \"name\": \"Medium\", \"price\": 560 },\n//     { \"name\": \"Large\", \"price\": 640 }\n//   ],\n//   \"modifiers\": [\n//     { \"groupId\": \"68fb717a95797e9c43aba295\", \"required\": false, \"min\": 0, \"max\": 1 },\n//     { \"groupId\": \"68fb7188e863ecc60b60c975\", \"required\": false, \"min\": 0, \"max\": 3 }\n//   ],\n//   \"isActive\": true\n// }\n{\n  \"name\": \"Cappuccino\",\n  \"slug\": \"cappuccino\",\n  \"categoryIds\": [\"68fb6f8495797e9c43aba28c\"],\n  \"variants\": [\n    { \"name\": \"Small\", \"price\": 460 },\n    { \"name\": \"Medium\", \"price\": 540 },\n    { \"name\": \"Large\", \"price\": 620 }\n  ],\n  \"modifiers\": [\n    { \"groupId\": \"68fb717a95797e9c43aba295\", \"required\": false, \"min\": 0, \"max\": 1 }\n  ]\n}\n"
-						},
-						"url": {
-							"raw": "{{Pos-Live}}/t/catalog/items",
-							"host": [
-								"{{Pos-Live}}"
-							],
-							"path": [
-								"t",
-								"catalog",
-								"items"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Upsert Recipe (BOM)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{tenant_token}}"
-							},
-							{
-								"key": "x-tenant-id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"itemId\":\"{{item_id}}\",\n  \"variantName\":\"Regular\",\n  \"yieldQty\":1,\n  \"yieldUnit\":\"pcs\",\n  \"components\":[\n    {\"name\":\"Bun\",\"qty\":1,\"unit\":\"pcs\"},\n    {\"name\":\"Patty\",\"qty\":150,\"unit\":\"g\"},\n    {\"name\":\"Lettuce\",\"qty\":20,\"unit\":\"g\"}\n  ]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/t/catalog/recipes/upsert",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"catalog",
-								"recipes",
-								"upsert"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Menu (branch)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{tenant_token}}"
-							},
-							{
-								"key": "x-tenant-id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "x-branch-id",
-								"value": "{{branch_id}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"branchId\":\"{{branch_id}}\",\n  \"title\":\"Main Menu\",\n  \"status\":\"draft\",\n  \"sections\":[\n    {\"name\":\"Burgers\",\"categoryId\":\"{{category_id}}\",\"sortIndex\":0}\n  ]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/t/catalog/menus",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"catalog",
-								"menus"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Publish Menu",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{tenant_token}}"
-							},
-							{
-								"key": "x-tenant-id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "x-branch-id",
-								"value": "{{branch_id}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/catalog/menus/{{menu_id}}/publish",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"catalog",
-								"menus",
-								"{{menu_id}}",
-								"publish"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POS Payload for Branch",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{tenant_token}}"
-							},
-							{
-								"key": "x-tenant-id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "x-branch-id",
-								"value": "{{branch_id}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/catalog/menus/branch/{{branch_id}}/pos",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"catalog",
-								"menus",
-								"branch",
-								"{{branch_id}}",
-								"pos"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Tenant Advanced Catalog",
-			"item": [
-				{
-					"name": "Tenant Branch",
-					"item": [
-						{
-							"name": "Create Branch",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"DHA Phase 6\",\n  \"code\": \"dha-6\",\n  \"status\": \"active\",\n  \"address\": {\"city\":\"Karachi\",\"country\":\"PK\"},\n  \"timezone\": \"Asia/Karachi\",\n  \"currency\":\"PKR\",\n  \"tax\": {\"mode\":\"exclusive\",\"rate\": 5},\n  \"posConfig\": {\"orderPrefix\":\"DHA6\",\"enableHoldOrders\":true}\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/branches",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "List Branches",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/branches?q=&status=active&page=1&limit=20",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches"
-									],
-									"query": [
-										{
-											"key": "q",
-											"value": ""
-										},
-										{
-											"key": "status",
-											"value": "active"
-										},
-										{
-											"key": "page",
-											"value": "1"
-										},
-										{
-											"key": "limit",
-											"value": "20"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Branch by ID",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/branches/{{branch_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches",
-										"{{branch_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Branch",
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"DHA Phase 6 - Main\",\n  \"posConfig\": {\"receiptFooter\":\"Thanks for visiting!\"}\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/branches/{{branch_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches",
-										"{{branch_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Set Default Branch",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/branches/{{branch_id}}/set-default",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches",
-										"{{branch_id}}",
-										"set-default"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Branch Settings",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "x-branch-id",
-										"value": "{{branch_id}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/branches/{{branch_id}}/settings",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches",
-										"{{branch_id}}",
-										"settings"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Branch Settings",
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "x-branch-id",
-										"value": "{{branch_id}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"tax\": {\"mode\": \"exclusive\", \"rate\": 8},\n  \"posConfig\": {\"orderPrefix\": \"DHA6\", \"enableTableService\": true}\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/branches/{{branch_id}}/settings",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches",
-										"{{branch_id}}",
-										"settings"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Attach User to Branch (optional)",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "x-branch-id",
-										"value": "{{branch_id}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \"userId\": \"{{user_id}}\" }"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/branches/{{branch_id}}/attach-user",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches",
-										"{{branch_id}}",
-										"attach-user"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Detach User from Branch (optional)",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "x-branch-id",
-										"value": "{{branch_id}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \"userId\": \"{{user_id}}\" }"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/branches/{{branch_id}}/detach-user",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches",
-										"{{branch_id}}",
-										"detach-user"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Branch",
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-id",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/branches/{{branch_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"branches",
-										"{{branch_id}}"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Combos",
-					"item": [
-						{
-							"name": "Create Combo",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\":\"Burger Meal\",\n  \"slug\":\"burger-meal\",\n  \"priceMode\":\"fixed\",\n  \"basePrice\": 999,\n  \"currency\":\"PKR\",\n  \"courses\":[\n    {\"name\":\"Main\",\"min\":1,\"max\":1,\"source\":\"category\",\"categoryId\":\"<CAT_ID>\"},\n    {\"name\":\"Side\",\"min\":1,\"max\":1,\"source\":\"items\",\"itemIds\":[\"<FRIES_ID>\"]},\n    {\"name\":\"Drink\",\"min\":1,\"max\":1,\"source\":\"items\",\"itemIds\":[\"<COKE_ID>\"]}\n  ],\n  \"branchIds\":[\"{{branch_id}}\"],\n  \"active\":true\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/catalog/combos",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"combos"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "List Combos",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/catalog/combos",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"combos"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Availability",
-					"item": [
-						{
-							"name": "Upsert Availability (Item breakfast window)",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"targetType\":\"item\",\n  \"targetId\":\"<ITEM_ID>\",\n  \"windows\":[{\"dow\":[1,2,3,4,5],\"start\":\"08:00\",\"end\":\"11:30\"}],\n  \"includeDates\":[],\n  \"excludeDates\":[\"2025-12-25\"],\n  \"timezone\":\"Asia/Karachi\",\n  \"active\":true\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/catalog/availability",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"availability"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Availability",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/catalog/availability?targetType=item&targetId=<ITEM_ID>",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"availability"
-									],
-									"query": [
-										{
-											"key": "targetType",
-											"value": "item"
-										},
-										{
-											"key": "targetId",
-											"value": "<ITEM_ID>"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Price Lists",
-					"item": [
-						{
-							"name": "Create Price List (Takeaway)",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\":\"Takeaway Oct\",\n  \"channel\":\"takeaway\",\n  \"precedence\":50,\n  \"active\":true,\n  \"rules\":[\n    {\"targetType\":\"item\",\"targetId\":\"<ITEM_ID>\",\"price\":850,\"currency\":\"PKR\",\"branchId\":\"{{branch_id}}\"}\n  ]\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/catalog/pricelists",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"pricelists"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "List Price Lists",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/catalog/pricelists",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"pricelists"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Item Extras",
-					"item": [
-						{
-							"name": "Upsert Item Extras",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"itemId\":\"<ITEM_ID>\",\n  \"allergens\":[\"gluten\",\"nuts\"],\n  \"nutrition\":{\"calories\":420,\"protein\":18},\n  \"translations\":{\"name\":{\"ar\":\"برجر\"}},\n  \"images\":[{\"url\":\"https://cdn.example.com/img1.jpg\",\"alt\":\"Burger\"}],\n  \"autoHideWhenOOS\":true,\n  \"minStockThreshold\":5\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/catalog/item-extras",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"item-extras"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Item Extras",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/catalog/item-extras/<ITEM_ID>",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"item-extras",
-										"<ITEM_ID>"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Taxes & Service Charges",
-					"item": [
-						{
-							"name": "Create Tax (VAT 16%)",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \"name\":\"VAT 16%\",\"code\":\"vat16\",\"rate\":0.16,\"inclusive\":false,\"country\":\"PK\",\"active\":true }"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/catalog/taxes",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"taxes"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Create Service Charge (5% dine-in)",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \"name\":\"Service 5%\",\"code\":\"svc5\",\"type\":\"percentage\",\"value\":0.05,\"applyOn\":[\"dinein\"],\"branchIds\":[\"{{branch_id}}\"],\"active\":true }"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/catalog/service-charges",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"service-charges"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Menu Versions & POS",
-					"item": [
-						{
-							"name": "Create Menu Draft",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \"menuId\":\"<MENU_ID>\", \"name\":\"Oct v2\", \"payload\": { \"sections\": [ { \"title\":\"Burgers\", \"itemIds\":[\"<ITEM_ID>\"] } ] } }"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/catalog/menu-versions",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"menu-versions"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Publish Menu Version (now)",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \"branchId\": \"{{branch_id}}\" }"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/catalog/menu-versions/<VERSION_ID>/publish",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"menu-versions",
-										"<VERSION_ID>",
-										"publish"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get POS Payload (cached)",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/t/catalog/pos-payload?branchId={{branch_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"pos-payload"
-									],
-									"query": [
-										{
-											"key": "branchId",
-											"value": "{{branch_id}}"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Invalidate POS Cache",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{tenant_token}}"
-									},
-									{
-										"key": "x-tenant-slug",
-										"value": "{{tenant_slug}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \"branchId\": \"{{branch_id}}\" }"
-								},
-								"url": {
-									"raw": "{{base_url}}/t/catalog/cache/invalidate",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"t",
-										"catalog",
-										"cache",
-										"invalidate"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "POS Orders & KDS",
-			"item": [
-				{
-					"name": "Create Order",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"branchId\": \"{{branch_id}}\",\n  \"serviceType\": \"dine_in\",\n  \"channel\": \"pos\",\n  \"tableNo\": \"A1\",\n  \"customer\": {\"name\": \"John\", \"phone\": \"+92-300-0000000\"},\n  \"lines\": [\n    {\n      \"itemId\": \"6530aaaa0000000000000001\",\n      \"variantId\": \"6530bbbb0000000000000001\",\n      \"name\": \"Zinger Burger\",\n      \"sku\": \"ZNGR-01\",\n      \"quantity\": 2,\n      \"basePrice\": {\"amount\": 450, \"currency\": \"PKR\"},\n      \"modifiers\": [\n        { \"name\": \"Cheese\", \"sku\": \"ADD-CHS\", \"priceAdj\": {\"amount\": 50, \"currency\": \"PKR\"}, \"qty\": 2 }\n      ]\n    }\n  ],\n  \"amounts\": {\"currency\":\"PKR\",\"discount\": 0, \"serviceCharge\": 0, \"tax\": 0}\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/t/orders",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"orders"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List Orders",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/orders?branchId={{branch_id}}&status=pending&page=1&limit=20",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"orders"
-							],
-							"query": [
-								{
-									"key": "branchId",
-									"value": "{{branch_id}}"
-								},
-								{
-									"key": "status",
-									"value": "pending"
-								},
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "20"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Order by ID",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/orders/:id",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"orders",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Status → preparing",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{ \"status\": \"preparing\", \"note\": \"KOT printed\" }"
-						},
-						"url": {
-							"raw": "{{base_url}}/t/orders/:id/status",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"orders",
-								":id",
-								"status"
-							],
-							"variable": [
-								{
-									"key": "id"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Record Payment",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{ \"method\": \"cash\", \"amount\": 950, \"currency\": \"PKR\", \"txRef\": \"POS-123\" }"
-						},
-						"url": {
-							"raw": "{{base_url}}/t/orders/:id/pay",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"orders",
-								":id",
-								"pay"
-							],
-							"variable": [
-								{
-									"key": "id"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Cancel (soft delete)",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/orders/:id?note=customer_cancelled",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"orders",
-								":id"
-							],
-							"query": [
-								{
-									"key": "note",
-									"value": "customer_cancelled"
-								}
-							],
-							"variable": [
-								{
-									"key": "id"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "KDS Board",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/kds/board?branchId={{branch_id}}&statuses=accepted,preparing,ready",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"kds",
-								"board"
-							],
-							"query": [
-								{
-									"key": "branchId",
-									"value": "{{branch_id}}"
-								},
-								{
-									"key": "statuses",
-									"value": "accepted,preparing,ready"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "POS Inventory & Receipies",
-			"item": [
-				{
-					"name": "Create Ingredient Item",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{ \"name\":\"Chicken Breast\", \"sku\":\"ING-CHK-01\", \"uom\":\"g\", \"minThreshold\": 500, \"costPerUom\": 0.9 }"
-						},
-						"url": {
-							"raw": "{{base_url}}/t/inventory/items",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"inventory",
-								"items"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List Items (with branch stock)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/inventory/items?branchId={{branch_id}}&q=chicken",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"inventory",
-								"items"
-							],
-							"query": [
-								{
-									"key": "branchId",
-									"value": "{{branch_id}}"
-								},
-								{
-									"key": "q",
-									"value": "chicken"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Adjust Stock (+500g)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{ \"itemId\": \"{{item_id}}\", \"branchId\": \"{{branch_id}}\", \"uom\":\"g\", \"qty\": 500, \"reason\":\"opening-balance\" }"
-						},
-						"url": {
-							"raw": "{{base_url}}/t/inventory/items/adjust",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"inventory",
-								"items",
-								"adjust"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Upsert Recipe (Burger → 150g chicken)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"catalogItemId\": \"{{catalog_item_id}}\",\n  \"catalogVariantId\": \"{{catalog_variant_id}}\",\n  \"yieldQty\": 1,\n  \"ingredients\": [ { \"itemId\": \"{{item_id}}\", \"uom\": \"g\", \"qty\": 150 } ],\n  \"notes\": \"standard patty\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/t/inventory/recipes",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"inventory",
-								"recipes"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Recipe",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/inventory/recipes?catalogItemId={{catalog_item_id}}&catalogVariantId={{catalog_variant_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"inventory",
-								"recipes"
-							],
-							"query": [
-								{
-									"key": "catalogItemId",
-									"value": "{{catalog_item_id}}"
-								},
-								{
-									"key": "catalogVariantId",
-									"value": "{{catalog_variant_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create PO",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"supplierName\":\"Metro\",\n  \"branchId\":\"{{branch_id}}\",\n  \"lines\":[{\"itemId\":\"{{item_id}}\",\"uom\":\"g\",\"qty\":1000,\"unitCost\":{\"amount\":0.8,\"currency\":\"PKR\"}}]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/t/inventory/purchase-orders",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"inventory",
-								"purchase-orders"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "PO Receive",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "X-Tenant-Id",
-								"value": "{{tenant_slug}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/t/inventory/purchase-orders/{{po_id}}/receive",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"t",
-								"inventory",
-								"purchase-orders",
-								"{{po_id}}",
-								"receive"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
 			"name": "POS Branches (Quickstart)",
 			"item": [
 				{
@@ -3752,6 +2031,1286 @@
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "POS",
+			"item": [
+				{
+					"name": "Inventory Units & Conversions",
+					"item": [
+						{
+							"name": "Create Unit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"gram\",\n  \"symbol\": \"g\",\n  \"type\": \"mass\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/units",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"units"
+									]
+								},
+								"description": "Define a base or derived unit. Examples: gram(g), kilogram(kg), piece(pc), milliliter(ml)."
+							},
+							"response": []
+						},
+						{
+							"name": "List Units",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/units",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"units"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Conversion",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"fromUnit\": \"kg\",\n  \"toUnit\": \"g\",\n  \"factor\": 1000.0\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/conversions",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"conversions"
+									]
+								},
+								"description": "Define conversion factor: qty_in_toUnit = qty_in_fromUnit * factor"
+							},
+							"response": []
+						},
+						{
+							"name": "List Conversions",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/conversions",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"conversions"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Inventory",
+					"item": [
+						{
+							"name": "Create Inventory Item – Stockable",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Chicken Breast\",\n  \"sku\": \"CHICK-BRST\",\n  \"type\": \"stock\",\n  \"baseUnit\": \"g\",\n  \"purchaseUnit\": \"kg\",\n  \"conversion\": {\n    \"purchaseToBase\": 1000\n  },\n  \"trackStock\": true,\n  \"category\": \"raw-protein\",\n  \"reorderPoint\": 5000,\n  \"barcode\": \"\",\n  \"taxCategory\": \"food\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/items",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"items"
+									]
+								},
+								"description": "Stock item that participates in recipes. `baseUnit` is used in recipes; optional purchase→base conversion."
+							},
+							"response": []
+						},
+						{
+							"name": "Create Inventory Item – Non-Stock (Service/Add-on)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Extra Shot\",\n  \"sku\": \"ADD-ESP-SHOT\",\n  \"type\": \"service\",\n  \"baseUnit\": \"pc\",\n  \"trackStock\": false,\n  \"taxCategory\": \"beverage\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/items",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"items"
+									]
+								},
+								"description": "Non-stock items for add-ons or fees."
+							},
+							"response": []
+						},
+						{
+							"name": "List Inventory Items",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/items",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"items"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Adjust Stock (Receive/Waste/Transfer)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"receive\",\n  \"branchId\": \"{{branchId}}\",\n  \"lines\": [\n    {\n      \"itemId\": \"64f000...chicken\",\n      \"qty\": 20000,\n      \"unit\": \"g\",\n      \"note\": \"GRN #123\"\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/txns",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"txns"
+									]
+								},
+								"description": "Inventory transaction ledger. POS consumption will write `usage` entries on order."
+							},
+							"response": []
+						},
+						{
+							"name": "Search Inventory",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/items?q=chicken",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"items"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "chicken"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Recipes",
+					"item": [
+						{
+							"name": "Create Recipe",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Chicken Burger Patty\",\n  \"yield\": {\n    \"qty\": 10,\n    \"unit\": \"pc\"\n  },\n  \"lines\": [\n    {\n      \"inventoryItemId\": \"64f000...chicken\",\n      \"qty\": 1500,\n      \"unit\": \"g\"\n    },\n    {\n      \"inventoryItemId\": \"64f000...salt\",\n      \"qty\": 10,\n      \"unit\": \"g\"\n    },\n    {\n      \"inventoryItemId\": \"64f000...spice\",\n      \"qty\": 5,\n      \"unit\": \"g\"\n    }\n  ],\n  \"lossPct\": 5,\n  \"costing\": {\n    \"mode\": \"auto\"\n  }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/recipes",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"recipes"
+									]
+								},
+								"description": "Recipe ties to inventory items in base units. Yield defines output quantity."
+							},
+							"response": []
+						},
+						{
+							"name": "List Recipes",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/recipes",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"recipes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Recipe by ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/recipes/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"recipes",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Recipe",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Chicken Burger Patty v2\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/recipes/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"recipes",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Menu Taxonomy",
+					"item": [
+						{
+							"name": "Create Section",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Coffees\",\n  \"displayPriority\": 10,\n  \"active\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/sections",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"sections"
+									]
+								},
+								"description": "Top-level menu grouping (e.g., Coffees, Burgers, Breakfast)."
+							},
+							"response": []
+						},
+						{
+							"name": "Create Category in Section",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"sectionId\": \"64fsec...\",\n  \"name\": \"Latte\",\n  \"displayPriority\": 10,\n  \"active\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/categories",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"categories"
+									]
+								},
+								"description": "Category under a section (e.g., Latte, Frappuccino)."
+							},
+							"response": []
+						},
+						{
+							"name": "List Sections",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/sections",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"sections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Categories by Section",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/categories?sectionId=:sectionId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"categories"
+									],
+									"query": [
+										{
+											"key": "sectionId",
+											"value": ":sectionId"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reorder Section Priorities",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"orders\": [\n    {\n      \"sectionId\": \"64fsec...\",\n      \"displayPriority\": 1\n    },\n    {\n      \"sectionId\": \"64fsec2...\",\n      \"displayPriority\": 2\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/sections/reorder",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"sections",
+										"reorder"
+									]
+								},
+								"description": "Batch update of display priorities."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Full Tree for POS",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/tree?branchId={{branchId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"tree"
+									],
+									"query": [
+										{
+											"key": "branchId",
+											"value": "{{branchId}}"
+										}
+									]
+								},
+								"description": "Returns Section→Categories→Items with branch overrides, prices, availability windows, and printer targets resolved."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Menu Items",
+					"item": [
+						{
+							"name": "Create Menu Item (Recipe-linked)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Hazelnut Latte\",\n  \"categoryId\": \"64fcat...latte\",\n  \"sku\": \"LATTE-HAZL\",\n  \"basePrice\": 16.0,\n  \"taxCategory\": \"beverage\",\n  \"recipeId\": \"64frec...latte-recipe\",\n  \"printerTarget\": \"bar\",\n  \"modifiers\": [\n    {\n      \"name\": \"Size\",\n      \"key\": \"size\",\n      \"choices\": [\n        {\n          \"name\": \"Small\",\n          \"priceDelta\": 0\n        },\n        {\n          \"name\": \"Medium\",\n          \"priceDelta\": 2\n        },\n        {\n          \"name\": \"Large\",\n          \"priceDelta\": 4\n        }\n      ]\n    },\n    {\n      \"name\": \"Extra Shot\",\n      \"key\": \"xshot\",\n      \"choices\": [\n        {\n          \"name\": \"Yes\",\n          \"priceDelta\": 3,\n          \"inventory\": {\n            \"itemId\": \"64f...espresso\",\n            \"qty\": 1,\n            \"unit\": \"pc\"\n          }\n        }\n      ]\n    }\n  ],\n  \"availability\": {\n    \"days\": [\n      1,\n      2,\n      3,\n      4,\n      5,\n      6,\n      7\n    ],\n    \"from\": \"07:00\",\n    \"to\": \"23:00\"\n  },\n  \"branchOverrides\": [\n    {\n      \"branchId\": \"{{branchId}}\",\n      \"price\": 17.0,\n      \"active\": true\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/items",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"items"
+									]
+								},
+								"description": "A sellable POS item. Can consume recipe + modifier inventory. `printerTarget` maps to Branch.printers."
+							},
+							"response": []
+						},
+						{
+							"name": "List Menu Items (by Category)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/items?categoryId=:categoryId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"items"
+									],
+									"query": [
+										{
+											"key": "categoryId",
+											"value": ":categoryId"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Menu Item",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/items/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"items",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Menu Item",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"basePrice\": 18.0\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/menu/items/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"menu",
+										"items",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Deals / Bundles",
+					"item": [
+						{
+							"name": "Create Bundle / Deal",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Burger Combo\",\n  \"bundlePrice\": 28.0,\n  \"lines\": [\n    {\n      \"type\": \"menuItem\",\n      \"menuItemId\": \"64f...burger\",\n      \"qty\": 1\n    },\n    {\n      \"type\": \"menuItem\",\n      \"menuItemId\": \"64f...fries\",\n      \"qty\": 1\n    },\n    {\n      \"type\": \"menuItem\",\n      \"menuItemId\": \"64f...drink\",\n      \"qty\": 1\n    }\n  ],\n  \"availability\": {\n    \"days\": [\n      1,\n      2,\n      3,\n      4,\n      5,\n      6,\n      7\n    ],\n    \"from\": \"11:00\",\n    \"to\": \"23:59\"\n  },\n  \"branchOverrides\": [\n    {\n      \"branchId\": \"{{branchId}}\",\n      \"price\": 29.0,\n      \"active\": true\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/deals",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"deals"
+									]
+								},
+								"description": "Fixed-price combo that expands to multiple menu items; POS will expand to lines and consume underlying recipes."
+							},
+							"response": []
+						},
+						{
+							"name": "List Deals",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/deals",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"deals"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Deal",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/deals/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"deals",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Deal",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"bundlePrice\": 27.5\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/deals/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"deals",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Branch Settings",
+					"item": [
+						{
+							"name": "Get Branch Settings",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/branches/:branchId/settings",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										":branchId",
+										"settings"
+									],
+									"variable": [
+										{
+											"key": "branchId"
+										}
+									]
+								},
+								"description": "Reads tax mode/rate, currency, printers for the POS UI."
+							},
+							"response": []
+						},
+						{
+							"name": "Update Branch Settings",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenantSlug}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"tax\": {\n    \"mode\": \"exclusive\",\n    \"rate\": 15\n  },\n  \"posConfig\": {\n    \"receiptFooter\": \"Shukriya!\"\n  }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/branches/:branchId/settings",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"branches",
+										":branchId",
+										"settings"
+									],
+									"variable": [
+										{
+											"key": "branchId"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}

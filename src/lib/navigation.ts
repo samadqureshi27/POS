@@ -20,6 +20,11 @@ export const navigationConfig: NavigationItem[] = [
     href: "/dashboard",
     group: "main",
   },
+  {
+    name: "Items",
+    href: "/items",
+    group: "items",
+  },
     {
         name: "Notifications",
         href: "/Notification",
