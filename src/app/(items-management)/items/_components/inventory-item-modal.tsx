@@ -258,7 +258,7 @@ export default function InventoryItemModal({
                   value={formData.name}
                   onChange={(e) => handleFieldChange("name", e.target.value)}
                   placeholder="e.g., Chicken Breast"
-                  className="bg-white border-gray-300 h-11"
+                  className="bg-white border-gray-300 h-9 rounded-md"
                 />
               </div>
 
@@ -270,7 +270,7 @@ export default function InventoryItemModal({
                     value={formData.sku}
                     onChange={(e) => handleFieldChange("sku", e.target.value)}
                     placeholder="e.g., CHICK-BRST-001"
-                    className="bg-white border-gray-300"
+                    className="bg-white border-gray-300 h-9 rounded-md"
                   />
                   <p className="text-gray-500 text-xs mt-1">Unique identifier for this item</p>
                 </div>
@@ -283,7 +283,7 @@ export default function InventoryItemModal({
                     value={formData.type}
                     onValueChange={(value) => handleFieldChange("type", value)}
                   >
-                    <SelectTrigger className="bg-white border-gray-300">
+                    <SelectTrigger className="bg-white border-gray-300 h-9 rounded-md">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -306,7 +306,7 @@ export default function InventoryItemModal({
                       onFocus={() => setShowCategorySuggestions(categoryInput.length > 0)}
                       onBlur={() => setTimeout(() => setShowCategorySuggestions(false), 200)}
                       placeholder="Type or select category"
-                      className="bg-white border-gray-300 pr-10"
+                      className="bg-white border-gray-300 pr-10 h-9 rounded-md w-full"
                     />
                     <button
                       type="button"
@@ -368,19 +368,6 @@ export default function InventoryItemModal({
 
             {/* Stock & Units Tab */}
             <TabsContent value="stock" className="space-y-4">
-              {/* Track Stock */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label className="text-gray-700 font-medium">Track Stock Levels</Label>
-                    <p className="text-gray-500 text-xs mt-1">Monitor and manage inventory quantities</p>
-                  </div>
-                  <Switch
-                    checked={formData.trackStock}
-                    onCheckedChange={(checked) => handleFieldChange("trackStock", checked)}
-                  />
-                </div>
-              </div>
 
               {/* Base Unit */}
               <div>
@@ -475,7 +462,7 @@ export default function InventoryItemModal({
                       value={formData.reorderPoint}
                       onChange={(e) => handleFieldChange("reorderPoint", parseInt(e.target.value) || 0)}
                       placeholder="0"
-                      className="bg-white border-gray-300"
+                      className="bg-white border-gray-300 h-9 rounded-md"
                     />
                     <p className="text-gray-500 text-xs mt-1">
                       Alert when stock falls below this level (in {formData.baseUnit})
@@ -483,6 +470,19 @@ export default function InventoryItemModal({
                   </div>
                 </>
               )}
+              {/* Track Stock */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-gray-700 font-medium">Track Stock Levels</Label>
+                    <p className="text-gray-500 text-xs mt-1">Monitor and manage inventory quantities</p>
+                  </div>
+                  <Switch
+                    checked={formData.trackStock}
+                    onCheckedChange={(checked) => handleFieldChange("trackStock", checked)}
+                  />
+                </div>
+              </div>
             </TabsContent>
 
             {/* Vendors Tab (Edit Mode Only) */}
