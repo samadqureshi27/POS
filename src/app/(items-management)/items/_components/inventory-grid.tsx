@@ -74,7 +74,7 @@ export default function InventoryGrid({
                 const StatusIcon = status.icon;
 
                 return (
-                  <tr key={item.ID} className="hover:bg-gray-50 transition-colors">
+                  <tr key={item.ID} className="hover:shadow-lg transition-shadow duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
@@ -156,7 +156,7 @@ export default function InventoryGrid({
         return (
           <div
             key={item.ID}
-            className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200"
+            className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200"
           >
             {/* Card Header - Icon */}
             <div className="relative h-32 bg-gray-50 flex items-center justify-center border-b border-gray-200">
@@ -169,7 +169,7 @@ export default function InventoryGrid({
               </div>
 
               {/* Hover Actions Overlay */}
-              <div className="absolute inset-0 bg-white/95 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+              <div className="absolute inset-0 background-grey opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
                 <Button
                   onClick={() => onEdit(item)}
                   className="bg-gray-900 hover:bg-black text-white"

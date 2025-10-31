@@ -1,6 +1,6 @@
 // contexts/LoginContext.tsx
 "use client";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import authService from "@/lib/auth-service";
@@ -96,7 +96,7 @@ export const useLoginContext = () => {
   return context;
 };
 
-export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const transitionMs = 900;
@@ -384,5 +384,16 @@ export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     <LoginContext.Provider value={contextValue}>
       {children}
     </LoginContext.Provider>
+  );
+};
+
+// Wrapper component with Suspense boundary
+export const LoginProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center bg-[#d1ab35]">
+      <div className="animate-pulse text-white text-xl">Loading...</div>
+    </div>}>
+      <LoginProviderContent>{children}</LoginProviderContent>
+    </Suspense>
   );
 };
