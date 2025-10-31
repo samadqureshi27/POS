@@ -3,7 +3,7 @@
 import React from "react";
 import { Package, Edit2, Trash2, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { InventoryItem } from "@/lib/util/inventoryApi";
+import type { InventoryItem } from "@/lib/services/inventory-service";
 
 interface InventoryGridProps {
   items: InventoryItem[];
@@ -74,7 +74,7 @@ export default function InventoryGrid({
                 const StatusIcon = status.icon;
 
                 return (
-                  <tr key={item.ID} className="hover:shadow-lg transition-shadow duration-200">
+                  <tr key={item._id || item.id} className="hover:shadow-lg transition-shadow duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
@@ -82,8 +82,8 @@ export default function InventoryGrid({
                         </div>
                         <div>
                           <div className="font-medium text-gray-900">{item.name}</div>
-                          {item.category && (
-                            <div className="text-xs text-gray-500">{item.category}</div>
+                          {item.categoryId && (
+                            <div className="text-xs text-gray-500">{item.categoryId}</div>
                           )}
                         </div>
                       </div>
@@ -155,7 +155,7 @@ export default function InventoryGrid({
 
         return (
           <div
-            key={item.ID}
+            key={item._id || item.id}
             className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200"
           >
             {/* Card Header - Icon */}
@@ -221,10 +221,10 @@ export default function InventoryGrid({
                   </div>
                 )}
 
-                {item.category && (
+                {item.categoryId && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Category:</span>
-                    <span className="text-gray-700 text-xs truncate max-w-[120px]">{item.category}</span>
+                    <span className="text-gray-700 text-xs truncate max-w-[120px]">{item.categoryId}</span>
                   </div>
                 )}
               </div>

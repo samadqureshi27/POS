@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "c526d693-1dcc-4410-ac51-cf22e03ab20a",
+		"_postman_id": "91b03792-939d-4c59-89fe-1eb6e835253e",
 		"name": "Pos-Backend",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "12222084",
-		"_collection_link": "https://planetary-star-331194.postman.co/workspace/New-Team-Workspace~e46bd8d0-6848-4740-94c5-ef04ec2c9f8a/collection/12222084-c526d693-1dcc-4410-ac51-cf22e03ab20a?action=share&source=collection_link&creator=12222084"
+		"_exporter_id": "48917537",
+		"_collection_link": "https://dkay042-3274752.postman.co/workspace/Faraz's-Workspace~976616b6-c854-4493-86ae-6b6ff1d9e4fc/collection/48917537-91b03792-939d-4c59-89fe-1eb6e835253e?action=share&source=collection_link&creator=48917537"
 	},
 	"item": [
 		{
@@ -3304,6 +3304,421 @@
 									"variable": [
 										{
 											"key": "branchId"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "POS-V2",
+			"item": [
+				{
+					"name": "Inventory Categories",
+					"item": [
+						{
+							"name": "Create Category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Coffee Beans\",\n  \"description\": \"All bean types\",\n  \"displayOrder\": 10,\n  \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/categories",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Categories (search/paginate)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/categories?q=coffee&page=1&limit=20&isActive=true&sort=displayOrder&order=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"categories"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "coffee"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										},
+										{
+											"key": "isActive",
+											"value": "true"
+										},
+										{
+											"key": "sort",
+											"value": "displayOrder"
+										},
+										{
+											"key": "order",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Category by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/categories/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"categories",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Category",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Coffee & Beans\",\n  \"slug\": \"coffee-beans\",\n  \"description\": \"Roasted & green beans\",\n  \"displayOrder\": 5,\n  \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/categories/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"categories",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Category (guarded)",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/categories/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"categories",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Inventory Items",
+					"item": [
+						{
+							"name": "Create Item (SKU auto if omitted)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Arabica Beans 1kg\",\n  \"type\": \"stock\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"baseUnit\": \"g\",\n  \"purchaseUnit\": \"kg\",\n  \"conversion\": 1000,\n  \"reorderPoint\": 2,\n  \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/items",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"items"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Items (by category/search)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/items?q=beans&categoryId={{categoryId}}&page=1&limit=20&sort=createdAt&order=desc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"items"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "beans"
+										},
+										{
+											"key": "categoryId",
+											"value": "{{categoryId}}"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										},
+										{
+											"key": "sort",
+											"value": "createdAt"
+										},
+										{
+											"key": "order",
+											"value": "desc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Item by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/items/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"items",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Item",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Arabica Beans 500g\",\n  \"sku\": \"EXTR-000123\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"baseUnit\": \"g\",\n  \"purchaseUnit\": \"g\",\n  \"conversion\": 1,\n  \"reorderPoint\": 5,\n  \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/items/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"items",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Item",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "x-tenant-id",
+										"value": "{{tenant}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/t/inventory/items/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"t",
+										"inventory",
+										"items",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
 										}
 									]
 								}

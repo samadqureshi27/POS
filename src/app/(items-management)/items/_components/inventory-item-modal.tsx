@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Save, Loader2, Plus, Trash2, Building2, ChevronDown } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,9 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { InventoryAPI, type InventoryItem, type Unit, type Vendor, type Branch } from "@/lib/util/inventoryApi";
+import { InventoryService, UnitsService, type InventoryItem, type Unit } from "@/lib/services/inventory-service";
+import { CategoriesService, type Category } from "@/lib/services/categories-service";
+import { InventoryAPI, type Vendor, type Branch } from "@/lib/util/inventoryApi";
 
 interface InventoryItemModalProps {
   isOpen: boolean;
@@ -28,7 +30,7 @@ export default function InventoryItemModal({
   const [units, setUnits] = useState<Unit[]>([]);
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [categoryInput, setCategoryInput] = useState("");
   const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
@@ -40,18 +42,16 @@ export default function InventoryItemModal({
     type: "stock",
     baseUnit: "pc",
     purchaseUnit: "",
-    conversionFactor: undefined,
+    conversion: undefined,
     trackStock: true,
-    category: "",
+    categoryId: "",
     reorderPoint: 0,
     barcode: "",
     taxCategory: "",
-    Status: "Active",
-    vendors: [],
-    branches: [],
+    isActive: true,
   });
 
-  // Vendor modal state
+  // Vendor modal state (NOT YET CONNECTED TO BACKEND API)
   const [isAddingVendor, setIsAddingVendor] = useState(false);
   const [newVendor, setNewVendor] = useState({
     Company_Name: "",
@@ -60,8 +60,9 @@ export default function InventoryItemModal({
     Address: "",
     Email: "",
   });
+  const [selectedVendors, setSelectedVendors] = useState<number[]>([]);
 
-  // Branch distribution state
+  // Branch distribution state (NOT YET CONNECTED TO BACKEND API)
   const [branchDistribution, setBranchDistribution] = useState<{ branchId: number; quantity: number }[]>([]);
 
   useEffect(() => {
@@ -75,18 +76,20 @@ export default function InventoryItemModal({
           type: editingItem.type,
           baseUnit: editingItem.baseUnit,
           purchaseUnit: editingItem.purchaseUnit,
-          conversionFactor: editingItem.conversionFactor,
+          conversion: editingItem.conversion,
           trackStock: editingItem.trackStock,
-          category: editingItem.category,
+          categoryId: editingItem.categoryId,
           reorderPoint: editingItem.reorderPoint,
           barcode: editingItem.barcode,
           taxCategory: editingItem.taxCategory,
-          Status: editingItem.Status,
-          vendors: editingItem.vendors || [],
-          branches: editingItem.branches || [],
+          isActive: editingItem.isActive ?? true,
         });
-        setCategoryInput(editingItem.category || "");
-        setBranchDistribution(editingItem.branches || []);
+        // Find category name from ID for display
+        const category = categories.find(c => (c._id || c.id) === editingItem.categoryId);
+        setCategoryInput(category?.name || editingItem.categoryId || "");
+        // Load vendors and branches from mock API (not yet in backend)
+        setSelectedVendors([]);
+        setBranchDistribution([]);
       } else {
         // Reset form for new item
         setFormData({
@@ -95,31 +98,47 @@ export default function InventoryItemModal({
           type: "stock",
           baseUnit: "pc",
           purchaseUnit: "",
-          conversionFactor: undefined,
+          conversion: undefined,
           trackStock: true,
-          category: "",
+          categoryId: "",
           reorderPoint: 0,
           barcode: "",
           taxCategory: "",
-          Status: "Active",
-          vendors: [],
-          branches: [],
+          isActive: true,
         });
         setCategoryInput("");
+        setSelectedVendors([]);
         setBranchDistribution([]);
       }
     }
   }, [isOpen, editingItem]);
 
   const loadData = async () => {
-    const [unitsRes, vendorsRes, branchesRes, categoriesRes] = await Promise.all([
-      InventoryAPI.getUnits(),
+    // Load from REAL API
+    const [unitsRes, categoriesRes] = await Promise.all([
+      UnitsService.listUnits(),
+      CategoriesService.listCategories({ limit: 1000 }),
+    ]);
+
+    console.log('Units Response:', unitsRes);
+    console.log('Categories Response:', categoriesRes);
+
+    if (unitsRes.success && unitsRes.data) {
+      console.log('Setting units:', unitsRes.data);
+      setUnits(unitsRes.data);
+    } else {
+      console.error('Failed to load units:', unitsRes.message);
+    }
+
+    if (categoriesRes.success && categoriesRes.data) setCategories(categoriesRes.data);
+
+    // Load from MOCK API (not yet connected to backend)
+    const [vendorsRes, branchesRes] = await Promise.all([
       InventoryAPI.getVendors(),
       InventoryAPI.getBranches(),
       InventoryAPI.getCategories(),
     ]);
 
-    if (unitsRes.success && unitsRes.data) setUnits(unitsRes.data);
     if (vendorsRes.success && vendorsRes.data) setVendors(vendorsRes.data);
     if (branchesRes.success && branchesRes.data) setBranches(branchesRes.data);
     if (categoriesRes.success && categoriesRes.data) setCategories(categoriesRes.data);
@@ -128,11 +147,27 @@ export default function InventoryItemModal({
   const handleSave = async () => {
     if (!formData.name || !formData.baseUnit) return;
 
+    // For stock items, ensure purchaseUnit and conversion are set
+    const submitData = { ...formData };
+    if (submitData.type === "stock") {
+      // If no purchaseUnit set, use baseUnit (no conversion needed)
+      if (!submitData.purchaseUnit) {
+        submitData.purchaseUnit = submitData.baseUnit;
+      }
+      // If purchaseUnit same as baseUnit, conversion should be 1
+      if (submitData.purchaseUnit === submitData.baseUnit) {
+        submitData.conversion = 1;
+      }
+      // If purchaseUnit differs but no conversion set, show error
+      if (submitData.purchaseUnit !== submitData.baseUnit && !submitData.conversion) {
+        alert("Conversion rate is required when purchase unit differs from base unit");
+        setLoading(false);
+        return;
+      }
+    }
+
     setLoading(true);
-    await onSave({
-      ...formData,
-      branches: branchDistribution,
-    });
+    await onSave(submitData);
     setLoading(false);
   };
 
@@ -142,13 +177,13 @@ export default function InventoryItemModal({
 
   const handleCategoryInputChange = (value: string) => {
     setCategoryInput(value);
-    handleFieldChange("category", value);
+    // Don't set categoryId until user selects or creates a category
     setShowCategorySuggestions(value.length > 0);
   };
 
-  const selectCategory = (category: string) => {
-    setCategoryInput(category);
-    handleFieldChange("category", category);
+  const selectCategory = (category: Category) => {
+    setCategoryInput(category.name);
+    handleFieldChange("categoryId", category._id || category.id || "");
     setShowCategorySuggestions(false);
   };
 
@@ -156,29 +191,38 @@ export default function InventoryItemModal({
     if (!categoryInput.trim()) return;
 
     setAddingCategory(true);
-    const response = await InventoryAPI.createCategory(categoryInput);
+    try {
+      const response = await CategoriesService.createCategory({
+        name: categoryInput,
+        isActive: true,
+      });
 
-    if (response.success) {
-      setCategories([...categories, response.data]);
-      setCategoryInput(response.data);
-      handleFieldChange("category", response.data);
-      setShowCategorySuggestions(false);
-    } else {
-      alert(response.message);
+      if (response.success && response.data) {
+        setCategories([...categories, response.data]);
+        const newCategoryId = response.data._id || response.data.id || "";
+        // Keep showing the category name in the input, but store the ID
+        setCategoryInput(response.data.name);
+        handleFieldChange("categoryId", newCategoryId);
+        setShowCategorySuggestions(false);
+      } else {
+        alert(response.message || "Failed to create category");
+      }
+    } catch (error) {
+      console.error("Error creating category:", error);
+      alert("Failed to create category. Please try again.");
     }
     setAddingCategory(false);
   };
 
   const filteredCategories = categories.filter((cat) =>
-    cat.toLowerCase().includes(categoryInput.toLowerCase())
+    cat.name.toLowerCase().includes(categoryInput.toLowerCase())
   );
 
   const toggleVendor = (vendorId: number) => {
-    const currentVendors = formData.vendors || [];
-    if (currentVendors.includes(vendorId)) {
-      handleFieldChange("vendors", currentVendors.filter(id => id !== vendorId));
+    if (selectedVendors.includes(vendorId)) {
+      setSelectedVendors(selectedVendors.filter(id => id !== vendorId));
     } else {
-      handleFieldChange("vendors", [...currentVendors, vendorId]);
+      setSelectedVendors([...selectedVendors, vendorId]);
     }
   };
 
@@ -222,14 +266,12 @@ export default function InventoryItemModal({
       <DialogContent className="max-w-3xl h-[85vh] overflow-hidden bg-white border border-gray-200 text-gray-900 p-0 flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {editingItem ? "Edit Item" : "Add New Item"}
-            </h2>
-            <p className="text-gray-600 text-sm mt-1">
-              {editingItem ? "Update item details and manage vendors & distribution" : "Create a new inventory item with basic information"}
-            </p>
-          </div>
+          <DialogTitle className="text-2xl font-bold text-gray-900">
+            {editingItem ? "Edit Item" : "Add New Item"}
+          </DialogTitle>
+          <p className="text-gray-600 text-sm mt-1">
+            {editingItem ? "Update item details and manage vendors & distribution" : "Create a new inventory item with basic information"}
+          </p>
         </div>
 
         {/* Content */}
@@ -321,12 +363,12 @@ export default function InventoryItemModal({
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-48 overflow-y-auto">
                         {filteredCategories.map((cat) => (
                           <button
-                            key={cat}
+                            key={cat._id || cat.id}
                             type="button"
                             onClick={() => selectCategory(cat)}
                             className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-700 capitalize"
                           >
-                            {cat}
+                            {cat.name}
                           </button>
                         ))}
                       </div>
@@ -359,8 +401,8 @@ export default function InventoryItemModal({
                     <p className="text-gray-500 text-xs mt-1">Enable this item for use in operations</p>
                   </div>
                   <Switch
-                    checked={formData.Status === "Active"}
-                    onCheckedChange={(checked) => handleFieldChange("Status", checked ? "Active" : "Inactive")}
+                    checked={formData.isActive === true}
+                    onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
                   />
                 </div>
               </div>
@@ -384,7 +426,7 @@ export default function InventoryItemModal({
                   <SelectContent>
                     {units.length > 0 ? (
                       units.map((unit) => (
-                        <SelectItem key={unit.ID} value={unit.symbol}>
+                        <SelectItem key={unit._id || unit.id} value={unit.symbol}>
                           {unit.name} ({unit.symbol}) - {unit.type}
                         </SelectItem>
                       ))
@@ -414,7 +456,7 @@ export default function InventoryItemModal({
                       </SelectTrigger>
                       <SelectContent>
                         {units.map((unit) => (
-                          <SelectItem key={unit.ID} value={unit.symbol}>
+                          <SelectItem key={unit._id || unit.id} value={unit.symbol}>
                             {unit.name} ({unit.symbol})
                           </SelectItem>
                         ))}
@@ -433,16 +475,16 @@ export default function InventoryItemModal({
                       <Input
                         type="number"
                         step="any"
-                        value={formData.conversionFactor || ""}
+                        value={formData.conversion || ""}
                         onChange={(e) =>
-                          handleFieldChange("conversionFactor", parseFloat(e.target.value) || 0)
+                          handleFieldChange("conversion", parseFloat(e.target.value) || 0)
                         }
                         placeholder="e.g., 1000"
                         className="bg-white border-gray-300"
                       />
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
                         <p className="text-blue-700 text-sm font-medium">
-                          Conversion: 1 {formData.purchaseUnit} = {formData.conversionFactor || "?"}{" "}
+                          Conversion: 1 {formData.purchaseUnit} = {formData.conversion || "?"}{" "}
                           {formData.baseUnit}
                         </p>
                         <p className="text-blue-600 text-xs mt-1">
@@ -488,8 +530,11 @@ export default function InventoryItemModal({
             {/* Vendors Tab (Edit Mode Only) */}
             {isEditMode && (
               <TabsContent value="vendors" className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                  <p className="text-blue-700 text-sm">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                  <p className="text-yellow-800 text-sm font-medium">
+                    ⚠️ Note: Vendor management not yet connected to backend API (using mock data)
+                  </p>
+                  <p className="text-yellow-700 text-sm mt-1">
                     Manage suppliers for this item. You can select multiple vendors for better sourcing options.
                   </p>
                 </div>
@@ -593,7 +638,7 @@ export default function InventoryItemModal({
                           key={vendor.ID}
                           onClick={() => toggleVendor(vendor.ID)}
                           className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                            formData.vendors?.includes(vendor.ID)
+                            selectedVendors.includes(vendor.ID)
                               ? "border-gray-900 bg-gray-50"
                               : "border-gray-200 bg-white hover:border-gray-300"
                           }`}
@@ -605,11 +650,11 @@ export default function InventoryItemModal({
                               <div className="text-xs text-gray-500">{vendor.Contact}</div>
                             </div>
                             <div className={`h-5 w-5 rounded border-2 flex items-center justify-center ${
-                              formData.vendors?.includes(vendor.ID)
+                              selectedVendors.includes(vendor.ID)
                                 ? "border-gray-900 bg-gray-900"
                                 : "border-gray-300"
                             }`}>
-                              {formData.vendors?.includes(vendor.ID) && (
+                              {selectedVendors.includes(vendor.ID) && (
                                 <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
@@ -627,10 +672,13 @@ export default function InventoryItemModal({
             {/* Branches Tab (Edit Mode Only) */}
             {isEditMode && (
               <TabsContent value="branches" className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-blue-700" />
-                    <p className="text-blue-700 text-sm">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                  <p className="text-yellow-800 text-sm font-medium">
+                    ⚠️ Note: Branch distribution not yet connected to backend API (using mock data)
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Building2 className="h-5 w-5 text-yellow-700" />
+                    <p className="text-yellow-700 text-sm">
                       Distribute inventory to specific branches. Specify quantity for each location.
                     </p>
                   </div>

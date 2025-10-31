@@ -10,19 +10,19 @@ export interface InventoryItem {
   name: string;
   sku?: string;
   type: "stock" | "service";
+  categoryId?: string; // API uses categoryId, not category
   baseUnit: string;
   purchaseUnit?: string;
-  conversion?: {
-    purchaseToBase?: number;
-  };
-  trackStock: boolean;
-  category?: string;
+  conversion?: number; // API uses simple number, not object
+  trackStock?: boolean;
   reorderPoint?: number;
   barcode?: string;
   taxCategory?: string;
   currentStock?: number;
   image?: string;
-  active?: boolean;
+  isActive?: boolean; // API uses isActive, not active
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Unit {
@@ -125,7 +125,9 @@ export const InventoryService = {
     page?: number;
     limit?: number;
     type?: "stock" | "service";
-    category?: string;
+    categoryId?: string;
+    sort?: string;
+    order?: "asc" | "desc";
   }): Promise<ApiResponse<InventoryItem[]>> {
     const q = params?.q ?? "";
     const page = params?.page ?? 1;
@@ -133,7 +135,9 @@ export const InventoryService = {
 
     let url = buildUrl(`/t/inventory/items?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`);
     if (params?.type) url += `&type=${params.type}`;
-    if (params?.category) url += `&category=${encodeURIComponent(params.category)}`;
+    if (params?.categoryId) url += `&categoryId=${encodeURIComponent(params.categoryId)}`;
+    if (params?.sort) url += `&sort=${params.sort}`;
+    if (params?.order) url += `&order=${params.order}`;
 
     const res = await fetch(url, { headers: buildHeaders() });
     const data = await res.json().catch(() => ({}));
@@ -142,7 +146,7 @@ export const InventoryService = {
       return { success: false, message: data?.message || `List items failed (${res.status})` };
     }
 
-    const items: InventoryItem[] = data?.items ?? data?.result ?? [];
+    const items: InventoryItem[] = data?.items ?? data?.result ?? data?.data ?? [];
     return { success: true, data: items };
   },
 
@@ -164,20 +168,21 @@ export const InventoryService = {
   async createItem(payload: Partial<InventoryItem>): Promise<ApiResponse<InventoryItem>> {
     const url = buildUrl(`/t/inventory/items`);
 
-    const apiPayload = {
+    const apiPayload: any = {
       name: payload.name,
-      sku: payload.sku || "",
       type: payload.type || "stock",
       baseUnit: payload.baseUnit || "pc",
-      purchaseUnit: payload.purchaseUnit,
-      conversion: payload.conversion,
-      trackStock: payload.trackStock ?? true,
-      category: payload.category,
-      reorderPoint: payload.reorderPoint,
-      barcode: payload.barcode,
-      taxCategory: payload.taxCategory,
-      active: payload.active ?? true,
+      isActive: payload.isActive ?? true,
     };
+
+    // Optional fields - only include if provided
+    if (payload.sku) apiPayload.sku = payload.sku;
+    if (payload.categoryId) apiPayload.categoryId = payload.categoryId;
+    if (payload.purchaseUnit) apiPayload.purchaseUnit = payload.purchaseUnit;
+    if (payload.conversion !== undefined) apiPayload.conversion = payload.conversion;
+    if (payload.reorderPoint !== undefined) apiPayload.reorderPoint = payload.reorderPoint;
+    if (payload.barcode) apiPayload.barcode = payload.barcode;
+    if (payload.taxCategory) apiPayload.taxCategory = payload.taxCategory;
 
     const res = await fetch(url, {
       method: "POST",
@@ -190,7 +195,7 @@ export const InventoryService = {
       return { success: false, message: data?.message || `Create item failed (${res.status})` };
     }
 
-    const item: InventoryItem = data?.result ?? data;
+    const item: InventoryItem = data?.result ?? data?.data ?? data;
     return { success: true, data: item };
   },
 
@@ -202,15 +207,14 @@ export const InventoryService = {
     if (payload.name !== undefined) apiPayload.name = payload.name;
     if (payload.sku !== undefined) apiPayload.sku = payload.sku;
     if (payload.type !== undefined) apiPayload.type = payload.type;
+    if (payload.categoryId !== undefined) apiPayload.categoryId = payload.categoryId;
     if (payload.baseUnit !== undefined) apiPayload.baseUnit = payload.baseUnit;
     if (payload.purchaseUnit !== undefined) apiPayload.purchaseUnit = payload.purchaseUnit;
     if (payload.conversion !== undefined) apiPayload.conversion = payload.conversion;
-    if (payload.trackStock !== undefined) apiPayload.trackStock = payload.trackStock;
-    if (payload.category !== undefined) apiPayload.category = payload.category;
     if (payload.reorderPoint !== undefined) apiPayload.reorderPoint = payload.reorderPoint;
     if (payload.barcode !== undefined) apiPayload.barcode = payload.barcode;
     if (payload.taxCategory !== undefined) apiPayload.taxCategory = payload.taxCategory;
-    if (payload.active !== undefined) apiPayload.active = payload.active;
+    if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
 
     const res = await fetch(url, {
       method: "PUT",
@@ -223,7 +227,7 @@ export const InventoryService = {
       return { success: false, message: data?.message || `Update item failed (${res.status})` };
     }
 
-    const item: InventoryItem = data?.result ?? data;
+    const item: InventoryItem = data?.result ?? data?.data ?? data;
     return { success: true, data: item };
   },
 
@@ -274,7 +278,7 @@ export const UnitsService = {
       return { success: false, message: data?.message || `List units failed (${res.status})` };
     }
 
-    const units: Unit[] = data?.items ?? data?.result ?? [];
+    const units: Unit[] = data?.items ?? data?.result ?? data?.data ?? [];
     return { success: true, data: units };
   },
 
