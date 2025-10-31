@@ -8,7 +8,7 @@ import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import UnitsManagementModal from "./_components/units-management-modal";
 import InventoryItemModal from "./_components/inventory-item-modal";
 import InventoryGrid from "./_components/inventory-grid";
-import { InventoryAPI, type InventoryItem } from "@/lib/util/inventoryApi";
+import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
 import { exportToCSV, importFromCSV } from "@/lib/util/csvUtil";
 
 export default function ItemsPage() {
@@ -36,14 +36,25 @@ export default function ItemsPage() {
   // Load items
   const loadItems = async () => {
     setLoading(true);
-    const filters: any = { q: searchQuery };
-    if (filterType !== "all") filters.type = filterType;
-    if (filterStatus !== "all") filters.status = filterStatus;
+    const params: any = { q: searchQuery, limit: 1000 };
+    if (filterType !== "all") params.type = filterType;
+    // Note: API doesn't have status filter, we'll filter client-side if needed
 
-    const response = await InventoryAPI.getInventoryItems(filters);
+    const response = await InventoryService.listItems(params);
     if (response.success && response.data) {
-      setItems(response.data);
-      calculateStats(response.data);
+      let filteredItems = response.data;
+
+      // Client-side status filtering if needed
+      if (filterStatus !== "all") {
+        filteredItems = filteredItems.filter(item =>
+          filterStatus === "Active" ? item.isActive !== false : item.isActive === false
+        );
+      }
+
+      setItems(filteredItems);
+      calculateStats(filteredItems);
+    } else {
+      console.error("Failed to load items:", response.message);
     }
     setLoading(false);
   };
@@ -51,7 +62,7 @@ export default function ItemsPage() {
   const calculateStats = (itemsList: InventoryItem[]) => {
     setStats({
       totalItems: itemsList.length,
-      stockItems: itemsList.filter(i => i.trackStock).length,
+      stockItems: itemsList.filter(i => i.type === "stock").length,
       lowStock: itemsList.filter(i => i.currentStock && i.reorderPoint && i.currentStock <= i.reorderPoint).length,
       outOfStock: itemsList.filter(i => i.currentStock === 0).length,
     });
@@ -74,27 +85,38 @@ export default function ItemsPage() {
   const handleDeleteItem = async (item: InventoryItem) => {
     if (!window.confirm(`Delete "${item.name}"?`)) return;
 
-    const response = await InventoryAPI.deleteInventoryItem(item.ID);
+    const itemId = item._id || item.id;
+    if (!itemId) {
+      alert("Item ID is missing");
+      return;
+    }
+
+    const response = await InventoryService.deleteItem(itemId);
     if (response.success) {
       loadItems();
+    } else {
+      alert(`Failed to delete item: ${response.message}`);
     }
   };
 
   const handleItemSave = async (data: Partial<InventoryItem>) => {
     let response;
     if (editingItem) {
-      response = await InventoryAPI.updateInventoryItem(editingItem.ID, data);
+      const itemId = editingItem._id || editingItem.id;
+      if (!itemId) {
+        alert("Item ID is missing");
+        return;
+      }
+      response = await InventoryService.updateItem(itemId, data);
     } else {
-      response = await InventoryAPI.createInventoryItem({
-        ...data,
-        Status: data.Status || "Active",
-        Priority: 1,
-      } as any);
+      response = await InventoryService.createItem(data);
     }
 
     if (response.success) {
       setIsItemModalOpen(false);
       loadItems();
+    } else {
+      alert(`Failed to save item: ${response.message}`);
     }
   };
 
@@ -115,15 +137,25 @@ export default function ItemsPage() {
       const importedItems = await importFromCSV(file);
 
       if (window.confirm(`Import ${importedItems.length} items? This will create new inventory items.`)) {
+        let successCount = 0;
+        let failCount = 0;
+
         for (const item of importedItems) {
-          await InventoryAPI.createInventoryItem({
+          const response = await InventoryService.createItem({
             ...item,
-            Status: item.Status || "Active",
-            Priority: item.Priority || 1,
+            isActive: item.isActive ?? true,
           } as any);
+
+          if (response.success) {
+            successCount++;
+          } else {
+            failCount++;
+            console.error(`Failed to import item:`, item.name, response.message);
+          }
         }
+
         loadItems();
-        alert(`Successfully imported ${importedItems.length} items!`);
+        alert(`Import complete!\nSuccess: ${successCount}\nFailed: ${failCount}`);
       }
     } catch (error) {
       alert("Failed to import CSV. Please check the file format.");
