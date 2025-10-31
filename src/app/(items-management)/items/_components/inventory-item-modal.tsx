@@ -136,10 +136,12 @@ export default function InventoryItemModal({
     const [vendorsRes, branchesRes] = await Promise.all([
       InventoryAPI.getVendors(),
       InventoryAPI.getBranches(),
+      InventoryAPI.getCategories(),
     ]);
 
     if (vendorsRes.success && vendorsRes.data) setVendors(vendorsRes.data);
     if (branchesRes.success && branchesRes.data) setBranches(branchesRes.data);
+    if (categoriesRes.success && categoriesRes.data) setCategories(categoriesRes.data);
   };
 
   const handleSave = async () => {
@@ -392,7 +394,7 @@ export default function InventoryItemModal({
               </div>
 
               {/* Active Status */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-gray-700 font-medium">Active Status</Label>
