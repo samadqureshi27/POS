@@ -92,8 +92,8 @@ let mockBranches: Branch[] = [
   { ID: 4, name: "West Branch", location: "West Side" },
 ];
 
-// Mock Categories
-export const mockCategories = [
+// Mock Categories (mutable for adding new categories)
+export let mockCategories = [
   "raw-protein",
   "dairy",
   "vegetables",
@@ -232,6 +232,22 @@ export const InventoryAPI = {
   async getCategories(): Promise<{ success: boolean; data: string[] }> {
     await mockDelay();
     return { success: true, data: [...mockCategories] };
+  },
+
+  async createCategory(category: string): Promise<{ success: boolean; data: string; message: string }> {
+    await mockDelay();
+    const trimmedCategory = category.trim().toLowerCase();
+
+    if (!trimmedCategory) {
+      return { success: false, data: "", message: "Category name cannot be empty" };
+    }
+
+    if (mockCategories.includes(trimmedCategory)) {
+      return { success: false, data: trimmedCategory, message: "Category already exists" };
+    }
+
+    mockCategories.push(trimmedCategory);
+    return { success: true, data: trimmedCategory, message: "Category created successfully" };
   },
 
   // Units
