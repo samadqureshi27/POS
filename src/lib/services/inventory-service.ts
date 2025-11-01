@@ -4,13 +4,21 @@ import AuthService from "@/lib/auth-service";
 
 // ==================== Types ====================
 
+export interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+  slug?: string;
+  isActive?: boolean;
+}
+
 export interface InventoryItem {
   _id?: string;
   id?: string;
   name: string;
   sku?: string;
   type: "stock" | "service";
-  categoryId?: string; // API uses categoryId, not category
+  categoryId?: string | Category; // Can be either string ID or populated Category object
   baseUnit: string;
   purchaseUnit?: string;
   conversion?: number; // API uses simple number, not object
@@ -30,9 +38,43 @@ export interface Unit {
   id?: string;
   name: string;
   symbol: string;
-  type: "mass" | "volume" | "count" | "length" | "custom";
+  type: "weight" | "volume" | "count" | "custom";
   active?: boolean;
 }
+
+// Static industry-standard units for POS/Restaurant systems
+export const PREDEFINED_UNITS: Unit[] = [
+  // Weight Units
+  { name: "Milligram", symbol: "mg", type: "weight", active: true },
+  { name: "Gram", symbol: "g", type: "weight", active: true },
+  { name: "Kilogram", symbol: "kg", type: "weight", active: true },
+  { name: "Ounce", symbol: "oz", type: "weight", active: true },
+  { name: "Pound", symbol: "lb", type: "weight", active: true },
+
+  // Volume Units
+  { name: "Milliliter", symbol: "ml", type: "volume", active: true },
+  { name: "Liter", symbol: "l", type: "volume", active: true },
+  { name: "Gallon", symbol: "gal", type: "volume", active: true },
+  { name: "Fluid Ounce", symbol: "fl oz", type: "volume", active: true },
+  { name: "Cup", symbol: "cup", type: "volume", active: true },
+  { name: "Tablespoon", symbol: "tbsp", type: "volume", active: true },
+  { name: "Teaspoon", symbol: "tsp", type: "volume", active: true },
+
+  // Count Units
+  { name: "Piece", symbol: "pc", type: "count", active: true },
+  { name: "Box", symbol: "box", type: "count", active: true },
+  { name: "Pack", symbol: "pack", type: "count", active: true },
+  { name: "Dozen", symbol: "doz", type: "count", active: true },
+  { name: "Case", symbol: "case", type: "count", active: true },
+  { name: "Unit", symbol: "unit", type: "count", active: true },
+  { name: "Bag", symbol: "bag", type: "count", active: true },
+  { name: "Bottle", symbol: "btl", type: "count", active: true },
+  { name: "Can", symbol: "can", type: "count", active: true },
+  { name: "Jar", symbol: "jar", type: "count", active: true },
+];
+
+// Custom units storage key
+const CUSTOM_UNITS_STORAGE_KEY = 'pos_custom_units';
 
 export interface Conversion {
   _id?: string;
@@ -58,6 +100,17 @@ export interface ApiResponse<T> {
   success: boolean;
   message?: string;
   data?: T;
+  stats?: InventoryStats;
+}
+
+export interface InventoryStats {
+  totalItems: number;
+  stockItems: number;
+  serviceItems: number;
+  lowStock: number;
+  outOfStock: number;
+  activeItems: number;
+  inactiveItems: number;
 }
 
 // ==================== Configuration ====================
@@ -124,6 +177,43 @@ function buildHeaders(extra?: Record<string, string>, skipContentType?: boolean)
 // ==================== Inventory Items Service ====================
 
 export const InventoryService = {
+  // Get inventory statistics
+  async getStats(params?: {
+    categoryId?: string;
+  }): Promise<ApiResponse<InventoryStats>> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
+
+      const queryString = queryParams.toString();
+      const url = buildUrl(`/t/inventory/stats${queryString ? `?${queryString}` : ''}`);
+
+      const res = await fetch(url, { headers: buildHeaders() });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        return { success: false, message: data?.message || `Get stats failed (${res.status})` };
+      }
+
+      // Map API response format to our interface
+      const apiStats = data?.result ?? data?.stats ?? data?.data ?? data;
+      const stats: InventoryStats = {
+        totalItems: apiStats.total ?? 0,
+        stockItems: apiStats.tracked ?? 0,
+        serviceItems: apiStats.service ?? 0,
+        lowStock: apiStats.low ?? 0,
+        outOfStock: apiStats.outOfStock ?? 0,
+        activeItems: apiStats.active ?? 0,
+        inactiveItems: apiStats.inactive ?? 0,
+      };
+
+      return { success: true, data: stats };
+    } catch (error: any) {
+      console.error("Error getting inventory stats:", error);
+      return { success: false, message: error.message };
+    }
+  },
+
   // List inventory items
   async listItems(params?: {
     q?: string;
@@ -134,15 +224,19 @@ export const InventoryService = {
     sort?: string;
     order?: "asc" | "desc";
   }): Promise<ApiResponse<InventoryItem[]>> {
-    const q = params?.q ?? "";
-    const page = params?.page ?? 1;
-    const limit = params?.limit ?? 100;
+    // Build query params only when they have values
+    const queryParams = new URLSearchParams();
 
-    let url = buildUrl(`/t/inventory/items?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`);
-    if (params?.type) url += `&type=${params.type}`;
-    if (params?.categoryId) url += `&categoryId=${encodeURIComponent(params.categoryId)}`;
-    if (params?.sort) url += `&sort=${params.sort}`;
-    if (params?.order) url += `&order=${params.order}`;
+    if (params?.q) queryParams.append('q', params.q);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.type) queryParams.append('type', params.type);
+    if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
+    if (params?.sort) queryParams.append('sort', params.sort);
+    if (params?.order) queryParams.append('order', params.order);
+
+    const queryString = queryParams.toString();
+    const url = buildUrl(`/t/inventory/items${queryString ? `?${queryString}` : ''}`);
 
     const res = await fetch(url, { headers: buildHeaders() });
     const data = await res.json().catch(() => ({}));
@@ -152,6 +246,8 @@ export const InventoryService = {
     }
 
     const items: InventoryItem[] = data?.items ?? data?.result ?? data?.data ?? [];
+
+    // Note: Stats are now fetched from dedicated /t/inventory/stats endpoint
     return { success: true, data: items };
   },
 
@@ -188,6 +284,9 @@ export const InventoryService = {
     if (payload.reorderPoint !== undefined) apiPayload.reorderPoint = payload.reorderPoint;
     if (payload.barcode) apiPayload.barcode = payload.barcode;
     if (payload.taxCategory) apiPayload.taxCategory = payload.taxCategory;
+    if (payload.trackStock !== undefined) apiPayload.trackStock = payload.trackStock;
+
+    console.log('Creating item with payload:', apiPayload);
 
     const res = await fetch(url, {
       method: "POST",
@@ -387,58 +486,96 @@ export const InventoryService = {
 // ==================== Units Service ====================
 
 export const UnitsService = {
-  // List units
+  // Get custom units from localStorage
+  getCustomUnits(): Unit[] {
+    if (typeof window === 'undefined') return [];
+    const stored = localStorage.getItem(CUSTOM_UNITS_STORAGE_KEY);
+    if (!stored) return [];
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return [];
+    }
+  },
+
+  // Save custom units to localStorage
+  saveCustomUnits(units: Unit[]): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(CUSTOM_UNITS_STORAGE_KEY, JSON.stringify(units));
+  },
+
+  // List all units (predefined + custom)
   async listUnits(params?: { type?: string }): Promise<ApiResponse<Unit[]>> {
-    let url = buildUrl(`/t/inventory/units`);
-    if (params?.type) url += `?type=${params.type}`;
+    try {
+      const customUnits = this.getCustomUnits();
+      let allUnits = [...PREDEFINED_UNITS, ...customUnits];
 
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+      // Filter by type if specified
+      if (params?.type) {
+        allUnits = allUnits.filter(unit => unit.type === params.type);
+      }
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `List units failed (${res.status})` };
+      // Filter only active units
+      allUnits = allUnits.filter(unit => unit.active !== false);
+
+      return { success: true, data: allUnits };
+    } catch (error: any) {
+      console.error("Error listing units:", error);
+      return { success: false, message: error.message };
     }
-
-    const units: Unit[] = data?.items ?? data?.result ?? data?.data ?? [];
-    return { success: true, data: units };
   },
 
-  // Create unit
+  // Create custom unit
   async createUnit(payload: Partial<Unit>): Promise<ApiResponse<Unit>> {
-    const url = buildUrl(`/t/inventory/units`);
+    try {
+      if (!payload.name || !payload.symbol) {
+        return { success: false, message: "Name and symbol are required" };
+      }
 
-    const apiPayload = {
-      name: payload.name,
-      symbol: payload.symbol,
-      type: payload.type || "custom",
-    };
+      const customUnits = this.getCustomUnits();
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
+      // Check for duplicate symbol
+      const allUnits = [...PREDEFINED_UNITS, ...customUnits];
+      if (allUnits.some(u => u.symbol.toLowerCase() === payload.symbol?.toLowerCase())) {
+        return { success: false, message: "A unit with this symbol already exists" };
+      }
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Create unit failed (${res.status})` };
+      const newUnit: Unit = {
+        id: Date.now().toString(),
+        name: payload.name,
+        symbol: payload.symbol,
+        type: payload.type || "custom",
+        active: true,
+      };
+
+      customUnits.push(newUnit);
+      this.saveCustomUnits(customUnits);
+
+      return { success: true, data: newUnit };
+    } catch (error: any) {
+      console.error("Error creating unit:", error);
+      return { success: false, message: error.message };
     }
-
-    const unit: Unit = data?.result ?? data;
-    return { success: true, data: unit };
   },
 
-  // Delete unit
+  // Delete custom unit (can't delete predefined units)
   async deleteUnit(id: string): Promise<ApiResponse<null>> {
-    const url = buildUrl(`/t/inventory/units/${id}`);
-    const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });
+    try {
+      const customUnits = this.getCustomUnits();
+      const index = customUnits.findIndex(u => u.id === id || u._id === id);
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      return { success: false, message: data?.message || `Delete unit failed (${res.status})` };
+      if (index === -1) {
+        return { success: false, message: "Cannot delete predefined units" };
+      }
+
+      customUnits.splice(index, 1);
+      this.saveCustomUnits(customUnits);
+
+      return { success: true, data: null };
+    } catch (error: any) {
+      console.error("Error deleting unit:", error);
+      return { success: false, message: error.message };
     }
-
-    return { success: true, data: null };
   },
 };
 

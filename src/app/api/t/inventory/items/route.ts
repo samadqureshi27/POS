@@ -5,15 +5,19 @@ import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helper
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const q = searchParams.get("q") || "";
-  const page = searchParams.get("page") || "1";
-  const limit = searchParams.get("limit") || "100";
-  const type = searchParams.get("type") || "";
-  const category = searchParams.get("category") || "";
 
-  let url = `${getRemoteBase()}/t/inventory/items?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`;
-  if (type) url += `&type=${type}`;
-  if (category) url += `&category=${encodeURIComponent(category)}`;
+  // Build query params properly
+  const queryParams = new URLSearchParams();
+  if (searchParams.get("q")) queryParams.append("q", searchParams.get("q")!);
+  if (searchParams.get("page")) queryParams.append("page", searchParams.get("page")!);
+  if (searchParams.get("limit")) queryParams.append("limit", searchParams.get("limit")!);
+  if (searchParams.get("type")) queryParams.append("type", searchParams.get("type")!);
+  if (searchParams.get("categoryId")) queryParams.append("categoryId", searchParams.get("categoryId")!);
+  if (searchParams.get("sort")) queryParams.append("sort", searchParams.get("sort")!);
+  if (searchParams.get("order")) queryParams.append("order", searchParams.get("order")!);
+
+  const queryString = queryParams.toString();
+  const url = `${getRemoteBase()}/t/inventory/items${queryString ? `?${queryString}` : ''}`;
 
   const res = await fetch(url, {
     method: "GET",

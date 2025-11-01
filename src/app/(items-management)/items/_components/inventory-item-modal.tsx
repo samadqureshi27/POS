@@ -45,6 +45,7 @@ export default function InventoryItemModal({
     conversion: undefined,
     trackStock: true,
     categoryId: "",
+    currentStock: 0,
     reorderPoint: 0,
     barcode: "",
     taxCategory: "",
@@ -70,6 +71,11 @@ export default function InventoryItemModal({
       loadData();
 
       if (editingItem) {
+        // Extract category ID if it's a populated object
+        const categoryIdValue = typeof editingItem.categoryId === 'object' && editingItem.categoryId?._id
+          ? editingItem.categoryId._id
+          : editingItem.categoryId;
+
         setFormData({
           name: editingItem.name,
           sku: editingItem.sku,
@@ -78,15 +84,19 @@ export default function InventoryItemModal({
           purchaseUnit: editingItem.purchaseUnit,
           conversion: editingItem.conversion,
           trackStock: editingItem.trackStock,
-          categoryId: editingItem.categoryId,
+          categoryId: typeof categoryIdValue === 'string' ? categoryIdValue : '',
+          currentStock: editingItem.currentStock,
           reorderPoint: editingItem.reorderPoint,
           barcode: editingItem.barcode,
           taxCategory: editingItem.taxCategory,
           isActive: editingItem.isActive ?? true,
         });
-        // Find category name from ID for display
-        const category = categories.find(c => (c._id || c.id) === editingItem.categoryId);
-        setCategoryInput(category?.name || editingItem.categoryId || "");
+
+        // Set category name for display
+        const categoryName = typeof editingItem.categoryId === 'object' && editingItem.categoryId?.name
+          ? editingItem.categoryId.name
+          : categories.find(c => (c._id || c.id) === categoryIdValue)?.name || '';
+        setCategoryInput(categoryName);
         // Load vendors and branches from mock API (not yet in backend)
         setSelectedVendors([]);
         setBranchDistribution([]);
@@ -101,6 +111,7 @@ export default function InventoryItemModal({
           conversion: undefined,
           trackStock: true,
           categoryId: "",
+          currentStock: 0,
           reorderPoint: 0,
           barcode: "",
           taxCategory: "",
@@ -114,17 +125,16 @@ export default function InventoryItemModal({
   }, [isOpen, editingItem]);
 
   const loadData = async () => {
-    // Load from REAL API
+    // Load units from static service
     const [unitsRes, categoriesRes] = await Promise.all([
       UnitsService.listUnits(),
       CategoriesService.listCategories({ limit: 1000 }),
     ]);
 
-    console.log('Units Response:', unitsRes);
-    console.log('Categories Response:', categoriesRes);
+    console.log('Units loaded:', unitsRes);
 
     if (unitsRes.success && unitsRes.data) {
-      console.log('Setting units:', unitsRes.data);
+      console.log('Setting units:', unitsRes.data.length, 'units');
       setUnits(unitsRes.data);
     } else {
       console.error('Failed to load units:', unitsRes.message);
@@ -426,7 +436,7 @@ export default function InventoryItemModal({
                   <SelectContent>
                     {units.length > 0 ? (
                       units.map((unit) => (
-                        <SelectItem key={unit._id || unit.id} value={unit.symbol}>
+                        <SelectItem key={unit._id || unit.id || unit.symbol} value={unit.symbol}>
                           {unit.name} ({unit.symbol}) - {unit.type}
                         </SelectItem>
                       ))
@@ -456,7 +466,7 @@ export default function InventoryItemModal({
                       </SelectTrigger>
                       <SelectContent>
                         {units.map((unit) => (
-                          <SelectItem key={unit._id || unit.id} value={unit.symbol}>
+                          <SelectItem key={unit._id || unit.id || unit.symbol} value={unit.symbol}>
                             {unit.name} ({unit.symbol})
                           </SelectItem>
                         ))}
@@ -493,6 +503,23 @@ export default function InventoryItemModal({
                       </div>
                     </div>
                   )}
+
+                  {/* Current Stock / Initial Quantity */}
+                  <div>
+                    <Label className="text-gray-700 text-sm font-medium mb-2">
+                      Current Stock Quantity
+                    </Label>
+                    <Input
+                      type="number"
+                      value={formData.currentStock !== undefined ? formData.currentStock : ""}
+                      onChange={(e) => handleFieldChange("currentStock", e.target.value ? parseInt(e.target.value) : 0)}
+                      placeholder="0"
+                      className="bg-white border-gray-300 h-9 rounded-md"
+                    />
+                    <p className="text-gray-500 text-xs mt-1">
+                      Initial or current stock quantity (in {formData.baseUnit})
+                    </p>
+                  </div>
 
                   {/* Threshold (Reorder Point) */}
                   <div>
