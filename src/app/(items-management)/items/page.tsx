@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import InventoryItemModal from "./_components/inventory-item-modal";
 import InventoryGrid from "./_components/inventory-grid";
+import ImportResultsDialog from "./_components/import-results-dialog";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
 
 export default function ItemsPage() {
@@ -21,6 +22,10 @@ export default function ItemsPage() {
   // Modals
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+  
+  // Import Results Dialog
+  const [importResults, setImportResults] = useState<any>(null);
+  const [isImportResultsOpen, setIsImportResultsOpen] = useState(false);
 
   // Stats
   const [stats, setStats] = useState({
@@ -168,7 +173,7 @@ export default function ItemsPage() {
     try {
       const response = await InventoryService.exportItems({
         q: searchQuery,
-        // Add categoryId filter if needed
+        // categoryId can be added here when category filtering is implemented
       });
       
       if (response.success && response.data) {
@@ -213,22 +218,29 @@ export default function ItemsPage() {
 
       const response = await InventoryService.importItems(file, duplicatePolicy);
 
-      if (response.success) {
-        const result = response.data;
-        let message = 'Import completed successfully!';
-        
-        if (result?.summary) {
-          message = `Import Summary:
-• Created: ${result.summary.created || 0} items
-• Updated: ${result.summary.updated || 0} items
-• Skipped: ${result.summary.skipped || 0} items
-• Failed: ${result.summary.failed || 0} items`;
-        }
+      // Debug: Log the complete API response structure
+      console.log('Import API Response:', JSON.stringify(response, null, 2));
+      console.log('Response data structure:', response.data);
+      console.log('Response success:', response.success);
 
-        alert(message);
+      if (response.success && response.data) {
+        // The API response is in response.data, so we need to map it correctly
+        const apiData = response.data;
+        
+        setImportResults({
+          success: apiData.success !== undefined ? apiData.success : true,
+          message: apiData.message || 'Import completed successfully',
+          summary: apiData.summary || apiData,
+          errors: apiData.errors || [],
+          validations: apiData.validations || [],
+          warnings: apiData.warnings || [],
+          duplicates: apiData.duplicates || [],
+          failedRows: apiData.failedRows || []
+        });
+        setIsImportResultsOpen(true);
         loadItems(); // Refresh the items list
       } else {
-        alert(`Import failed: ${response.message}`);
+        alert(`Import failed: ${response.message || 'Unknown error occurred'}`);
       }
     } catch (error) {
       console.error('Error importing items:', error);
@@ -468,6 +480,12 @@ export default function ItemsPage() {
         editingItem={editingItem}
         onSave={handleItemSave}
       />
+
+      <ImportResultsDialog
+         open={isImportResultsOpen}
+         onClose={() => setIsImportResultsOpen(false)}
+         results={importResults}
+       />
     </div>
   );
 }
