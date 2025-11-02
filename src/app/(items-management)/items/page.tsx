@@ -588,9 +588,6 @@ export default function ItemsPage() {
                           {item.baseUnit?.slice(0, 3)}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-600 font-medium">
-                        {item.baseUnit}
-                      </span>
                     </div>
 
                     {/* Stock Quantity */}
