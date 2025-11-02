@@ -165,7 +165,9 @@ export const useRecipeData = () => {
           Description: recipe.description || "",
           type: recipe.type || "sub",
           Priority: 0,
-          _id: recipe._id
+          _id: recipe._id,
+          ingredients: recipe.ingredients || [], // Include ingredients for display
+          totalCost: recipe.totalCost || 0,
         }));
         setRecipeOptions(transformedRecipes);
       } else {

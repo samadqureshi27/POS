@@ -138,23 +138,29 @@ const RecipesManagementPage = () => {
         )}
         columns={[
           {
-            key: "ID",
-            header: "ID",
-            render: (item) => <span className="text-gray-700 font-mono text-sm">#{item.ID}</span>,
-            className: "w-20",
-          },
-          {
             key: "Name",
-            header: "Name",
+            header: "Recipe Name",
             render: (item) => (
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
-                  <UtensilsCrossed className="h-5 w-5 text-gray-600" />
+                <div className={`h-10 w-10 rounded-lg flex items-center justify-center border ${
+                  (item as any).type === "final"
+                    ? "bg-blue-50 border-blue-200"
+                    : (item as any).type === "sub"
+                    ? "bg-purple-50 border-purple-200"
+                    : "bg-gray-50 border-gray-200"
+                }`}>
+                  <UtensilsCrossed className={`h-5 w-5 ${
+                    (item as any).type === "final"
+                      ? "text-blue-600"
+                      : (item as any).type === "sub"
+                      ? "text-purple-600"
+                      : "text-gray-600"
+                  }`} />
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-900">{item.Name}</div>
                   {item.Description && (
-                    <div className="text-xs text-gray-500 truncate max-w-[200px]">{item.Description}</div>
+                    <div className="text-xs text-gray-500 truncate max-w-[300px]">{item.Description}</div>
                   )}
                 </div>
               </div>
@@ -164,22 +170,41 @@ const RecipesManagementPage = () => {
             key: "type",
             header: "Type",
             render: (item: any) => (
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
                 item.type === "final"
                   ? "bg-blue-100 text-blue-700"
                   : item.type === "sub"
                   ? "bg-purple-100 text-purple-700"
                   : "bg-gray-100 text-gray-700"
               }`}>
-                {item.type ? (item.type === "final" ? "Final Recipe" : "Sub Recipe") : "—"}
+                {item.type ? (item.type === "final" ? "Final" : "Sub") : "—"}
               </span>
             ),
+            className: "w-28",
+          },
+          {
+            key: "ingredients",
+            header: "Ingredients",
+            render: (item: any) => {
+              const ingredientCount = item.ingredients?.length || 0;
+              return (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center h-6 w-6 rounded-full bg-gray-100 text-xs font-semibold text-gray-700">
+                    {ingredientCount}
+                  </div>
+                  <span className="text-sm text-gray-600">
+                    {ingredientCount === 1 ? "item" : "items"}
+                  </span>
+                </div>
+              );
+            },
+            className: "w-36",
           },
           {
             key: "Status",
             header: "Status",
             render: (item) => (
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
                 item.Status === "Active"
                   ? "bg-green-100 text-green-700"
                   : "bg-red-100 text-red-700"
@@ -187,69 +212,107 @@ const RecipesManagementPage = () => {
                 {item.Status}
               </span>
             ),
-          },
-          {
-            key: "Priority",
-            header: "Priority",
-            render: (item) => <span className="text-gray-700">{item.Priority || "—"}</span>,
+            className: "w-28",
           },
         ]}
         renderGridCard={(item: any, actions) => {
           const recipeType = item.type || "unknown";
           const typeLabel = recipeType === "final" ? "Final Recipe" : recipeType === "sub" ? "Sub Recipe" : "Recipe";
-          const typeColor = recipeType === "final" ? "bg-blue-100 text-blue-700" : recipeType === "sub" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700";
+          const ingredientCount = item.ingredients?.length || 0;
+          const isActive = item.Status === "Active";
 
           return (
-            <div className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200">
-              {/* Card Header - Icon */}
-              <div className="relative h-32 bg-gray-50 flex items-center justify-center border-b border-gray-200">
-                <UtensilsCrossed className="h-12 w-12 text-gray-300" />
+            <div className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-200">
+              {/* Card Header with Gradient Background */}
+              <div className={`relative h-28 flex items-center justify-center border-b-2 ${
+                recipeType === "final"
+                  ? "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200"
+                  : recipeType === "sub"
+                  ? "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200"
+                  : "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200"
+              }`}>
+                <UtensilsCrossed className={`h-14 w-14 ${
+                  recipeType === "final"
+                    ? "text-blue-400"
+                    : recipeType === "sub"
+                    ? "text-purple-400"
+                    : "text-gray-400"
+                }`} />
 
-                {/* Type Badge */}
-                <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${typeColor}`}>
+                {/* Status Badge - Top Left */}
+                <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${
+                  isActive
+                    ? "bg-green-500 text-white"
+                    : "bg-red-500 text-white"
+                }`}>
+                  {item.Status}
+                </div>
+
+                {/* Type Badge - Top Right */}
+                <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${
+                  recipeType === "final"
+                    ? "bg-blue-600 text-white"
+                    : recipeType === "sub"
+                    ? "bg-purple-600 text-white"
+                    : "bg-gray-600 text-white"
+                }`}>
                   {typeLabel}
                 </div>
 
                 {/* Hover Actions Overlay */}
-                <div className="absolute inset-0 bg-gray-900 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-3">
                   {actions}
                 </div>
               </div>
 
               {/* Card Content */}
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">{item.Name}</h3>
-                <p className="text-xs text-gray-500 font-mono mb-3">ID: #{item.ID}</p>
+                {/* Recipe Name */}
+                <h3 className="text-base font-bold text-gray-900 mb-2 truncate" title={item.Name}>
+                  {item.Name}
+                </h3>
 
-                {/* Info Grid */}
-                <div className="space-y-2 mb-4">
-                  {/* Status */}
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Status:</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                      item.Status === "Active"
-                        ? "text-green-600 bg-green-50"
-                        : "text-red-600 bg-red-50"
+                {/* Description */}
+                {item.Description ? (
+                  <p className="text-xs text-gray-600 mb-3 line-clamp-2 min-h-[2.5rem]">
+                    {item.Description}
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-400 italic mb-3 min-h-[2.5rem]">
+                    No description provided
+                  </p>
+                )}
+
+                {/* Stats Row */}
+                <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                  {/* Ingredient Count */}
+                  <div className="flex items-center gap-2">
+                    <div className={`flex items-center justify-center h-7 w-7 rounded-lg ${
+                      recipeType === "final"
+                        ? "bg-blue-100"
+                        : "bg-purple-100"
                     }`}>
-                      {item.Status}
+                      <span className={`text-xs font-bold ${
+                        recipeType === "final"
+                          ? "text-blue-700"
+                          : "text-purple-700"
+                      }`}>
+                        {ingredientCount}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-600 font-medium">
+                      {ingredientCount === 1 ? "ingredient" : "ingredients"}
                     </span>
                   </div>
 
-                  {/* Description */}
-                  {item.Description && (
-                    <div className="flex flex-col text-sm">
-                      <span className="text-gray-600 mb-1">Description:</span>
-                      <span className="text-gray-700 text-xs line-clamp-2">{item.Description}</span>
-                    </div>
-                  )}
-
-                  {/* Priority */}
-                  {item.Priority !== undefined && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Priority:</span>
-                      <span className="text-gray-900 font-medium">{item.Priority}</span>
-                    </div>
-                  )}
+                  {/* Cost Placeholder (can be implemented later) */}
+                  <div className="text-xs text-gray-500">
+                    {item.totalCost ? (
+                      <span className="font-semibold text-gray-700">${item.totalCost.toFixed(2)}</span>
+                    ) : (
+                      <span className="italic">Cost: N/A</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
