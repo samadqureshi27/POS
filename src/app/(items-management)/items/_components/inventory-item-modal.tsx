@@ -43,8 +43,9 @@ export default function InventoryItemModal({
     baseUnit: "pc",
     purchaseUnit: "",
     conversion: undefined,
-    trackStock: true,
+    // trackStock: Let backend set default based on item type (stock items default to true)
     categoryId: "",
+    quantity: 0,
     reorderPoint: 0,
     barcode: "",
     taxCategory: "",
@@ -70,6 +71,11 @@ export default function InventoryItemModal({
       loadData();
 
       if (editingItem) {
+        // Extract category ID if it's a populated object
+        const categoryIdValue = typeof editingItem.categoryId === 'object' && editingItem.categoryId?._id
+          ? editingItem.categoryId._id
+          : editingItem.categoryId;
+
         setFormData({
           name: editingItem.name,
           sku: editingItem.sku,
@@ -78,15 +84,19 @@ export default function InventoryItemModal({
           purchaseUnit: editingItem.purchaseUnit,
           conversion: editingItem.conversion,
           trackStock: editingItem.trackStock,
-          categoryId: editingItem.categoryId,
+          categoryId: typeof categoryIdValue === 'string' ? categoryIdValue : '',
+          quantity: editingItem.quantity,
           reorderPoint: editingItem.reorderPoint,
           barcode: editingItem.barcode,
           taxCategory: editingItem.taxCategory,
           isActive: editingItem.isActive ?? true,
         });
-        // Find category name from ID for display
-        const category = categories.find(c => (c._id || c.id) === editingItem.categoryId);
-        setCategoryInput(category?.name || editingItem.categoryId || "");
+
+        // Set category name for display
+        const categoryName = typeof editingItem.categoryId === 'object' && editingItem.categoryId?.name
+          ? editingItem.categoryId.name
+          : categories.find(c => (c._id || c.id) === categoryIdValue)?.name || '';
+        setCategoryInput(categoryName);
         // Load vendors and branches from mock API (not yet in backend)
         setSelectedVendors([]);
         setBranchDistribution([]);
@@ -99,8 +109,9 @@ export default function InventoryItemModal({
           baseUnit: "pc",
           purchaseUnit: "",
           conversion: undefined,
-          trackStock: true,
+          // trackStock: Let backend set default based on item type
           categoryId: "",
+          quantity: 0,
           reorderPoint: 0,
           barcode: "",
           taxCategory: "",
@@ -114,17 +125,16 @@ export default function InventoryItemModal({
   }, [isOpen, editingItem]);
 
   const loadData = async () => {
-    // Load from REAL API
+    // Load units from static service
     const [unitsRes, categoriesRes] = await Promise.all([
       UnitsService.listUnits(),
       CategoriesService.listCategories({ limit: 1000 }),
     ]);
 
-    console.log('Units Response:', unitsRes);
-    console.log('Categories Response:', categoriesRes);
+    console.log('Units loaded:', unitsRes);
 
     if (unitsRes.success && unitsRes.data) {
-      console.log('Setting units:', unitsRes.data);
+      console.log('Setting units:', unitsRes.data.length, 'units');
       setUnits(unitsRes.data);
     } else {
       console.error('Failed to load units:', unitsRes.message);
@@ -149,6 +159,13 @@ export default function InventoryItemModal({
 
     // For stock items, ensure purchaseUnit and conversion are set
     const submitData = { ...formData };
+
+    // Don't send trackStock for new items - let backend set default
+    // Only send if explicitly set and different from default
+    if (!editingItem && submitData.trackStock === undefined) {
+      delete submitData.trackStock;
+    }
+
     if (submitData.type === "stock") {
       // If no purchaseUnit set, use baseUnit (no conversion needed)
       if (!submitData.purchaseUnit) {
@@ -166,6 +183,7 @@ export default function InventoryItemModal({
       }
     }
 
+    console.log('Saving item with data:', JSON.stringify(submitData, null, 2));
     setLoading(true);
     await onSave(submitData);
     setLoading(false);
@@ -426,7 +444,7 @@ export default function InventoryItemModal({
                   <SelectContent>
                     {units.length > 0 ? (
                       units.map((unit) => (
-                        <SelectItem key={unit._id || unit.id} value={unit.symbol}>
+                        <SelectItem key={unit._id || unit.id || unit.symbol} value={unit.symbol}>
                           {unit.name} ({unit.symbol}) - {unit.type}
                         </SelectItem>
                       ))
@@ -442,8 +460,8 @@ export default function InventoryItemModal({
                 </p>
               </div>
 
-              {/* Purchase Unit & Conversion */}
-              {formData.trackStock && (
+              {/* Purchase Unit & Conversion - Show for stock items by default */}
+              {(formData.type === "stock" || formData.trackStock) && (
                 <>
                   <div>
                     <Label className="text-gray-700 text-sm font-medium mb-2">Purchase Unit (Optional)</Label>
@@ -456,7 +474,7 @@ export default function InventoryItemModal({
                       </SelectTrigger>
                       <SelectContent>
                         {units.map((unit) => (
-                          <SelectItem key={unit._id || unit.id} value={unit.symbol}>
+                          <SelectItem key={unit._id || unit.id || unit.symbol} value={unit.symbol}>
                             {unit.name} ({unit.symbol})
                           </SelectItem>
                         ))}
@@ -494,6 +512,23 @@ export default function InventoryItemModal({
                     </div>
                   )}
 
+                  {/* Current Stock / Initial Quantity */}
+                  <div>
+                    <Label className="text-gray-700 text-sm font-medium mb-2">
+                      Current Stock Quantity
+                    </Label>
+                    <Input
+                      type="number"
+                      value={formData.quantity !== undefined ? formData.quantity : ""}
+                      onChange={(e) => handleFieldChange("quantity", e.target.value ? parseInt(e.target.value) : 0)}
+                      placeholder="0"
+                      className="bg-white border-gray-300 h-9 rounded-md"
+                    />
+                    <p className="text-gray-500 text-xs mt-1">
+                      Initial or current stock quantity (in {formData.baseUnit})
+                    </p>
+                  </div>
+
                   {/* Threshold (Reorder Point) */}
                   <div>
                     <Label className="text-gray-700 text-sm font-medium mb-2">
@@ -512,19 +547,31 @@ export default function InventoryItemModal({
                   </div>
                 </>
               )}
-              {/* Track Stock */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label className="text-gray-700 font-medium">Track Stock Levels</Label>
-                    <p className="text-gray-500 text-xs mt-1">Monitor and manage inventory quantities</p>
+              {/* Track Stock - Only show toggle for service items */}
+              {formData.type === "service" && (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-gray-700 font-medium">Track Stock Levels</Label>
+                      <p className="text-gray-500 text-xs mt-1">
+                        Monitor and manage inventory quantities for this service item
+                      </p>
+                    </div>
+                    <Switch
+                      checked={formData.trackStock ?? false}
+                      onCheckedChange={(checked) => handleFieldChange("trackStock", checked)}
+                    />
                   </div>
-                  <Switch
-                    checked={formData.trackStock}
-                    onCheckedChange={(checked) => handleFieldChange("trackStock", checked)}
-                  />
                 </div>
-              </div>
+              )}
+              {/* Info message for stock items */}
+              {formData.type === "stock" && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-blue-700 text-sm">
+                    ℹ️ Stock tracking is automatically enabled for stock items
+                  </p>
+                </div>
+              )}
             </TabsContent>
 
             {/* Vendors Tab (Edit Mode Only) */}

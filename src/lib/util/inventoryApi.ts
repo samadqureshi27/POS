@@ -44,7 +44,7 @@ export interface InventoryItem {
   reorderPoint?: number;
   barcode?: string;
   taxCategory?: string;
-  currentStock?: number;
+  quantity?: number;
   Status: "Active" | "Inactive";
   Priority: number;
   vendors?: number[]; // Array of vendor IDs
@@ -121,7 +121,7 @@ let mockInventoryItems: InventoryItem[] = [
     reorderPoint: 5000,
     barcode: "1234567890",
     taxCategory: "food",
-    currentStock: 8000,
+    quantity: 8000,
     Status: "Active",
     Priority: 1,
     vendors: [1, 2],
@@ -141,7 +141,7 @@ let mockInventoryItems: InventoryItem[] = [
     trackStock: true,
     category: "sauces",
     reorderPoint: 2000,
-    currentStock: 5500,
+    quantity: 5500,
     Status: "Active",
     Priority: 2,
   },
@@ -156,7 +156,7 @@ let mockInventoryItems: InventoryItem[] = [
     trackStock: true,
     category: "dairy",
     reorderPoint: 3000,
-    currentStock: 1500,
+    quantity: 1500,
     Status: "Active",
     Priority: 3,
   },
@@ -180,7 +180,7 @@ let mockInventoryItems: InventoryItem[] = [
     trackStock: true,
     category: "spices",
     reorderPoint: 500,
-    currentStock: 0,
+    quantity: 0,
     Status: "Active",
     Priority: 5,
   },
@@ -195,7 +195,7 @@ let mockInventoryItems: InventoryItem[] = [
     trackStock: true,
     category: "oils",
     reorderPoint: 1000,
-    currentStock: 3200,
+    quantity: 3200,
     Status: "Inactive",
     Priority: 6,
   },

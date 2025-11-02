@@ -1,8 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import MenuAPI from "@/lib/util/recipeApi";
-import { recipeOptionsApi } from "@/lib/util/recipe-options-api";
-import { useIngredientsData } from "./useIngredientsData";
+import { RecipeService } from "@/lib/services/recipe-service";
+import { InventoryService } from "@/lib/services/inventory-service";
 import {
   RecipeOption,
   Ingredient,
@@ -12,13 +11,21 @@ import {
 } from "../types/recipes";
 
 export const useRecipeData = () => {
-  // Get ingredients data from ingredients hook and transform to match expected format
-  const { items: rawIngredients } = useIngredientsData();
+  // Fetch inventory items from items-management
+  const [inventoryItems, setInventoryItems] = useState<any[]>([]);
 
-  // Transform ingredients to match expected format (string ID to number ID)
-  const ingredients: Ingredient[] = rawIngredients.map(item => ({
-    ...item,
-    ID: parseInt(item.ID.replace('#', '')) || 0
+  // Transform inventory to ingredients format
+  const ingredients: Ingredient[] = inventoryItems.map((item, index) => ({
+    ID: item._id || item.id || index,
+    Name: item.name,
+    Unit: item.baseUnit || "pc",
+    _id: item._id || item.id,
+    name: item.name,
+    baseUnit: item.baseUnit,
+    sku: item.sku,
+    type: item.type,
+    quantity: item.quantity,
+    reorderPoint: item.reorderPoint,
   }));
 
   // State management
@@ -46,50 +53,132 @@ export const useRecipeData = () => {
   const loadInitialData = async () => {
     await Promise.all([
       loadRecipeOptions(),
-      loadAvailableRecipeOptions()
+      loadAvailableRecipeOptions(),
+      loadInventoryItems()
     ]);
   };
+
+  const loadInventoryItems = useCallback(async () => {
+    try {
+      const response = await InventoryService.listItems();
+      if (response.success && response.data) {
+        console.log("✅ Loaded inventory items for recipes:", response.data.length, "items");
+        setInventoryItems(response.data);
+      } else {
+        console.error("Failed to load inventory:", response.message);
+      }
+    } catch (error) {
+      console.error("Error loading inventory:", error);
+    }
+  }, []);
 
 
   const loadAvailableRecipeOptions = useCallback(async () => {
     try {
-      const response = await recipeOptionsApi.getRecipeOptions();
+      const response = await RecipeService.listRecipes();
+      console.log("📦 Raw response for available recipes:", response);
+
       if (response.success) {
-        // Map the response data to match expected format
-        const optionsWithDefaults = response.data.map(option => ({
-          ID: option.ID,
-          Name: option.Name,
-          Status: option.Status || "Active" as "Active" | "Inactive",
-          Description: option.Description || "",
-          Priority: option.Priority || 0
+        // Handle different response formats
+        let recipesArray = response.data;
+
+        // If data is not an array, it might be wrapped in another property
+        if (!Array.isArray(recipesArray)) {
+          console.warn("Response data is not an array, checking for nested data...");
+          // Check common API response patterns
+          if (response.data && typeof response.data === 'object') {
+            recipesArray = (response.data as any).recipes ||
+                          (response.data as any).data ||
+                          (response.data as any).items || [];
+          } else {
+            recipesArray = [];
+          }
+        }
+
+        console.log("✅ Loaded available recipe options:", recipesArray.length);
+
+        if (recipesArray.length === 0) {
+          console.warn("No recipes found in response");
+          setAvailableRecipeOptions([]);
+          return;
+        }
+
+        // Use the same recipe data - filter for sub recipes in the modal
+        const transformedRecipes = recipesArray.map((recipe: any) => ({
+          ID: recipe._id || recipe.id,
+          Name: recipe.name,
+          Status: recipe.isActive === false ? "Inactive" : "Active",
+          Description: recipe.description || "",
+          type: recipe.type || "sub",
+          Priority: 0,
+          _id: recipe._id,
+          name: recipe.name, // Also keep lowercase for compatibility
         }));
-        setAvailableRecipeOptions(optionsWithDefaults);
+        setAvailableRecipeOptions(transformedRecipes);
       } else {
-        throw new Error((response as any).message || "Failed to fetch recipe options");
+        console.error("Failed to load recipe options:", response.message);
+        setAvailableRecipeOptions([]);
       }
     } catch (error) {
       console.error("Error fetching available recipe options:", error);
-      showToast("Failed to load recipe options", "error");
+      setAvailableRecipeOptions([]);
     }
   }, []);
 
   const loadRecipeOptions = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await MenuAPI.getRecipeOption();
+      const response = await RecipeService.listRecipes();
+      console.log("📦 Raw response for recipes:", response);
+
       if (response.success) {
-        // Ensure all recipes have the required Description field
-        const recipesWithDefaults = response.data.map(recipe => ({
-          ...recipe,
-          Description: recipe.Description || ""
+        // Handle different response formats
+        let recipesArray = response.data;
+
+        // If data is not an array, it might be wrapped in another property
+        if (!Array.isArray(recipesArray)) {
+          console.warn("Response data is not an array, checking for nested data...");
+          // Check common API response patterns
+          if (response.data && typeof response.data === 'object') {
+            recipesArray = (response.data as any).recipes ||
+                          (response.data as any).data ||
+                          (response.data as any).items || [];
+          } else {
+            recipesArray = [];
+          }
+        }
+
+        console.log("✅ Loaded real recipes:", recipesArray.length);
+
+        if (recipesArray.length === 0) {
+          console.warn("No recipes found - this is normal if you haven't created any yet");
+          setRecipeOptions([]);
+          setLoading(false);
+          return;
+        }
+
+        // Transform recipes to match the expected format
+        const transformedRecipes = recipesArray.map((recipe: any) => ({
+          ID: recipe._id || recipe.id,
+          Name: recipe.name,
+          Status: recipe.isActive === false ? "Inactive" : "Active",
+          Description: recipe.description || "",
+          type: recipe.type || "sub",
+          Priority: 0,
+          _id: recipe._id,
+          ingredients: recipe.ingredients || [], // Include ingredients for display
+          totalCost: recipe.totalCost || 0,
         }));
-        setRecipeOptions(recipesWithDefaults);
+        setRecipeOptions(transformedRecipes);
       } else {
-        throw new Error(response.message || "Failed to fetch recipes");
+        console.error("Failed to load recipes:", response.message);
+        showToast(response.message || "Failed to load recipes", "error");
+        setRecipeOptions([]);
       }
     } catch (error) {
       console.error("Error fetching recipes:", error);
       showToast("Failed to load recipes", "error");
+      setRecipeOptions([]);
     } finally {
       setLoading(false);
     }
@@ -97,7 +186,8 @@ export const useRecipeData = () => {
 
   // Computed values
   const filteredItems = recipeOptions.filter((item) => {
-    const matchesSearch = item.Name.toLowerCase().includes(
+    const itemName = item.Name || item.name || "";
+    const matchesSearch = itemName.toLowerCase().includes(
       searchTerm.toLowerCase()
     );
     const matchesStatus = statusFilter === "" || item.Status === statusFilter;
@@ -133,93 +223,104 @@ export const useRecipeData = () => {
   }, []);
 
   // CRUD Operations
-  const createRecipe = useCallback(async (itemData: RecipePayload) => {
+  const createRecipe = useCallback(async (itemData: any) => {
     try {
       setActionLoading(true);
-      
-      // Ensure Description is provided
-      const recipeData: RecipePayload = {
-        ...itemData,
-        Description: itemData.Description || ""
-      };
-      
-      const response = await MenuAPI.createRecipeOption(recipeData);
-      if (response.success) {
-        setRecipeOptions((prevItems) => [...prevItems, response.data]);
+
+      console.log("📤 Creating recipe with data:", itemData);
+
+      const response = await RecipeService.createRecipe(itemData);
+      if (response.success && response.data) {
+        await Promise.all([
+          loadRecipeOptions(), // Reload all recipes
+          loadAvailableRecipeOptions() // Reload available recipes for dropdown
+        ]);
         showToast(response.message || "Recipe created successfully", "success");
         return { success: true, data: response.data };
       } else {
         throw new Error(response.message || "Failed to create recipe");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating recipe:", error);
-      showToast("Failed to create recipe", "error");
+      showToast(error.message || "Failed to create recipe", "error");
       return { success: false, error };
     } finally {
       setActionLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, loadRecipeOptions, loadAvailableRecipeOptions]);
 
-  const updateRecipe = useCallback(async (id: number, itemData: RecipePayload) => {
+  const updateRecipe = useCallback(async (id: string, itemData: any) => {
     try {
       setActionLoading(true);
-      
-      // Ensure Description is provided
-      const recipeData: RecipePayload = {
-        ...itemData,
-        Description: itemData.Description || ""
-      };
-      
-      const response = await MenuAPI.updateRecipeOption(id, recipeData);
-      if (response.success) {
-        setRecipeOptions((prevItems) =>
-          prevItems.map((item) =>
-            item.ID === id ? response.data : item
-          )
-        );
+
+      console.log("📤 Updating recipe:", id, itemData);
+
+      const response = await RecipeService.updateRecipe(id, itemData);
+      if (response.success && response.data) {
+        await Promise.all([
+          loadRecipeOptions(), // Reload all recipes
+          loadAvailableRecipeOptions() // Reload available recipes for dropdown
+        ]);
         showToast(response.message || "Recipe updated successfully", "success");
         return { success: true, data: response.data };
       } else {
         throw new Error(response.message || "Failed to update recipe");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating recipe:", error);
-      showToast("Failed to update recipe", "error");
+      showToast(error.message || "Failed to update recipe", "error");
       return { success: false, error };
     } finally {
       setActionLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, loadRecipeOptions, loadAvailableRecipeOptions]);
 
   const deleteRecipes = useCallback(async (itemIds: number[]) => {
     if (itemIds.length === 0) return { success: false };
 
     try {
       setActionLoading(true);
-      const response = await MenuAPI.bulkDeleteRecipeOption(itemIds);
-      if (response.success) {
-        setRecipeOptions((prev) => {
-          const remaining = prev.filter((i) => !itemIds.includes(i.ID));
-          // Reassign IDs sequentially
-          return remaining.map((item, idx) => ({ ...item, ID: idx + 1 }));
-        });
+
+      // Find the actual recipe IDs (_id) from the selected numeric IDs
+      const recipesToDelete = recipeOptions.filter((recipe) =>
+        itemIds.includes(recipe.ID)
+      );
+
+      console.log("🗑️ Deleting recipes:", recipesToDelete);
+
+      // Delete each recipe using RecipeService
+      const deletePromises = recipesToDelete.map(async (recipe) => {
+        const recipeId = recipe._id || recipe.ID.toString();
+        return await RecipeService.deleteRecipe(recipeId);
+      });
+
+      const results = await Promise.all(deletePromises);
+
+      // Check if all deletions were successful
+      const allSuccessful = results.every((result) => result.success);
+
+      if (allSuccessful) {
+        await loadRecipeOptions(); // Reload all recipes
         setSelectedItems([]);
         showToast(
-          response.message || `${itemIds.length} recipe(s) deleted successfully`,
+          `${itemIds.length} recipe(s) deleted successfully`,
           "success"
         );
         return { success: true };
       } else {
-        throw new Error(response.message || "Failed to delete recipes");
+        const failedCount = results.filter((r) => !r.success).length;
+        throw new Error(
+          `Failed to delete ${failedCount} of ${itemIds.length} recipes`
+        );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting recipes:", error);
-      showToast("Failed to delete recipes", "error");
+      showToast(error.message || "Failed to delete recipes", "error");
       return { success: false, error };
     } finally {
       setActionLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, recipeOptions, loadRecipeOptions]);
 
   // Selection handlers
   const handleSelectItem = useCallback((itemId: number, checked: boolean) => {
@@ -245,8 +346,38 @@ export const useRecipeData = () => {
     setIsModalOpen(true);
   }, [selectedItems.length]);
 
-  const openEditModal = useCallback((item: RecipeOption) => {
-    setEditingItem(item);
+  const openEditModal = useCallback(async (item: RecipeOption) => {
+    try {
+      console.log("🔄 openEditModal called with item:", item);
+
+      // Fetch full recipe details including ingredients
+      const recipeId = item._id || item.ID.toString();
+      console.log("📡 Fetching recipe details for ID:", recipeId);
+
+      const response = await RecipeService.getRecipe(recipeId);
+      console.log("📦 Recipe details response:", response);
+
+      if (response.success && response.data) {
+        console.log("✅ Recipe data received:", response.data);
+        console.log("  - Ingredients count:", response.data.ingredients?.length || 0);
+        console.log("  - Ingredients:", response.data.ingredients);
+
+        // Merge the full recipe data with the item
+        const fullRecipe = {
+          ...item,
+          ingredients: response.data.ingredients || [],
+          description: response.data.description,
+        };
+        console.log("🔀 Merged full recipe:", fullRecipe);
+        setEditingItem(fullRecipe as any);
+      } else {
+        console.error("❌ Failed to fetch recipe details:", response.message);
+        setEditingItem(item);
+      }
+    } catch (error) {
+      console.error("❌ Error fetching recipe details:", error);
+      setEditingItem(item);
+    }
     setIsModalOpen(true);
   }, []);
 
@@ -257,9 +388,11 @@ export const useRecipeData = () => {
 
   const handleModalSubmit = useCallback(async (data: RecipePayload) => {
     let result;
-    
+
     if (editingItem) {
-      result = await updateRecipe(editingItem.ID, data);
+      // Use _id for API call, not the transformed ID
+      const recipeId = editingItem._id || editingItem.ID.toString();
+      result = await updateRecipe(recipeId, data);
     } else {
       result = await createRecipe(data);
     }
