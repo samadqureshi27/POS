@@ -1,0 +1,10 @@
+📦 Recipe details response: {success: true, data: {…}}
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\lib\hooks\useRecipeData.ts:353 ✅ Recipe data received: {status: 200, message: 'OK', result: {…}}message: "OK"result: code: ""createdAt: "2025-11-02T14:45:23.612Z"customName: ""description: ""ingredients: Array(1)0: {sourceType: 'inventory', sourceId: '69060731ee70eebe0e166558', nameSnapshot: 'Arabica Beans', quantity: 1, unit: 'kg', …}length: 1[[Prototype]]: Array(0)isActive: truename: "beeeens"slug: "beeeens"totalCost: 0type: "sub"updatedAt: "2025-11-02T14:45:23.612Z"yield: 1__v: 0_id: "69076e8399a790c6d1f8f234"[[Prototype]]: Objectstatus: 200[[Prototype]]: Object
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\lib\hooks\useRecipeData.ts:354   - Ingredients count: 0
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\lib\hooks\useRecipeData.ts:355   - Ingredients: undefined
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\lib\hooks\useRecipeData.ts:363 🔀 Merged full recipe: {ID: '69076e8399a790c6d1f8f234', Name: 'beeeens', Status: 'Active', Description: '', type: 'sub', …}
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-management\_components\recipe-modal.tsx:100 🔍 Modal opened with:
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-management\_components\recipe-modal.tsx:101   - Inventory items: 8
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-management\_components\recipe-modal.tsx:102   - Available recipes: 2
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-management\_components\recipe-modal.tsx:106   - Editing recipe with 0 ingredients: []length: 0[[Prototype]]: Array(0)
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\components\ui\dialog.tsx:60 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.

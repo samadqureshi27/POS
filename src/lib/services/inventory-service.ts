@@ -26,7 +26,7 @@ export interface InventoryItem {
   reorderPoint?: number;
   barcode?: string;
   taxCategory?: string;
-  currentStock?: number;
+  quantity?: number;
   image?: string;
   isActive?: boolean; // API uses isActive, not active
   createdAt?: string;
@@ -284,9 +284,10 @@ export const InventoryService = {
     if (payload.reorderPoint !== undefined) apiPayload.reorderPoint = payload.reorderPoint;
     if (payload.barcode) apiPayload.barcode = payload.barcode;
     if (payload.taxCategory) apiPayload.taxCategory = payload.taxCategory;
-    if (payload.trackStock !== undefined) apiPayload.trackStock = payload.trackStock;
+    // trackStock: Let backend set default based on item type (stock items default to true)
+    if (payload.quantity !== undefined) apiPayload.quantity = payload.quantity;
 
-    console.log('Creating item with payload:', apiPayload);
+    console.log('Creating item with payload:', JSON.stringify(apiPayload, null, 2));
 
     const res = await fetch(url, {
       method: "POST",
@@ -300,6 +301,7 @@ export const InventoryService = {
     }
 
     const item: InventoryItem = data?.result ?? data?.data ?? data;
+    console.log('Created item response:', item);
     return { success: true, data: item };
   },
 
@@ -319,6 +321,11 @@ export const InventoryService = {
     if (payload.barcode !== undefined) apiPayload.barcode = payload.barcode;
     if (payload.taxCategory !== undefined) apiPayload.taxCategory = payload.taxCategory;
     if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
+    if (payload.quantity !== undefined) apiPayload.quantity = payload.quantity;
+    // Only include trackStock if explicitly being changed
+    if (payload.trackStock !== undefined) apiPayload.trackStock = payload.trackStock;
+
+    console.log('Updating item with payload:', JSON.stringify(apiPayload, null, 2));
 
     const res = await fetch(url, {
       method: "PUT",
@@ -332,6 +339,7 @@ export const InventoryService = {
     }
 
     const item: InventoryItem = data?.result ?? data?.data ?? data;
+    console.log('Updated item response:', item);
     return { success: true, data: item };
   },
 

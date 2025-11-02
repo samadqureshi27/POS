@@ -12,7 +12,8 @@
       "Bash(npm run build:*)",
       "Bash(npx tsc:*)",
       "Bash(node -c:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

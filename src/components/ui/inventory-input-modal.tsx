@@ -12,7 +12,7 @@ interface InventoryInputModalProps {
 interface InventoryData {
   itemName: string;
   category: string;
-  currentStock: number;
+  quantity: number;
   minimumStock: number;
   maximumStock: number;
   unit: string;
@@ -20,7 +20,6 @@ interface InventoryData {
   supplier?: string;
   lastRestocked?: string;
   actionType: "add" | "remove" | "adjust";
-  quantity: number;
   reason: string;
 }
 
@@ -53,7 +52,7 @@ export const InventoryInputModal: React.FC<InventoryInputModalProps> = ({
   const [formData, setFormData] = useState<InventoryData>({
     itemName: "",
     category: "",
-    currentStock: 0,
+    quantity: 0,
     minimumStock: 0,
     maximumStock: 0,
     unit: "",
@@ -61,7 +60,6 @@ export const InventoryInputModal: React.FC<InventoryInputModalProps> = ({
     supplier: "",
     lastRestocked: new Date().toISOString().split('T')[0],
     actionType: "add",
-    quantity: 0,
     reason: ""
   });
 
@@ -72,7 +70,7 @@ export const InventoryInputModal: React.FC<InventoryInputModalProps> = ({
 
     if (!formData.itemName) newErrors.itemName = "Item name is required";
     if (!formData.category) newErrors.category = "Category is required";
-    if (formData.currentStock < 0) newErrors.currentStock = "Stock cannot be negative";
+    if (formData.quantity < 0) newErrors.quantity = "Stock cannot be negative";
     if (formData.minimumStock < 0) newErrors.minimumStock = "Minimum stock cannot be negative";
     if (formData.maximumStock <= formData.minimumStock) {
       newErrors.maximumStock = "Maximum stock must be greater than minimum";
@@ -93,7 +91,7 @@ export const InventoryInputModal: React.FC<InventoryInputModalProps> = ({
       setFormData({
         itemName: "",
         category: "",
-        currentStock: 0,
+        quantity: 0,
         minimumStock: 0,
         maximumStock: 0,
         unit: "",
@@ -101,7 +99,6 @@ export const InventoryInputModal: React.FC<InventoryInputModalProps> = ({
         supplier: "",
         lastRestocked: new Date().toISOString().split('T')[0],
         actionType: "add",
-        quantity: 0,
         reason: ""
       });
       onClose();
@@ -228,13 +225,13 @@ export const InventoryInputModal: React.FC<InventoryInputModalProps> = ({
                 <input
                   type="number"
                   min="0"
-                  value={formData.currentStock}
-                  onChange={(e) => handleInputChange("currentStock", parseFloat(e.target.value) || 0)}
+                  value={formData.quantity}
+                  onChange={(e) => handleInputChange("quantity", parseFloat(e.target.value) || 0)}
                   className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.currentStock ? "border-red-500" : "border-gray-300"
+                    errors.quantity ? "border-red-500" : "border-gray-300"
                   }`}
                 />
-                {errors.currentStock && <p className="text-red-500 text-sm mt-1">{errors.currentStock}</p>}
+                {errors.quantity && <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>}
               </div>
 
               <div>
