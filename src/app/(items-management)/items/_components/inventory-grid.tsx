@@ -51,9 +51,12 @@ export default function InventoryGrid({
   };
 
   const getStockStatus = (item: InventoryItem) => {
-    if (!item.trackStock) return { label: "Not Tracked", color: "text-gray-600 bg-gray-50", icon: CheckCircle2 };
-    if (item.currentStock === 0) return { label: "Out of Stock", color: "text-red-600 bg-red-50", icon: AlertCircle };
-    if (item.reorderPoint && item.currentStock && item.currentStock <= item.reorderPoint) {
+    // Stock items should always show stock status
+    if (item.type !== "stock" && !item.trackStock) {
+      return { label: "Not Tracked", color: "text-gray-600 bg-gray-50", icon: CheckCircle2 };
+    }
+    if (item.quantity === 0) return { label: "Out of Stock", color: "text-red-600 bg-red-50", icon: AlertCircle };
+    if (item.reorderPoint && item.quantity && item.quantity <= item.reorderPoint) {
       return { label: "Low Stock", color: "text-yellow-600 bg-yellow-50", icon: AlertCircle };
     }
     return { label: "In Stock", color: "text-green-600 bg-green-50", icon: CheckCircle2 };
@@ -115,8 +118,8 @@ export default function InventoryGrid({
                       {item.baseUnit}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {item.trackStock ? (
-                        <span className="text-gray-900 font-medium">{item.currentStock || 0}</span>
+                      {(item.type === "stock" || item.trackStock) ? (
+                        <span className="text-gray-900 font-medium">{item.quantity || 0}</span>
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}
@@ -248,24 +251,24 @@ export default function InventoryGrid({
                   <span className="text-gray-900 font-medium">{item.baseUnit}</span>
                 </div>
 
-                {/* Current Stock Quantity */}
-                {item.trackStock && (
+                {/* Current Stock Quantity - Show for stock items by default */}
+                {(item.type === "stock" || item.trackStock) && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Quantity:</span>
-                    <span className="text-gray-900 font-bold text-lg">{item.currentStock || 0} {item.baseUnit}</span>
+                    <span className="text-gray-900 font-bold text-lg">{item.quantity || 0} {item.baseUnit}</span>
                   </div>
                 )}
               </div>
 
-              {/* Reorder Point Info - Show if tracking stock */}
-              {item.trackStock && (
+              {/* Reorder Point Info - Show if tracking stock or stock item */}
+              {(item.type === "stock" || item.trackStock) && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="flex items-center justify-between text-xs mb-2">
                     <span className="text-gray-600">
                       {item.reorderPoint ? 'Stock Level' : 'Current Stock'}
                     </span>
                     <span className="text-gray-900 font-medium">
-                      {item.currentStock !== undefined ? item.currentStock : 'N/A'} {item.baseUnit}
+                      {item.quantity !== undefined ? item.quantity : 'N/A'} {item.baseUnit}
                       {item.reorderPoint && ` / ${item.reorderPoint} (threshold)`}
                     </span>
                   </div>
@@ -277,12 +280,12 @@ export default function InventoryGrid({
                         {/* Progress bar */}
                         <div
                           className={`h-full transition-all ${
-                            (item.currentStock || 0) <= item.reorderPoint
+                            (item.quantity || 0) <= item.reorderPoint
                               ? "bg-red-500"
                               : "bg-green-500"
                           }`}
                           style={{
-                            width: `${Math.min(((item.currentStock || 0) / (item.reorderPoint * 2)) * 100, 100)}%`,
+                            width: `${Math.min(((item.quantity || 0) / (item.reorderPoint * 2)) * 100, 100)}%`,
                           }}
                         ></div>
                         {/* Threshold marker */}

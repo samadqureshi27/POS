@@ -1,0 +1,147 @@
+{
+  "info": {
+    "_postman_id": "b7a90ef4-62cf-4c2e-9673-efb93d14d556",
+    "name": "Recipe Module (Enterprise Level)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Sub-Recipe (Example: Grilled Patty)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/t/recipes",
+          "host": ["{{baseUrl}}"],
+          "path": ["t", "recipes"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Grilled Patty\",\n  \"type\": \"sub\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{beef_item_id}}\",\n      \"nameSnapshot\": \"Beef Mince\",\n      \"quantity\": 150,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.05\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{onion_item_id}}\",\n      \"nameSnapshot\": \"Onion\",\n      \"quantity\": 20,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.01\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{oil_item_id}}\",\n      \"nameSnapshot\": \"Cooking Oil\",\n      \"quantity\": 10,\n      \"unit\": \"ml\",\n      \"costPerUnit\": 0.02\n    }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "Create Sub-Recipe (Example: Burger Sauce)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/t/recipes",
+          "host": ["{{baseUrl}}"],
+          "path": ["t", "recipes"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Burger Sauce\",\n  \"type\": \"sub\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{mayo_item_id}}\",\n      \"nameSnapshot\": \"Mayonnaise\",\n      \"quantity\": 50,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.03\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{mustard_item_id}}\",\n      \"nameSnapshot\": \"Mustard\",\n      \"quantity\": 10,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.04\n    }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "Create Final Recipe (Example: Cheeseburger)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/t/recipes",
+          "host": ["{{baseUrl}}"],
+          "path": ["t", "recipes"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Cheeseburger\",\n  \"type\": \"final\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"recipe\",\n      \"sourceId\": \"{{grilled_patty_id}}\",\n      \"nameSnapshot\": \"Grilled Patty\",\n      \"quantity\": 1,\n      \"unit\": \"piece\"\n    },\n    {\n      \"sourceType\": \"recipe\",\n      \"sourceId\": \"{{burger_sauce_id}}\",\n      \"nameSnapshot\": \"Burger Sauce\",\n      \"quantity\": 1,\n      \"unit\": \"portion\"\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{bun_item_id}}\",\n      \"nameSnapshot\": \"Burger Bun\",\n      \"quantity\": 2,\n      \"unit\": \"pcs\",\n      \"costPerUnit\": 0.25\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{cheese_item_id}}\",\n      \"nameSnapshot\": \"Cheese Slice\",\n      \"quantity\": 1,\n      \"unit\": \"slice\",\n      \"costPerUnit\": 0.5\n    }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "Get All Recipes",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/t/recipes?page=1&limit=20&sort=createdAt&order=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["t", "recipes"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "20" },
+            { "key": "sort", "value": "createdAt" },
+            { "key": "order", "value": "desc" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Single Recipe",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/t/recipes/{{recipe_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["t", "recipes", "{{recipe_id}}"]
+        }
+      }
+    },
+    {
+      "name": "Update Recipe",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/t/recipes/{{recipe_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["t", "recipes", "{{recipe_id}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Updated description\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{bun_item_id}}\",\n      \"quantity\": 2,\n      \"unit\": \"pcs\",\n      \"costPerUnit\": 0.3\n    }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "Delete Recipe",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/t/recipes/{{recipe_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["t", "recipes", "{{recipe_id}}"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3297" },
+    { "key": "token", "value": "" },
+    { "key": "beef_item_id", "value": "" },
+    { "key": "onion_item_id", "value": "" },
+    { "key": "oil_item_id", "value": "" },
+    { "key": "bun_item_id", "value": "" },
+    { "key": "cheese_item_id", "value": "" },
+    { "key": "mayo_item_id", "value": "" },
+    { "key": "mustard_item_id", "value": "" },
+    { "key": "grilled_patty_id", "value": "" },
+    { "key": "burger_sauce_id", "value": "" },
+    { "key": "recipe_id", "value": "" }
+  ]
+}

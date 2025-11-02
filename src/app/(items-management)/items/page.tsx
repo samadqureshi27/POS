@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Package, Plus, Search, Grid3x3, List, TrendingUp, AlertTriangle, Zap, Upload, Download, FileDown } from "lucide-react";
+import { Package, Plus, Upload, Download, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
+import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
+import ResponsiveGrid from "@/components/ui/responsive-grid";
 import InventoryItemModal from "./_components/inventory-item-modal";
-import InventoryGrid from "./_components/inventory-grid";
 import ImportResultsDialog from "./_components/import-results-dialog";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
 
@@ -50,6 +50,13 @@ export default function ItemsPage() {
 
     if (response.success && response.data) {
       let filteredItems = response.data;
+      console.log('Loaded items from API:', filteredItems.map(item => ({
+        name: item.name,
+        type: item.type,
+        trackStock: item.trackStock,
+        quantity: item.quantity,
+        reorderPoint: item.reorderPoint
+      })));
 
       // Client-side type filtering (backend not filtering correctly)
       if (filterType !== "all") {
@@ -89,8 +96,8 @@ export default function ItemsPage() {
     setStats({
       totalItems: itemsList.length,
       stockItems: itemsList.filter(i => i.type === "stock").length,
-      lowStock: itemsList.filter(i => i.currentStock && i.reorderPoint && i.currentStock <= i.reorderPoint).length,
-      outOfStock: itemsList.filter(i => i.currentStock === 0).length,
+      lowStock: itemsList.filter(i => i.quantity && i.reorderPoint && i.quantity <= i.reorderPoint).length,
+      outOfStock: itemsList.filter(i => i.quantity === 0).length,
     });
   };
 
@@ -344,133 +351,254 @@ export default function ItemsPage() {
         </div>
 
         {/* Action Bar */}
-        <div className="bg-white border border-grey rounded-lg p-4 mb-6 hover:shadow-lg transition-shadow duration-200">
-          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-            {/* Search */}
-            <div className="relative flex-1 w-full lg:max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search items by name, SKU, or barcode..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 bg-gray-50 border-gray-300 h-11"
-              />
-            </div>
-
-            {/* Filters & Actions */}
-            <div className="flex items-center gap-3 w-full lg:w-auto flex-wrap">
-              {/* Type Filter Pills */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setFilterType("all")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    filterType === "all"
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setFilterType("stock")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    filterType === "stock"
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  Stock
-                </button>
-                <button
-                  onClick={() => setFilterType("service")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    filterType === "service"
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  Service
-                </button>
-              </div>
-
-              {/* Status Filter Pills */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setFilterStatus("all")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    filterStatus === "all"
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  All Status
-                </button>
-                <button
-                  onClick={() => setFilterStatus("Active")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    filterStatus === "Active"
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  Active
-                </button>
-                <button
-                  onClick={() => setFilterStatus("Inactive")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    filterStatus === "Inactive"
-                      ? "bg-red-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  Inactive
-                </button>
-              </div>
-
-              {/* View Mode Toggle */}
-              <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-md transition-all ${
-                    viewMode === "grid"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  <Grid3x3 className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-md transition-all ${
-                    viewMode === "list"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  <List className="h-5 w-5" />
-                </button>
-              </div>
-
-              {/* Primary Actions */}
-              <Button
-                onClick={handleAddItem}
-                className="bg-gray-900 hover:bg-black text-white"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Add Item
-              </Button>
-            </div>
-          </div>
-        </div>
+        <EnhancedActionBar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search items by name, SKU, or barcode..."
+          filters={[
+            {
+              options: [
+                { label: "All", value: "all" },
+                { label: "Stock", value: "stock" },
+                { label: "Service", value: "service" },
+              ],
+              activeValue: filterType,
+              onChange: (value) => setFilterType(value as "all" | "stock" | "service"),
+            },
+            {
+              options: [
+                { label: "All Status", value: "all" },
+                { label: "Active", value: "Active", color: "green" },
+                { label: "Inactive", value: "Inactive", color: "red" },
+              ],
+              activeValue: filterStatus,
+              onChange: (value) => setFilterStatus(value as "all" | "Active" | "Inactive"),
+            },
+          ]}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          showViewToggle={true}
+          onPrimaryAction={handleAddItem}
+          primaryActionLabel="Add Item"
+          primaryActionIcon={<Plus className="h-5 w-5 mr-2" />}
+        />
 
         {/* Inventory Grid */}
-        <InventoryGrid
+        <ResponsiveGrid<InventoryItem>
           items={items}
           loading={loading}
+          loadingText="Loading inventory..."
           viewMode={viewMode}
+          emptyIcon={<Package className="h-16 w-16 text-gray-300" />}
+          emptyTitle="No items found"
+          emptyDescription="Start by adding your first inventory item"
+          getItemId={(item) => item._id || item.id || ""}
           onEdit={handleEditItem}
           onDelete={handleDeleteItem}
+          columns={[
+            {
+              key: "name",
+              header: "Item",
+              render: (item) => (
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
+                    <Package className="h-5 w-5 text-gray-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900">{item.name}</div>
+                    {item.categoryId && (
+                      <div className="text-xs text-gray-500">
+                        {typeof item.categoryId === 'object' && item.categoryId.name
+                          ? item.categoryId.name
+                          : typeof item.categoryId === 'string' ? item.categoryId : ''}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ),
+            },
+            {
+              key: "sku",
+              header: "SKU",
+              render: (item) => (
+                <span className="text-gray-700 font-mono text-sm">{item.sku || "—"}</span>
+              ),
+            },
+            {
+              key: "type",
+              header: "Type",
+              render: (item) => (
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  item.type === "stock"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-purple-100 text-purple-700"
+                }`}>
+                  {item.type}
+                </span>
+              ),
+            },
+            {
+              key: "baseUnit",
+              header: "Unit",
+              render: (item) => <span className="text-gray-700">{item.baseUnit}</span>,
+            },
+            {
+              key: "quantity",
+              header: "Stock",
+              render: (item) => (
+                (item.type === "stock" || item.trackStock) ? (
+                  <span className="text-gray-900 font-medium">{item.quantity || 0}</span>
+                ) : (
+                  <span className="text-gray-400">—</span>
+                )
+              ),
+            },
+            {
+              key: "isActive",
+              header: "Status",
+              render: (item) => {
+                const isActive = item.isActive !== false;
+                return (
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm ${isActive ? "text-green-600" : "text-red-600"}`}>
+                      {isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                );
+              },
+            },
+          ]}
+          renderGridCard={(item, actions) => {
+            const itemStatus = item.isActive !== false ? { label: "Active", color: "text-green-600 bg-green-50" } : { label: "Inactive", color: "text-red-600 bg-red-50" };
+            const stockStatus =
+              item.type !== "stock" && !item.trackStock
+                ? { label: "Not Tracked", color: "text-gray-600 bg-gray-50" }
+                : item.quantity === 0
+                ? { label: "Out of Stock", color: "text-red-600 bg-red-50" }
+                : item.reorderPoint && item.quantity && item.quantity <= item.reorderPoint
+                ? { label: "Low Stock", color: "text-yellow-600 bg-yellow-50" }
+                : { label: "In Stock", color: "text-green-600 bg-green-50" };
+
+            return (
+              <div className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200">
+                {/* Card Header - Icon */}
+                <div className="relative h-32 bg-gray-50 flex items-center justify-center border-b border-gray-200">
+                  <Package className="h-12 w-12 text-gray-300" />
+
+                  {/* Type Badge */}
+                  <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${
+                    item.type === "stock"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-purple-100 text-purple-700"
+                  }`}>
+                    {item.type}
+                  </div>
+
+                  {/* Hover Actions Overlay */}
+                  <div className="absolute inset-0 background-grey opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+                    {actions}
+                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">{item.name}</h3>
+                  {item.sku && (
+                    <p className="text-xs text-gray-500 font-mono mb-3">{item.sku}</p>
+                  )}
+
+                  {/* Info Grid */}
+                  <div className="space-y-2 mb-4">
+                    {/* Item Status */}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Status:</span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${itemStatus.color}`}>
+                        {itemStatus.label}
+                      </span>
+                    </div>
+
+                    {/* Stock Status */}
+                    {item.trackStock && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Stock Status:</span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${stockStatus.color}`}>
+                          {stockStatus.label}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Category */}
+                    {item.categoryId && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Category:</span>
+                        <span className="text-gray-700 text-xs truncate max-w-[120px]">
+                          {typeof item.categoryId === 'object' && item.categoryId.name
+                            ? item.categoryId.name
+                            : typeof item.categoryId === 'string' ? item.categoryId : ''}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Unit */}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Unit:</span>
+                      <span className="text-gray-900 font-medium">{item.baseUnit}</span>
+                    </div>
+
+                    {/* Current Stock Quantity */}
+                    {(item.type === "stock" || item.trackStock) && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Quantity:</span>
+                        <span className="text-gray-900 font-bold text-lg">{item.quantity || 0} {item.baseUnit}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Reorder Point Info */}
+                  {(item.type === "stock" || item.trackStock) && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="flex items-center justify-between text-xs mb-2">
+                        <span className="text-gray-600">
+                          {item.reorderPoint ? 'Stock Level' : 'Current Stock'}
+                        </span>
+                        <span className="text-gray-900 font-medium">
+                          {item.quantity !== undefined ? item.quantity : 'N/A'} {item.baseUnit}
+                          {item.reorderPoint && ` / ${item.reorderPoint} (threshold)`}
+                        </span>
+                      </div>
+
+                      {/* Progress bar */}
+                      {item.reorderPoint && (
+                        <>
+                          <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full transition-all ${
+                                (item.quantity || 0) <= item.reorderPoint
+                                  ? "bg-red-500"
+                                  : "bg-green-500"
+                              }`}
+                              style={{
+                                width: `${Math.min(((item.quantity || 0) / (item.reorderPoint * 2)) * 100, 100)}%`,
+                              }}
+                            ></div>
+                            <div
+                              className="absolute top-0 bottom-0 w-0.5 bg-yellow-500"
+                              style={{ left: '50%' }}
+                            ></div>
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
+                            <span>0</span>
+                            <span className="text-yellow-600">← Threshold</span>
+                            <span>{item.reorderPoint * 2}</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          }}
         />
       </div>
 
