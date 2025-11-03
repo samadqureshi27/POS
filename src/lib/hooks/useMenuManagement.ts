@@ -1,118 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/lib/hooks";
-import { MenuItemService, TenantMenuItem } from "@/lib/services/menu-item-service";
+import MenuAPI from "@/lib/util/menu1-api";
+import { MenuItem } from "@/lib/types/menum";
 import { useMenuOptions } from "@/lib/hooks/useMenuOptions";
 import { useCategory } from "@/lib/hooks/useCategory";
 import { MenuItemOptions } from "@/lib/types/menuItemOptions";
 import { CategoryItem } from "@/lib/types/category";
-
-// Frontend MenuItem interface (existing structure)
-interface MenuItem {
-  ID: number;
-  Name: string;
-  Price: number;
-  Category: string;
-  StockQty: string;
-  Status: "Active" | "Inactive";
-  Description?: string;
-  MealType?: string;
-  Priority?: number;
-  MinimumQuantity?: number;
-  ShowOnMenu?: "Active" | "Inactive";
-  Featured?: "Active" | "Inactive";
-  StaffPick?: "Active" | "Inactive";
-  ShowOnMain?: "Active" | "Inactive";
-  Deal?: "Active" | "Inactive";
-  Special?: "Active" | "Inactive";
-  SubTBE?: "Active" | "Inactive";
-  DisplayType?: string;
-  Displaycat?: string;
-  SpecialStartDate?: string;
-  SpecialEndDate?: string;
-  SpecialPrice?: number | string;
-  OverRide?: any[];
-  OptionValue?: string[];
-  OptionPrice?: number[];
-  MealValue?: string[];
-  MealPrice?: number[];
-  PName?: string[];
-  PPrice?: number[];
-  backendId?: string; // Store backend ID
-}
-
-// Map API Item to frontend MenuItem
-const mapApiItemToMenuItem = (apiItem: TenantMenuItem, index: number, categories: CategoryItem[], modifierGroups: MenuItemOptions[]): MenuItem => {
-  const id = apiItem._id || apiItem.id || String(index + 1);
-
-  // Get first variant price as the main price (if variants exist)
-  const price = apiItem.variants && apiItem.variants.length > 0
-    ? apiItem.variants[0].price
-    : 0;
-
-  // Map first categoryId to category name
-  const categoryId = apiItem.categoryIds && apiItem.categoryIds.length > 0
-    ? apiItem.categoryIds[0]
-    : "";
-  const category = categories.find(cat => cat.backendId === categoryId);
-  const categoryName = category?.Name || "";
-
-  // Map modifiers from backend to frontend format
-  // Backend: modifiers = [{ groupId: "abc", required: false, min: 0, max: 1 }]
-  // Frontend: OptionValue = ["Milk Options", "Size"] (modifier group names)
-  const optionValue: string[] = [];
-  const optionPrice: number[] = [];
-
-  if (apiItem.modifiers && apiItem.modifiers.length > 0) {
-    apiItem.modifiers.forEach(mod => {
-      const modGroup = modifierGroups.find(mg => mg.backendId === mod.groupId);
-      if (modGroup) {
-        optionValue.push(modGroup.Name);
-        optionPrice.push(0); // Prices are in the modifier group options, not here
-      }
-    });
-  }
-
-  // Determine display type based on variants
-  // Multiple variants = "Var" (multi-price)
-  // Single variant = "Qty" (quantity-based, simple pricing)
-  // Weight/Units not supported in backend yet, so ignoring "Weight" option
-  const displaycat = apiItem.variants && apiItem.variants.length > 1 ? "Var" : "Qty";
-
-  return {
-    ID: index + 1,
-    Name: apiItem.name,
-    Price: price,
-    Category: categoryName,
-    StockQty: apiItem.stockQty?.toString() || "0",
-    Status: apiItem.isActive ? "Active" : "Inactive",
-    Description: apiItem.description || "",
-    Priority: apiItem.priority || index + 1,
-    Featured: apiItem.featured ? "Active" : "Inactive",
-    MinimumQuantity: apiItem.minStockThreshold || 0,
-    backendId: id,
-
-    // Stubbed fields (not in API)
-    MealType: "All Day",
-    ShowOnMenu: "Active",
-    StaffPick: "Inactive",
-    ShowOnMain: "Active",
-    Deal: "Inactive",
-    Special: "Inactive",
-    SubTBE: "Inactive",
-    DisplayType: "Select a type",
-    Displaycat: displaycat,
-    SpecialStartDate: "",
-    SpecialEndDate: "",
-    SpecialPrice: "",
-    OverRide: [],
-    OptionValue: optionValue,
-    OptionPrice: optionPrice,
-    MealValue: [],
-    MealPrice: [],
-    PName: apiItem.variants?.map(v => v.name) || [],
-    PPrice: apiItem.variants?.map(v => v.price) || [],
-  };
-};
 
 export const useMenuManagement = () => {
   // State management
@@ -147,7 +40,7 @@ export const useMenuManagement = () => {
     Displaycat: "",
     SpecialStartDate: "",
     SpecialEndDate: "",
-    SpecialPrice: "",
+    SpecialPrice: 0,
     OverRide: [],
     OptionValue: [],
     OptionPrice: [],
@@ -171,10 +64,9 @@ export const useMenuManagement = () => {
   const loadMenuItems = async () => {
     try {
       setLoading(true);
-      const response = await MenuItemService.listItems();
+      const response = await MenuAPI.getMenuItems();
       if (response.success && response.data) {
-        const mapped = response.data.map((item, idx) => mapApiItemToMenuItem(item, idx, categories, menuOptions));
-        setMenuItems(mapped.sort((a, b) => (a.Priority || 0) - (b.Priority || 0)));
+        setMenuItems(response.data.sort((a, b) => (a.Priority || 0) - (b.Priority || 0)));
       } else {
         throw new Error(response.message || "Failed to fetch menu items");
       }
@@ -205,7 +97,7 @@ export const useMenuManagement = () => {
       Displaycat: "",
       SpecialStartDate: "",
       SpecialEndDate: "",
-      SpecialPrice: "",
+      SpecialPrice: 0,
       OptionValue: [],
       OptionPrice: [],
       OverRide: [],
@@ -253,7 +145,7 @@ export const useMenuManagement = () => {
         Displaycat: editingItem.Displaycat || "",
         SpecialStartDate: editingItem.SpecialStartDate || "",
         SpecialEndDate: editingItem.SpecialEndDate || "",
-        SpecialPrice: editingItem.SpecialPrice || "",
+        SpecialPrice: editingItem.SpecialPrice || 0,
         OverRide: editingItem.OverRide || [],
         OptionValue: editingItem.OptionValue || [],
         OptionPrice: editingItem.OptionPrice || [],
@@ -314,57 +206,7 @@ export const useMenuManagement = () => {
     try {
       setActionLoading(true);
 
-      // Find category ID from name
-      const category = categories.find(cat => cat.Name === itemData.Category);
-      const categoryIds = category?.backendId ? [category.backendId] : [];
-
-      // Build variants array
-      const variants = [];
-      if (itemData.Displaycat === "Var" && itemData.PName && itemData.PPrice) {
-        for (let i = 0; i < itemData.PName.length; i++) {
-          if (itemData.PName[i] && itemData.PPrice[i] !== undefined) {
-            variants.push({
-              name: itemData.PName[i],
-              price: itemData.PPrice[i],
-            });
-          }
-        }
-      } else {
-        // Single price item - create one default variant
-        variants.push({
-          name: "Regular",
-          price: itemData.Price,
-        });
-      }
-
-      // Map modifiers from frontend to backend
-      // Frontend: OptionValue = ["Milk Options", "Size"] (modifier group names)
-      // Backend: modifiers = [{ groupId: "abc", required: false, min: 0, max: 1 }]
-      const modifiers = (itemData.OptionValue || []).map(optionName => {
-        const modGroup = menuOptions.find(mg => mg.Name === optionName);
-        return {
-          groupId: modGroup?.backendId || "",
-          required: false,
-          min: modGroup?.min || 0,
-          max: modGroup?.max || 1,
-        };
-      }).filter(mod => mod.groupId); // Remove any that didn't find a match
-
-      const payload: Partial<TenantMenuItem> = {
-        name: itemData.Name,
-        categoryIds,
-        description: itemData.Description || "",
-        variants,
-        modifiers,
-        isActive: itemData.Status === "Active",
-        featured: itemData.Featured === "Active",
-        priority: itemData.Priority || 1,
-        trackStock: false,
-        stockQty: parseInt(itemData.StockQty) || 0,
-        minStockThreshold: itemData.MinimumQuantity || 0,
-      };
-
-      const response = await MenuItemService.createItem(payload);
+      const response = await MenuAPI.createMenuItem(itemData);
       if (response.success) {
         await loadMenuItems(); // Reload list
         setIsModalOpen(false);
@@ -382,7 +224,7 @@ export const useMenuManagement = () => {
   };
 
   const handleUpdateItem = async (itemData: Omit<MenuItem, "ID">) => {
-    if (!editingItem || !editingItem.backendId) {
+    if (!editingItem) {
       showToast("Menu item ID not found", "error");
       return;
     }
@@ -390,53 +232,7 @@ export const useMenuManagement = () => {
     try {
       setActionLoading(true);
 
-      // Find category ID from name
-      const category = categories.find(cat => cat.Name === itemData.Category);
-      const categoryIds = category?.backendId ? [category.backendId] : [];
-
-      // Build variants array
-      const variants = [];
-      if (itemData.Displaycat === "Var" && itemData.PName && itemData.PPrice) {
-        for (let i = 0; i < itemData.PName.length; i++) {
-          if (itemData.PName[i] && itemData.PPrice[i] !== undefined) {
-            variants.push({
-              name: itemData.PName[i],
-              price: itemData.PPrice[i],
-            });
-          }
-        }
-      } else {
-        variants.push({
-          name: "Regular",
-          price: itemData.Price,
-        });
-      }
-
-      // Map modifiers from frontend to backend
-      const modifiers = (itemData.OptionValue || []).map(optionName => {
-        const modGroup = menuOptions.find(mg => mg.Name === optionName);
-        return {
-          groupId: modGroup?.backendId || "",
-          required: false,
-          min: modGroup?.min || 0,
-          max: modGroup?.max || 1,
-        };
-      }).filter(mod => mod.groupId);
-
-      const payload: Partial<TenantMenuItem> = {
-        name: itemData.Name,
-        categoryIds,
-        description: itemData.Description || "",
-        variants,
-        modifiers,
-        isActive: itemData.Status === "Active",
-        featured: itemData.Featured === "Active",
-        priority: itemData.Priority || 1,
-        stockQty: parseInt(itemData.StockQty) || 0,
-        minStockThreshold: itemData.MinimumQuantity || 0,
-      };
-
-      const response = await MenuItemService.updateItem(editingItem.backendId, payload);
+      const response = await MenuAPI.updateMenuItem(editingItem.ID, itemData);
       if (response.success) {
         await loadMenuItems(); // Reload list
         setIsModalOpen(false);
@@ -459,17 +255,10 @@ export const useMenuManagement = () => {
     try {
       setActionLoading(true);
 
-      // Map local IDs to backend IDs
-      const idsToDelete = selectedItems
-        .map((n) => menuItems.find((item) => item.ID === n)?.backendId)
-        .filter((id): id is string => typeof id === "string" && id.length > 0);
-
-      // Delete each item
-      for (const id of idsToDelete) {
-        const resp = await MenuItemService.deleteItem(id);
-        if (!resp.success) {
-          throw new Error(resp.message || `Failed to delete item ${id}`);
-        }
+      // Use bulk delete with mock API
+      const response = await MenuAPI.bulkDeleteMenuItem(selectedItems);
+      if (!response.success) {
+        throw new Error(response.message || "Failed to delete items");
       }
 
       await loadMenuItems();

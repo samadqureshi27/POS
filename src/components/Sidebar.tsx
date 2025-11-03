@@ -35,16 +35,16 @@ export default function Sidebar() {
       group: 'items'
     },
     {
-      icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
-      label: 'Menu Management',
-      link: '/menu-management',
-      group: 'menu' // This will match menu-related routes
-    },
-    {
       icon: <Package2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Recipe Management',
       link: '/recipes-management',
       group: 'recipes'
+    },
+    {
+      icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      label: 'Menu Management',
+      link: '/menu-management',
+      group: 'menu' // This will match menu-related routes
     },
     {
       icon: <Building2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
