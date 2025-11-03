@@ -1,24 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CategoryItem, CategoryFormData } from '@/lib/types/category';
-import { CategoryService, TenantCategory } from '@/lib/services/category-service';
+import { MenuAPI } from '@/lib/util/category-api';
 import { useToast } from '@/lib/hooks';
-
-// Map API category to frontend CategoryItem
-const mapApiCategoryToItem = (apiCat: TenantCategory, index: number): CategoryItem => {
-  const id = apiCat._id || apiCat.id || String(index + 1);
-  const status = apiCat.isActive ? "Active" : "Inactive";
-
-  return {
-    ID: index + 1, // UI display ID
-    Name: apiCat.name,
-    Status: status,
-    Description: apiCat.description || "",
-    Parent: apiCat.parent || "",
-    Priority: apiCat.sortIndex ?? index + 1,
-    Image: apiCat.image || "",
-    backendId: id, // Store actual backend ID
-  };
-};
 
 export const useCategory = () => {
   const { showToast } = useToast();
@@ -34,10 +17,9 @@ export const useCategory = () => {
   const loadCategoryItems = async () => {
     try {
       setLoading(true);
-      const response = await CategoryService.listCategories();
+      const response = await MenuAPI.getCategoryItems();
       if (response.success && response.data) {
-        const mapped = response.data.map((cat, idx) => mapApiCategoryToItem(cat, idx));
-        setCategoryItems(mapped);
+        setCategoryItems(response.data);
       } else {
         throw new Error(response.message || "Failed to fetch category items");
       }
