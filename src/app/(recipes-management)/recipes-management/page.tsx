@@ -61,6 +61,48 @@ const RecipesManagementPage = () => {
     return result;
   };
 
+  const handleDelete = async (recipe: RecipeOption) => {
+    console.log("🗑️ Delete clicked for recipe:", recipe);
+
+    // Get the actual MongoDB _id or fallback to ID
+    const recipeId = (recipe as any)._id || recipe.ID;
+
+    if (!recipeId) {
+      console.error("❌ Recipe ID is missing");
+      globalShowToast("Recipe ID is missing", "error");
+      return;
+    }
+
+    // Confirm deletion
+    const confirmed = window.confirm(`Are you sure you want to delete "${recipe.Name}"?`);
+    console.log("Confirmation result:", confirmed);
+
+    if (!confirmed) {
+      return;
+    }
+
+    console.log("🔄 Deleting recipe with ID:", recipeId);
+
+    try {
+      // Import RecipeService at the top if not already imported
+      const RecipeService = (await import("@/lib/services/recipe-service")).RecipeService;
+
+      const result = await RecipeService.deleteRecipe(String(recipeId));
+      console.log("Delete result:", result);
+
+      if (result.success) {
+        globalShowToast("Recipe deleted successfully", "success");
+        // Refresh the page data
+        window.location.reload();
+      } else {
+        globalShowToast(result.message || "Failed to delete recipe", "error");
+      }
+    } catch (error: any) {
+      console.error("Error deleting recipe:", error);
+      globalShowToast(error.message || "Failed to delete recipe", "error");
+    }
+  };
+
   // Apply recipe type filter to the filtered items (must be before early return)
   const typeFilteredItems = useMemo(() => {
     if (recipeTypeFilter === "all") return filteredItems;
@@ -126,6 +168,7 @@ const RecipesManagementPage = () => {
         emptyDescription="Start by adding your first recipe"
         getItemId={(item) => String(item.ID)}
         onEdit={openEditModal}
+        onDelete={handleDelete}
         customActions={(item) => (
           <div className="flex items-center gap-2">
             <button
@@ -133,6 +176,12 @@ const RecipesManagementPage = () => {
               className="px-3 py-1 bg-gray-900 hover:bg-black text-white text-sm rounded-md transition-all"
             >
               Edit
+            </button>
+            <button
+              onClick={() => handleDelete(item)}
+              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-all"
+            >
+              Delete
             </button>
           </div>
         )}
