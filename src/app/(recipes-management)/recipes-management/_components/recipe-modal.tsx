@@ -377,10 +377,10 @@ export default function RecipeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh] p-0 flex flex-col">
+      <DialogContent size="4xl" fullHeight>
         {/* Header */}
-        <div className="p-5 border-b border-gray-200 flex-shrink-0">
-          <DialogTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+        <div className="p-5 border-b border-gray-200 flex-shrink-0 flex flex-col">
+          <DialogTitle className="text-xl font-bold text-gray-900 flex gap-2">
             <UtensilsCrossed className="h-5 w-5 text-gray-700" />
             {editingItem ? "Edit Recipe" : "Create Recipe"}
           </DialogTitle>
@@ -397,8 +397,8 @@ export default function RecipeModal({
             className="flex-1 flex flex-col min-h-0"
           >
             {/* Tab List */}
-            <div className="px-5 pt-3 pb-2 border-b border-gray-100 flex-shrink-0">
-              <TabsList className="grid w-full max-w-md grid-cols-2 h-9">
+            <div className="px-5 pt-3 pb-2 border-b border-gray-100 flex-shrink-0 flex justify-center">
+              <TabsList className="grid w-full max-w-sm grid-cols-2 h-9">
                 <TabsTrigger value="final" className="text-sm gap-1.5">
                   <Sparkles className="h-3.5 w-3.5" />
                   Final Recipe
@@ -408,12 +408,17 @@ export default function RecipeModal({
                   Sub Recipe
                 </TabsTrigger>
               </TabsList>
-              <p className="text-xs text-gray-600 mt-2">
+              
+            </div>
+           // optional description below tabs
+            <div className="px-5 flex items-center justify-center">
+              <p className="text-xs text-gray-600 items-center justify-center">
                 {formData.type === "sub"
                   ? "Components that can be reused in other recipes"
                   : "Complete menu items ready to serve"}
               </p>
             </div>
+              
 
             {/* Tab Content */}
             <div className="flex-1 overflow-y-auto p-5 min-h-0">

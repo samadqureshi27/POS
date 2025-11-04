@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, Plus, X } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -207,13 +207,18 @@ export default function MenuItemModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogTitle className="text-2xl font-semibold">
-          {editingItem ? "Edit Menu Item" : "Add New Menu Item"}
-        </DialogTitle>
-
+      <DialogContent size="4xl" fullHeight>
+        {/* Header */}
+        <DialogHeader className="p-5 border-b border-gray-200 flex-shrink-0">
+          <DialogTitle className="text-xl font-bold text-gray-900">
+            {editingItem ? "Edit Menu Item" : "Add New Menu Item"}
+          </DialogTitle>
+        </DialogHeader>
+        
+        {/* Tab Navigation */}
+        
         <Tabs defaultValue="basic" className="mt-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full max-w-sm grid-cols-3 h-9">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="pricing">Pricing</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
@@ -455,23 +460,15 @@ export default function MenuItemModal({
         </Tabs>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={actionLoading}
-          >
+        <DialogFooter className="flex justify-end gap-3 mt-6 pt-6 border-t">
+          <Button variant="outline" onClick={onClose} disabled={actionLoading}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={actionLoading}
-            className="bg-gray-900 hover:bg-black"
-          >
+          <Button onClick={handleSave} disabled={actionLoading} className="bg-gray-900 hover:bg-black">
             {actionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {editingItem ? "Update Menu Item" : "Create Menu Item"}
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
