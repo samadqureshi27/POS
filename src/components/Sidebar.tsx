@@ -43,7 +43,7 @@ export default function Sidebar() {
     {
       icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Menu Management',
-      link: '/menu-management',
+      link: '/menu-items',
       group: 'menu' // This will match menu-related routes
     },
     {

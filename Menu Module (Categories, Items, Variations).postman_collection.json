@@ -1,0 +1,706 @@
+{
+	"info": {
+		"_postman_id": "2169a0c6-11e6-4546-8e96-1da67ec6584a",
+		"name": "Menu Module (Categories, Items, Variations)",
+		"description": "Production-ready menu endpoints aligned with inventory, recipes, and recipe-variations. Uses x-tenant-id + Bearer token.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48720699",
+		"_collection_link": "https://qabdulsamad18-8144213.postman.co/workspace/samad's-Workspace~d933fcd7-cd8e-4fa4-8349-f7c0e98781cf/collection/48720699-2169a0c6-11e6-4546-8e96-1da67ec6584a?action=share&source=collection_link&creator=48720699"
+	},
+	"item": [
+		{
+			"name": "Menu Categories",
+			"item": [
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Pizzas\",\n  \"slug\": \"pizzas\",\n  \"code\": \"CAT-PIZ\",\n  \"description\": \"All pizza items\",\n  \"parentId\": null,\n  \"isActive\": true,\n  \"displayOrder\": 10,\n  \"metadata\": {\"color\":\"#ffcc00\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories?q=&parentId=&isActive=true&page=1&limit=20&sort=displayOrder&order=asc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								},
+								{
+									"key": "parentId",
+									"value": ""
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sort",
+									"value": "displayOrder"
+								},
+								{
+									"key": "order",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Premium Pizzas\",\n  \"displayOrder\": 5,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Menu Items",
+			"item": [
+				{
+					"name": "Create Menu Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Fajita Pizza\",\n  \"slug\": \"fajita-pizza\",\n  \"code\": \"MI-FJP\",\n  \"description\": \"Chicken fajita pizza with peppers and onions.\",\n  \"categoryId\": \"REPLACE_MENU_CATEGORY_ID\",\n  \"recipeId\": \"REPLACE_RECIPE_ID\",\n  \"pricing\": {\n    \"basePrice\": 25.0,\n    \"priceIncludesTax\": false,\n    \"currency\": \"SAR\"\n  },\n  \"isActive\": true,\n  \"displayOrder\": 10,\n  \"tags\": [\"spicy\",\"best-seller\"],\n  \"media\": [{\"url\":\"https://cdn.example.com/img/fajita.jpg\",\"alt\":\"Fajita Pizza\",\"type\":\"image\"}],\n  \"branchIds\": [],\n  \"metadata\": {\"kcal\": 680}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Menu Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items?q=&categoryId=&isActive=true&page=1&limit=20&sort=displayOrder&order=asc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								},
+								{
+									"key": "categoryId",
+									"value": ""
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sort",
+									"value": "displayOrder"
+								},
+								{
+									"key": "order",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Menu Item by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Menu Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Spicy chicken fajita pizza with onions & peppers.\",\n  \"pricing\": {\"basePrice\": 26.5, \"priceIncludesTax\": false, \"currency\": \"SAR\"},\n  \"tags\": [\"spicy\",\"top-rated\"],\n  \"displayOrder\": 9\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Menu Item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Menu Variations",
+			"item": [
+				{
+					"name": "Create Menu Variation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"menuItemId\": \"REPLACE_MENU_ITEM_ID\",\n  \"name\": \"Large (Stuffed Crust)\",\n  \"type\": \"size\",\n  \"priceDelta\": 8,\n  \"costDelta\": 2,\n  \"sizeMultiplier\": 1.6,\n  \"crustType\": \"Stuffed Crust\",\n  \"ingredients\": [\n    {\"sourceType\":\"inventory\",\"sourceId\":\"REPLACE_INV_ITEM_ID\",\"nameSnapshot\":\"Extra Cheese\",\"quantity\":50,\"unit\":\"g\"}\n  ],\n  \"isDefault\": false,\n  \"isActive\": true,\n  \"displayOrder\": 10,\n  \"metadata\": {\"note\":\"popular\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/variations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"variations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Variations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/variations?q=&menuItemId=&isActive=true&page=1&limit=20&sort=displayOrder&order=asc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"variations"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								},
+								{
+									"key": "menuItemId",
+									"value": ""
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sort",
+									"value": "displayOrder"
+								},
+								{
+									"key": "order",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Variations by Menu Item",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/variations/by-item/:menuItemId?page=1&limit=50&sort=displayOrder&order=asc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"variations",
+								"by-item",
+								":menuItemId"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "sort",
+									"value": "displayOrder"
+								},
+								{
+									"key": "order",
+									"value": "asc"
+								}
+							],
+							"variable": [
+								{
+									"key": "menuItemId"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Variation by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/variations/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"variations",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Variation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"priceDelta\": 9,\n  \"displayOrder\": 9,\n  \"isDefault\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/variations/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"variations",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Variation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenantId}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/variations/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"variations",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3297"
+		},
+		{
+			"key": "token",
+			"value": "REPLACE_WITH_JWT"
+		},
+		{
+			"key": "tenantId",
+			"value": "REPLACE_WITH_TENANT_SLUG_OR_ID"
+		}
+	]
+}

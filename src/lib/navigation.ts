@@ -90,7 +90,7 @@ export const navigationConfig: NavigationItem[] = [
 
   {
     name: "Menu Management",
-    href: "/menu-management",
+    href: "/menu-items",
     group: "menu",
   },
   {
@@ -100,8 +100,8 @@ export const navigationConfig: NavigationItem[] = [
   }
   ,
   {
-    name: "Category",
-    href: "/category",
+    name: "Categories",
+    href: "/categories",
     group: "menu",
   },
 

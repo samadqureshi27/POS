@@ -1,0 +1,268 @@
+// Menu Category Service
+
+import AuthService from "@/lib/auth-service";
+import { MenuCategory, MenuCategoryPayload, ApiResponse } from "@/lib/types/menu";
+
+// Helper function to get auth token
+function getToken(): string | null {
+  const t = AuthService.getToken();
+  if (t) return t;
+  if (typeof window !== "undefined") {
+    return (
+      localStorage.getItem("access_token") ||
+      sessionStorage.getItem("access_token") ||
+      null
+    );
+  }
+  return null;
+}
+
+// Helper function to get tenant info
+function getTenantInfo(): { id: string | null; slug: string | null } {
+  if (typeof window === "undefined") {
+    return { id: null, slug: null };
+  }
+  const id = localStorage.getItem("tenant_id") || sessionStorage.getItem("tenant_id");
+  const slug = localStorage.getItem("tenant_slug") || sessionStorage.getItem("tenant_slug");
+  return { id, slug };
+}
+
+// Build headers with auth and tenant
+function buildHeaders(includeContentType: boolean = true): HeadersInit {
+  const token = getToken();
+  const { id, slug } = getTenantInfo();
+
+  const headers: Record<string, string> = {};
+
+  if (includeContentType) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  if (id) headers["x-tenant-id"] = id;
+  else if (slug) headers["x-tenant-id"] = slug;
+
+  return headers;
+}
+
+export class MenuCategoryService {
+  /**
+   * Get all menu categories
+   */
+  static async listCategories(params?: {
+    q?: string;
+    parentId?: string;
+    isActive?: boolean;
+    page?: number;
+    limit?: number;
+    sort?: string;
+    order?: string;
+  }): Promise<ApiResponse<MenuCategory[]>> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.q) queryParams.append("q", params.q);
+      if (params?.parentId) queryParams.append("parentId", params.parentId);
+      if (params?.isActive !== undefined) queryParams.append("isActive", String(params.isActive));
+      if (params?.page) queryParams.append("page", String(params.page));
+      if (params?.limit) queryParams.append("limit", String(params.limit));
+      if (params?.sort) queryParams.append("sort", params.sort);
+      if (params?.order) queryParams.append("order", params.order);
+
+      const queryString = queryParams.toString();
+      const url = `/api/menu/categories${queryString ? `?${queryString}` : ''}`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: buildHeaders(),
+      });
+
+      const data = await response.json();
+      console.log("🔍 MenuCategoryService.listCategories - Raw API response:", data);
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to fetch menu categories",
+        };
+      }
+
+      // Handle different API response structures
+      let categories = data;
+
+      // If wrapped in a data property
+      if (data.data) {
+        categories = data.data;
+      }
+
+      // If it's a paginated response
+      if (data.categories) {
+        categories = data.categories;
+      }
+
+      // If response has items property
+      if (data.items) {
+        categories = data.items;
+      }
+
+      console.log("✅ MenuCategoryService.listCategories - Extracted categories:", Array.isArray(categories) ? categories.length : typeof categories);
+
+      return {
+        success: true,
+        data: categories,
+      };
+    } catch (error: any) {
+      console.error("Error fetching menu categories:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to fetch menu categories",
+      };
+    }
+  }
+
+  /**
+   * Get single menu category by ID
+   */
+  static async getCategory(id: string): Promise<ApiResponse<MenuCategory>> {
+    try {
+      const response = await fetch(`/api/menu/categories/${id}`, {
+        method: "GET",
+        headers: buildHeaders(),
+      });
+
+      const data = await response.json();
+      console.log("🔍 MenuCategoryService.getCategory - Raw API response:", data);
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to fetch menu category",
+        };
+      }
+
+      // Handle different API response structures
+      let category = data;
+
+      // If wrapped in result property
+      if (data.result) {
+        category = data.result;
+      }
+      // If wrapped in data property
+      else if (data.data) {
+        category = data.data;
+      }
+
+      console.log("✅ MenuCategoryService.getCategory - Extracted category:", category);
+
+      return {
+        success: true,
+        data: category,
+      };
+    } catch (error: any) {
+      console.error("Error fetching menu category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to fetch menu category",
+      };
+    }
+  }
+
+  /**
+   * Create new menu category
+   */
+  static async createCategory(category: MenuCategoryPayload): Promise<ApiResponse<MenuCategory>> {
+    try {
+      const response = await fetch("/api/menu/categories", {
+        method: "POST",
+        headers: buildHeaders(),
+        body: JSON.stringify(category),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to create menu category",
+        };
+      }
+
+      return {
+        success: true,
+        data: data.data || data,
+        message: data.message || "Menu category created successfully",
+      };
+    } catch (error: any) {
+      console.error("Error creating menu category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to create menu category",
+      };
+    }
+  }
+
+  /**
+   * Update existing menu category
+   */
+  static async updateCategory(id: string, updates: Partial<MenuCategoryPayload>): Promise<ApiResponse<MenuCategory>> {
+    try {
+      const response = await fetch(`/api/menu/categories/${id}`, {
+        method: "PUT",
+        headers: buildHeaders(),
+        body: JSON.stringify(updates),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to update menu category",
+        };
+      }
+
+      return {
+        success: true,
+        data: data.data || data,
+        message: data.message || "Menu category updated successfully",
+      };
+    } catch (error: any) {
+      console.error("Error updating menu category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to update menu category",
+      };
+    }
+  }
+
+  /**
+   * Delete menu category
+   */
+  static async deleteCategory(id: string): Promise<ApiResponse<void>> {
+    try {
+      const response = await fetch(`/api/menu/categories/${id}`, {
+        method: "DELETE",
+        headers: buildHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to delete menu category",
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Menu category deleted successfully",
+      };
+    } catch (error: any) {
+      console.error("Error deleting menu category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to delete menu category",
+      };
+    }
+  }
+}
