@@ -7,8 +7,7 @@ import ActionBar from "@/components/ui/action-bar";
 import StatCard from "@/components/ui/summary-card";
 import StaffTable from "./_components/staff-table";
 import StaffModal from "./_components/staffModal";
-import { Toaster } from "@/components/ui/sonner";
-import { useToast } from "@/lib/hooks";
+import {Toast} from "@/components/ui/toast";
 import { useStaff } from "@/lib/hooks/useSatffManagement";
 import { useStaffModal } from "@/lib/hooks/useStaffModal";
 import { useStaffFiltering } from "@/lib/hooks/useSatffFiltering";
@@ -17,7 +16,6 @@ import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 const EmployeeRecordsPage = () => {
   const params = useParams();
   const branchId = params?.branchId as string;
-  const { showToast: globalShowToast } = useToast();
 
   // Core staff management hook
   const {
@@ -25,7 +23,9 @@ const EmployeeRecordsPage = () => {
     branchInfo,
     loading,
     actionLoading,
+    toast,
     showToast,
+    setToast,
     handleCreateItem,
     handleUpdateItem,
     handleDeleteSelected,
@@ -87,19 +87,6 @@ const EmployeeRecordsPage = () => {
     }
   };
 
-  // Enhanced action handlers with consistent toast notifications
-  const handleAddWithToast = () => {
-    openModal();
-  };
-
-  const handleDeleteWithToast = async () => {
-    if (selectedItems.length === 0) {
-      globalShowToast("Please select staff members to delete", "warning");
-      return;
-    }
-    await handleDelete();
-  };
-
   if (loading) {
     return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
   }
@@ -117,7 +104,13 @@ const EmployeeRecordsPage = () => {
 
   return (
     <div className="p-6 bg-background min-h-screen w-full mt-17">
-      <Toaster position="top-right" />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
 
       <div className="mb-8 mt-2">
         <h1 className="text-3xl font-semibold">
@@ -139,9 +132,9 @@ const EmployeeRecordsPage = () => {
 
       {/* Action Bar */}
       <ActionBar
-        onAdd={handleAddWithToast}
+        onAdd={openModal}
         addDisabled={selectedItems.length > 0}
-        onDelete={handleDeleteWithToast}
+        onDelete={handleDelete}
         deleteDisabled={selectedItems.length === 0}
         isDeleting={actionLoading}
         searchValue={searchTerm}

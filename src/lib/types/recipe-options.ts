@@ -1,7 +1,41 @@
 // lib/types/recipe-options.ts
 // All recipe-related types in one file
 
-// Base RecipeOption interface that matches your existing components
+// Recipe Variant Ingredient interface based on API structure
+export interface RecipeVariantIngredient {
+  sourceType: "inventory" | "recipe";
+  sourceId: string;
+  nameSnapshot: string;
+  quantity: number;
+  unit: string;
+  costPerUnit?: number;
+}
+
+// Recipe Variant Metadata interface
+export interface RecipeVariantMetadata {
+  menuDisplayName?: string;
+  availability?: string[];
+}
+
+// Main Recipe Variant interface based on API structure
+export interface RecipeVariant {
+  _id?: string;
+  ID?: number;
+  recipeId: string;
+  recipeName?: string;        // For display purposes
+  name: string;
+  description?: string;
+  type: "size" | "flavor" | "crust" | "custom";
+  sizeMultiplier?: number;
+  baseCostAdjustment?: number;
+  crustType?: string;
+  ingredients: RecipeVariantIngredient[];
+  metadata?: RecipeVariantMetadata;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Legacy RecipeOption interface for backward compatibility
 export interface RecipeOption {
   ID: number;
   Name: string;
@@ -34,8 +68,12 @@ export interface ToastState {
   type: "success" | "error";
 }
 
-// Form data type
+// Form data types
 export type RecipeFormData = Omit<RecipeOption, "ID">;
+export type RecipeVariantFormData = Omit<RecipeVariant, "_id" | "ID" | "createdAt" | "updatedAt">;
+
+// Display filter types
+export type DisplayFilterType = "all" | "size" | "flavor" | "crust" | "custom" | "active" | "inactive" | string;
 
 // For useRecipeOptions hook
 export interface UseRecipeOptionsReturn {
@@ -63,14 +101,43 @@ export interface UseRecipeOptionsReturn {
   dismissToast: () => void;
 }
 
+// For useRecipeVariants hook
+export interface UseRecipeVariantsReturn {
+  items: RecipeVariant[];
+  loading: boolean;
+  error: string | null;
+  selectedItems: string[];  // Changed to string[] for _id
+  searchTerm: string;
+  displayFilter: string;
+  editingItem: RecipeVariant | null;
+  isModalOpen: boolean;
+  actionLoading: boolean;
+  toast: ToastState | null;
+  
+  // Actions
+  setSearchTerm: (term: string) => void;
+  setDisplayFilter: (filter: string) => void;
+  handleSelectAll: (checked: boolean) => void;
+  handleSelectItem: (itemId: string, checked: boolean) => void;
+  handleAddNew: () => void;
+  handleEdit: (item: RecipeVariant) => void;
+  handleDelete: () => void;
+  handleModalClose: () => void;
+  handleModalSubmit: (data: RecipeVariantFormData) => void;
+  dismissToast: () => void;
+}
+
 // For API and filtering
 export interface FilterOptions {
   search?: string;
   category?: string;
   status?: string;
   difficulty?: string;
+  type?: string;        // Added for Recipe Variant filtering
+  recipeId?: string;    // Added for filtering by recipe
 }
 
+// API Payload interfaces
 export interface RecipePayload {
   Name: string;
   Status: string;
@@ -95,9 +162,19 @@ export interface RecipePayload {
   }>;
 }
 
-export type DisplayFilterType = "all" | "active" | "inactive" | string;
+export interface RecipeVariantPayload {
+  recipeId: string;
+  name: string;
+  description?: string;
+  type: "size" | "flavor" | "crust" | "custom";
+  sizeMultiplier?: number;
+  baseCostAdjustment?: number;
+  crustType?: string;
+  ingredients: RecipeVariantIngredient[];
+  metadata?: RecipeVariantMetadata;
+}
 
-// Page component props
+// Page Props interfaces
 export interface RecipePageProps {
   items: RecipeOption[];
   selectedItems: number[];
@@ -108,16 +185,34 @@ export interface RecipePageProps {
   onEditItem: (item: RecipeOption) => void;
 }
 
-// Modal props
+export interface RecipeVariantPageProps {
+  items: RecipeVariant[];
+  selectedItems: string[];
+  searchTerm: string;
+  displayFilter: string;
+  onSelectAll: (checked: boolean) => void;
+  onSelectItem: (itemId: string, checked: boolean) => void;
+  onEditItem: (item: RecipeVariant) => void;
+}
+
+// Modal Props interfaces
 export interface RecipeModalProps {
   isOpen: boolean;
   editingItem?: RecipeOption | null;
   onClose: () => void;
-  onSubmit: (data: Omit<RecipeOption, "ID">) => void;
-  actionLoading?: boolean;
+  onSubmit: (data: RecipeFormData) => void;
+  loading?: boolean;
 }
 
-// API response types
+export interface RecipeVariantModalProps {
+  isOpen: boolean;
+  editingItem?: RecipeVariant | null;
+  onClose: () => void;
+  onSubmit: (data: RecipeVariantFormData) => void;
+  loading?: boolean;
+}
+
+// API Response interfaces
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -127,7 +222,7 @@ export interface ApiResponse<T> {
 export interface PaginatedResponse<T> {
   success: boolean;
   data: T[];
-  pagination?: {
+  pagination: {
     page: number;
     limit: number;
     total: number;

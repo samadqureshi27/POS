@@ -366,6 +366,7 @@ const RecipeVariationsPage = () => {
         ingredients={ingredients}
         onClose={closeModal}
         onSubmit={handleModalSubmit}
+        editingItem={editingItem}
         actionLoading={actionLoading}
         showToast={globalShowToast}
       />
