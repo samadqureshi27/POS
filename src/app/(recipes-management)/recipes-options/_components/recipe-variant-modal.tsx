@@ -375,10 +375,10 @@ export default function RecipeVariantModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh] p-0 flex flex-col">
+      <DialogContent size="4xl" fullHeight>
         {/* Header */}
-        <div className="p-5 border-b border-gray-200 flex-shrink-0">
-          <DialogTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+        <div className="p-5 border-b border-gray-200 flex-shrink-0 flex flex-col">
+          <DialogTitle className="text-xl font-bold text-gray-900 flex  gap-2">
             <Sparkles className="h-5 w-5 text-gray-700" />
             {editingItem ? "Edit Recipe Variant" : "Create Recipe Variant"}
           </DialogTitle>
@@ -569,7 +569,7 @@ export default function RecipeVariantModal({
               onIngredientInputChange={handleIngredientInputChange}
               onToggleDropdown={handleToggleDropdown}
               onSelectIngredient={selectIngredient}
-              onUpdateIngredient={handleUpdateIngredient}
+              onUpdateIngredient={handleUpdateIngredient as any}
               onRemoveIngredient={handleRemoveIngredient}
               setFocusedIngredientIndex={setFocusedIngredientIndex}
               setShowSuggestions={setShowSuggestions}
