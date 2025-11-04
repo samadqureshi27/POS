@@ -379,11 +379,13 @@ export default function RecipeModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent size="4xl" fullHeight>
         {/* Header */}
-        <div className="p-5 border-b border-gray-200 flex-shrink-0 flex flex-col">
-          <DialogTitle className="text-xl font-bold text-gray-900 flex gap-2">
+        <div className="p-5 border-b border-gray-200 flex-shrink-0">
+          <div className="flex items-center gap-2">
             <UtensilsCrossed className="h-5 w-5 text-gray-700" />
-            {editingItem ? "Edit Recipe" : "Create Recipe"}
-          </DialogTitle>
+            <DialogTitle className="text-xl font-bold text-gray-900">
+              {editingItem ? "Edit Recipe" : "Create Recipe"}
+            </DialogTitle>
+          </div>
           <p className="text-sm text-gray-600 mt-1">
             {editingItem ? "Update recipe details" : "Build your recipe by adding ingredients"}
           </p>
@@ -397,26 +399,26 @@ export default function RecipeModal({
             className="flex-1 flex flex-col min-h-0"
           >
             {/* Tab List */}
-            <div className="px-5 pt-3 pb-2 border-b border-gray-100 flex-shrink-0 flex justify-center">
-              <TabsList className="grid w-full max-w-sm grid-cols-2 h-9">
-                <TabsTrigger value="final" className="text-sm gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Final Recipe
-                </TabsTrigger>
-                <TabsTrigger value="sub" className="text-sm gap-1.5">
-                  <UtensilsCrossed className="h-3.5 w-3.5" />
-                  Sub Recipe
-                </TabsTrigger>
-              </TabsList>
-              
-            </div>
-           // optional description below tabs
-            <div className="px-5 flex items-center justify-center">
-              <p className="text-xs text-gray-600 items-center justify-center">
-                {formData.type === "sub"
-                  ? "Components that can be reused in other recipes"
-                  : "Complete menu items ready to serve"}
-              </p>
+            <div className="px-5 pt-3 pb-3 border-b border-gray-100 flex-shrink-0">
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-center">
+                  <TabsList className="grid w-full max-w-sm grid-cols-2 h-9">
+                    <TabsTrigger value="final" className="text-sm gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Final Recipe
+                    </TabsTrigger>
+                    <TabsTrigger value="sub" className="text-sm gap-1.5">
+                      <UtensilsCrossed className="h-3.5 w-3.5" />
+                      Sub Recipe
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                <p className="text-xs text-gray-600 text-center">
+                  {formData.type === "sub"
+                    ? "Components that can be reused in other recipes"
+                    : "Complete menu items ready to serve"}
+                </p>
+              </div>
             </div>
               
 
