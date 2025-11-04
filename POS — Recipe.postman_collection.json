@@ -1,78 +1,42 @@
 {
   "info": {
-    "_postman_id": "b7a90ef4-62cf-4c2e-9673-efb93d14d556",
-    "name": "Recipe Module (Enterprise Level)",
+    "name": "Recipe Variant Module",
+    "_postman_id": "e6e7f3e2-9fd9-4c8c-96ce-variant-module",
+    "description": "Complete Recipe Variant API collection integrated with base Recipe module. Supports multi-tenant cost, size, flavor, crust variations.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Create Sub-Recipe (Example: Grilled Patty)",
+      "name": "Create Recipe Variant",
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{token}}" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
         ],
-        "url": {
-          "raw": "{{baseUrl}}/t/recipes",
-          "host": ["{{baseUrl}}"],
-          "path": ["t", "recipes"]
-        },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Grilled Patty\",\n  \"type\": \"sub\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{beef_item_id}}\",\n      \"nameSnapshot\": \"Beef Mince\",\n      \"quantity\": 150,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.05\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{onion_item_id}}\",\n      \"nameSnapshot\": \"Onion\",\n      \"quantity\": 20,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.01\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{oil_item_id}}\",\n      \"nameSnapshot\": \"Cooking Oil\",\n      \"quantity\": 10,\n      \"unit\": \"ml\",\n      \"costPerUnit\": 0.02\n    }\n  ]\n}"
-        }
-      }
-    },
-    {
-      "name": "Create Sub-Recipe (Example: Burger Sauce)",
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{token}}" }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/t/recipes",
-          "host": ["{{baseUrl}}"],
-          "path": ["t", "recipes"]
+          "raw": "{\n  \"recipeId\": \"671df7e9ac10b33f2203cd41\",\n  \"name\": \"Large Fajita Pizza (Stuffed Crust)\",\n  \"description\": \"A large stuffed crust pizza variation of our fajita pizza.\",\n  \"type\": \"size\",\n  \"sizeMultiplier\": 2,\n  \"baseCostAdjustment\": 8,\n  \"crustType\": \"Stuffed Crust\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"672ea2a9b9a9a1b8f7e8f12e\",\n      \"nameSnapshot\": \"Mozzarella Cheese\",\n      \"quantity\": 250,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.05\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"672ea2a9b9a9a1b8f7e8f12f\",\n      \"nameSnapshot\": \"Fajita Sauce\",\n      \"quantity\": 50,\n      \"unit\": \"ml\",\n      \"costPerUnit\": 0.10\n    },\n    {\n      \"sourceType\": \"recipe\",\n      \"sourceId\": \"671df7e9ac10b33f2203cd41\",\n      \"nameSnapshot\": \"Pizza Base\",\n      \"quantity\": 1,\n      \"unit\": \"unit\"\n    }\n  ],\n  \"metadata\": {\n    \"menuDisplayName\": \"Large Fajita Stuffed Pizza\",\n    \"availability\": [\"Riyadh\", \"Jeddah\"]\n  }\n}"
         },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Burger Sauce\",\n  \"type\": \"sub\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{mayo_item_id}}\",\n      \"nameSnapshot\": \"Mayonnaise\",\n      \"quantity\": 50,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.03\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{mustard_item_id}}\",\n      \"nameSnapshot\": \"Mustard\",\n      \"quantity\": 10,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.04\n    }\n  ]\n}"
-        }
-      }
-    },
-    {
-      "name": "Create Final Recipe (Example: Cheeseburger)",
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{token}}" }
-        ],
         "url": {
-          "raw": "{{baseUrl}}/t/recipes",
+          "raw": "{{baseUrl}}/t/recipe-variants",
           "host": ["{{baseUrl}}"],
-          "path": ["t", "recipes"]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Cheeseburger\",\n  \"type\": \"final\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"recipe\",\n      \"sourceId\": \"{{grilled_patty_id}}\",\n      \"nameSnapshot\": \"Grilled Patty\",\n      \"quantity\": 1,\n      \"unit\": \"piece\"\n    },\n    {\n      \"sourceType\": \"recipe\",\n      \"sourceId\": \"{{burger_sauce_id}}\",\n      \"nameSnapshot\": \"Burger Sauce\",\n      \"quantity\": 1,\n      \"unit\": \"portion\"\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{bun_item_id}}\",\n      \"nameSnapshot\": \"Burger Bun\",\n      \"quantity\": 2,\n      \"unit\": \"pcs\",\n      \"costPerUnit\": 0.25\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{cheese_item_id}}\",\n      \"nameSnapshot\": \"Cheese Slice\",\n      \"quantity\": 1,\n      \"unit\": \"slice\",\n      \"costPerUnit\": 0.5\n    }\n  ]\n}"
+          "path": ["t", "recipe-variants"]
         }
-      }
+      },
+      "response": []
     },
     {
-      "name": "Get All Recipes",
+      "name": "Get All Recipe Variants",
       "request": {
         "method": "GET",
-        "header": [
-          { "key": "Authorization", "value": "Bearer {{token}}" }
-        ],
+        "header": [],
         "url": {
-          "raw": "{{baseUrl}}/t/recipes?page=1&limit=20&sort=createdAt&order=desc",
+          "raw": "{{baseUrl}}/t/recipe-variants?page=1&limit=20&sort=createdAt&order=desc",
           "host": ["{{baseUrl}}"],
-          "path": ["t", "recipes"],
+          "path": ["t", "recipe-variants"],
           "query": [
             { "key": "page", "value": "1" },
             { "key": "limit", "value": "20" },
@@ -80,68 +44,78 @@
             { "key": "order", "value": "desc" }
           ]
         }
-      }
+      },
+      "response": []
     },
     {
-      "name": "Get Single Recipe",
+      "name": "Get Variant by ID",
       "request": {
         "method": "GET",
-        "header": [
-          { "key": "Authorization", "value": "Bearer {{token}}" }
-        ],
+        "header": [],
         "url": {
-          "raw": "{{baseUrl}}/t/recipes/{{recipe_id}}",
+          "raw": "{{baseUrl}}/t/recipe-variants/{{variantId}}",
           "host": ["{{baseUrl}}"],
-          "path": ["t", "recipes", "{{recipe_id}}"]
+          "path": ["t", "recipe-variants", "{{variantId}}"]
         }
-      }
+      },
+      "response": []
     },
     {
-      "name": "Update Recipe",
+      "name": "Update Recipe Variant",
       "request": {
         "method": "PUT",
         "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{token}}" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
         ],
-        "url": {
-          "raw": "{{baseUrl}}/t/recipes/{{recipe_id}}",
-          "host": ["{{baseUrl}}"],
-          "path": ["t", "recipes", "{{recipe_id}}"]
-        },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"description\": \"Updated description\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"{{bun_item_id}}\",\n      \"quantity\": 2,\n      \"unit\": \"pcs\",\n      \"costPerUnit\": 0.3\n    }\n  ]\n}"
+          "raw": "{\n  \"name\": \"Medium Fajita Pizza (Thin Crust)\",\n  \"sizeMultiplier\": 1.5,\n  \"baseCostAdjustment\": 5,\n  \"crustType\": \"Thin Crust\",\n  \"ingredients\": [\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"672ea2a9b9a9a1b8f7e8f12e\",\n      \"nameSnapshot\": \"Mozzarella Cheese\",\n      \"quantity\": 180,\n      \"unit\": \"g\",\n      \"costPerUnit\": 0.05\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"672ea2a9b9a9a1b8f7e8f12f\",\n      \"nameSnapshot\": \"Fajita Sauce\",\n      \"quantity\": 40,\n      \"unit\": \"ml\",\n      \"costPerUnit\": 0.10\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/t/recipe-variants/{{variantId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["t", "recipe-variants", "{{variantId}}"]
         }
-      }
+      },
+      "response": []
     },
     {
-      "name": "Delete Recipe",
+      "name": "Delete Recipe Variant",
       "request": {
         "method": "DELETE",
-        "header": [
-          { "key": "Authorization", "value": "Bearer {{token}}" }
-        ],
+        "header": [],
         "url": {
-          "raw": "{{baseUrl}}/t/recipes/{{recipe_id}}",
+          "raw": "{{baseUrl}}/t/recipe-variants/{{variantId}}",
           "host": ["{{baseUrl}}"],
-          "path": ["t", "recipes", "{{recipe_id}}"]
+          "path": ["t", "recipe-variants", "{{variantId}}"]
         }
-      }
+      },
+      "response": []
+    },
+    {
+      "name": "List Variants for Specific Recipe",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/t/recipe-variants?recipeId={{recipeId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["t", "recipe-variants"],
+          "query": [
+            { "key": "recipeId", "value": "{{recipeId}}" }
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3297" },
-    { "key": "token", "value": "" },
-    { "key": "beef_item_id", "value": "" },
-    { "key": "onion_item_id", "value": "" },
-    { "key": "oil_item_id", "value": "" },
-    { "key": "bun_item_id", "value": "" },
-    { "key": "cheese_item_id", "value": "" },
-    { "key": "mayo_item_id", "value": "" },
-    { "key": "mustard_item_id", "value": "" },
-    { "key": "grilled_patty_id", "value": "" },
-    { "key": "burger_sauce_id", "value": "" },
-    { "key": "recipe_id", "value": "" }
+    { "key": "tenant", "value": "demo-tenant" },
+    { "key": "variantId", "value": "replace-with-your-variant-id" },
+    { "key": "recipeId", "value": "replace-with-your-recipe-id" }
   ]
 }

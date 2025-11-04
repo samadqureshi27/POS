@@ -1,10 +1,61 @@
-📦 Recipe details response: {success: true, data: {…}}
-C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\lib\hooks\useRecipeData.ts:353 ✅ Recipe data received: {status: 200, message: 'OK', result: {…}}message: "OK"result: code: ""createdAt: "2025-11-02T14:45:23.612Z"customName: ""description: ""ingredients: Array(1)0: {sourceType: 'inventory', sourceId: '69060731ee70eebe0e166558', nameSnapshot: 'Arabica Beans', quantity: 1, unit: 'kg', …}length: 1[[Prototype]]: Array(0)isActive: truename: "beeeens"slug: "beeeens"totalCost: 0type: "sub"updatedAt: "2025-11-02T14:45:23.612Z"yield: 1__v: 0_id: "69076e8399a790c6d1f8f234"[[Prototype]]: Objectstatus: 200[[Prototype]]: Object
-C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\lib\hooks\useRecipeData.ts:354   - Ingredients count: 0
-C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\lib\hooks\useRecipeData.ts:355   - Ingredients: undefined
-C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\lib\hooks\useRecipeData.ts:363 🔀 Merged full recipe: {ID: '69076e8399a790c6d1f8f234', Name: 'beeeens', Status: 'Active', Description: '', type: 'sub', …}
-C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-management\_components\recipe-modal.tsx:100 🔍 Modal opened with:
-C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-management\_components\recipe-modal.tsx:101   - Inventory items: 8
-C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-management\_components\recipe-modal.tsx:102   - Available recipes: 2
-C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-management\_components\recipe-modal.tsx:106   - Editing recipe with 0 ingredients: []length: 0[[Prototype]]: Array(0)
-C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\components\ui\dialog.tsx:60 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+📝 Loading editing item: {
+  "status": 200,
+  "message": "OK",
+  "result": {
+    "_id": "6908f63cda18baa79c61c92c",
+    "recipeId": {
+      "_id": "69078a0899a790c6d1f8f2d5",
+      "name": "saucy k",
+      "slug": "saucy-k"
+    },
+    "name": "beans",
+    "description": "",
+    "type": "size",
+    "sizeMultiplier": 1,
+    "baseCostAdjustment": 20,
+    "crustType": "",
+    "ingredients": [
+      {
+        "sourceType": "inventory",
+        "sourceId": "69060731ee70eebe0e166558",
+        "nameSnapshot": "Arabica Beans",
+        "quantity": 0.2,
+        "unit": "kg",
+        "costPerUnit": 0,
+        "totalCost": 0,
+        "_id": "6908f63cda18baa79c61c92d"
+      }
+    ],
+    "totalCost": 20,
+    "isActive": true,
+    "metadata": {
+      "menuDisplayName": "",
+      "availability": [],
+      "appliesTo": [
+        "69078a0899a790c6d1f8f2d5"
+      ]
+    },
+    "createdAt": "2025-11-03T18:36:44.865Z",
+    "updatedAt": "2025-11-03T18:36:44.865Z",
+    "__v": 0
+  }
+}
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-options\_components\recipe-variant-modal.tsx:95 🔍 Extracted values: {variantName: '', variantDesc: '', variantType: 'size', sizeMultiplier: 1, baseCostAdj: 0, …}baseCostAdj: 0crustType: ""recipeIds: Array(0)length: 0[[Prototype]]: Array(0)sizeMultiplier: 1variantDesc: ""variantName: ""variantType: "size"[[Prototype]]: Object
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-options\_components\recipe-variant-modal.tsx:121 📋 Setting form data: {
+  "recipeId": [],
+  "name": "",
+  "description": "",
+  "type": "size",
+  "sizeMultiplier": 1,
+  "baseCostAdjustment": 0,
+  "crustType": "",
+  "ingredients": [],
+  "metadata": {
+    "menuDisplayName": "",
+    "availability": [],
+    "appliesTo": []
+  }
+}
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-options\_components\recipe-variant-modal.tsx:132 ✅ Form data state updated
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-options\_components\recipe-variant-modal.tsx:355 🎨 Modal rendering with formData: {name: '', type: 'size', recipeId: Array(0), sizeMultiplier: 1, baseCostAdjustment: 0, …}
+C:\Users\faraz\Documents\GitHub\umt code\POS\POS\src\app\(recipes-management)\recipes-options\_components\recipe-variant-modal.tsx:355 🎨 Modal rendering with formData: {name: '', type: 'size', recipeId: Array(0), sizeMultiplier: 1, baseCostAdjustment: 0, …}
