@@ -1,8 +1,9 @@
 // components/MenuModal.tsx
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
 import DetailsForm from './detail-form';
 import OptionValuesForm from './option-value-form';
 import { MenuItemOptions, MenuModalProps } from '@/lib/types/menuItemOptions';
@@ -26,64 +27,81 @@ const MenuModal: React.FC<MenuModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className="max-w-lg lg:max-w-2xl h-[80vh] max-h-[800px] flex flex-col p-0 overflow-hidden"
-        showCloseButton={false}
-        onWheel={(e) => e.preventDefault()}
-      >
-        {/* Fixed Header */}
-        <DialogHeader className="flex-shrink-0 p-6 pb-4 border-b border-gray-100">
-          <DialogTitle className="text-lg sm:text-xl md:text-2xl">
-            {editingItem ? "Edit Option" : "Add Option"}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent size="3xl" fullHeight>
+        {/* Header */}
+        <div className="p-5 border-b border-gray-200 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <Settings className="h-5 w-5 text-gray-700" />
+            <DialogTitle className="text-xl font-bold text-gray-900">
+              {editingItem ? "Edit Option" : "Add Option"}
+            </DialogTitle>
+          </div>
+          <p className="text-sm text-gray-600 mt-1">
+            {editingItem ? "Update option details and values" : "Create a new menu option"}
+          </p>
+        </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-            {/* Tab Navigation */}
-            <div className="flex-shrink-0 px-6 pt-2">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="option-values">Option Values</TabsTrigger>
-              </TabsList>
+        {/* Content */}
+        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+            {/* Tab List */}
+            <div className="px-5 pt-3 pb-3 border-b border-gray-100 flex-shrink-0">
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-center">
+                  <TabsList className="grid w-full max-w-sm grid-cols-2 h-9">
+                    <TabsTrigger value="details" className="text-sm">
+                      Details
+                    </TabsTrigger>
+                    <TabsTrigger value="option-values" className="text-sm">
+                      Option Values
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                <p className="text-xs text-gray-600 text-center">
+                  {activeTab === "details"
+                    ? "Configure basic option information and settings"
+                    : "Define individual values and pricing for this option"}
+                </p>
+              </div>
             </div>
 
-            {/* Tab Content - Scrollable */}
-            <div className="flex-1 min-h-0 overflow-hidden">
-              <TabsContent value="details" className="h-full mt-0 data-[state=active]:flex data-[state=active]:flex-col">
-                <div className="flex-1 min-h-0 overflow-hidden">
-                  <DetailsForm
-                    formData={formData}
-                    onFormDataChange={onFormDataChange}
-                  />
-                </div>
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto p-5 min-h-0">
+              <TabsContent value="details" className="mt-0">
+                <DetailsForm
+                  formData={formData}
+                  onFormDataChange={onFormDataChange}
+                />
               </TabsContent>
-
-              <TabsContent value="option-values" className="h-full mt-0 data-[state=active]:flex data-[state=active]:flex-col">
-                <div className="flex-1 min-h-0 overflow-hidden">
-                  <OptionValuesForm
-                    formData={formData}
-                    onFormDataChange={onFormDataChange}
-                  />
-                </div>
+              <TabsContent value="option-values" className="mt-0">
+                <OptionValuesForm
+                  formData={formData}
+                  onFormDataChange={onFormDataChange}
+                />
               </TabsContent>
             </div>
           </Tabs>
         </div>
 
-        {/* Fixed Footer */}
-        <DialogFooter className="flex-shrink-0 p-6 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end items-center gap-2 flex-shrink-0">
+          <Button
+            onClick={onClose}
+            variant="outline"
+            size="sm"
+            className="h-9"
+          >
             Cancel
           </Button>
           <Button
             onClick={onSubmit}
             disabled={!isFormValid()}
+            size="sm"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9"
           >
             {editingItem ? "Update" : "Save & Close"}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
