@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +45,14 @@ export default function CategoryModal({
     displayOrder: 0,
     metadata: {},
   });
+
+  const [activeTab, setActiveTab] = useState("basic");
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab("basic");
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -125,15 +134,41 @@ export default function CategoryModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogTitle className="text-2xl font-semibold">
-          {editingItem ? "Edit Category" : "Add New Category"}
-        </DialogTitle>
+      <DialogContent size="3xl" fullHeight>
+        {/* Header */}
+        <div className="p-5 border-b border-gray-200 flex-shrink-0">
+          <DialogTitle className="text-xl font-bold text-gray-900">
+            {editingItem ? "Edit Category" : "Add Category"}
+          </DialogTitle>
+          <p className="text-sm text-gray-600 mt-1">
+            {editingItem ? "Update category details and organization" : "Create a new menu category"}
+          </p>
+        </div>
 
-        <div className="space-y-6 mt-6">
-          {/* Basic Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">Basic Information</h3>
+        {/* Content */}
+        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+            {/* Tab List */}
+            <div className="px-5 pt-3 pb-3 border-b border-gray-100 flex-shrink-0">
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-center">
+                  <TabsList className="grid w-full max-w-sm grid-cols-2 h-9">
+                    <TabsTrigger value="basic" className="text-sm">Basic Info</TabsTrigger>
+                    <TabsTrigger value="organization" className="text-sm">Organization</TabsTrigger>
+                  </TabsList>
+                </div>
+                <p className="text-xs text-gray-600 text-center">
+                  {activeTab === "basic"
+                    ? "Configure basic category information"
+                    : "Set display order and parent category"}
+                </p>
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto p-5 min-h-0">
+              <TabsContent value="basic" className="mt-0 space-y-6">
+                <h3 className="text-lg font-medium text-gray-900">Basic Information</h3>
 
             {/* Name */}
             <div className="space-y-2">
@@ -180,11 +215,10 @@ export default function CategoryModal({
                 rows={3}
               />
             </div>
-          </div>
+              </TabsContent>
 
-          {/* Organization */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">Organization</h3>
+              <TabsContent value="organization" className="mt-0 space-y-6">
+                <h3 className="text-lg font-medium text-gray-900">Organization</h3>
 
             {/* Parent Category */}
             <div className="space-y-2">
@@ -219,35 +253,35 @@ export default function CategoryModal({
               />
               <p className="text-xs text-gray-500">Lower numbers appear first</p>
             </div>
-          </div>
 
-          {/* Status */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">Status</h3>
-
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div>
-                <Label htmlFor="isActive" className="text-base font-medium">
-                  Active Category
-                </Label>
-                <p className="text-sm text-gray-500">
-                  Category will be visible on the menu
-                </p>
-              </div>
-              <Switch
-                id="isActive"
-                checked={formData.isActive !== false}
-                onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
-              />
+                {/* Active Status */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <Label htmlFor="isActive" className="text-base font-medium">
+                      Active Category
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Category will be visible on the menu
+                    </p>
+                  </div>
+                  <Switch
+                    id="isActive"
+                    checked={formData.isActive !== false}
+                    onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
+                  />
+                </div>
+              </TabsContent>
             </div>
-          </div>
+          </Tabs>
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end items-center gap-2 flex-shrink-0">
           <Button
-            variant="outline"
             onClick={onClose}
+            variant="outline"
+            size="sm"
+            className="h-9"
             disabled={actionLoading}
           >
             Cancel
@@ -255,10 +289,11 @@ export default function CategoryModal({
           <Button
             onClick={handleSave}
             disabled={actionLoading}
-            className="bg-gray-900 hover:bg-black"
+            size="sm"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9"
           >
             {actionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {editingItem ? "Update Category" : "Create Category"}
+            {editingItem ? "Update" : "Save & Close"}
           </Button>
         </div>
       </DialogContent>

@@ -205,27 +205,53 @@ export default function MenuItemModal({
     }
   };
 
+  const [activeTab, setActiveTab] = useState("basic");
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab("basic");
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent size="4xl" fullHeight>
         {/* Header */}
-        <DialogHeader className="p-5 border-b border-gray-200 flex-shrink-0">
+        <div className="p-5 border-b border-gray-200 flex-shrink-0">
           <DialogTitle className="text-xl font-bold text-gray-900">
-            {editingItem ? "Edit Menu Item" : "Add New Menu Item"}
+            {editingItem ? "Edit Menu Item" : "Add Menu Item"}
           </DialogTitle>
-        </DialogHeader>
-        
-        {/* Tab Navigation */}
-        
-        <Tabs defaultValue="basic" className="mt-6">
-          <TabsList className="grid w-full max-w-sm grid-cols-3 h-9">
-            <TabsTrigger value="basic">Basic Info</TabsTrigger>
-            <TabsTrigger value="pricing">Pricing</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
-          </TabsList>
+          <p className="text-sm text-gray-600 mt-1">
+            {editingItem ? "Update menu item details and pricing" : "Create a new menu item"}
+          </p>
+        </div>
 
-          {/* Basic Information Tab */}
-          <TabsContent value="basic" className="space-y-6 mt-6">
+        {/* Content */}
+        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+            {/* Tab List */}
+            <div className="px-5 pt-3 pb-3 border-b border-gray-100 flex-shrink-0">
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-center">
+                  <TabsList className="grid w-full max-w-sm grid-cols-3 h-9">
+                    <TabsTrigger value="basic" className="text-sm">Basic Info</TabsTrigger>
+                    <TabsTrigger value="pricing" className="text-sm">Pricing</TabsTrigger>
+                    <TabsTrigger value="details" className="text-sm">Details</TabsTrigger>
+                  </TabsList>
+                </div>
+                <p className="text-xs text-gray-600 text-center">
+                  {activeTab === "basic"
+                    ? "Configure basic item information and category"
+                    : activeTab === "pricing"
+                    ? "Set pricing and currency details"
+                    : "Additional settings and metadata"}
+                </p>
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto p-5 min-h-0">
+              <TabsContent value="basic" className="mt-0 space-y-6">
             {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="name">Item Name *</Label>
@@ -312,10 +338,9 @@ export default function MenuItemModal({
                 </SelectContent>
               </Select>
             </div>
-          </TabsContent>
+              </TabsContent>
 
-          {/* Pricing Tab */}
-          <TabsContent value="pricing" className="space-y-6 mt-6">
+              <TabsContent value="pricing" className="mt-0 space-y-6">
             <h3 className="text-lg font-medium text-gray-900">Pricing Information</h3>
 
             {/* Base Price */}
@@ -366,10 +391,9 @@ export default function MenuItemModal({
                 onCheckedChange={(checked) => handlePricingChange("priceIncludesTax", checked)}
               />
             </div>
-          </TabsContent>
+              </TabsContent>
 
-          {/* Details Tab */}
-          <TabsContent value="details" className="space-y-6 mt-6">
+              <TabsContent value="details" className="mt-0 space-y-6">
             <h3 className="text-lg font-medium text-gray-900">Additional Details</h3>
 
             {/* Display Order */}
@@ -456,19 +480,32 @@ export default function MenuItemModal({
                 onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
               />
             </div>
-          </TabsContent>
-        </Tabs>
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
 
-        {/* Actions */}
-        <DialogFooter className="flex justify-end gap-3 mt-6 pt-6 border-t">
-          <Button variant="outline" onClick={onClose} disabled={actionLoading}>
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end items-center gap-2 flex-shrink-0">
+          <Button
+            onClick={onClose}
+            variant="outline"
+            size="sm"
+            className="h-9"
+            disabled={actionLoading}
+          >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={actionLoading} className="bg-gray-900 hover:bg-black">
+          <Button
+            onClick={handleSave}
+            disabled={actionLoading}
+            size="sm"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9"
+          >
             {actionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {editingItem ? "Update Menu Item" : "Create Menu Item"}
+            {editingItem ? "Update" : "Save & Close"}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
