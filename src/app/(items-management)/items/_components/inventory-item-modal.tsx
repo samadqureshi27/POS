@@ -144,9 +144,7 @@ export default function InventoryItemModal({
 
     // Load from MOCK API (not yet connected to backend)
     const [vendorsRes, branchesRes] = await Promise.all([
-      InventoryAPI.getVendors(),
-      InventoryAPI.getBranches(),
-      InventoryAPI.getCategories(),
+      InventoryAPI.getVendors(),      InventoryAPI.getBranches(),
     ]);
 
     if (vendorsRes.success && vendorsRes.data) setVendors(vendorsRes.data);

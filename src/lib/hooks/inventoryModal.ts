@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { InventoryItem, InventoryModalFormData } from "@/lib/types/inventory";
-import { calculateStatus } from "../util/inventory-api";
+import { calculateStatus } from "@/lib/utils";
 
 export const useInventoryModal = (branchId: number) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
