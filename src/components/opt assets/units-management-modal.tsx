@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { InventoryAPI, type Unit, type Conversion } from "@/lib/util/inventoryApi";
+import { UnitsService, ConversionsService, type Unit, type Conversion } from "@/lib/services/inventory-service";
 
 interface UnitsManagementModalProps {
   isOpen: boolean;
@@ -25,8 +25,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
   const [newUnit, setNewUnit] = useState({
     name: "",
     symbol: "",
-    type: "mass" as "mass" | "volume" | "count" | "length" | "custom",
-    Status: "Active" as "Active" | "Inactive",
+    type: "count" as Unit["type"],
   });
 
   // New Conversion Form
@@ -34,7 +33,6 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
     fromUnit: "",
     toUnit: "",
     factor: "",
-    Status: "Active" as "Active" | "Inactive",
   });
 
   useEffect(() => {
@@ -46,8 +44,8 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
   const loadData = async () => {
     setLoading(true);
     const [unitsRes, conversionsRes] = await Promise.all([
-      InventoryAPI.getUnits(),
-      InventoryAPI.getConversions(),
+      UnitsService.listUnits(),
+      ConversionsService.listConversions(),
     ]);
 
     if (unitsRes.success && unitsRes.data) setUnits(unitsRes.data);
@@ -58,18 +56,18 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
   const handleAddUnit = async () => {
     if (!newUnit.name || !newUnit.symbol) return;
 
-    const response = await InventoryAPI.createUnit(newUnit);
+    const response = await UnitsService.createUnit(newUnit);
     if (response.success) {
-      setNewUnit({ name: "", symbol: "", type: "mass", Status: "Active" });
+      setNewUnit({ name: "", symbol: "", type: "count" });
       loadData();
       if (onRefresh) onRefresh();
     }
   };
 
-  const handleDeleteUnit = async (id: number) => {
+  const handleDeleteUnit = async (id: string) => {
     if (!window.confirm("Delete this unit?")) return;
 
-    const response = await InventoryAPI.deleteUnit(id);
+    const response = await UnitsService.deleteUnit(id);
     if (response.success) {
       loadData();
       if (onRefresh) onRefresh();
@@ -79,33 +77,31 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
   const handleAddConversion = async () => {
     if (!newConversion.fromUnit || !newConversion.toUnit || !newConversion.factor) return;
 
-    const response = await InventoryAPI.createConversion({
+    const response = await ConversionsService.createConversion({
       fromUnit: newConversion.fromUnit,
       toUnit: newConversion.toUnit,
       factor: parseFloat(newConversion.factor),
-      Status: newConversion.Status,
     });
 
     if (response.success) {
-      setNewConversion({ fromUnit: "", toUnit: "", factor: "", Status: "Active" });
+      setNewConversion({ fromUnit: "", toUnit: "", factor: "" });
       loadData();
     }
   };
 
-  const handleDeleteConversion = async (id: number) => {
+  const handleDeleteConversion = async (id: string) => {
     if (!window.confirm("Delete this conversion?")) return;
 
-    const response = await InventoryAPI.deleteConversion(id);
+    const response = await ConversionsService.deleteConversion(id);
     if (response.success) {
       loadData();
     }
   };
 
   const unitTypeColors: Record<string, string> = {
-    mass: "bg-yellow-100 text-yellow-700",
+    weight: "bg-yellow-100 text-yellow-700",
     volume: "bg-blue-100 text-blue-700",
     count: "bg-green-100 text-green-700",
-    length: "bg-purple-100 text-purple-700",
     custom: "bg-gray-100 text-gray-700",
   };
 
@@ -172,10 +168,9 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="mass">Mass (Weight)</SelectItem>
+                        <SelectItem value="weight">Weight</SelectItem>
                         <SelectItem value="volume">Volume (Liquid)</SelectItem>
                         <SelectItem value="count">Count (Pieces)</SelectItem>
-                        <SelectItem value="length">Length</SelectItem>
                         <SelectItem value="custom">Custom</SelectItem>
                       </SelectContent>
                     </Select>
@@ -207,9 +202,9 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {units.map((unit) => (
+                        {units.map((unit) => (
                       <div
-                        key={unit.ID}
+                        key={(unit.id as string) || unit.symbol}
                         className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between mb-3">
@@ -219,8 +214,9 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDeleteUnit(unit.ID)}
+                            onClick={() => unit.id && handleDeleteUnit(unit.id as string)}
                             className="text-red-600 hover:text-red-700 hover:bg-red-50 -mr-2 -mt-2"
+                            disabled={!unit.id}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -264,7 +260,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                       </SelectTrigger>
                       <SelectContent>
                         {units.map((unit) => (
-                          <SelectItem key={unit.ID} value={unit.symbol}>
+                          <SelectItem key={(unit.id as string) || unit.symbol} value={unit.symbol}>
                             {unit.name} ({unit.symbol})
                           </SelectItem>
                         ))}
@@ -283,7 +279,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                       </SelectTrigger>
                       <SelectContent>
                         {units.map((unit) => (
-                          <SelectItem key={unit.ID} value={unit.symbol}>
+                          <SelectItem key={(unit.id as string) || unit.symbol} value={unit.symbol}>
                             {unit.name} ({unit.symbol})
                           </SelectItem>
                         ))}
@@ -338,7 +334,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                   <div className="space-y-3">
                     {conversions.map((conversion) => (
                       <div
-                        key={conversion.ID}
+                        key={(conversion.id as string) || (conversion._id as string) || `${conversion.fromUnit}-${conversion.toUnit}-${conversion.factor}`}
                         className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all"
                       >
                         <div className="flex items-center justify-between">
@@ -364,7 +360,10 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDeleteConversion(conversion.ID)}
+                            onClick={() => {
+                              const cid = (conversion.id as string) || (conversion._id as string);
+                              if (cid) handleDeleteConversion(cid);
+                            }}
                             className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4" />

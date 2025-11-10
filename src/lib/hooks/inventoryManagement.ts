@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { InventoryAPI, calculateStatus } from "../util/inventory-api";
+import { InventoryService } from "@/lib/services/inventory-service";
+import { calculateStatus } from "@/lib/utils";
 import { useSelection } from "./selection";
 import { useToast } from './toast';
 import { useInventoryModal } from "./inventoryModal";
@@ -7,6 +8,8 @@ import { InventoryItem } from "@/lib/types/inventory";
 
 export const useInventoryManagement = (branchId: number) => {
     const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+    // Map legacy numeric IDs used in UI to real service IDs (string)
+    const [idMap, setIdMap] = useState<Record<number, string>>({});
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<"" | "Low" | "Medium" | "High">("");
     const [unitFilter, setUnitFilter] = useState("");
@@ -34,19 +37,50 @@ export const useInventoryManagement = (branchId: number) => {
         updateFormData,
     } = useInventoryModal(branchId);
 
-    // Load inventory items
+    // Load inventory items from real service and map to legacy UI shape
     const loadInventoryItems = async () => {
         try {
             setLoading(true);
-            const response = await InventoryAPI.getInventoryItems(branchId);
-            if (response.success) {
-                setInventoryItems(response.data);
+            const response = await InventoryService.listItems({
+                // Optionally apply search term when reloading
+                q: searchTerm || undefined,
+                limit: 1000,
+            });
+            if (response.success && response.data) {
+                // Map service items to legacy UI shape and build ID map
+                const map: Record<number, string> = {};
+                const mapped: InventoryItem[] = response.data.map((item, index) => {
+                    const legacyId = index + 1; // stable per load order
+                    const updatedStock = (item.quantity || 0); // treat service quantity as current stock
+                    const threshold = item.reorderPoint ?? 0;
+
+                    map[legacyId] = (item._id || item.id || String(legacyId));
+
+                    return {
+                        ID: legacyId,
+                        Name: item.name || "",
+                        Unit: item.baseUnit || "",
+                        Status: calculateStatus(updatedStock, threshold),
+                        InitialStock: updatedStock, // we don't have historical split; treat as initial
+                        AddedStock: 0,
+                        UpdatedStock: updatedStock,
+                        Threshold: threshold,
+                        supplier: typeof item.categoryId === 'object' && item.categoryId?.name 
+                          ? item.categoryId.name 
+                          : "",
+                        BranchID: branchId,
+                    };
+                });
+
+                setIdMap(map);
+                setInventoryItems(mapped);
             } else {
                 throw new Error(response.message || "Failed to fetch inventory items");
             }
         } catch (error) {
             console.error("Error fetching inventory:", error);
             showToast(`Failed to load inventory for Branch #${branchId}`, "error");
+            setInventoryItems([]);
         } finally {
             setLoading(false);
         }
@@ -69,12 +103,50 @@ export const useInventoryManagement = (branchId: number) => {
     const handleCreateItem = async (itemData: Omit<InventoryItem, "ID">) => {
         try {
             setActionLoading(true);
-            const response = await InventoryAPI.createInventoryItem(itemData, branchId);
-            if (response.success) {
-                setInventoryItems((prev) => [...prev, response.data]);
+            // Map legacy form data to real service payload
+            const payload = {
+                name: itemData.Name,
+                baseUnit: itemData.Unit,
+                type: "stock" as const,
+                reorderPoint: itemData.Threshold,
+                quantity: (itemData.InitialStock || 0) + (itemData.AddedStock || 0),
+                isActive: true,
+            };
+
+            const response = await InventoryService.createItem(payload);
+            if (response.success && response.data) {
+                // Map created service item back to legacy UI shape
+                const newServiceItem = response.data;
+                const updatedStock = newServiceItem.quantity || 0;
+                const threshold = newServiceItem.reorderPoint ?? 0;
+                const legacyId = (inventoryItems[inventoryItems.length - 1]?.ID || 0) + 1;
+
+                setIdMap((prev) => ({
+                    ...prev,
+                    [legacyId]: newServiceItem._id || newServiceItem.id || String(legacyId),
+                }));
+
+                const legacyItem: InventoryItem = {
+                    ID: legacyId,
+                    Name: newServiceItem.name || itemData.Name,
+                    Unit: newServiceItem.baseUnit || itemData.Unit,
+                    Status: calculateStatus(updatedStock, threshold),
+                    InitialStock: updatedStock,
+                    AddedStock: 0,
+                    UpdatedStock: updatedStock,
+                    Threshold: threshold,
+                    supplier: typeof newServiceItem.categoryId === 'object' && newServiceItem.categoryId?.name 
+                      ? newServiceItem.categoryId.name 
+                      : itemData.supplier || "",
+                    BranchID: branchId,
+                };
+
+                setInventoryItems((prev) => [...prev, legacyItem]);
                 closeModal();
                 setSearchTerm("");
                 showToast(response.message || "Item created successfully", "success");
+            } else {
+                throw new Error(response.message || "Failed to create inventory item");
             }
         } catch (error) {
             console.error("Error creating item:", error);
@@ -89,21 +161,52 @@ export const useInventoryManagement = (branchId: number) => {
         if (!editingItem) return;
         try {
             setActionLoading(true);
-            const response = await InventoryAPI.updateInventoryItem(
-                editingItem.ID,
-                itemData,
-                branchId
-            );
-            if (response.success) {
+
+            const realId = idMap[editingItem.ID];
+            if (!realId) throw new Error("Missing real ID mapping for item");
+
+            const payload = {
+                name: itemData.Name,
+                baseUnit: itemData.Unit,
+                type: "stock" as const,
+                reorderPoint: itemData.Threshold,
+                quantity: (itemData.InitialStock || 0) + (itemData.AddedStock || 0),
+                isActive: true,
+            };
+
+            const response = await InventoryService.updateItem(realId, payload);
+            if (response.success && response.data) {
+                const updated = response.data;
+                const updatedStock = updated.quantity || 0;
+                const threshold = updated.reorderPoint ?? 0;
+
+                const legacyUpdated: InventoryItem = {
+                    ID: editingItem.ID,
+                    Name: updated.name || itemData.Name,
+                    Unit: updated.baseUnit || itemData.Unit,
+                    Status: calculateStatus(updatedStock, threshold),
+                    InitialStock: updatedStock,
+                    AddedStock: 0,
+                    UpdatedStock: updatedStock,
+                    Threshold: threshold,
+                    supplier: typeof updated.categoryId === 'object' && updated.categoryId?.name 
+                      ? updated.categoryId.name 
+                      : editingItem.supplier,
+                    BranchID: branchId,
+                };
+
                 setInventoryItems(prev =>
                     prev.map(item =>
-                        item.ID === editingItem.ID ? response.data : item
+                        item.ID === editingItem.ID ? legacyUpdated : item
                     )
                 );
                 closeModal();
                 showToast(response.message || "Item updated successfully", "success");
+            } else {
+                throw new Error(response.message || "Failed to update inventory item");
             }
         } catch (error) {
+            console.error(error);
             showToast("Failed to update inventory item", "error");
         } finally {
             setActionLoading(false);
@@ -115,13 +218,17 @@ export const useInventoryManagement = (branchId: number) => {
         if (selectedItems.length === 0) return;
         try {
             setActionLoading(true);
-            const response = await InventoryAPI.bulkDeleteInventoryItems(selectedItems as number[], branchId);
-            if (response.success) {
-                setInventoryItems((prev) => prev.filter((i) => !selectedItems.includes(i.ID)));
-                clearSelection();
-                showToast(response.message || "Items deleted successfully", "success");
+            // Delete items one by one using real IDs
+            for (const legacyId of selectedItems as number[]) {
+                const realId = idMap[legacyId];
+                if (!realId) continue;
+                await InventoryService.deleteItem(realId);
             }
+            setInventoryItems((prev) => prev.filter((i) => !selectedItems.includes(i.ID)));
+            clearSelection();
+            showToast("Items deleted successfully", "success");
         } catch (error) {
+            console.error(error);
             showToast("Failed to delete inventory items", "error");
         } finally {
             setActionLoading(false);
