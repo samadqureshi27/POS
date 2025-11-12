@@ -335,43 +335,51 @@ export default function RecipeModal({
         />
       </div>
 
-      {/* Add Ingredient Button */}
-      <div className={`bg-gradient-to-r ${recipeType === "sub" ? "from-purple-50 to-white border-purple-200" : "from-blue-50 to-white border-blue-200"} border-2 rounded-lg p-4 flex items-center justify-between`}>
-        <div>
-          <Label className="text-sm font-semibold text-gray-900">Ingredients</Label>
-          <p className="text-xs text-gray-600 mt-0.5">
-            {recipeType === "sub" ? "Add inventory items" : "Add inventory items or sub recipes"}
-          </p>
+      {/* Ingredients Section Header */}
+      <div className={`bg-gradient-to-r ${recipeType === "sub" ? "from-purple-50 to-white border-purple-200" : "from-blue-50 to-white border-blue-200"} border-2 rounded-lg p-4`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <Label className="text-sm font-semibold text-gray-900">Ingredients</Label>
+            <p className="text-xs text-gray-600 mt-0.5">
+              {recipeType === "sub" ? "Add inventory items" : "Add inventory items or sub recipes"}
+            </p>
+          </div>
+          <div className="text-xs font-semibold text-gray-600">
+            {recipeIngredients.length} item{recipeIngredients.length !== 1 ? 's' : ''}
+          </div>
         </div>
-        <Button
-          type="button"
-          onClick={handleAddIngredient}
-          size="sm"
-          className={`${recipeType === "sub" ? "bg-purple-600 hover:bg-purple-700" : "bg-blue-600 hover:bg-blue-700"} text-white`}
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Add
-        </Button>
       </div>
 
       {/* Ingredients List */}
-      <RecipeIngredientsList
-        ingredients={recipeIngredients}
-        ingredientInputs={ingredientInputs}
-        showSuggestions={showSuggestions}
-        inventoryItems={ingredients}
-        availableRecipes={availableRecipeOptions}
-        getIngredientValidation={getIngredientValidation}
-        getCompatibleUnits={getCompatibleUnits}
-        onIngredientInputChange={handleIngredientInputChange}
-        onToggleDropdown={handleToggleDropdown}
-        onSelectIngredient={selectIngredient}
-        onUpdateIngredient={handleUpdateIngredient}
-        onRemoveIngredient={handleRemoveIngredient}
-        setFocusedIngredientIndex={setFocusedIngredientIndex}
-        setShowSuggestions={setShowSuggestions}
-        recipeType={recipeType}
-      />
+      <div className="relative">
+        <RecipeIngredientsList
+          ingredients={recipeIngredients}
+          ingredientInputs={ingredientInputs}
+          showSuggestions={showSuggestions}
+          inventoryItems={ingredients}
+          availableRecipes={availableRecipeOptions}
+          getIngredientValidation={getIngredientValidation}
+          getCompatibleUnits={getCompatibleUnits}
+          onIngredientInputChange={handleIngredientInputChange}
+          onToggleDropdown={handleToggleDropdown}
+          onSelectIngredient={selectIngredient}
+          onUpdateIngredient={handleUpdateIngredient}
+          onRemoveIngredient={handleRemoveIngredient}
+          setFocusedIngredientIndex={setFocusedIngredientIndex}
+          setShowSuggestions={setShowSuggestions}
+          recipeType={recipeType}
+        />
+
+        {/* Floating Add Button - Bottom Right */}
+        <button
+          type="button"
+          onClick={handleAddIngredient}
+          className={`fixed bottom-24 right-11 z-50 w-14 h-14 rounded-full shadow-xl ${recipeType === "sub" ? "bg-purple-600 hover:bg-purple-700" : "bg-blue-600 hover:bg-blue-700"} text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-opacity-50 ${recipeType === "sub" ? "focus:ring-purple-400" : "focus:ring-blue-400"}`}
+          title="Add Ingredient"
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+      </div>
     </div>
   );
 
@@ -424,7 +432,7 @@ export default function RecipeModal({
               
 
             {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-5 min-h-0">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-5 min-h-0">
               <TabsContent value="final" className="mt-0">
                 {renderTabContent("final")}
               </TabsContent>

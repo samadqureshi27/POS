@@ -5,6 +5,7 @@ import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { Toaster } from "@/components/ui/sonner";
 import { useToast } from "@/lib/hooks";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import CategoryModal from "./_components/category-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useCategoryData } from "@/lib/hooks/useCategoryData";
@@ -13,6 +14,8 @@ import { MenuCategoryOption } from "@/lib/types/menu";
 const CategoriesManagementPage = () => {
   const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<MenuCategoryOption | null>(null);
 
   const {
     // Data
@@ -59,21 +62,21 @@ const CategoriesManagementPage = () => {
     return result;
   };
 
-  const handleDelete = async (category: MenuCategoryOption) => {
-    console.log("🗑️ Delete clicked for category:", category);
+  const handleDelete = (category: MenuCategoryOption) => {
+    setCategoryToDelete(category);
+    setDeleteDialogOpen(true);
+  };
 
-    const categoryId = category.ID;
+  const confirmDelete = async () => {
+    if (!categoryToDelete) return;
+
+    console.log("🗑️ Deleting category:", categoryToDelete);
+
+    const categoryId = categoryToDelete.ID;
 
     if (!categoryId) {
       console.error("❌ Category ID is missing");
       globalShowToast("Category ID is missing", "error");
-      return;
-    }
-
-    // Confirm deletion
-    const confirmed = window.confirm(`Are you sure you want to delete "${category.Name}"?`);
-
-    if (!confirmed) {
       return;
     }
 
@@ -304,6 +307,18 @@ const CategoriesManagementPage = () => {
         onSubmit={handleModalSubmit}
         actionLoading={actionLoading}
         parentCategories={parentCategories}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Category"
+        description={`Are you sure you want to delete "${categoryToDelete?.Name}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
       />
     </div>
   );

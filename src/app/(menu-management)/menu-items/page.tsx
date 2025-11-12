@@ -5,6 +5,7 @@ import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { Toaster } from "@/components/ui/sonner";
 import { useToast } from "@/lib/hooks";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import MenuItemModal from "./_components/menu-item-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useMenuItemData } from "@/lib/hooks/useMenuItemData";
@@ -13,6 +14,8 @@ import { MenuItemOption } from "@/lib/types/menu";
 const MenuItemsManagementPage = () => {
   const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<MenuItemOption | null>(null);
 
   const {
     // Data
@@ -60,21 +63,21 @@ const MenuItemsManagementPage = () => {
     return result;
   };
 
-  const handleDelete = async (menuItem: MenuItemOption) => {
-    console.log("🗑️ Delete clicked for menu item:", menuItem);
+  const handleDelete = (menuItem: MenuItemOption) => {
+    setItemToDelete(menuItem);
+    setDeleteDialogOpen(true);
+  };
 
-    const itemId = menuItem.ID;
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    console.log("🗑️ Deleting menu item:", itemToDelete);
+
+    const itemId = itemToDelete.ID;
 
     if (!itemId) {
       console.error("❌ Menu item ID is missing");
       globalShowToast("Menu item ID is missing", "error");
-      return;
-    }
-
-    // Confirm deletion
-    const confirmed = window.confirm(`Are you sure you want to delete "${menuItem.Name}"?`);
-
-    if (!confirmed) {
       return;
     }
 
@@ -359,6 +362,18 @@ const MenuItemsManagementPage = () => {
         actionLoading={actionLoading}
         categories={categories}
         recipes={recipes}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Menu Item"
+        description={`Are you sure you want to delete "${itemToDelete?.Name}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
       />
     </div>
   );
