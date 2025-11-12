@@ -33,11 +33,11 @@ const MenuModal: React.FC<MenuModalProps> = ({
           <div className="flex items-center gap-2">
             <Settings className="h-5 w-5 text-gray-700" />
             <DialogTitle className="text-xl font-bold text-gray-900">
-              {editingItem ? "Edit Option" : "Add Option"}
+              {editingItem ? "Edit Add-on" : "Add Add-on"}
             </DialogTitle>
           </div>
           <p className="text-sm text-gray-600 mt-1">
-            {editingItem ? "Update option details and values" : "Create a new menu option"}
+            {editingItem ? "Update add-on details and values" : "Create a new add-on"}
           </p>
         </div>
 
@@ -59,8 +59,8 @@ const MenuModal: React.FC<MenuModalProps> = ({
                 </div>
                 <p className="text-xs text-gray-600 text-center">
                   {activeTab === "details"
-                    ? "Configure basic option information and settings"
-                    : "Define individual values and pricing for this option"}
+                    ? "Configure basic add-on information and settings"
+                    : "Define individual values and pricing for this add-on"}
                 </p>
               </div>
             </div>

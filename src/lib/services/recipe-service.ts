@@ -126,11 +126,17 @@ export class RecipeService {
   }
 
   /**
-   * Get single recipe by ID
+   * Get single recipe by ID with variants
    */
-  static async getRecipe(id: string): Promise<ApiResponse<Recipe>> {
+  static async getRecipe(id: string, includeVariants: boolean = true): Promise<ApiResponse<any>> {
     try {
-      const response = await fetch(`/api/recipes/${id}`, {
+      // Use the new /with-variants endpoint if variants are requested
+      let url = `/api/recipes/${id}`;
+      if (includeVariants) {
+        url += `?withVariants=1&activeOnly=true&page=1&limit=50`;
+      }
+
+      const response = await fetch(url, {
         method: "GET",
         headers: buildHeaders(),
       });
@@ -145,24 +151,27 @@ export class RecipeService {
         };
       }
 
-      // Handle different API response structures
+      // The new endpoint returns: {status, message, result: {recipe, variants, count, page, limit}}
       let recipe = data;
+      let variants = [];
 
-      // If wrapped in result property
       if (data.result) {
-        recipe = data.result;
-      }
-      // If wrapped in data property
-      else if (data.data) {
-        recipe = data.data;
+        recipe = data.result.recipe || data.result;
+        variants = data.result.variants || [];
+      } else if (data.data) {
+        recipe = data.data.recipe || data.data;
+        variants = data.data.variants || [];
       }
 
       console.log("✅ RecipeService.getRecipe - Extracted recipe:", recipe);
-      console.log("  - Ingredients:", recipe.ingredients);
+      console.log("✅ RecipeService.getRecipe - Extracted variants:", variants?.length || 0);
 
       return {
         success: true,
-        data: recipe,
+        data: {
+          recipe,
+          variants: includeVariants ? variants : undefined,
+        },
       };
     } catch (error: any) {
       console.error("Error fetching recipe:", error);
