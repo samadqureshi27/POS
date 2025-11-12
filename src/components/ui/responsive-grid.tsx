@@ -118,7 +118,7 @@ export default function ResponsiveGrid<T>({
     }
 
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 justify-end">
         {onEdit && (
           <Button
             variant="ghost"
@@ -161,7 +161,7 @@ export default function ResponsiveGrid<T>({
                     </th>
                   ))}
                   {showActions && (onEdit || onDelete || customActions) && (
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
                       Actions
                     </th>
                   )}
@@ -181,7 +181,7 @@ export default function ResponsiveGrid<T>({
                       </td>
                     ))}
                     {showActions && (onEdit || onDelete || customActions) && (
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-right w-32 whitespace-nowrap">
                         {renderActions(item)}
                       </td>
                     )}

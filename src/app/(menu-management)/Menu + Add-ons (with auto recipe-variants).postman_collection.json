@@ -1,0 +1,662 @@
+{
+	"info": {
+		"_postman_id": "8a59b108-f2da-4a4a-94a7-e0e38a5892b9",
+		"name": "Menu + Add-ons (with auto recipe-variants)",
+		"description": "CRUD for Menu Categories, Menu Items, and Add-ons. Includes list/get with ?includeRecipeVariants=1&includeCategoryAddOns=1 to auto-pull recipe variants and category add-ons.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48917537",
+		"_collection_link": "https://dkay042-3274752.postman.co/workspace/Faraz's-Workspace~976616b6-c854-4493-86ae-6b6ff1d9e4fc/collection/48917537-8a59b108-f2da-4a4a-94a7-e0e38a5892b9?action=share&source=collection_link&creator=48917537"
+	},
+	"item": [
+		{
+			"name": "Menu Categories",
+			"item": [
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Pizza\",\n  \"slug\": \"pizza\",\n  \"description\": \"All kinds of pizza\",\n  \"isActive\": true,\n  \"displayOrder\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories?q=&isActive=true&page=1&limit=50",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories/{{categoryId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories",
+								"{{categoryId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Pizzas, calzones, garlic breads\",\n  \"displayOrder\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories/{{categoryId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories",
+								"{{categoryId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/categories/{{categoryId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"categories",
+								"{{categoryId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Add-ons (category-linked)",
+			"item": [
+				{
+					"name": "Create Add-on",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Extra Cheese\",\n  \"slug\": \"extra-cheese\",\n  \"description\": \"Add extra cheese\",\n  \"price\": 5,\n  \"categoryIds\": [\"{{categoryId}}\"],\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/addons",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"addons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Add-ons (all)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/addons?page=1&limit=50",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"addons"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Add-ons by Category",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/addons?categoryId={{categoryId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"addons"
+							],
+							"query": [
+								{
+									"key": "categoryId",
+									"value": "{{categoryId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Add-on by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/addons/{{addOnId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"addons",
+								"{{addOnId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Add-on",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price\": 6,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/addons/{{addOnId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"addons",
+								"{{addOnId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Add-on",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/addons/{{addOnId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"addons",
+								"{{addOnId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Menu Items (auto variants + add-ons fetch)",
+			"item": [
+				{
+					"name": "Create Menu Item (links a Recipe)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Fajita Pizza\",\n  \"slug\": \"fajita-pizza\",\n  \"description\": \"Delicious fajita pizza\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"recipeId\": \"{{recipeId}}\",\n  \"pricing\": { \"basePrice\": 50, \"priceIncludesTax\": false, \"currency\": \"SAR\" },\n  \"isActive\": true,\n  \"tags\": [\"pizza\",\"fajita\"],\n  \"media\": [{ \"url\": \"https://example.com/fajita.jpg\", \"alt\": \"Fajita Pizza\", \"type\": \"image\" }]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Menu Items (with variants + add-ons)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items?includeRecipeVariants=1&includeCategoryAddOns=1&page=1&limit=50",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items"
+							],
+							"query": [
+								{
+									"key": "includeRecipeVariants",
+									"value": "1"
+								},
+								{
+									"key": "includeCategoryAddOns",
+									"value": "1"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Menu Item by ID (with variants + add-ons)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items/{{menuItemId}}?includeRecipeVariants=1&includeCategoryAddOns=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items",
+								"{{menuItemId}}"
+							],
+							"query": [
+								{
+									"key": "includeRecipeVariants",
+									"value": "1"
+								},
+								{
+									"key": "includeCategoryAddOns",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Menu Items (simple)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items?page=1&limit=50",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Menu Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Updated description\",\n  \"pricing\": { \"basePrice\": 54 }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items/{{menuItemId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items",
+								"{{menuItemId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Menu Item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "{{tenant}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/t/menu/items/{{menuItemId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"t",
+								"menu",
+								"items",
+								"{{menuItemId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "tenant",
+			"value": "tenant_1"
+		},
+		{
+			"key": "token",
+			"value": "YOUR_JWT_HERE"
+		},
+		{
+			"key": "categoryId",
+			"value": "64aaaabbbbccccddddeeee01"
+		},
+		{
+			"key": "menuItemId",
+			"value": "64aaaabbbbccccddddeeee02"
+		},
+		{
+			"key": "recipeId",
+			"value": "64aaaabbbbccccddddeeee03"
+		},
+		{
+			"key": "addOnId",
+			"value": "64aaaabbbbccccddddeeee04"
+		}
+	]
+}

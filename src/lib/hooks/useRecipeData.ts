@@ -106,13 +106,19 @@ export const useRecipeData = () => {
         // Use the same recipe data - filter for sub recipes in the modal
         const transformedRecipes = recipesArray.map((recipe: any) => ({
           ID: recipe._id || recipe.id,
+          _id: recipe._id,
           Name: recipe.name,
+          name: recipe.name, // Also keep lowercase for compatibility
           Status: recipe.isActive === false ? "Inactive" : "Active",
           Description: recipe.description || "",
           type: recipe.type || "sub",
           Priority: 0,
-          _id: recipe._id,
-          name: recipe.name, // Also keep lowercase for compatibility
+          price: recipe.totalCost || 0,
+          OptionValue: "",
+          OptionPrice: 0,
+          IngredientValue: "",
+          IngredientPrice: 0,
+          Ingredients: recipe.ingredients || [],
         }));
         setAvailableRecipeOptions(transformedRecipes);
       } else {
@@ -160,13 +166,18 @@ export const useRecipeData = () => {
         // Transform recipes to match the expected format
         const transformedRecipes = recipesArray.map((recipe: any) => ({
           ID: recipe._id || recipe.id,
+          _id: recipe._id,
           Name: recipe.name,
           Status: recipe.isActive === false ? "Inactive" : "Active",
           Description: recipe.description || "",
           type: recipe.type || "sub",
           Priority: 0,
-          _id: recipe._id,
-          ingredients: recipe.ingredients || [], // Include ingredients for display
+          price: recipe.totalCost || 0,
+          OptionValue: "",
+          OptionPrice: 0,
+          IngredientValue: "",
+          IngredientPrice: 0,
+          Ingredients: recipe.ingredients || [], // Include ingredients for display
           totalCost: recipe.totalCost || 0,
         }));
         setRecipeOptions(transformedRecipes);

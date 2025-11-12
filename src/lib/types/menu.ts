@@ -164,6 +164,7 @@ export interface MenuCategoryOption {
 export interface MenuItemOption {
   ID: string;
   Name: string;
+  Slug?: string;
   Code: string;
   Status: "Active" | "Inactive";
   Description: string;

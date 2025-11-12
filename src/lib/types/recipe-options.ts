@@ -38,7 +38,9 @@ export interface RecipeVariant {
 // Legacy RecipeOption interface for backward compatibility
 export interface RecipeOption {
   ID: number;
+  _id?: string;               // MongoDB ID for API operations
   Name: string;
+  name?: string;              // Lowercase name for compatibility
   Status: string;
   Description?: string;
   Category?: string;
@@ -54,6 +56,8 @@ export interface RecipeOption {
   IngredientPrice: number;
   Priority?: number;
   Price?: number;             // Add uppercase Price for compatibility if needed
+  type?: string;              // Recipe type (sub/final)
+  totalCost?: number;         // Total cost for display
   Ingredients?: Array<{
     ingredientId: string;
     quantity: number;

@@ -108,7 +108,7 @@ const RecipeVariationsPage = () => {
               { label: "All Types", value: "all" },
               { label: "Size", value: "size", color: "blue" },
               { label: "Flavor", value: "flavor", color: "purple" },
-              { label: "Crust", value: "crust", color: "orange" },
+              { label: "Crust", value: "crust", color: "red" },
               { label: "Custom", value: "custom", color: "green" },
             ],
             activeValue: typeFilter,
@@ -366,7 +366,6 @@ const RecipeVariationsPage = () => {
         ingredients={ingredients}
         onClose={closeModal}
         onSubmit={handleModalSubmit}
-        editingItem={editingItem}
         actionLoading={actionLoading}
         showToast={globalShowToast}
       />
