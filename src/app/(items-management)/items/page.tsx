@@ -17,6 +17,9 @@ export default function ItemsPage() {
   const [filterType, setFilterType] = useState<"all" | "stock" | "service">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "Active" | "Inactive">("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(21);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Modals
@@ -39,7 +42,9 @@ export default function ItemsPage() {
   const loadItems = async () => {
     setLoading(true);
     const params: any = {
-      limit: 200,
+      // Use pagination parameters instead of loading everything
+      page: currentPage,
+      limit: itemsPerPage,
       sort: "createdAt",
       order: "desc"
     };
@@ -103,6 +108,11 @@ export default function ItemsPage() {
 
   useEffect(() => {
     loadItems();
+  }, [currentPage, searchQuery, filterType, filterStatus]);
+
+  // Reset to first page when filters/search change
+  useEffect(() => {
+    setCurrentPage(1);
   }, [searchQuery, filterType, filterStatus]);
 
   const handleAddItem = () => {
@@ -415,6 +425,19 @@ export default function ItemsPage() {
               </Button>
             </div>
           )}
+          // Pagination props
+          showPagination={true}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+          totalItems={stats.totalItems}
+          totalPages={Math.max(1, Math.ceil((stats.totalItems || 0) / itemsPerPage))}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            // Smoothly scroll to top when page changes
+            if (typeof window !== 'undefined') {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
           columns={[
             {
               key: "name",
