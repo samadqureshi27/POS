@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MenuItemOption, MenuItemPayload } from "@/lib/types/menu";
+import { MenuItemOption, MenuItemPayload, extractId } from "@/lib/types/menu";
 
 interface MenuItemModalProps {
   isOpen: boolean;
@@ -65,16 +65,21 @@ export default function MenuItemModal({
 
   useEffect(() => {
     if (isOpen) {
+      let recipeIdToFetch = "";
+
       if (editingItem && editingItem._raw) {
         // Use raw data for editing
         const raw = editingItem._raw;
+        // Extract string ID from potentially populated field
+        recipeIdToFetch = extractId(raw.recipeId);
+
         setFormData({
           name: raw.name,
           slug: raw.slug || "",
           code: raw.code || "",
           description: raw.description || "",
-          categoryId: raw.categoryId || "",
-          recipeId: raw.recipeId || "",
+          categoryId: extractId(raw.categoryId),
+          recipeId: extractId(raw.recipeId),
           pricing: {
             basePrice: raw.pricing?.basePrice || 0,
             priceIncludesTax: raw.pricing?.priceIncludesTax || false,
@@ -89,13 +94,16 @@ export default function MenuItemModal({
         });
       } else if (editingItem) {
         // Fallback if no raw data
+        // Extract string ID from potentially populated field
+        recipeIdToFetch = extractId(editingItem.RecipeId as any);
+
         setFormData({
           name: editingItem.Name,
           slug: editingItem.Slug || "",
           code: editingItem.Code || "",
           description: editingItem.Description || "",
-          categoryId: editingItem.CategoryId || "",
-          recipeId: editingItem.RecipeId || "",
+          categoryId: extractId(editingItem.CategoryId as any),
+          recipeId: extractId(editingItem.RecipeId as any),
           pricing: {
             basePrice: editingItem.BasePrice || 0,
             priceIncludesTax: editingItem.PriceIncludesTax || false,
@@ -130,8 +138,44 @@ export default function MenuItemModal({
           metadata: {},
         });
       }
+
+      // Fetch recipe variations if editing item with recipe
+      if (recipeIdToFetch) {
+        fetchRecipeVariations(recipeIdToFetch);
+      } else {
+        setRecipeVariations([]);
+      }
     }
   }, [isOpen, editingItem]);
+
+  // Helper function to fetch recipe variations
+  const fetchRecipeVariations = async (recipeId: string) => {
+    if (!recipeId || recipeId === 'none') {
+      setRecipeVariations([]);
+      return;
+    }
+
+    try {
+      setLoadingVariations(true);
+      const recipeResponse = await RecipeService.getRecipe(recipeId, true);
+      setLoadingVariations(false);
+
+      if (recipeResponse.success && recipeResponse.data) {
+        const { variants } = recipeResponse.data;
+        if (variants && Array.isArray(variants)) {
+          setRecipeVariations(variants);
+        } else {
+          setRecipeVariations([]);
+        }
+      } else {
+        setRecipeVariations([]);
+      }
+    } catch (error) {
+      console.error("Error fetching recipe variations:", error);
+      setLoadingVariations(false);
+      setRecipeVariations([]);
+    }
+  };
 
   const handleFieldChange = async (field: keyof MenuItemPayload, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -139,7 +183,6 @@ export default function MenuItemModal({
     // When recipe is selected, fetch recipe details with variants (single API call)
     if (field === "recipeId" && value) {
       try {
-        console.log("🔄 Fetching recipe with variants for:", value);
         setLoadingVariations(true);
 
         // Fetch recipe with variants from /t/recipes/:id/with-variants
@@ -148,8 +191,6 @@ export default function MenuItemModal({
 
         if (recipeResponse.success && recipeResponse.data) {
           const { recipe, variants } = recipeResponse.data;
-          console.log("✅ Recipe fetched:", recipe);
-          console.log("✅ Variants included:", variants?.length || 0);
 
           // Auto-populate fields from recipe
           setFormData((prev) => {
@@ -161,13 +202,11 @@ export default function MenuItemModal({
             // Auto-fill name if empty (use recipe name)
             if (recipe?.name && !prev.name) {
               updates.name = recipe.name;
-              console.log("✅ Auto-filled name:", recipe.name);
             }
 
             // Auto-fill description if empty
             if (recipe?.description && !prev.description) {
               updates.description = recipe.description;
-              console.log("✅ Auto-filled description:", recipe.description);
             }
 
             // Auto-fill base price from recipe's totalCost (even if 0)
@@ -178,7 +217,6 @@ export default function MenuItemModal({
                 priceIncludesTax: prev.pricing?.priceIncludesTax || false,
                 currency: prev.pricing?.currency || "SAR",
               };
-              console.log("✅ Auto-filled base price:", recipe.totalCost);
             }
 
             return updates;
@@ -186,18 +224,15 @@ export default function MenuItemModal({
 
           // Set recipe variations
           if (variants && Array.isArray(variants)) {
-            console.log("✅ Setting recipe variations:", variants.length);
             setRecipeVariations(variants);
           } else {
-            console.log("⚠️ No variations found");
             setRecipeVariations([]);
           }
         } else {
-          console.log("⚠️ Recipe fetch failed:", recipeResponse.message);
           setRecipeVariations([]);
         }
       } catch (error) {
-        console.error("❌ Error fetching recipe details:", error);
+        console.error("Error fetching recipe details:", error);
         setLoadingVariations(false);
         setRecipeVariations([]);
       }
@@ -249,13 +284,24 @@ export default function MenuItemModal({
       // Generate slug from name if not provided
       const slug = formData.slug || formData.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
+      // Ensure categoryId and recipeId are strings (or undefined for recipeId)
+      const categoryId = String(formData.categoryId || "").trim();
+      const recipeId = formData.recipeId && String(formData.recipeId).trim() !== ""
+        ? String(formData.recipeId).trim()
+        : undefined;
+
+      if (!categoryId) {
+        alert("Category is required");
+        return;
+      }
+
       const payload: MenuItemPayload = {
         name: formData.name!,
         slug: slug!,
         code: formData.code || "",
         description: formData.description,
-        categoryId: formData.categoryId!,
-        recipeId: formData.recipeId || undefined,
+        categoryId: categoryId,
+        recipeId: recipeId,
         pricing: {
           basePrice: formData.pricing!.basePrice!,
           priceIncludesTax: formData.pricing?.priceIncludesTax || false,
@@ -268,8 +314,6 @@ export default function MenuItemModal({
         branchIds: formData.branchIds || [],
         metadata: formData.metadata || {},
       };
-
-      console.log("📤 Submitting menu item payload:", payload);
 
       await onSubmit(payload);
       onClose();
@@ -376,6 +420,7 @@ export default function MenuItemModal({
             <div className="space-y-2">
               <Label htmlFor="categoryId">Category *</Label>
               <Select
+                key={`category-${formData.categoryId || 'empty'}-${isOpen}`}
                 value={formData.categoryId || ""}
                 onValueChange={(value) => handleFieldChange("categoryId", value)}
               >
@@ -383,19 +428,27 @@ export default function MenuItemModal({
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat: any) => (
-                    <SelectItem key={cat._id || cat.id} value={cat._id || cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
+                  {categories.map((cat: any) => {
+                    const catValue = String(cat._id || cat.id);
+                    return (
+                      <SelectItem key={catValue} value={catValue}>
+                        {cat.name}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
+              {/* Debug info - remove before production */}
+              <p className="text-xs text-gray-500">
+                Selected: {String(formData.categoryId || 'None')} | Available: {categories.length}
+              </p>
             </div>
 
             {/* Recipe (Optional) */}
             <div className="space-y-2">
               <Label htmlFor="recipeId">Recipe (Optional)</Label>
               <Select
+                key={`recipe-${formData.recipeId || 'none'}-${isOpen}`}
                 value={formData.recipeId || "none"}
                 onValueChange={(value) => handleFieldChange("recipeId", value === "none" ? "" : value)}
               >
@@ -404,13 +457,20 @@ export default function MenuItemModal({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">None</SelectItem>
-                  {recipes.map((recipe: any) => (
-                    <SelectItem key={recipe._id || recipe.id} value={recipe._id || recipe.id}>
-                      {recipe.name}
-                    </SelectItem>
-                  ))}
+                  {recipes.map((recipe: any) => {
+                    const recipeValue = String(recipe._id || recipe.id);
+                    return (
+                      <SelectItem key={recipeValue} value={recipeValue}>
+                        {recipe.name}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
+              {/* Debug info - remove before production */}
+              <p className="text-xs text-gray-500">
+                Selected: {String(formData.recipeId || 'None')} | Available: {recipes.length}
+              </p>
             </div>
 
             {/* Recipe Variations Display */}

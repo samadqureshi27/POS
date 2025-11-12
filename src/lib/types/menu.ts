@@ -29,14 +29,23 @@ export interface MenuCategoryPayload {
 
 // ===== MENU ITEM TYPES =====
 
+// Helper types for populated fields
+export interface PopulatedRef {
+  _id?: string;
+  id?: string;
+  name?: string;
+  slug?: string;
+}
+
+// MenuItem can have populated categoryId/recipeId or string IDs
 export interface MenuItem {
   _id?: string;
   name: string;
   slug: string;
   code: string;
   description?: string;
-  categoryId: string;
-  recipeId?: string;
+  categoryId: string | PopulatedRef;
+  recipeId?: string | PopulatedRef;
   pricing: {
     basePrice: number;
     priceIncludesTax: boolean;
@@ -147,6 +156,17 @@ export type MenuStatus = typeof MENU_STATUS[number];
 
 export const CURRENCY_OPTIONS = ["SAR", "USD", "EUR", "GBP"] as const;
 export type Currency = typeof CURRENCY_OPTIONS[number];
+
+// ===== HELPER FUNCTIONS =====
+
+/**
+ * Extract string ID from either a string or populated reference object
+ */
+export function extractId(value: string | PopulatedRef | undefined | null): string {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value._id || value.id || "";
+}
 
 // ===== DISPLAY/UI TYPES =====
 

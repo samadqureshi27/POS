@@ -18,14 +18,11 @@ export const useRecipeData = () => {
   const ingredients: Ingredient[] = inventoryItems.map((item, index) => ({
     ID: item._id || item.id || index,
     Name: item.name,
+    Status: "Active" as "Active" | "Inactive",
+    Description: item.description || "",
     Unit: item.baseUnit || "pc",
-    _id: item._id || item.id,
-    name: item.name,
-    baseUnit: item.baseUnit,
-    sku: item.sku,
-    type: item.type,
-    quantity: item.quantity,
-    reorderPoint: item.reorderPoint,
+    Threshold: item.reorderPoint || 0,
+    Priority: 0,
   }));
 
   // State management
@@ -109,16 +106,17 @@ export const useRecipeData = () => {
           _id: recipe._id,
           Name: recipe.name,
           name: recipe.name, // Also keep lowercase for compatibility
-          Status: recipe.isActive === false ? "Inactive" : "Active",
+          Status: (recipe.isActive === false ? "Inactive" : "Active") as "Active" | "Inactive",
           Description: recipe.description || "",
           type: recipe.type || "sub",
           Priority: 0,
           price: recipe.totalCost || 0,
-          OptionValue: "",
-          OptionPrice: 0,
-          IngredientValue: "",
-          IngredientPrice: 0,
-          Ingredients: recipe.ingredients || [],
+          OptionValue: [] as string[],
+          OptionPrice: [] as number[],
+          IngredientValue: [] as string[],
+          IngredientPrice: [] as number[],
+          Ingredients: recipe.ingredients || [], // Uppercase for compatibility
+          ingredients: recipe.ingredients || [], // Lowercase for display
         }));
         setAvailableRecipeOptions(transformedRecipes);
       } else {
@@ -164,20 +162,21 @@ export const useRecipeData = () => {
         }
 
         // Transform recipes to match the expected format
-        const transformedRecipes = recipesArray.map((recipe: any) => ({
+        const transformedRecipes: RecipeOption[] = recipesArray.map((recipe: any) => ({
           ID: recipe._id || recipe.id,
           _id: recipe._id,
           Name: recipe.name,
-          Status: recipe.isActive === false ? "Inactive" : "Active",
+          Status: (recipe.isActive === false ? "Inactive" : "Active") as "Active" | "Inactive",
           Description: recipe.description || "",
           type: recipe.type || "sub",
           Priority: 0,
           price: recipe.totalCost || 0,
-          OptionValue: "",
-          OptionPrice: 0,
-          IngredientValue: "",
-          IngredientPrice: 0,
-          Ingredients: recipe.ingredients || [], // Include ingredients for display
+          OptionValue: [] as string[],
+          OptionPrice: [] as number[],
+          IngredientValue: [] as string[],
+          IngredientPrice: [] as number[],
+          Ingredients: recipe.ingredients || [], // Uppercase for compatibility
+          ingredients: recipe.ingredients || [], // Lowercase for display
           totalCost: recipe.totalCost || 0,
         }));
         setRecipeOptions(transformedRecipes);
@@ -361,23 +360,25 @@ export const useRecipeData = () => {
     try {
       console.log("🔄 openEditModal called with item:", item);
 
-      // Fetch full recipe details including ingredients
+      // Fetch full recipe details including ingredients (without variants for edit modal)
       const recipeId = item._id || item.ID.toString();
       console.log("📡 Fetching recipe details for ID:", recipeId);
 
-      const response = await RecipeService.getRecipe(recipeId);
+      const response = await RecipeService.getRecipe(recipeId, false);
       console.log("📦 Recipe details response:", response);
 
       if (response.success && response.data) {
-        console.log("✅ Recipe data received:", response.data);
-        console.log("  - Ingredients count:", response.data.ingredients?.length || 0);
-        console.log("  - Ingredients:", response.data.ingredients);
+        // Extract the actual recipe from the nested structure
+        const recipeData = response.data.recipe || response.data;
+        console.log("✅ Recipe data received:", recipeData);
+        console.log("  - Ingredients count:", recipeData.ingredients?.length || 0);
+        console.log("  - Ingredients:", recipeData.ingredients);
 
         // Merge the full recipe data with the item
         const fullRecipe = {
           ...item,
-          ingredients: response.data.ingredients || [],
-          description: response.data.description,
+          ingredients: recipeData.ingredients || [],
+          description: recipeData.description,
         };
         console.log("🔀 Merged full recipe:", fullRecipe);
         setEditingItem(fullRecipe as any);
