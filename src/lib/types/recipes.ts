@@ -2,11 +2,14 @@
 
 export interface RecipeOption {
   ID: number;
+  _id?: string; // MongoDB ID for API operations
   Name: string;
+  name?: string; // Lowercase for compatibility
   Status: "Active" | "Inactive";
   Description: string; // Make required instead of optional
   Category?: string;
   Price?: number;
+  price?: number; // Lowercase for compatibility
   PrepTime?: number;
   CookTime?: number;
   Servings?: number;
@@ -18,6 +21,9 @@ export interface RecipeOption {
   IngredientValue: string[];
   IngredientPrice: number[];
   Priority: number;
+  type?: string; // Recipe type (sub/final)
+  totalCost?: number; // Total cost for display
+  ingredients?: any[]; // Lowercase for display compatibility
   Ingredients?: RecipeIngredient[];
 }
 
