@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, Plus, X } from "lucide-react";
+import { RecipeService } from "@/lib/services/recipe-service";
+import { RecipeVariantService } from "@/lib/services/recipe-variant-service";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,6 +60,8 @@ export default function MenuItemModal({
   });
 
   const [currentTag, setCurrentTag] = useState("");
+  const [recipeVariations, setRecipeVariations] = useState<any[]>([]);
+  const [loadingVariations, setLoadingVariations] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -66,8 +70,8 @@ export default function MenuItemModal({
         const raw = editingItem._raw;
         setFormData({
           name: raw.name,
-          slug: raw.slug,
-          code: raw.code,
+          slug: raw.slug || "",
+          code: raw.code || "",
           description: raw.description || "",
           categoryId: raw.categoryId || "",
           recipeId: raw.recipeId || "",
@@ -87,8 +91,8 @@ export default function MenuItemModal({
         // Fallback if no raw data
         setFormData({
           name: editingItem.Name,
-          slug: editingItem.Name.toLowerCase().replace(/\s+/g, '-'),
-          code: editingItem.Code,
+          slug: editingItem.Slug || "",
+          code: editingItem.Code || "",
           description: editingItem.Description || "",
           categoryId: editingItem.CategoryId || "",
           recipeId: editingItem.RecipeId || "",
@@ -129,13 +133,77 @@ export default function MenuItemModal({
     }
   }, [isOpen, editingItem]);
 
-  const handleFieldChange = (field: keyof MenuItemPayload, value: any) => {
+  const handleFieldChange = async (field: keyof MenuItemPayload, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
 
-    // Auto-generate slug from name
-    if (field === "name" && typeof value === "string") {
-      const slug = value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      setFormData((prev) => ({ ...prev, slug }));
+    // When recipe is selected, fetch recipe details with variants (single API call)
+    if (field === "recipeId" && value) {
+      try {
+        console.log("🔄 Fetching recipe with variants for:", value);
+        setLoadingVariations(true);
+
+        // Fetch recipe with variants from /t/recipes/:id/with-variants
+        const recipeResponse = await RecipeService.getRecipe(value, true);
+        setLoadingVariations(false);
+
+        if (recipeResponse.success && recipeResponse.data) {
+          const { recipe, variants } = recipeResponse.data;
+          console.log("✅ Recipe fetched:", recipe);
+          console.log("✅ Variants included:", variants?.length || 0);
+
+          // Auto-populate fields from recipe
+          setFormData((prev) => {
+            const updates: any = {
+              ...prev,
+              recipeId: value,
+            };
+
+            // Auto-fill name if empty (use recipe name)
+            if (recipe?.name && !prev.name) {
+              updates.name = recipe.name;
+              console.log("✅ Auto-filled name:", recipe.name);
+            }
+
+            // Auto-fill description if empty
+            if (recipe?.description && !prev.description) {
+              updates.description = recipe.description;
+              console.log("✅ Auto-filled description:", recipe.description);
+            }
+
+            // Auto-fill base price from recipe's totalCost (even if 0)
+            if (recipe?.totalCost !== undefined) {
+              updates.pricing = {
+                ...prev.pricing,
+                basePrice: recipe.totalCost || 0,
+                priceIncludesTax: prev.pricing?.priceIncludesTax || false,
+                currency: prev.pricing?.currency || "SAR",
+              };
+              console.log("✅ Auto-filled base price:", recipe.totalCost);
+            }
+
+            return updates;
+          });
+
+          // Set recipe variations
+          if (variants && Array.isArray(variants)) {
+            console.log("✅ Setting recipe variations:", variants.length);
+            setRecipeVariations(variants);
+          } else {
+            console.log("⚠️ No variations found");
+            setRecipeVariations([]);
+          }
+        } else {
+          console.log("⚠️ Recipe fetch failed:", recipeResponse.message);
+          setRecipeVariations([]);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching recipe details:", error);
+        setLoadingVariations(false);
+        setRecipeVariations([]);
+      }
+    } else if (field === "recipeId" && !value) {
+      // Clear variations if recipe is deselected
+      setRecipeVariations([]);
     }
   };
 
@@ -167,8 +235,8 @@ export default function MenuItemModal({
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.slug || !formData.code || !formData.categoryId) {
-      alert("Please fill in all required fields (Name, Slug, Code, Category)");
+    if (!formData.name || !formData.categoryId) {
+      alert("Please fill in all required fields (Name, Category)");
       return;
     }
 
@@ -178,10 +246,13 @@ export default function MenuItemModal({
     }
 
     try {
+      // Generate slug from name if not provided
+      const slug = formData.slug || formData.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
       const payload: MenuItemPayload = {
         name: formData.name!,
-        slug: formData.slug!,
-        code: formData.code!,
+        slug: slug!,
+        code: formData.code || "",
         description: formData.description,
         categoryId: formData.categoryId!,
         recipeId: formData.recipeId || undefined,
@@ -197,6 +268,8 @@ export default function MenuItemModal({
         branchIds: formData.branchIds || [],
         metadata: formData.metadata || {},
       };
+
+      console.log("📤 Submitting menu item payload:", payload);
 
       await onSubmit(payload);
       onClose();
@@ -263,27 +336,28 @@ export default function MenuItemModal({
               />
             </div>
 
-            {/* Slug */}
+            {/* Slug (Auto-generated preview) */}
             <div className="space-y-2">
-              <Label htmlFor="slug">Slug *</Label>
+              <Label htmlFor="slug">Slug (Auto-generated)</Label>
               <Input
                 id="slug"
-                value={formData.slug || ""}
-                onChange={(e) => handleFieldChange("slug", e.target.value)}
-                placeholder="e.g., fajita-pizza"
+                value={formData.name ? formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : "Will be generated from name"}
+                disabled
+                className="bg-gray-50 text-gray-500 cursor-not-allowed"
               />
-              <p className="text-xs text-gray-500">URL-friendly identifier</p>
+              <p className="text-xs text-gray-500">This slug will be auto-generated from the item name</p>
             </div>
 
-            {/* Code */}
+            {/* Code (Future functionality) */}
             <div className="space-y-2">
-              <Label htmlFor="code">Code *</Label>
+              <Label htmlFor="code">Code (Future functionality)</Label>
               <Input
                 id="code"
-                value={formData.code || ""}
-                onChange={(e) => handleFieldChange("code", e.target.value)}
-                placeholder="e.g., MI-FJP"
+                value={formData.code || "Coming soon"}
+                disabled
+                className="bg-gray-50 text-gray-500 cursor-not-allowed"
               />
+              <p className="text-xs text-gray-500">This feature will be available in a future update</p>
             </div>
 
             {/* Description */}
@@ -338,6 +412,69 @@ export default function MenuItemModal({
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Recipe Variations Display */}
+            {formData.recipeId && (
+              <div className="space-y-3 pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold text-gray-900">Recipe Variations</Label>
+                  {loadingVariations && (
+                    <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                  )}
+                </div>
+
+                {!loadingVariations && recipeVariations.length === 0 && (
+                  <div className="text-sm text-gray-500 italic bg-gray-50 p-4 rounded-lg text-center">
+                    No variations found for this recipe
+                  </div>
+                )}
+
+                {!loadingVariations && recipeVariations.length > 0 && (
+                  <div className="grid grid-cols-1 gap-2">
+                    {recipeVariations.map((variation: any, index: number) => (
+                      <div
+                        key={variation._id || index}
+                        className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 hover:border-blue-300 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${
+                            variation.type === 'size' ? 'bg-blue-500' :
+                            variation.type === 'flavor' ? 'bg-purple-500' :
+                            variation.type === 'crust' ? 'bg-orange-500' :
+                            'bg-green-500'
+                          }`} />
+                          <div>
+                            <div className="font-medium text-gray-900">{variation.name}</div>
+                            {variation.description && (
+                              <div className="text-xs text-gray-600">{variation.description}</div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                            variation.type === 'size' ? 'bg-blue-100 text-blue-700' :
+                            variation.type === 'flavor' ? 'bg-purple-100 text-purple-700' :
+                            variation.type === 'crust' ? 'bg-orange-100 text-orange-700' :
+                            'bg-green-100 text-green-700'
+                          }`}>
+                            {variation.type}
+                          </span>
+                          {variation.baseCostAdjustment && (
+                            <span className="text-sm font-semibold text-gray-700">
+                              +${variation.baseCostAdjustment.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <p className="text-xs text-gray-500 mt-2">
+                  These variations are associated with the selected recipe and can affect pricing
+                </p>
+              </div>
+            )}
               </TabsContent>
 
               <TabsContent value="pricing" className="mt-0 space-y-6">

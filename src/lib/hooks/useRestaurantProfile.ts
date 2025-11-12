@@ -9,6 +9,7 @@ export const useRestaurantProfile = () => {
     const [formData, setFormData] = useState<RestaurantData>({
         name: "",
         type: "",
+        ownerName: "",
         contact: "",
         email: "",
         address: "",

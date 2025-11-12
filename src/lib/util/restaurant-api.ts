@@ -10,6 +10,7 @@ export class RestaurantAPI {
     private static mockData: Omit<RestaurantData, "logo"> = {
         name: "",
         type: "",
+        ownerName: "",
         contact: "",
         email: "",
         address: "",

@@ -23,7 +23,7 @@ export interface ApiListResponse<T> {
 
 const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
 const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "true").toLowerCase() === "true";
-const CATEGORIES_BASE = "/t/catalog/categories";
+const CATEGORIES_BASE = "/t/menu/categories";
 
 function buildUrl(path: string) {
   return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
