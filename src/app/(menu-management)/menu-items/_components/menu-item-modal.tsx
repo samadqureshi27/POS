@@ -315,6 +315,8 @@ export default function MenuItemModal({
         metadata: formData.metadata || {},
       };
 
+      console.log("📤 Submitting menu item payload:", payload);
+
       await onSubmit(payload);
       onClose();
     } catch (error) {
