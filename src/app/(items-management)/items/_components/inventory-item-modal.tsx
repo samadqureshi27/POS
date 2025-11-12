@@ -376,7 +376,7 @@ export default function InventoryItemModal({
 
                     {/* Category Suggestions Dropdown */}
                     {showCategorySuggestions && filteredCategories.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-48 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-[100] max-h-48 overflow-y-auto">
                         {filteredCategories.map((cat) => (
                           <button
                             key={cat._id || cat.id}
@@ -544,31 +544,6 @@ export default function InventoryItemModal({
                     </p>
                   </div>
                 </>
-              )}
-              {/* Track Stock - Only show toggle for service items */}
-              {formData.type === "service" && (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label className="text-gray-700 font-medium">Track Stock Levels</Label>
-                      <p className="text-gray-500 text-xs mt-1">
-                        Monitor and manage inventory quantities for this service item
-                      </p>
-                    </div>
-                    <Switch
-                      checked={formData.trackStock ?? false}
-                      onCheckedChange={(checked) => handleFieldChange("trackStock", checked)}
-                    />
-                  </div>
-                </div>
-              )}
-              {/* Info message for stock items */}
-              {formData.type === "stock" && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-blue-700 text-sm">
-                    ℹ️ Stock tracking is automatically enabled for stock items
-                  </p>
-                </div>
               )}
             </TabsContent>
 
