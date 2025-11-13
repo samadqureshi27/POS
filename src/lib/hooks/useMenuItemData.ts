@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { MenuService } from "@/lib/services/menu-service";
 import { MenuCategoryService } from "@/lib/services/menu-category-service";
 import { RecipeService } from "@/lib/services/recipe-service";
-import { MenuItem, MenuItemOption, ToastMessage } from "@/lib/types/menu";
+import { MenuItem, MenuItemOption, ToastMessage, extractId } from "@/lib/types/menu";
 
 export const useMenuItemData = () => {
   // State management
@@ -97,9 +97,13 @@ export const useMenuItemData = () => {
 
         // Transform menu items to match the expected format
         const transformedItems = itemsArray.map((item: any) => {
+          // Extract string IDs from potentially populated objects
+          const categoryId = extractId(item.categoryId);
+          const recipeId = extractId(item.recipeId);
+
           // Find category and recipe names
-          const category = categories.find(c => c._id === item.categoryId);
-          const recipe = recipes.find(r => r._id === item.recipeId);
+          const category = categories.find(c => c._id === categoryId);
+          const recipe = recipes.find(r => r._id === recipeId);
 
           return {
             ID: item._id || item.id,
@@ -108,9 +112,9 @@ export const useMenuItemData = () => {
             Status: item.isActive === false ? "Inactive" : "Active",
             Description: item.description || "",
             Category: category?.name || "",
-            CategoryId: item.categoryId || "",
+            CategoryId: categoryId,
             Recipe: recipe?.name || "",
-            RecipeId: item.recipeId || "",
+            RecipeId: recipeId,
             BasePrice: item.pricing?.basePrice || 0,
             Currency: item.pricing?.currency || "SAR",
             PriceIncludesTax: item.pricing?.priceIncludesTax || false,

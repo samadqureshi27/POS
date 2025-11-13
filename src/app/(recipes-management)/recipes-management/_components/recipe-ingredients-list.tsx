@@ -198,7 +198,7 @@ export function RecipeIngredientsList({
                 <Label className="mb-1.5 block text-xs font-medium text-gray-700">
                   {ingredient.sourceType === "inventory" ? "Search Inventory" : "Search Sub Recipe"}
                 </Label>
-                <div className="relative">
+                <div className="relative group">
                   <Input
                     value={ingredientInputs[index] || ""}
                     onChange={(e) => onIngredientInputChange(index, e.target.value)}
@@ -219,11 +219,12 @@ export function RecipeIngredientsList({
                         ? "border-green-300 focus:border-green-500"
                         : "border-gray-300 focus:border-blue-500"
                     }`}
+                    id={`ingredient-input-${index}`}
                   />
                   <button
                     type="button"
                     onClick={() => onToggleDropdown(index)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10"
                   >
                     <ChevronDown className="h-3.5 w-3.5" />
                   </button>
@@ -278,7 +279,7 @@ export function RecipeIngredientsList({
                       )}
                     </div>
                   )}
-                </div>
+                    </div>
               </div>
 
               {/* Quantity & Unit Row - Professional POS Layout */}
