@@ -1,4 +1,15 @@
 // types/interfaces.ts
+export interface AddonItemValue {
+  sourceType: "inventory" | "recipe";
+  sourceId: string;
+  nameSnapshot: string;
+  price: number;
+  unit?: string;
+  isRequired?: boolean;
+  displayOrder?: number;
+  backendId?: string; // For editing
+}
+
 export interface MenuItemOptions {
   ID: number;
   Name: string;
@@ -10,6 +21,11 @@ export interface MenuItemOptions {
   selection?: "single" | "multiple"; // Backend selection type
   min?: number; // Backend min selections
   max?: number; // Backend max selections
+  // New add-ons structure
+  categoryId?: string; // Menu category ID
+  groupId?: string; // Add-on group ID
+  groupName?: string; // For display
+  addonItems?: AddonItemValue[]; // New structure for add-on items
 }
 
 export interface ApiResponse<T> {

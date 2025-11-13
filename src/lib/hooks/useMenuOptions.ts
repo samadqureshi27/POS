@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { ModifierService, TenantModifier } from "@/lib/services/modifier-service";
 import { MenuItemOptions } from "@/lib/types/menuItemOptions";
 import { useToast } from "@/lib/hooks";
+import { AddonsGroupsService } from "@/lib/services/addons-groups-service";
+import { AddonsItemsService } from "@/lib/services/addons-items-service";
 
 // Map API Modifier to frontend MenuItemOptions
 const mapApiModifierToItem = (apiMod: TenantModifier, index: number): MenuItemOptions => {
@@ -56,6 +58,10 @@ export const useMenuOptions = () => {
         Priority: 1,
         OptionValue: [],
         OptionPrice: [],
+        categoryId: undefined,
+        groupId: undefined,
+        groupName: undefined,
+        addonItems: [],
     });
 
     useEffect(() => {
@@ -74,6 +80,10 @@ export const useMenuOptions = () => {
                 selection: editingItem.selection,
                 min: editingItem.min,
                 max: editingItem.max,
+                categoryId: editingItem.categoryId,
+                groupId: editingItem.groupId,
+                groupName: editingItem.groupName,
+                addonItems: editingItem.addonItems ? [...editingItem.addonItems] : [],
             });
         } else {
             const maxPriority = MenuItemOptionss.length > 0
@@ -86,6 +96,10 @@ export const useMenuOptions = () => {
                 OptionValue: [],
                 OptionPrice: [],
                 Priority: maxPriority + 1,
+                categoryId: undefined,
+                groupId: undefined,
+                groupName: undefined,
+                addonItems: [],
             });
         }
     }, [editingItem, isModalOpen, MenuItemOptionss]);
@@ -122,53 +136,51 @@ export const useMenuOptions = () => {
         try {
             setActionLoading(true);
 
-            // Map DisplayType to selection + min/max
-            let selection: "single" | "multiple" = "single";
-            let min = 0;
-            let max = 1;
-
-            if (itemData.DisplayType === "Checkbox") {
-                selection = "multiple";
-                min = 0;
-                max = itemData.OptionValue.length;
-            } else if (itemData.DisplayType === "Select") {
-                selection = "single";
-                min = 0;
-                max = itemData.OptionValue.length;
-            } else { // Radio
-                selection = "single";
-                min = 0;
-                max = 1;
+            // Validate required fields for new add-ons structure
+            if (!itemData.categoryId) {
+                showToast("Please select a menu category", "error");
+                return;
             }
 
-            // Convert parallel arrays to options array
-            const options = itemData.OptionValue.map((name, idx) => ({
-                name,
-                price: itemData.OptionPrice[idx] || 0,
-            }));
+            if (!itemData.groupId) {
+                showToast("Please select or create an add-on group", "error");
+                return;
+            }
 
-            const payload: Partial<TenantModifier> = {
-                name: itemData.Name,
-                selection,
-                min,
-                max,
-                options,
+            if (!itemData.addonItems || itemData.addonItems.length === 0) {
+                showToast("Please add at least one add-on item", "error");
+                return;
+            }
+
+            // Bulk create add-on items using the new API
+            const bulkPayload = {
+                groupId: itemData.groupId,
+                categoryId: itemData.categoryId,
+                items: itemData.addonItems.map((item, idx) => ({
+                    sourceType: item.sourceType,
+                    sourceId: item.sourceId,
+                    nameSnapshot: item.nameSnapshot,
+                    price: item.price,
+                    unit: item.unit || "unit",
+                    isRequired: item.isRequired || false,
+                    displayOrder: item.displayOrder || idx + 1,
+                })),
             };
 
-            const response = await ModifierService.createModifier(payload);
+            const response = await AddonsItemsService.bulkCreateItems(bulkPayload);
             if (response.success) {
                 await loadMenuItemOptionss(); // Reload list
                 setIsModalOpen(false);
                 setEditingItem(null);
                 setSearchTerm("");
                 setDisplayFilter("");
-                showToast(response.message || "Modifier created successfully", "success");
+                showToast("Add-on items created successfully", "success");
             } else {
-                showToast(response.message || "Failed to create modifier", "error");
+                showToast(response.message || "Failed to create add-on items", "error");
             }
         } catch (error) {
-            console.error("Error creating modifier:", error);
-            showToast(error instanceof Error ? error.message : "Failed to create modifier", "error");
+            console.error("Error creating add-on items:", error);
+            showToast(error instanceof Error ? error.message : "Failed to create add-on items", "error");
         } finally {
             setActionLoading(false);
         }
@@ -276,16 +288,20 @@ export const useMenuOptions = () => {
     };
 
     const isFormValid = () => {
+        // Validate basic fields
         if (!formData.Name.trim()) return false;
         if (!formData.DisplayType.trim()) return false;
+        if (!formData.categoryId) return false;
+        if (!formData.groupId) return false;
 
-        if (formData.OptionValue.length > 0) {
-            if (formData.OptionValue.length !== formData.OptionPrice.length) return false;
+        // Validate addon items
+        if (!formData.addonItems || formData.addonItems.length === 0) return false;
 
-            for (let i = 0; i < formData.OptionValue.length; i++) {
-                if (!formData.OptionValue[i] || !formData.OptionValue[i].trim()) return false;
-                if (formData.OptionPrice[i] == null || formData.OptionPrice[i] < 0) return false;
-            }
+        for (const item of formData.addonItems) {
+            if (!item.sourceType) return false;
+            if (!item.sourceId) return false;
+            if (!item.nameSnapshot || !item.nameSnapshot.trim()) return false;
+            if (item.price == null || item.price < 0) return false;
         }
 
         return true;
