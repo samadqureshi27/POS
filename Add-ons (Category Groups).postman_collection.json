@@ -1,0 +1,376 @@
+{
+	"info": {
+		"_postman_id": "73e40caf-8e5a-4e5a-ab7e-f28d5442c711",
+		"name": "Add-ons (Category Groups)",
+		"description": "Manage category-linked add-on groups and items with bulk support. Simple required/optional flags; price; inventory/recipe sources.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48720699",
+		"_collection_link": "https://qabdulsamad18-8144213.postman.co/workspace/samad's-Workspace~d933fcd7-cd8e-4fa4-8349-f7c0e98781cf/collection/48720699-73e40caf-8e5a-4e5a-ab7e-f28d5442c711?action=share&source=collection_link&creator=48720699"
+	},
+	"item": [
+		{
+			"name": "Groups",
+			"item": [
+				{
+					"name": "Create Group (e.g., SAUCES)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryId\": \"<menuCategoryId>\",\n  \"name\": \"SAUCES\",\n  \"description\": \"All wrap sauces\",\n  \"isActive\": true,\n  \"displayOrder\": 0\n}"
+						},
+						"url": {
+							"raw": "localhost:3000/t/addons/groups",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Groups (by Category)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/t/addons/groups?categoryId=<menuCategoryId>",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"groups"
+							],
+							"query": [
+								{
+									"key": "categoryId",
+									"value": "<menuCategoryId>"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Group",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"name\": \"SAUCES\", \"isActive\": true }"
+						},
+						"url": {
+							"raw": "localhost:3000/t/addons/groups/<groupId>",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"groups",
+								"<groupId>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Group",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/t/addons/groups/<groupId>",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"groups",
+								"<groupId>"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Items",
+			"item": [
+				{
+					"name": "Bulk Create Items (in a Group)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"groupId\": \"<groupId>\",\n  \"categoryId\": \"<menuCategoryId>\",\n  \"items\": [\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"<inventoryItemId_ketchup>\",\n      \"nameSnapshot\": \"Ketchup\",\n      \"price\": 0,\n      \"unit\": \"unit\",\n      \"isRequired\": true,\n      \"displayOrder\": 1\n    },\n    {\n      \"sourceType\": \"inventory\",\n      \"sourceId\": \"<inventoryItemId_mayo>\",\n      \"nameSnapshot\": \"Mayonnaise\",\n      \"price\": 0,\n      \"unit\": \"unit\",\n      \"isRequired\": true,\n      \"displayOrder\": 2\n    },\n    {\n      \"sourceType\": \"recipe\",\n      \"sourceId\": \"<recipeId_garlicSauce>\",\n      \"nameSnapshot\": \"Garlic Sauce\",\n      \"price\": 2,\n      \"unit\": \"unit\",\n      \"isRequired\": false,\n      \"displayOrder\": 3\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "localhost:3000/t/addons/items/bulk",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"items",
+								"bulk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Item (single)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"groupId\": \"<groupId>\",\n  \"categoryId\": \"<menuCategoryId>\",\n  \"sourceType\": \"inventory\",\n  \"sourceId\": \"<inventoryItemId_fries>\",\n  \"nameSnapshot\": \"French Fries\",\n  \"price\": 5,\n  \"unit\": \"portion\",\n  \"isRequired\": false,\n  \"displayOrder\": 1\n}"
+						},
+						"url": {
+							"raw": "localhost:3000/t/addons/items",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Items (by group)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/t/addons/items?groupId=<groupId>",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"items"
+							],
+							"query": [
+								{
+									"key": "groupId",
+									"value": "<groupId>"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"price\": 6, \"isRequired\": false }"
+						},
+						"url": {
+							"raw": "localhost:3000/t/addons/items/<itemId>",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"items",
+								"<itemId>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/t/addons/items/<itemId>",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"items",
+								"<itemId>"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POS Config",
+			"item": [
+				{
+					"name": "Get Config by Category (groups + items)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tenant-id",
+								"value": "tenant_1"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-token"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/t/addons/config/by-category/<menuCategoryId>",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"t",
+								"addons",
+								"config",
+								"by-category",
+								"<menuCategoryId>"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -1,26 +1,115 @@
 // components/OptionValuesForm.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, X, Grip } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import DragTable from '@/components/ui/drag-table';
-import { MenuItemOptions, OptionValuesFormProps } from '@/lib/types/menuItemOptions';
+import { MenuItemOptions, OptionValuesFormProps, AddonItemValue } from '@/lib/types/menuItemOptions';
+import { InventoryService, InventoryItem } from '@/lib/services/inventory-service';
+import { RecipeService, Recipe } from '@/lib/services/recipe-service';
 
 const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDataChange }) => {
-  const addOptionPair = () => {
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Initialize addon items if not present
+  useEffect(() => {
+    if (!formData.addonItems) {
+      onFormDataChange({
+        ...formData,
+        addonItems: [],
+      });
+    }
+  }, []);
+
+  // Load inventory items and recipes
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [inventoryRes, recipeRes] = await Promise.all([
+        InventoryService.listItems({ limit: 1000 }),
+        RecipeService.listRecipes(),
+      ]);
+
+      if (inventoryRes.success && inventoryRes.data) {
+        setInventoryItems(inventoryRes.data);
+      }
+
+      if (recipeRes.success && recipeRes.data) {
+        setRecipes(recipeRes.data);
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addAddonItem = () => {
+    const newItem: AddonItemValue = {
+      sourceType: "inventory",
+      sourceId: "",
+      nameSnapshot: "",
+      price: 0,
+      unit: "unit",
+      isRequired: false,
+      displayOrder: (formData.addonItems?.length || 0) + 1,
+    };
+
     onFormDataChange({
       ...formData,
-      OptionValue: [...formData.OptionValue, ""],
-      OptionPrice: [...formData.OptionPrice, 0],
+      addonItems: [...(formData.addonItems || []), newItem],
     });
   };
 
-  const removeOptionPair = (index: number) => {
+  const removeAddonItem = (index: number) => {
     onFormDataChange({
       ...formData,
-      OptionValue: formData.OptionValue.filter((_, i) => i !== index),
-      OptionPrice: formData.OptionPrice.filter((_, i) => i !== index),
+      addonItems: (formData.addonItems || []).filter((_, i) => i !== index),
+    });
+  };
+
+  const updateAddonItem = (index: number, updates: Partial<AddonItemValue>) => {
+    const updated = [...(formData.addonItems || [])];
+    updated[index] = { ...updated[index], ...updates };
+    onFormDataChange({
+      ...formData,
+      addonItems: updated,
+    });
+  };
+
+  const handleSourceChange = (index: number, sourceType: "inventory" | "recipe") => {
+    updateAddonItem(index, {
+      sourceType,
+      sourceId: "",
+      nameSnapshot: "",
+    });
+  };
+
+  const handleItemSelect = (index: number, sourceId: string) => {
+    const item = formData.addonItems?.[index];
+    if (!item) return;
+
+    let name = "";
+    if (item.sourceType === "inventory") {
+      const invItem = inventoryItems.find(i => (i._id || i.id) === sourceId);
+      name = invItem?.name || "";
+    } else {
+      const recipe = recipes.find(r => r._id === sourceId);
+      name = recipe?.name || "";
+    }
+
+    updateAddonItem(index, {
+      sourceId,
+      nameSnapshot: name,
     });
   };
 
@@ -28,80 +117,124 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
     const { source, destination } = result;
     if (!destination || source.index === destination.index) return;
 
-    const newOptionValue = Array.from(formData.OptionValue);
-    const [movedValue] = newOptionValue.splice(source.index, 1);
-    newOptionValue.splice(destination.index, 0, movedValue);
+    const items = Array.from(formData.addonItems || []);
+    const [movedItem] = items.splice(source.index, 1);
+    items.splice(destination.index, 0, movedItem);
 
-    const newOptionPrice = Array.from(formData.OptionPrice);
-    const [movedPrice] = newOptionPrice.splice(source.index, 1);
-    newOptionPrice.splice(destination.index, 0, movedPrice);
+    // Update display orders
+    const updatedItems = items.map((item, idx) => ({
+      ...item,
+      displayOrder: idx + 1,
+    }));
 
     onFormDataChange({
       ...formData,
-      OptionValue: newOptionValue,
-      OptionPrice: newOptionPrice,
+      addonItems: updatedItems,
     });
   };
 
-  const updateValue = (index: number, value: string) => {
-    const updated = [...formData.OptionValue];
-    updated[index] = value;
-    onFormDataChange({
-      ...formData,
-      OptionValue: updated,
-    });
-  };
-
-  const updatePrice = (index: number, value: number) => {
-    const updated = [...formData.OptionPrice];
-    updated[index] = value;
-    onFormDataChange({
-      ...formData,
-      OptionPrice: updated,
-    });
+  const getSourceItems = (sourceType: "inventory" | "recipe") => {
+    if (sourceType === "inventory") {
+      return inventoryItems;
+    }
+    return recipes;
   };
 
   // Prepare data for DragTable
-  const tableData = formData.OptionValue.map((value: string, idx: number) => ({
-    value: value,
-    price: formData.OptionPrice[idx] || 0,
+  const tableData = (formData.addonItems || []).map((item, idx) => ({
+    ...item,
     index: idx
   }));
 
   const tableColumns = [
     {
-      key: 'value',
-      label: 'Value Name',
-      width: 'minmax(200px, 1fr)',
-      render: (value: string, item: any, index: number) => (
-        <Input
-          type="text"
+      key: 'sourceType',
+      label: 'Source Type',
+      width: '140px',
+      render: (value: string, item: AddonItemValue, index: number) => (
+        <Select
           value={value}
-          onChange={(e) => updateValue(index, e.target.value)}
-          placeholder="Option value (e.g., Small, Medium, Large)"
-          className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 w-full min-w-0"
-        />
+          onValueChange={(val) => handleSourceChange(index, val as "inventory" | "recipe")}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="inventory">Inventory</SelectItem>
+            <SelectItem value="recipe">Recipe</SelectItem>
+          </SelectContent>
+        </Select>
+      )
+    },
+    {
+      key: 'sourceId',
+      label: 'Item',
+      width: 'minmax(200px, 1fr)',
+      render: (value: string, item: AddonItemValue, index: number) => (
+        <Select
+          value={value}
+          onValueChange={(val) => handleItemSelect(index, val)}
+          disabled={!item.sourceType}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select item" />
+          </SelectTrigger>
+          <SelectContent>
+            {getSourceItems(item.sourceType).map((sourceItem: any) => (
+              <SelectItem key={sourceItem._id || sourceItem.id} value={sourceItem._id || sourceItem.id || ''}>
+                {sourceItem.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       )
     },
     {
       key: 'price',
       label: 'Price',
-      width: '120px',
-      render: (value: number, item: any, index: number) => (
+      width: '100px',
+      render: (value: number, item: AddonItemValue, index: number) => (
         <Input
           type="number"
           step="0.01"
           min="0"
           value={value}
-          onChange={(e) => updatePrice(index, Number(e.target.value) || 0)}
-          className="w-full text-center transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 min-w-0"
+          onChange={(e) => updateAddonItem(index, { price: Number(e.target.value) || 0 })}
+          className="w-full text-center"
           placeholder="0.00"
         />
+      )
+    },
+    {
+      key: 'unit',
+      label: 'Unit',
+      width: '100px',
+      render: (value: string, item: AddonItemValue, index: number) => (
+        <Input
+          type="text"
+          value={value || 'unit'}
+          onChange={(e) => updateAddonItem(index, { unit: e.target.value })}
+          className="w-full"
+          placeholder="unit"
+        />
+      )
+    },
+    {
+      key: 'isRequired',
+      label: 'Required',
+      width: '80px',
+      render: (value: boolean, item: AddonItemValue, index: number) => (
+        <div className="flex justify-center">
+          <Checkbox
+            checked={value || false}
+            onCheckedChange={(checked) => updateAddonItem(index, { isRequired: checked as boolean })}
+          />
+        </div>
       )
     }
   ];
 
-  const hasOptions = formData.OptionValue && formData.OptionValue.length > 0;
+  const hasItems = formData.addonItems && formData.addonItems.length > 0;
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -109,10 +242,10 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
       <div className="flex-shrink-0 space-y-4 p-6 bg-white">
         <div>
           <h3 className="text-sm font-semibold text-gray-800">
-            Option Values
+            Add-on Items
           </h3>
           <p className="text-xs text-gray-500 mt-1">
-            Add specific choices customers can select for this option with their respective prices
+            Add items from inventory or recipes as add-on options
           </p>
         </div>
 
@@ -120,26 +253,26 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
           type="button"
           variant="outline"
           size="sm"
-          onClick={addOptionPair}
+          onClick={addAddonItem}
           className="flex items-center gap-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 hover:bg-blue-50"
         >
           <Plus size={16} />
-          Add Option Value
+          Add Item
         </Button>
       </div>
 
       {/* Scrollable Content Area with Fixed Height */}
       <div className="flex-1 min-h-0 overflow-hidden">
-        {hasOptions ? (
+        {hasItems ? (
           <div className="h-full flex flex-col">
             {/* Section Header - Sticky */}
             <div className="flex-shrink-0 px-6 py-3 bg-white border-b border-gray-100 sticky top-0 z-10">
               <h4 className="text-sm font-medium text-gray-700">
-                Option Values ({formData.OptionValue.length})
+                Items ({formData.addonItems?.length || 0})
               </h4>
             </div>
 
-            {/* Scrollable Options List */}
+            {/* Scrollable Items List */}
             <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4">
               {/* Desktop Table Layout */}
               <div className="hidden lg:block h-full">
@@ -149,9 +282,9 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                       data={tableData}
                       columns={tableColumns}
                       onReorder={handleDragEnd}
-                      onDelete={removeOptionPair}
-                      droppableId="option-values"
-                      emptyMessage="No option values added"
+                      onDelete={removeAddonItem}
+                      droppableId="addon-items"
+                      emptyMessage="No items added"
                     />
                   </div>
                 </div>
@@ -159,7 +292,7 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
 
               {/* Mobile Card Layout */}
               <div className="lg:hidden space-y-3">
-                {formData.OptionValue.map((opt, idx) => (
+                {(formData.addonItems || []).map((item, idx) => (
                   <div
                     key={idx}
                     className="flex-shrink-0 p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50/50 transition-colors"
@@ -171,47 +304,95 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="text-sm font-medium text-gray-800 truncate">
-                            Option Value #{idx + 1}
+                            Item #{idx + 1}
                           </div>
-                          <div className="text-xs text-gray-500">Customer choice option</div>
+                          <div className="text-xs text-gray-500">{item.nameSnapshot || 'Not selected'}</div>
                         </div>
                       </div>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => removeOptionPair(idx)}
+                        onClick={() => removeAddonItem(idx)}
                         className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors flex-shrink-0 ml-2"
                       >
                         <X size={16} />
                       </Button>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="min-w-0">
+                    <div className="space-y-3">
+                      <div>
                         <Label className="text-xs font-medium text-gray-700 mb-1 block">
-                          Value Name
+                          Source Type
                         </Label>
-                        <Input
-                          type="text"
-                          value={opt}
-                          onChange={(e) => updateValue(idx, e.target.value)}
-                          placeholder="Option name"
-                          className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 w-full min-w-0"
-                        />
+                        <Select
+                          value={item.sourceType}
+                          onValueChange={(val) => handleSourceChange(idx, val as "inventory" | "recipe")}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="inventory">Inventory</SelectItem>
+                            <SelectItem value="recipe">Recipe</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <div className="min-w-0">
+                      <div>
                         <Label className="text-xs font-medium text-gray-700 mb-1 block">
-                          Price
+                          Item
                         </Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={formData.OptionPrice[idx]}
-                          onChange={(e) => updatePrice(idx, Number(e.target.value) || 0)}
-                          placeholder="0.00"
-                          className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 w-full min-w-0"
+                        <Select
+                          value={item.sourceId}
+                          onValueChange={(val) => handleItemSelect(idx, val)}
+                          disabled={!item.sourceType}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select item" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getSourceItems(item.sourceType).map((sourceItem: any) => (
+                              <SelectItem key={sourceItem._id || sourceItem.id} value={sourceItem._id || sourceItem.id || ''}>
+                                {sourceItem.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-xs font-medium text-gray-700 mb-1 block">
+                            Price
+                          </Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={item.price}
+                            onChange={(e) => updateAddonItem(idx, { price: Number(e.target.value) || 0 })}
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs font-medium text-gray-700 mb-1 block">
+                            Unit
+                          </Label>
+                          <Input
+                            type="text"
+                            value={item.unit || 'unit'}
+                            onChange={(e) => updateAddonItem(idx, { unit: e.target.value })}
+                            placeholder="unit"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id={`required-${idx}`}
+                          checked={item.isRequired || false}
+                          onCheckedChange={(checked) => updateAddonItem(idx, { isRequired: checked as boolean })}
                         />
+                        <Label htmlFor={`required-${idx}`} className="text-xs font-medium text-gray-700">
+                          Required
+                        </Label>
                       </div>
                     </div>
                   </div>
@@ -228,9 +409,9 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
-              <h4 className="text-sm font-medium text-gray-600 mb-1">No option values added</h4>
+              <h4 className="text-sm font-medium text-gray-600 mb-1">No items added</h4>
               <p className="text-xs text-gray-500 px-4">
-                Add option values to provide choices for customers when selecting this option
+                Add items from inventory or recipes to provide choices for customers
               </p>
             </div>
           </div>
