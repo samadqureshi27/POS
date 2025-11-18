@@ -6,6 +6,7 @@ import { useToast } from './toast';
 import { useBranchModal } from "./branchModal";
 import { BranchItem } from "@/lib/types/branch";
 import { BranchService, TenantBranch } from "@/lib/services/branch-service";
+import { BUSINESS_CONFIG } from "@/lib/constants";
 
 export const useBranchManagement = () => {
     const [branchItems, setBranchItems] = useState<BranchItem[]>([]);
@@ -93,8 +94,8 @@ export const useBranchManagement = () => {
             const payload: Partial<TenantBranch> = {
                 name: itemData.Branch_Name,
                 code: code,
-                timezone: "Asia/Karachi", // TODO: Make this configurable
-                currency: "PKR", // TODO: Make this configurable
+                timezone: BUSINESS_CONFIG.DEFAULT_TIMEZONE,
+                currency: BUSINESS_CONFIG.DEFAULT_CURRENCY,
                 status: itemData.Status === "Active" ? "active" : "inactive",
                 address: {
                     line: itemData.Address,
