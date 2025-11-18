@@ -5,6 +5,7 @@ import React from 'react';
 import StatCard from '@/components/ui/summary-card';
 import { ProfilePicture, StarRating, LargeStarRating } from './rating';
 import { CustomerSummaryData } from '@/lib/types/customer-details';
+import { formatDecimal } from '@/lib/util/formatters';
 
 interface CustomerSummaryCardsProps {
     summaryData: CustomerSummaryData;
@@ -54,7 +55,7 @@ const CustomerSummaryCards: React.FC<CustomerSummaryCardsProps> = ({ summaryData
                     </div>
                     <p className="text-1xl text-gray-500">
                         Avg. Feedback Rating{' '}
-                        <span className="text-xl text-gray-500">({averageRating.toFixed(1)})</span>
+                        <span className="text-xl text-gray-500">({formatDecimal(averageRating)})</span>
                     </p>
                 </div>
             </div>

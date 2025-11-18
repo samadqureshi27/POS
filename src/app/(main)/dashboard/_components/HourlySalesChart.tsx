@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
-import { formatCurrency } from "@/lib/util/formatters";
+import { formatCurrency, formatDecimal } from "@/lib/util/formatters";
 
 // Sample data that would come from your POS system
 const hourlySalesData = [
@@ -102,7 +102,7 @@ export const HourlySalesChart: React.FC = () => {
         </div>
         <div>
           <div className="text-2xl font-bold text-amber-600">
-            {(hourlySalesData.reduce((sum, hour) => sum + hour.avgTime, 0) / hourlySalesData.length).toFixed(1)}
+            {formatDecimal(hourlySalesData.reduce((sum, hour) => sum + hour.avgTime, 0) / hourlySalesData.length)}
           </div>
           <div className="text-xs text-gray-600">Avg Time (min)</div>
         </div>
