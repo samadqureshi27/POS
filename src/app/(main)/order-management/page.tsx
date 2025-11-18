@@ -1,7 +1,6 @@
 // page.tsx - Refactored Main Component
 "use client";
 import React, { useState, useEffect } from "react";
-import ActionBar from "@/components/ui/action-bar";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 // Import all our new components

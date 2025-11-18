@@ -2,7 +2,7 @@
 "use client";
 
 import React from 'react';
-import StatCard from '@/components/ui/summary-card';
+import { AdvancedMetricCard } from '@/components/ui/advanced-metric-card';
 import { ProfilePicture, StarRating, LargeStarRating } from './rating';
 import { CustomerSummaryData } from '@/lib/types/customer-details';
 import { formatDecimal } from '@/lib/util/formatters';
@@ -16,14 +16,20 @@ const CustomerSummaryCards: React.FC<CustomerSummaryCardsProps> = ({ summaryData
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[100vw]">
-            <StatCard
+            <AdvancedMetricCard
                 title="Total Customers"
-                value={totalCustomers.toString()}
+                subtitle="All registered"
+                value={totalCustomers}
+                format="number"
+                icon="customers"
             />
 
-            <StatCard
+            <AdvancedMetricCard
                 title="Total Orders"
-                value={totalOrders.toString()}
+                subtitle="All time orders"
+                value={totalOrders}
+                format="number"
+                icon="orders"
             />
 
             <div className="flex items-center justify-start gap-2 min-h-[100px] border  rounded-sm p-4 bg-white shadow-sm hover:shadow-lg transition-shadow duration-200">

@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 import { useRouter } from 'next/navigation';
-import ActionBar from "@/components/ui/action-bar";
+import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import { Toast } from "@/components/ui/toast";
 import CustomerSummaryCards from "./_components/customer-summary-cards";
 import CustomerTable from "./_components/customer-table";
@@ -54,10 +54,11 @@ const CustomerManagementPage = () => {
       {/* Summary Cards */}
       <CustomerSummaryCards summaryData={summaryData} />
 
-      <ActionBar
+      <EnhancedActionBar
         searchValue={searchTerm}
         onSearchChange={setSearchInput}
-        searchPlaceholder="Search"
+        searchPlaceholder="Search customers by name, email, or phone..."
+        showViewToggle={false}
       />
 
       {/* Customer Table */}
