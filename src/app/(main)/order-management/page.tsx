@@ -20,6 +20,7 @@ import { OrderAPI } from "@/lib/util/order-api";
 import { useOrderFilters } from "@/lib/hooks/useOrderFilter";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
+import { logError } from "@/lib/util/logger";
 
 const OrderManagementPage = () => {
   const [items, setItems] = useState<OrderItem[]>([]);
@@ -77,7 +78,10 @@ const OrderManagementPage = () => {
         throw new Error(response.message || "Failed to fetch orders");
       }
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      logError("Error fetching orders", error, {
+        component: "OrderManagement",
+        action: "loadOrders",
+      });
       showToast("Failed to load orders", "error");
     } finally {
       setLoading(false);
@@ -94,7 +98,10 @@ const OrderManagementPage = () => {
         throw new Error(response.message || "Failed to fetch order statistics");
       }
     } catch (error) {
-      console.error("Error fetching order stats:", error);
+      logError("Error fetching order stats", error, {
+        component: "OrderManagement",
+        action: "loadOrderStats",
+      });
       showToast("Failed to load order statistics", "error");
     } finally {
       setStatsLoading(false);
