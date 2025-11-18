@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { DataTable, DataTableColumn } from '@/components/ui/data-table';
 import { OrderItem } from '@/lib/types/analytics';
 import { formatCurrency } from '@/lib/util/formatters';
+import { getOrderStatusVariant, type OrderStatus } from '@/lib/util/status-helpers';
 
 interface RecentOrdersTableProps {
   orders: OrderItem[];
@@ -19,19 +20,6 @@ export const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({
   onSearchChange,
   maxRows = 8
 }) => {
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case "Completed":
-        return "default" as const;
-      case "Pending":
-        return "secondary" as const;
-      case "Cancelled":
-        return "destructive" as const;
-      default:
-        return "outline" as const;
-    }
-  };
-
   const getTypeVariant = (type: string) => {
     switch (type) {
       case "Dine in":
@@ -75,7 +63,7 @@ export const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({
       title: "Status",
       dataIndex: "Status",
       render: (value) => (
-        <Badge variant={getStatusVariant(value)} className="text-xs">
+        <Badge variant={getOrderStatusVariant(value as OrderStatus)} className="text-xs">
           {value}
         </Badge>
       )
