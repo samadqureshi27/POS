@@ -273,7 +273,7 @@ const AddOnsPage = () => {
                   {item.OptionPrice && item.OptionPrice.length > 0 && (
                     <div className="text-xs text-gray-500">
                       <span className="font-semibold text-gray-700">
-                        ${Math.min(...item.OptionPrice).toFixed(2)} - ${Math.max(...item.OptionPrice).toFixed(2)}
+                        ${formatPrice(Math.min(...item.OptionPrice))} - ${formatPrice(Math.max(...item.OptionPrice))}
                       </span>
                     </div>
                   )}

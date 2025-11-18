@@ -55,7 +55,7 @@ const RecipeVariantTable: React.FC<RecipeVariantTableProps> = ({
   // Helper function to format cost adjustment
   const formatCostAdjustment = (cost: number) => {
     if (cost === 0) return "No change";
-    return cost > 0 ? `+$${cost.toFixed(2)}` : `-$${Math.abs(cost).toFixed(2)}`;
+    return cost > 0 ? `+$${formatPrice(cost)}` : `-$${formatPrice(Math.abs(cost))}`;
   };
 
   // Helper function to format size multiplier

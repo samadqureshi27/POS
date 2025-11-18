@@ -522,7 +522,7 @@ export default function MenuItemModal({
                           </span>
                           {variation.baseCostAdjustment && (
                             <span className="text-sm font-semibold text-gray-700">
-                              +${variation.baseCostAdjustment.toFixed(2)}
+                              +${formatPrice(variation.baseCostAdjustment)}
                             </span>
                           )}
                         </div>
