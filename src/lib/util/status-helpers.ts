@@ -140,11 +140,11 @@ export function getStatusBgClass(status: string): string {
     return "bg-green-100 text-green-700";
   }
 
-  if (normalized.includes("pending") || normalized.includes("processing")) {
+  if (normalized.includes("pending") || normalized.includes("processing") || normalized.includes("progress")) {
     return "bg-blue-100 text-blue-700";
   }
 
-  if (normalized.includes("inactive") || normalized.includes("cancel")) {
+  if (normalized.includes("inactive") || normalized.includes("cancel") || normalized.includes("fail")) {
     return "bg-red-100 text-red-700";
   }
 
