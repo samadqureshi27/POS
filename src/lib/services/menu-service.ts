@@ -77,7 +77,6 @@ export class MenuService {
       });
 
       const data = await response.json();
-      console.log("🔍 MenuService.listMenuItems - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -104,8 +103,6 @@ export class MenuService {
         items = data.menuItems;
       }
 
-      console.log("✅ MenuService.listMenuItems - Extracted items:", Array.isArray(items) ? items.length : typeof items);
-
       return {
         success: true,
         data: items,
@@ -130,7 +127,6 @@ export class MenuService {
       });
 
       const data = await response.json();
-      console.log("🔍 MenuService.getMenuItem - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -150,8 +146,6 @@ export class MenuService {
       else if (data.data) {
         item = data.data;
       }
-
-      console.log("✅ MenuService.getMenuItem - Extracted item:", item);
 
       return {
         success: true,

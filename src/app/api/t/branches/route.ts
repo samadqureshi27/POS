@@ -9,7 +9,6 @@ export async function GET(req: Request) {
 
     const url = `${getRemoteBase()}/t/branches?page=${page}&limit=${limit}`;
 
-    console.log('🔄 Proxy: GET /t/branches', { url });
 
     const res = await fetch(url, {
       method: "GET",
@@ -21,7 +20,6 @@ export async function GET(req: Request) {
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-    console.log('📡 Proxy Response:', { status: res.status, ok: res.ok });
 
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),
@@ -44,7 +42,6 @@ export async function POST(req: Request) {
     const payload = await req.json().catch(() => ({}));
     const url = `${getRemoteBase()}/t/branches`;
 
-    console.log('🔄 Proxy: POST /t/branches', {
       url,
       headers: buildTenantHeaders(req, true),
       body: payload
@@ -61,7 +58,6 @@ export async function POST(req: Request) {
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-    console.log('📡 Proxy Response:', { status: res.status, ok: res.ok });
 
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),

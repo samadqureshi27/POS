@@ -83,7 +83,6 @@ export class RecipeService {
       });
 
       const data = await response.json();
-      console.log("🔍 RecipeService.listRecipes - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -109,8 +108,6 @@ export class RecipeService {
       if (data.items) {
         recipes = data.items;
       }
-
-      console.log("✅ RecipeService.listRecipes - Extracted recipes:", Array.isArray(recipes) ? recipes.length : typeof recipes);
 
       return {
         success: true,
@@ -142,7 +139,6 @@ export class RecipeService {
       });
 
       const data = await response.json();
-      console.log("🔍 RecipeService.getRecipe - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -162,9 +158,6 @@ export class RecipeService {
         recipe = data.data.recipe || data.data;
         variants = data.data.variants || [];
       }
-
-      console.log("✅ RecipeService.getRecipe - Extracted recipe:", recipe);
-      console.log("✅ RecipeService.getRecipe - Extracted variants:", variants?.length || 0);
 
       return {
         success: true,

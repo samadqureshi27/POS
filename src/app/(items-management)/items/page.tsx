@@ -55,7 +55,6 @@ export default function ItemsPage() {
 
     if (response.success && response.data) {
       let filteredItems = response.data;
-      console.log('Loaded items from API:', filteredItems.map(item => ({
         name: item.name,
         type: item.type,
         trackStock: item.trackStock,
@@ -236,9 +235,6 @@ export default function ItemsPage() {
       const response = await InventoryService.importItems(file, duplicatePolicy);
 
       // Debug: Log the complete API response structure
-      console.log('Import API Response:', JSON.stringify(response, null, 2));
-      console.log('Response data structure:', response.data);
-      console.log('Response success:', response.success);
 
       if (response.success && response.data) {
         // The API response is in response.data, so we need to map it correctly

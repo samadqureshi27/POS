@@ -7,12 +7,6 @@ export async function POST(req: Request) {
     const payload = await req.json().catch(() => ({}));
     const url = `${getRemoteBase()}/t/auth/forgot-password`;
 
-    console.log("🔄 Proxy: /t/auth/forgot-password", {
-      url,
-      headers: buildTenantHeaders(req, false),
-      body: payload,
-    });
-
     const res = await fetch(url, {
       method: "POST",
       headers: buildTenantHeaders(req, false),
@@ -24,7 +18,6 @@ export async function POST(req: Request) {
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-    console.log("📡 Proxy Response (forgot-password):", { status: res.status, ok: res.ok });
 
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),

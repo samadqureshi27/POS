@@ -58,7 +58,6 @@ const Dashboard = () => {
   const isInitialized = useRef(false);
 
   // Add debug logging
-  console.log('Dashboard render - Loading:', loading);
 
   // Modified load dashboard data function with optional loading parameter
   const loadDashboardData = useCallback(async (period: string, showLoading = true, startDate?: string, endDate?: string) => {
@@ -66,7 +65,6 @@ const Dashboard = () => {
       if (showLoading) {
         setLoading(true);
       }
-      console.log('Loading dashboard data for period:', period, startDate ? `from ${startDate} to ${endDate}` : '');
 
       const data = await dashboardAPI.getDashboardData(period, startDate, endDate);
       setDashboardData(data);
@@ -100,7 +98,6 @@ const Dashboard = () => {
   const handleRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
-      console.log('Refreshing dashboard data for period:', selectedPeriod);
 
       let data;
       if (selectedPeriod === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) {
@@ -124,7 +121,6 @@ const Dashboard = () => {
   // Modified period change handler - no loading animation for period changes
   const handlePeriodChange = useCallback(async (period: string) => {
     try {
-      console.log('Period changed to:', period);
       setSelectedPeriod(period);
       setShowDatePicker(false);
 
@@ -132,7 +128,6 @@ const Dashboard = () => {
       if (period === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) {
         const startDate = customDateRange[0].startDate.toISOString().split('T')[0];
         const endDate = customDateRange[0].endDate.toISOString().split('T')[0];
-        console.log('Loading custom range data:', startDate, 'to', endDate);
         await loadDashboardData(period, false, startDate, endDate);
       } else {
         // Load data without showing loading spinner for period changes
@@ -150,13 +145,11 @@ const Dashboard = () => {
 
   // Handle inventory submission
   const handleInventorySubmit = useCallback((inventory: any) => {
-    console.log('New inventory action:', inventory);
     showToast(`Inventory ${inventory.actionType} of ${inventory.quantity} ${inventory.unit} for ${inventory.itemName} has been processed!`, "success");
   }, [showToast]);
 
   // Handle expense submission
   const handleExpenseSubmit = useCallback((expense: any) => {
-    console.log('New expense submitted:', expense);
     showToast(`Expense of PKR ${expense.amount} for ${expense.category} has been added successfully!`, "success");
   }, [showToast]);
 
@@ -177,7 +170,6 @@ const Dashboard = () => {
   // Initial data load - only run once
   useEffect(() => {
     if (!isInitialized.current) {
-      console.log('Initializing dashboard...');
       isInitialized.current = true;
       loadDashboardData(selectedPeriod).catch(error => {
         console.error('Initial dashboard load failed:', error);

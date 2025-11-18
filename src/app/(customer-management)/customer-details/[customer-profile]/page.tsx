@@ -42,7 +42,6 @@ const CustomerProfilePage = () => {
   };
 
   // Debug render
-  console.log("Render state:", { customerId, loading, error, customer });
 
   if (loading) {
     return <LoadingSpinner customerId={customerId} />;

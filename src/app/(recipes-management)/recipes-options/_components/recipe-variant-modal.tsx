@@ -72,11 +72,9 @@ export default function RecipeVariantModal({
   const [focusedIngredientIndex, setFocusedIngredientIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    console.log("🔄 Modal useEffect triggered:", { isOpen, hasEditingItem: !!editingItem });
 
     if (isOpen) {
       if (editingItem) {
-        console.log("📝 Loading editing item:", JSON.stringify(editingItem, null, 2));
 
         // Handle both camelCase and PascalCase field names from API
         const existingIngredients = editingItem.ingredients || (editingItem as any).Ingredients || [];
@@ -100,7 +98,6 @@ export default function RecipeVariantModal({
         const baseCostAdj = editingItem.baseCostAdjustment ?? (editingItem as any).BaseCostAdjustment ?? 0;
         const crustType = editingItem.crustType || (editingItem as any).CrustType || "";
 
-        console.log("🔍 Extracted values:", {
           variantName,
           variantDesc,
           variantType,
@@ -126,7 +123,6 @@ export default function RecipeVariantModal({
           },
         };
 
-        console.log("📋 Setting form data:", JSON.stringify(newFormData, null, 2));
         setFormData(newFormData);
         setVariantIngredients(existingIngredients);
 
@@ -137,9 +133,7 @@ export default function RecipeVariantModal({
         setIngredientInputs(inputs);
         setShowSuggestions({});
 
-        console.log("✅ Form data state updated");
       } else {
-        console.log("➕ New variant mode - clearing form");
         setFormData({
           recipeId: [],
           name: "",
@@ -364,7 +358,6 @@ export default function RecipeVariantModal({
   const selectedRecipes = Array.isArray(formData.recipeId) ? formData.recipeId : [formData.recipeId];
 
   // Debug: Log current form data on every render
-  console.log("🎨 Modal rendering with formData:", {
     name: formData.name,
     type: formData.type,
     recipeId: formData.recipeId,

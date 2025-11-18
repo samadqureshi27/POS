@@ -143,7 +143,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const handleAdminClick = () => {
     if (phase !== "idle") return;
-    console.log("admin label clicked, setting role to admin");
     setPhase("toGold");
     setRole("admin");
     setError(null);
@@ -161,7 +160,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const handleManagerClick = () => {
     if (phase !== "idle") return;
-    console.log("Manager label clicked, setting role to manager");
     setPhase("toBlack");
     setRole("manager");
     setError(null);
@@ -223,7 +221,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
     setError(null);
 
     try {
-      console.log("Manager login attempt:", {
         pin: pin.replace(/./g, "*"),
         role,
       });
@@ -231,7 +228,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
       const response = await authService.pinLogin(pin, role || "manager");
 
       if (response.success && response.user) {
-        console.log("Manager login successful:", response.user);
         toast.success("Login successful! Redirecting...");
 
         // Small delay to show toast before redirect
@@ -256,7 +252,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
           }
         }, 500);
       } else {
-        console.log("Manager login failed:", response);
 
         // Handle error message safely
         let errorMessage = "Invalid PIN";

@@ -35,7 +35,6 @@ const EmailVerificationOverlay: React.FC = () => {
   const handleVerifyOtp = () => {
     const otp = otpCode.join("");
     if (otp.length === 5) {
-      console.log("Verifying OTP:", otp);
       setShowNewPassword(true);
       setTimeout(() => {
         setShowNewPasswordContainer(true);
@@ -52,7 +51,6 @@ const EmailVerificationOverlay: React.FC = () => {
   };
 
   const handleResendEmail = async () => {
-    console.log("Resending reset email");
     // Note: The reset email is stored in the context
     // You can add a resend API call here if needed
     alert("Reset email has been resent!");

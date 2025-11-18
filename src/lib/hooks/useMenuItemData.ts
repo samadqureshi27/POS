@@ -47,7 +47,6 @@ export const useMenuItemData = () => {
                           (response.data as any).data ||
                           (response.data as any).items || [];
         }
-        console.log("✅ Loaded categories for menu items:", categoriesArray.length);
         setCategories(categoriesArray);
       }
     } catch (error) {
@@ -65,7 +64,6 @@ export const useMenuItemData = () => {
                         (response.data as any).data ||
                         (response.data as any).items || [];
         }
-        console.log("✅ Loaded recipes for menu items:", recipesArray.length);
         setRecipes(recipesArray);
       }
     } catch (error) {
@@ -77,7 +75,6 @@ export const useMenuItemData = () => {
     try {
       setLoading(true);
       const response = await MenuService.listMenuItems();
-      console.log("📦 Raw response for menu items:", response);
 
       if (response.success) {
         let itemsArray = response.data;
@@ -92,8 +89,6 @@ export const useMenuItemData = () => {
             itemsArray = [];
           }
         }
-
-        console.log("✅ Loaded menu items:", itemsArray.length);
 
         // Transform menu items to match the expected format
         const transformedItems = itemsArray.map((item: any) => {
@@ -186,7 +181,6 @@ export const useMenuItemData = () => {
   const createMenuItem = useCallback(async (itemData: any) => {
     try {
       setActionLoading(true);
-      console.log("📤 Creating menu item with data:", itemData);
 
       const response = await MenuService.createMenuItem(itemData);
       if (response.success && response.data) {
@@ -208,7 +202,6 @@ export const useMenuItemData = () => {
   const updateMenuItem = useCallback(async (id: string, itemData: any) => {
     try {
       setActionLoading(true);
-      console.log("📤 Updating menu item:", id, itemData);
 
       const response = await MenuService.updateMenuItem(id, itemData);
       if (response.success && response.data) {
@@ -281,7 +274,6 @@ export const useMenuItemData = () => {
 
   const openEditModal = useCallback(async (item: MenuItemOption) => {
     try {
-      console.log("🔄 openEditModal called with item:", item);
       const itemId = item.ID;
       const response = await MenuService.getMenuItem(itemId);
 

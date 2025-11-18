@@ -287,8 +287,6 @@ export const InventoryService = {
     // trackStock: Let backend set default based on item type (stock items default to true)
     if (payload.quantity !== undefined) apiPayload.quantity = payload.quantity;
 
-    console.log('Creating item with payload:', JSON.stringify(apiPayload, null, 2));
-
     const res = await fetch(url, {
       method: "POST",
       headers: buildHeaders(),
@@ -301,7 +299,6 @@ export const InventoryService = {
     }
 
     const item: InventoryItem = data?.result ?? data?.data ?? data;
-    console.log('Created item response:', item);
     return { success: true, data: item };
   },
 
@@ -325,8 +322,6 @@ export const InventoryService = {
     // Only include trackStock if explicitly being changed
     if (payload.trackStock !== undefined) apiPayload.trackStock = payload.trackStock;
 
-    console.log('Updating item with payload:', JSON.stringify(apiPayload, null, 2));
-
     const res = await fetch(url, {
       method: "PUT",
       headers: buildHeaders(),
@@ -339,7 +334,6 @@ export const InventoryService = {
     }
 
     const item: InventoryItem = data?.result ?? data?.data ?? data;
-    console.log('Updated item response:', item);
     return { success: true, data: item };
   },
 

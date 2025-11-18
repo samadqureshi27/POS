@@ -5,7 +5,6 @@ export async function POST(req: Request, { params }: { params: { id: string; use
   try {
     const url = `${getRemoteBase()}/t/branches/${params.id}/users/${params.userId}`;
 
-    console.log('🔄 Proxy: POST /t/branches/:id/users/:userId', { url });
 
     const res = await fetch(url, {
       method: "POST",
@@ -17,7 +16,6 @@ export async function POST(req: Request, { params }: { params: { id: string; use
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-    console.log('📡 Proxy Response:', { status: res.status, ok: res.ok });
 
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),
@@ -39,7 +37,6 @@ export async function DELETE(req: Request, { params }: { params: { id: string; u
   try {
     const url = `${getRemoteBase()}/t/branches/${params.id}/users/${params.userId}`;
 
-    console.log('🔄 Proxy: DELETE /t/branches/:id/users/:userId', { url });
 
     const res = await fetch(url, {
       method: "DELETE",
@@ -51,7 +48,6 @@ export async function DELETE(req: Request, { params }: { params: { id: string; u
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-    console.log('📡 Proxy Response:', { status: res.status, ok: res.ok });
 
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),

@@ -18,7 +18,6 @@ export async function GET(
     const { id } = params;
     const url = `${REMOTE_BASE}/t/recipe-variations/${id}`;
 
-    console.log("🔍 [Recipe Variant API] GET request:", url);
 
     const response = await fetch(url, {
       method: "GET",
@@ -26,7 +25,6 @@ export async function GET(
     });
 
     const data = await response.json();
-    console.log("📦 [Recipe Variant API] Response:", data);
 
     if (!response.ok) {
       return NextResponse.json(
@@ -58,8 +56,6 @@ export async function PUT(
     const body = await req.json();
     const url = `${REMOTE_BASE}/t/recipe-variations/${id}`;
 
-    console.log("📤 [Recipe Variant API] PUT request:", url);
-    console.log("📦 [Recipe Variant API] Body:", body);
 
     const response = await fetch(url, {
       method: "PUT",
@@ -68,7 +64,6 @@ export async function PUT(
     });
 
     const data = await response.json();
-    console.log("📦 [Recipe Variant API] Response:", data);
 
     if (!response.ok) {
       return NextResponse.json(
@@ -99,7 +94,6 @@ export async function DELETE(
     const { id } = params;
     const url = `${REMOTE_BASE}/t/recipe-variations/${id}`;
 
-    console.log("🗑️ [Recipe Variant API] DELETE request:", url);
 
     const response = await fetch(url, {
       method: "DELETE",
@@ -107,7 +101,6 @@ export async function DELETE(
     });
 
     const data = await response.json();
-    console.log("📦 [Recipe Variant API] Response:", data);
 
     if (!response.ok) {
       return NextResponse.json(

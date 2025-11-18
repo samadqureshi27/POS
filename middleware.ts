@@ -18,17 +18,49 @@ function isPublicPath(pathname: string): boolean {
 }
 
 function addSecurityHeaders(res: NextResponse) {
-  // Note: Adjust CSP as needed for your app (inline scripts/styles if required)
-  res.headers.set(
-    'Content-Security-Policy',
-    "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.tritechtechnologyllc.com; frame-ancestors 'none'; base-uri 'self'"
+  // Get API base URL from environment (never hardcode in security headers!)
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || 'https://api.tritechtechnologyllc.com';
+  const isDev = process.env.NODE_ENV === 'development';
+
+  // Content Security Policy - Industry Best Practices
+  // - Removed 'unsafe-eval' (major XSS risk, not needed for Next.js)
+  // - Kept 'unsafe-inline' for styles only (required for Tailwind and CSS-in-JS)
+  // - Used environment variable for API URL
+  // - Added font-src for web fonts
+  // - Added object-src 'none' to prevent Flash/plugin exploits
+  const cspDirectives = [
+    "default-src 'self'",
+    "img-src 'self' data: blob: https:",  // Allow images from HTTPS sources
+    "style-src 'self' 'unsafe-inline' https:",  // Required for Tailwind & inline styles
+    isDev
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"  // Dev needs eval for hot reload
+      : "script-src 'self' 'unsafe-inline'",  // Production: no eval
+    `connect-src 'self' ${apiBaseUrl}`,  // API connections
+    "font-src 'self' data: https:",  // Web fonts
+    "object-src 'none'",  // Prevent Flash/Java/plugin exploits
+    "frame-ancestors 'none'",  // Clickjacking protection
+    "base-uri 'self'",  // Prevent base tag injection
+    "form-action 'self'",  // Forms can only submit to same origin
+  ];
+
+  res.headers.set('Content-Security-Policy', cspDirectives.join('; '));
+
+  // Additional security headers (Industry Standard)
+  res.headers.set('X-Frame-Options', 'DENY');  // Clickjacking protection
+  res.headers.set('X-Content-Type-Options', 'nosniff');  // MIME sniffing protection
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');  // Privacy protection
+  res.headers.set('X-XSS-Protection', '1; mode=block');  // Legacy XSS protection
+
+  // HSTS - only in production over HTTPS
+  if (!isDev) {
+    res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  }
+
+  // Permissions Policy - restrict access to browser features
+  res.headers.set('Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=(), usb=()'
   );
-  res.headers.set('X-Frame-Options', 'DENY');
-  res.headers.set('X-Content-Type-Options', 'nosniff');
-  res.headers.set('Referrer-Policy', 'no-referrer');
-  // HSTS only effective over HTTPS
-  res.headers.set('Strict-Transport-Security', 'max-age=15552000; includeSubDomains');
-  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()');
+
   return res;
 }
 

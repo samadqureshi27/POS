@@ -62,7 +62,6 @@ const RecipesManagementPage = () => {
   };
 
   const handleDelete = async (recipe: RecipeOption) => {
-    console.log("🗑️ Delete clicked for recipe:", recipe);
 
     // Get the actual MongoDB _id or fallback to ID
     const recipeId = (recipe as any)._id || recipe.ID;
@@ -75,20 +74,17 @@ const RecipesManagementPage = () => {
 
     // Confirm deletion
     const confirmed = window.confirm(`Are you sure you want to delete "${recipe.Name}"?`);
-    console.log("Confirmation result:", confirmed);
 
     if (!confirmed) {
       return;
     }
 
-    console.log("🔄 Deleting recipe with ID:", recipeId);
 
     try {
       // Import RecipeService at the top if not already imported
       const RecipeService = (await import("@/lib/services/recipe-service")).RecipeService;
 
       const result = await RecipeService.deleteRecipe(String(recipeId));
-      console.log("Delete result:", result);
 
       if (result.success) {
         globalShowToast("Recipe deleted successfully", "success");

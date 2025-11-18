@@ -2,11 +2,12 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Build quality gates enabled - ensures type safety and code quality
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 }
 

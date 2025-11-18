@@ -11,7 +11,6 @@ export const useCustomerProfile = (customerId: number | null) => {
 
     const loadCustomerData = async (id: number) => {
         try {
-            console.log(`Loading data for customer ID: ${id}`);
             setLoading(true);
             setError(null);
 
@@ -20,8 +19,6 @@ export const useCustomerProfile = (customerId: number | null) => {
                 CustomerAPI.getCustomerOrders(id),
             ]);
 
-            console.log("Customer response:", customerResponse);
-            console.log("Orders response:", ordersResponse);
 
             if (customerResponse.success) {
                 setCustomer(customerResponse.data);
@@ -41,7 +38,6 @@ export const useCustomerProfile = (customerId: number | null) => {
     };
 
     useEffect(() => {
-        console.log("Effect triggered, customerId:", customerId);
 
         if (customerId !== null) {
             loadCustomerData(customerId);

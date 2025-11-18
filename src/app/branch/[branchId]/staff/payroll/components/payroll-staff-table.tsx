@@ -115,7 +115,6 @@ export const StaffTable: React.FC<StaffTableProps> = ({
             icon: <Eye className="h-4 w-4" />,
             onClick: (item) => {
                 // Handle details action
-                console.log("View details for staff:", item.STAFF_ID);
             }
         }
     ];

@@ -1,4 +1,5 @@
 // src/lib/authService.ts
+import { getAccessToken, getRefreshToken, setTokens, updateAccessToken, clearTokens as clearAuthTokens, migrateLegacyTokens } from './util/token-manager';
 
 export interface User {
   _id?: string;
@@ -109,8 +110,11 @@ class AuthService {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      this.token = localStorage.getItem('accessToken');
-      this.refreshToken = localStorage.getItem('refreshToken');
+      // Migrate any legacy tokens on initialization
+      migrateLegacyTokens();
+
+      this.token = getAccessToken();
+      this.refreshToken = getRefreshToken();
     }
   }
 
@@ -124,15 +128,6 @@ class AuthService {
       const url = buildUrl(AUTH_LOGIN_PATH);
       const headers = buildHeaders();
 
-      console.log('🔐 Login Request:', {
-        url,
-        headers,
-        body: { email, password: '***', posId: null, defaultBranchId: null }
-      });
-
-      console.log('📧 Email:', email);
-      console.log('🔑 Password length:', password.length);
-
       const response = await fetch(url, {
         method: 'POST',
         headers,
@@ -143,8 +138,6 @@ class AuthService {
           defaultBranchId: null
         })
       });
-
-      console.log('📡 Login Response Status:', response.status);
 
       const contentType = response.headers.get('content-type') || '';
       if (!contentType.includes('application/json')) {
@@ -202,22 +195,19 @@ class AuthService {
   // PIN login for staff (no changes needed here)
   async pinLogin(pin: string, role?: string): Promise<LoginResponse> {
   try {
-    console.log('PIN Login attempt:', { pin: pin.replace(/./g, '*'), role });
-    
     const requestBody: any = { pin };
-    
+
     // Include role if provided (for manager login from role selection)
     if (role) {
       requestBody.role = role;
     }
-    
+
     const response = await fetch(buildUrl(AUTH_PIN_LOGIN_PATH), {
       method: 'POST',
       headers: buildHeaders(undefined),
       body: JSON.stringify(requestBody)
     });
 
-    console.log('PIN Login response status:', response.status);
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
       const text = await response.text();
@@ -225,7 +215,6 @@ class AuthService {
       return { success: false, error: 'Unexpected response from server', message: text };
     }
     const data: LoginResponse = await response.json();
-    console.log('PIN Login response data:', data);
 
     // Handle backend response format: {status, message, result: {token, user}}
     if (response.ok && data.result && data.result.token) {
@@ -337,7 +326,6 @@ class AuthService {
 
   async forgotPassword(email: string): Promise<ApiResponse> {
     try {
-      console.log('Requesting password reset for:', email);
       const url = buildUrl(AUTH_FORGOT_PASSWORD_PATH);
       const res = await fetch(url, {
         method: 'POST',
@@ -347,7 +335,6 @@ class AuthService {
 
       const contentType = res.headers.get('content-type') || 'application/json';
       const raw = contentType.includes('application/json') ? await res.json() : await res.text();
-      console.log('Forgot password response:', raw);
       if (typeof raw === 'string') {
         try {
           const parsed = JSON.parse(raw);
@@ -366,7 +353,6 @@ class AuthService {
 
   async resetPassword(token: string, password: string): Promise<ApiResponse> {
     try {
-      console.log('Resetting password with token');
       const url = buildUrl(AUTH_RESET_PASSWORD_PATH);
       const res = await fetch(url, {
         method: 'POST',
@@ -376,7 +362,6 @@ class AuthService {
 
       const contentType = res.headers.get('content-type') || 'application/json';
       const raw = contentType.includes('application/json') ? await res.json() : await res.text();
-      console.log('Reset password response:', raw);
       if (typeof raw === 'string') {
         try {
           const parsed = JSON.parse(raw);
@@ -425,12 +410,11 @@ class AuthService {
       });
 
       const data = await response.json();
-      
+
       if (data.access) {
         this.token = data.access;
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('accessToken', data.access);
-        }
+        // Use centralized token manager
+        updateAccessToken(data.access);
         return true;
       }
       return false;
@@ -460,10 +444,8 @@ class AuthService {
   private setTokens(accessToken: string, refreshToken: string): void {
     this.token = accessToken;
     this.refreshToken = refreshToken;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-    }
+    // Use centralized token manager
+    setTokens(accessToken, refreshToken);
   }
 
   private setUser(user: User): void {
@@ -483,23 +465,18 @@ class AuthService {
   private clearTokens(): void {
     this.token = null;
     this.refreshToken = null;
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
-    }
+    // Use centralized token manager which also cleans up legacy tokens
+    clearAuthTokens();
   }
 
   isAuthenticated(): boolean {
-    // Always check localStorage for latest auth state
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        this.token = token; // Keep in-memory token in sync
-        return true;
-      }
+    // Always check latest auth state using centralized token manager
+    const token = getAccessToken();
+    if (token) {
+      this.token = token; // Keep in-memory token in sync
+      return true;
     }
-    return !!this.token;
+    return false;
   }
 
   getCurrentUser(): User | null {
@@ -507,15 +484,12 @@ class AuthService {
   }
 
   getToken(): string | null {
-    // Always read from localStorage to ensure we get the latest token
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        this.token = token; // Keep in-memory token in sync
-        return token;
-      }
+    // Always read latest token using centralized token manager
+    const token = getAccessToken();
+    if (token) {
+      this.token = token; // Keep in-memory token in sync
     }
-    return this.token;
+    return token || this.token;
   }
 
   async makeAuthenticatedRequest<T = any>(

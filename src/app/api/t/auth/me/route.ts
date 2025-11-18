@@ -5,7 +5,6 @@ export async function GET(req: Request) {
   try {
     const url = `${getRemoteBase()}/t/auth/me`;
 
-    console.log('🔄 Proxy: GET /t/auth/me');
 
     const res = await fetch(url, {
       method: "GET",
@@ -17,7 +16,6 @@ export async function GET(req: Request) {
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-    console.log('📡 Proxy Response:', { status: res.status, ok: res.ok });
 
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),

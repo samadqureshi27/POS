@@ -24,23 +24,19 @@ export const apiConfig = {
   timeout: 10000,
 };
 
-// Token management
+// Token management - Now using centralized token manager
+import { getAccessToken, setTokens, clearTokens } from './util/token-manager';
+
 export const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('auth_token');
+  return getAccessToken();
 };
 
 export const setAuthToken = (token: string): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('auth_token', token);
-  }
+  setTokens(token);
 };
 
 export const removeAuthToken = (): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
-  }
+  clearTokens();
 };
 
 // Request interceptor for adding auth token

@@ -38,11 +38,9 @@ const ForgotPasswordOverlay: React.FC = () => {
     setError(null);
 
     try {
-      console.log("Requesting password reset for:", resetEmail);
       const response = await authService.forgotPassword(resetEmail);
 
       if (response.success) {
-        console.log("Password reset email sent successfully");
         // Show verification screen
         setShowVerification(true);
         setTimeout(() => {

@@ -70,7 +70,6 @@ const CategoriesManagementPage = () => {
   const confirmDelete = async () => {
     if (!categoryToDelete) return;
 
-    console.log("🗑️ Deleting category:", categoryToDelete);
 
     const categoryId = categoryToDelete.ID;
 
@@ -80,13 +79,11 @@ const CategoriesManagementPage = () => {
       return;
     }
 
-    console.log("🔄 Deleting category with ID:", categoryId);
 
     try {
       const MenuCategoryService = (await import("@/lib/services/menu-category-service")).MenuCategoryService;
 
       const result = await MenuCategoryService.deleteCategory(categoryId);
-      console.log("Delete result:", result);
 
       if (result.success) {
         globalShowToast("Category deleted successfully", "success");

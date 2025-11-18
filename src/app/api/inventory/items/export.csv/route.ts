@@ -7,7 +7,6 @@ export async function GET(req: Request) {
   try {
     const url = `${getRemoteBase()}/api/inventory/items/export.csv`;
 
-    console.log("🔄 Proxy: Items export", { url });
 
     // Create AbortController for timeout
     const controller = new AbortController();
@@ -21,7 +20,6 @@ export async function GET(req: Request) {
 
     clearTimeout(timeoutId);
 
-    console.log("📡 Export Response:", { status: res.status, ok: res.ok });
 
     if (!res.ok) {
       console.error("❌ Export Error:", res.status, res.statusText);

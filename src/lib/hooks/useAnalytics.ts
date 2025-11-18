@@ -41,7 +41,6 @@ export const useDashboard = () => {
       
       const currentPeriod = period || selectedPeriod;
       
-      console.log('Loading dashboard data for period:', currentPeriod);
       
       const [analyticsResponse, customersResponse, ordersResponse] = await Promise.all([
         AnalyticsAPI.getAnalyticsData(currentPeriod),
@@ -74,7 +73,6 @@ export const useDashboard = () => {
   const loadCustomRangeData = useCallback(async (startDate: string, endDate: string) => {
     try {
       setLoading(true);
-      console.log('Loading custom range data:', startDate, 'to', endDate);
       
       const response = await AnalyticsAPI.getCustomDateRangeData(startDate, endDate);
       if (response.success) {
@@ -92,7 +90,6 @@ export const useDashboard = () => {
 
   // FIXED: Memoized period change handler
   const handlePeriodChange = useCallback(async (period: string) => {
-    console.log('Period changed to:', period);
     setSelectedPeriod(period);
     setShowDatePicker(false);
     if (period !== "Custom") {
@@ -103,7 +100,6 @@ export const useDashboard = () => {
 
   // FIXED: Memoized custom date range handler
   const handleCustomDateRange = useCallback((startDate: string, endDate: string) => {
-    console.log('Custom date range selected:', startDate, 'to', endDate);
     setSelectedPeriod("Custom");
     loadCustomRangeData(startDate, endDate);
     return { startDate, endDate };
@@ -124,7 +120,6 @@ export const useDashboard = () => {
   // FIXED: Initial data load - only run once
   useEffect(() => {
     if (!isInitialized.current) {
-      console.log('Initializing dashboard...');
       isInitialized.current = true;
       loadDashboardData().catch(error => {
         console.error('Initial load failed:', error);

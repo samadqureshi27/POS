@@ -5,7 +5,6 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   try {
     const url = `${getRemoteBase()}/t/branches/${params.id}/default`;
 
-    console.log('🔄 Proxy: PUT /t/branches/:id/default', { url });
 
     const res = await fetch(url, {
       method: "PUT",
@@ -17,7 +16,6 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-    console.log('📡 Proxy Response:', { status: res.status, ok: res.ok });
 
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),

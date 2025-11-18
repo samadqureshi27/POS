@@ -24,7 +24,6 @@ const CustomerManagementPage = () => {
 
   // Handle customer row click - Navigate to dynamic route
   const handleCustomerClick = (customerId: number) => {
-    console.log('Navigating to customer ID:', customerId);
     router.push(`/customer-details/${customerId}`);
   };
 

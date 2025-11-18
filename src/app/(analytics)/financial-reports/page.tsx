@@ -64,17 +64,14 @@ const AnalyticsDashboard = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
 
   // Add debug logging
-  console.log('Analytics Dashboard render - Loading:', loading);
 
   // Simplified useEffect - the hook now handles initialization
   useEffect(() => {
-    console.log('Analytics Dashboard mounted');
   }, []); // Just for debugging
 
   // Memoize period change handler to prevent recreating on every render
   const handlePeriodChangeWithData = useCallback(async (period: string) => {
     try {
-      console.log('Changing period to:', period);
       setSelectedPeriod(period);
       setShowDatePicker(false);
       await loadDashboardData(period, false);
@@ -87,7 +84,6 @@ const AnalyticsDashboard = () => {
   // Memoize custom date range handler
   const handleCustomDateRangeWithData = useCallback(async (startDate: string, endDate: string) => {
     try {
-      console.log('Custom date range:', startDate, 'to', endDate);
       const startDateObj = new Date(startDate);
       const endDateObj = new Date(endDate);
       
@@ -133,7 +129,6 @@ const AnalyticsDashboard = () => {
 
   // Handle expense submission
   const handleExpenseSubmit = useCallback((expense: any) => {
-    console.log('New expense submitted:', expense);
     // Here you would typically send the expense data to your backend
     // For now, we'll just log it and possibly update local state
 
@@ -168,7 +163,6 @@ const AnalyticsDashboard = () => {
 
   // Add null check for analyticsData
   if (!analyticsData) {
-    console.log('Analytics data not loaded yet');
     return <GlobalSkeleton type="dashboard" showPeriodSelector={true} showCharts={true} summaryCardCount={8} />;
   }
 

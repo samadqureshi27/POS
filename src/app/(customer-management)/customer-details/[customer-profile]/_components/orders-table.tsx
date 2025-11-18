@@ -118,7 +118,6 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
             icon: <Eye className="h-4 w-4" />,
             onClick: (order) => {
                 // Handle details action
-                console.log("View details for order:", order.Order_ID);
             }
         }
     ];
