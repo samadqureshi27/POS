@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { formatCurrency } from "@/lib/util/formatters";
 import { Card, CardContent } from './card';
 import { Badge } from './badge';
 import {
@@ -73,11 +74,11 @@ export const AdvancedMetricCard: React.FC<AdvancedMetricCardProps> = ({
 
     switch (format) {
       case 'currency':
-        return `PKR ${val.toLocaleString()}`;
+        return `PKR ${formatCurrency(val)}`;
       case 'percentage':
         return `${val}%`;
       default:
-        return val.toLocaleString();
+        return formatCurrency(val);
     }
   };
 

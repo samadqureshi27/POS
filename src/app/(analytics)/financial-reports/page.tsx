@@ -6,6 +6,7 @@ import { toast } from "sonner";
 // Components
 import { StarRating } from '@/components/ui/StarRating';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
+import { formatCurrency } from "@/lib/util/formatters";
 import  {MetricCard } from '@/components/ui/MetricCard';
 import { AdvancedMetricCard } from '@/components/ui/advanced-metric-card';
 import { DashboardSection } from '@/components/ui/dashboard-section';
@@ -214,7 +215,7 @@ const AnalyticsDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 rounded-lg border border-green-200">
             <h3 className="text-sm font-medium text-green-800 mb-3">Revenue Performance</h3>
-            <div className="text-3xl font-bold text-green-900 mb-2">PKR {analyticsData.totalRevenue?.toLocaleString() || '485,000'}</div>
+            <div className="text-3xl font-bold text-green-900 mb-2">PKR {analyticsData.totalRevenue ? formatCurrency(analyticsData.totalRevenue) : '485,000'}</div>
             <div className="text-sm text-green-700">Monthly Revenue</div>
             <div className="flex items-center mt-2 text-sm text-green-600">
               <span className="font-medium">+18.5%</span>
