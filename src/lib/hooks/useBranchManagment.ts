@@ -7,6 +7,7 @@ import { useBranchModal } from "./branchModal";
 import { BranchItem } from "@/lib/types/branch";
 import { BranchService, TenantBranch } from "@/lib/services/branch-service";
 import { BUSINESS_CONFIG } from "@/lib/constants";
+import { logError } from "@/lib/util/logger";
 
 export const useBranchManagement = () => {
     const [branchItems, setBranchItems] = useState<BranchItem[]>([]);
@@ -67,7 +68,10 @@ export const useBranchManagement = () => {
                 throw new Error(response.message || "Failed to fetch branch items");
             }
         } catch (error) {
-            console.error("Error fetching branch items:", error);
+            logError("Error fetching branch items", error, {
+                component: "useBranchManagement",
+                action: "loadBranchItems",
+            });
             showToast("Failed to load Branch items", "error");
         } finally {
             setLoading(false);
@@ -112,7 +116,11 @@ export const useBranchManagement = () => {
                 return;
             }
         } catch (error: any) {
-            console.error("Error creating branch:", error);
+            logError("Error creating branch", error, {
+                component: "useBranchManagement",
+                action: "handleCreateItem",
+                branchName: itemData.Branch_Name,
+            });
             showToast(error?.message || "Failed to create Branch", "error");
         } finally {
             setActionLoading(false);
