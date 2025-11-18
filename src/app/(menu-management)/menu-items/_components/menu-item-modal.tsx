@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { formatPrice } from "@/lib/util/formatters";
 import { MenuItemOption, MenuItemPayload, extractId } from "@/lib/types/menu";
+import { logError } from "@/lib/util/logger";
 
 interface MenuItemModalProps {
   isOpen: boolean;
@@ -172,7 +173,11 @@ export default function MenuItemModal({
         setRecipeVariations([]);
       }
     } catch (error) {
-      console.error("Error fetching recipe variations:", error);
+      logError("Error fetching recipe variations", error, {
+        component: "MenuItemModal",
+        action: "fetchRecipeVariations",
+        recipeId,
+      });
       setLoadingVariations(false);
       setRecipeVariations([]);
     }
@@ -233,7 +238,11 @@ export default function MenuItemModal({
           setRecipeVariations([]);
         }
       } catch (error) {
-        console.error("Error fetching recipe details:", error);
+        logError("Error fetching recipe details", error, {
+          component: "MenuItemModal",
+          action: "handleFieldChange:recipeId",
+          recipeId: value,
+        });
         setLoadingVariations(false);
         setRecipeVariations([]);
       }
@@ -320,7 +329,11 @@ export default function MenuItemModal({
       await onSubmit(payload);
       onClose();
     } catch (error) {
-      console.error("Error saving menu item:", error);
+      logError("Error saving menu item", error, {
+        component: "MenuItemModal",
+        action: "handleSave",
+        itemName: formData.name,
+      });
     }
   };
 
