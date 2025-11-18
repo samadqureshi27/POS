@@ -10,6 +10,7 @@ import DragTable from '@/components/ui/drag-table';
 import { MenuItemOptions, OptionValuesFormProps, AddonItemValue } from '@/lib/types/menuItemOptions';
 import { InventoryService, InventoryItem } from '@/lib/services/inventory-service';
 import { RecipeService, Recipe } from '@/lib/services/recipe-service';
+import { logError } from '@/lib/util/logger';
 
 const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDataChange }) => {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
@@ -47,7 +48,10 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
         setRecipes(recipeRes.data);
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      logError('Error loading data', error, {
+        component: 'OptionValuesForm',
+        action: 'loadData',
+      });
     } finally {
       setLoading(false);
     }
