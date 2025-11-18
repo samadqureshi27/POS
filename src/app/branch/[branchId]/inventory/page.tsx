@@ -107,11 +107,11 @@ const InventoryManagementPage = () => {
   };
 
   if (loading) {
-    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={4} showActionBar={true} />;
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={4} showActionBar={true} hasSubmenu={true} />;
   }
 
   return (
-    <PageContainer>
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
       <PageHeader

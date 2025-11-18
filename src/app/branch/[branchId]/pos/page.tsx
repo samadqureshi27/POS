@@ -105,7 +105,7 @@ const PosListPage = () => {
     };
 
     if (loading) {
-        return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
+        return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} hasSubmenu={true} />;
     }
 
     if (!branchId) {
@@ -120,7 +120,7 @@ const PosListPage = () => {
     }
 
     return (
-        <PageContainer>
+        <PageContainer hasSubmenu={true}>
             <Toaster position="top-right" />
 
             <PageHeader
