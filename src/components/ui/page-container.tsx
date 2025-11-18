@@ -51,7 +51,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
       padding === "tight" && "p-4",
       maxWidth === "container" && "max-w-7xl mx-auto",
       maxWidth === "full" && "w-full",
-      hasSubmenu && "pt-16", // Add top padding for submenu clearance
+      hasSubmenu && "!pt-20", // Extra top padding for submenu: base pt-6 + 14 units (56px submenu height)
       className
     )}>
       {children}
