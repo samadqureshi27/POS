@@ -2,7 +2,7 @@
 import React from 'react';
 import { OrderItem } from '@/lib/types/customer-profile';
 import { OrdersTable } from './orders-table';
-import ActionBar from "@/components/ui/action-bar";
+import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 
 interface OrderHistorySectionProps {
     orders: OrderItem[];
@@ -33,10 +33,11 @@ export const OrderHistorySection: React.FC<OrderHistorySectionProps> = ({
             </div>
 
             {/* Search Bar */}
-            <ActionBar
+            <EnhancedActionBar
                 searchValue={searchTerm}
                 onSearchChange={onSearchChange}
-                searchPlaceholder="Search"
+                searchPlaceholder="Search orders by ID, date, or amount..."
+                showViewToggle={false}
             />
 
             {/* Orders Table */}

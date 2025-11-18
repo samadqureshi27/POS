@@ -3,6 +3,7 @@ import { Edit2, UtensilsCrossed, Package, ChevronDown } from "lucide-react";
 import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 import { RecipeVariant, DisplayFilterType } from "@/lib/types/recipe-options";
 import { RecipeService, Recipe } from "@/lib/services/recipe-service";
+import { formatPrice } from "@/lib/util/formatters";
 
 interface RecipeVariantTableProps {
   items: RecipeVariant[];
@@ -55,7 +56,7 @@ const RecipeVariantTable: React.FC<RecipeVariantTableProps> = ({
   // Helper function to format cost adjustment
   const formatCostAdjustment = (cost: number) => {
     if (cost === 0) return "No change";
-    return cost > 0 ? `+$${cost.toFixed(2)}` : `-$${Math.abs(cost).toFixed(2)}`;
+    return cost > 0 ? `+$${formatPrice(cost)}` : `-$${formatPrice(Math.abs(cost))}`;
   };
 
   // Helper function to format size multiplier

@@ -1,6 +1,7 @@
 // src/lib/services/inventory-service.ts
 
-import AuthService from "@/lib/auth-service";
+import { buildHeaders } from "@/lib/util/service-helpers";
+import { logError } from "@/lib/util/logger";
 
 // ==================== Types ====================
 
@@ -122,58 +123,6 @@ function buildUrl(path: string) {
   return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
 }
 
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken") ||
-      null
-    );
-  }
-  return null;
-}
-
-function getTenantSlug(): string | null {
-  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || "";
-  if (envSlug) return envSlug;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_slug") || null;
-  }
-  return null;
-}
-
-function getTenantId(): string | null {
-  const envId = process.env.NEXT_PUBLIC_TENANT_ID || "";
-  if (envId) return envId;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_id") || null;
-  }
-  return null;
-}
-
-function buildHeaders(extra?: Record<string, string>, skipContentType?: boolean) {
-  const token = getToken();
-  const slug = getTenantSlug();
-  const id = getTenantId();
-
-  const headers: Record<string, string> = {
-    "Accept": "application/json",
-  };
-  
-  // Only add Content-Type if not skipped (for FormData)
-  if (!skipContentType) {
-    headers["Content-Type"] = "application/json";
-  }
-  
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return { ...headers, ...(extra || {}) };
-}
-
 // ==================== Inventory Items Service ====================
 
 export const InventoryService = {
@@ -209,7 +158,10 @@ export const InventoryService = {
 
       return { success: true, data: stats };
     } catch (error: any) {
-      console.error("Error getting inventory stats:", error);
+      logError("Error getting inventory stats", error, {
+        component: "InventoryService",
+        action: "getStats",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -366,7 +318,10 @@ export const InventoryService = {
       const data = await response.json();
       return { success: true, data };
     } catch (error: any) {
-      console.error("Error adjusting stock:", error);
+      logError("Error adjusting stock", error, {
+        component: "InventoryService",
+        action: "adjustStock",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -401,7 +356,10 @@ export const InventoryService = {
       const blob = await response.blob();
       return { success: true, data: blob };
     } catch (error: any) {
-      console.error("Error downloading import template:", error);
+      logError("Error downloading import template", error, {
+        component: "InventoryService",
+        action: "downloadImportTemplate",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -437,7 +395,10 @@ export const InventoryService = {
       const data = await response.json();
       return { success: true, data };
     } catch (error: any) {
-      console.error("Error importing items:", error);
+      logError("Error importing items", error, {
+        component: "InventoryService",
+        action: "importItems",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -479,7 +440,10 @@ export const InventoryService = {
       const blob = await response.blob();
       return { success: true, data: blob };
     } catch (error: any) {
-      console.error("Error exporting items:", error);
+      logError("Error exporting items", error, {
+        component: "InventoryService",
+        action: "exportItems",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -522,7 +486,10 @@ export const UnitsService = {
 
       return { success: true, data: allUnits };
     } catch (error: any) {
-      console.error("Error listing units:", error);
+      logError("Error listing units", error, {
+        component: "InventoryService",
+        action: "listUnits",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -555,7 +522,10 @@ export const UnitsService = {
 
       return { success: true, data: newUnit };
     } catch (error: any) {
-      console.error("Error creating unit:", error);
+      logError("Error creating unit", error, {
+        component: "InventoryService",
+        action: "createUnit",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -575,7 +545,10 @@ export const UnitsService = {
 
       return { success: true, data: null };
     } catch (error: any) {
-      console.error("Error deleting unit:", error);
+      logError("Error deleting unit", error, {
+        component: "InventoryService",
+        action: "deleteUnit",
+      });
       return { success: false, message: error.message };
     }
   },

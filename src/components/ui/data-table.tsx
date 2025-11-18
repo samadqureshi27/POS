@@ -53,7 +53,7 @@ export interface DataTableProps<T> {
   multipleMobileButtons?: boolean; // New property to enable multiple mobile buttons
 }
 
-export function DataTable<T extends Record<string, any>>({
+export const DataTable = <T extends Record<string, any>>({
   data,
   columns,
   actions = [],
@@ -71,7 +71,7 @@ export function DataTable<T extends Record<string, any>>({
   nameColumn = "name",
   multipleMobileButtons = false
 
-}: DataTableProps<T>) {
+}: DataTableProps<T>) => {
   const isAllSelected = selectable && data.length > 0 && selectedItems.length === data.length;
   const isIndeterminate = selectable && selectedItems.length > 0 && selectedItems.length < data.length;
 
@@ -355,6 +355,6 @@ export function DataTable<T extends Record<string, any>>({
       </div>
     </div>
   );
-}
+};
 
 export default DataTable;

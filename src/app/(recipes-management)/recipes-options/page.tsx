@@ -10,6 +10,9 @@ import RecipeVariantModal from "./_components/recipe-variant-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeVariants } from "@/lib/hooks/useRecipeVariations";
 import { RecipeVariant } from "@/lib/types/recipe-variants";
+import { formatPrice } from "@/lib/util/formatters";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 const RecipeVariationsPage = () => {
   const { showToast: globalShowToast } = useToast();
@@ -86,16 +89,14 @@ const RecipeVariationsPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
       {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Recipe Variations</h1>
-        <p className="text-gray-600 text-sm mt-1">
-          Manage size, flavor, crust, and custom variations for your recipes
-        </p>
-      </header>
+      <PageHeader
+        title="Recipe Variations"
+        subtitle="Manage size, flavor, crust, and custom variations for your recipes"
+      />
 
       {/* Enhanced Action Bar */}
       <EnhancedActionBar
@@ -235,7 +236,7 @@ const RecipeVariationsPage = () => {
             header: "Cost Adjustment",
             render: (item) => (
               <span className="text-sm font-semibold text-gray-700">
-                {item.baseCostAdjustment ? `$${item.baseCostAdjustment.toFixed(2)}` : "—"}
+                {item.baseCostAdjustment ? `$${formatPrice(item.baseCostAdjustment)}` : "—"}
               </span>
             ),
             className: "w-36",
@@ -337,7 +338,7 @@ const RecipeVariationsPage = () => {
                   {/* Cost Adjustment */}
                   <div className="text-xs text-gray-500">
                     {item.baseCostAdjustment ? (
-                      <span className="font-semibold text-gray-700">+${item.baseCostAdjustment.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-700">+${formatPrice(item.baseCostAdjustment)}</span>
                     ) : (
                       <span className="italic">No cost adj.</span>
                     )}
@@ -369,7 +370,7 @@ const RecipeVariationsPage = () => {
         actionLoading={actionLoading}
         showToast={globalShowToast}
       />
-    </div>
+    </PageContainer>
   );
 };
 

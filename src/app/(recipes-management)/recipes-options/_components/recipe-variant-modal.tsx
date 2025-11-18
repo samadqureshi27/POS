@@ -98,15 +98,6 @@ export default function RecipeVariantModal({
         const baseCostAdj = editingItem.baseCostAdjustment ?? (editingItem as any).BaseCostAdjustment ?? 0;
         const crustType = editingItem.crustType || (editingItem as any).CrustType || "";
 
-          variantName,
-          variantDesc,
-          variantType,
-          sizeMultiplier,
-          baseCostAdj,
-          crustType,
-          recipeIds: recipeIds.filter(Boolean),
-        });
-
         const newFormData = {
           recipeId: recipeIds.filter(Boolean), // Remove any null/undefined values
           name: variantName,
@@ -356,15 +347,6 @@ export default function RecipeVariantModal({
   }));
 
   const selectedRecipes = Array.isArray(formData.recipeId) ? formData.recipeId : [formData.recipeId];
-
-  // Debug: Log current form data on every render
-    name: formData.name,
-    type: formData.type,
-    recipeId: formData.recipeId,
-    sizeMultiplier: formData.sizeMultiplier,
-    baseCostAdjustment: formData.baseCostAdjustment,
-    crustType: formData.crustType,
-  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { PaymentMethod, ModalFormData } from "@/lib/types/payment";
+import { useModalState } from "./useModalState";
 
 export const usePaymentModal = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<PaymentMethod | null>(null);
+  const { isOpen, editingItem, openCreate, openEdit, close } = useModalState<PaymentMethod>();
   const [formData, setFormData] = useState<ModalFormData>({
     Name: "",
     PaymentType: "Cash",
@@ -16,7 +16,7 @@ export const usePaymentModal = () => {
 
   // Lock/unlock body scroll when modal opens/closes
   useEffect(() => {
-    if (isModalOpen) {
+    if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -25,7 +25,7 @@ export const usePaymentModal = () => {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isModalOpen]);
+  }, [isOpen]);
 
   // Reset form data when modal opens/closes or editing item changes
   useEffect(() => {
@@ -50,21 +50,18 @@ export const usePaymentModal = () => {
         LastUsed: new Date().toISOString().split('T')[0],
       });
     }
-  }, [editingItem, isModalOpen]);
+  }, [editingItem, isOpen]);
 
   const openCreateModal = () => {
-    setEditingItem(null);
-    setIsModalOpen(true);
+    openCreate();
   };
 
   const openEditModal = (item: PaymentMethod) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
+    openEdit(item);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingItem(null);
+    close();
   };
 
   const handleStatusChange = (isActive: boolean) => {
@@ -79,7 +76,7 @@ export const usePaymentModal = () => {
   };
 
   return {
-    isModalOpen,
+    isModalOpen: isOpen,
     editingItem,
     formData,
     openCreateModal,

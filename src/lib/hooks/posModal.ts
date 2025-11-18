@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { PosItem, PosModalFormData } from "@/lib/types/pos";
+import { useModalState } from "./useModalState";
 
 export const usePosModal = (branchId: string) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<PosItem | null>(null);
+    const { isOpen, editingItem, openCreate, openEdit, close } = useModalState<PosItem>();
     const [formData, setFormData] = useState<PosModalFormData>({
         POS_Name: "",
         Status: "Active",
@@ -11,33 +11,30 @@ export const usePosModal = (branchId: string) => {
     });
 
     const openCreateModal = () => {
-        setEditingItem(null);
         setFormData({
             POS_Name: "",
             Status: "Active",
             Branch_ID_fk: branchId,
         });
-        setIsModalOpen(true);
+        openCreate();
     };
 
     const openEditModal = (item: PosItem) => {
-        setEditingItem(item);
         setFormData({
             POS_Name: item.POS_Name,
             Status: item.Status,
             Branch_ID_fk: item.Branch_ID_fk,
         });
-        setIsModalOpen(true);
+        openEdit(item);
     };
 
     const closeModal = () => {
-        setIsModalOpen(false);
-        setEditingItem(null);
         setFormData({
             POS_Name: "",
             Status: "Active",
             Branch_ID_fk: branchId,
         });
+        close();
     };
 
     const updateFormData = (updates: Partial<PosModalFormData>) => {
@@ -52,7 +49,7 @@ export const usePosModal = (branchId: string) => {
     };
 
     return {
-        isModalOpen,
+        isModalOpen: isOpen,
         editingItem,
         formData,
         openCreateModal,

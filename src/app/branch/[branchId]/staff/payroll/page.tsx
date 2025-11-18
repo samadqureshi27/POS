@@ -1,37 +1,34 @@
 "use client";
 
 import React, { useState } from "react";
-import { AlertCircle } from "lucide-react";
-
-// Components
+import { useParams } from "next/navigation";
+import { AlertCircle, DollarSign } from "lucide-react";
+import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { DateFilter } from "@/components/ui/date-filter";
 import { Toast } from "@/components/ui/toast";
-import StatCard from "@/components/ui/summary-card";
 import { StaffTable } from "./components/payroll-staff-table";
-import ActionBar from "@/components/ui/action-bar";
+import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
-
-// Hooks
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
+import { Toaster } from "@/components/ui/sonner";
 import { useDateFilter } from "@/lib/hooks/useDateFilter";
 import { useStaffData } from "@/lib/hooks/usePayrollStaffData";
 import { useFilters } from "@/lib/hooks/payrollFilter";
-import { useToast } from "@/lib/hooks/toast";
+import { useToast as useToastHook } from "@/lib/hooks/toast";
+import { formatCurrency } from "@/lib/util/formatters";
 
 const StaffManagementPage = () => {
-  // For demo purposes, let's set a default branch ID since we can't access real routing
-  const [branchId, setBranchId] = useState("1"); // Default to branch 1 for demo
-
-  // In a real Next.js app, you would use:
-  // const params = useParams();
-  // const branchId = params?.branchId;
+  const params = useParams();
+  const branchId = params?.branchId as string || "1";
 
   // Custom hooks
   const dateFilter = useDateFilter("Week");
-  const { toast, showToast, hideToast } = useToast();
-  
+  const { toast, showToast, hideToast } = useToastHook();
+
   // Staff data hook with error handling
   const { staffItems, loading, summaryData } = useStaffData(branchId);
-  
+
   // Filters hook
   const filters = useFilters(staffItems, dateFilter);
 
@@ -43,7 +40,7 @@ const StaffManagementPage = () => {
   }, [loading, branchId, showToast]);
 
   if (loading) {
-    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={4} showActionBar={true} hasSubmenu={true} />;
   }
 
   if (!branchId) {
@@ -58,7 +55,8 @@ const StaffManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen mt-17 w-full">
+    <PageContainer hasSubmenu={true}>
+      <Toaster position="top-right" />
       {toast && (
         <Toast
           message={toast.message}
@@ -67,38 +65,58 @@ const StaffManagementPage = () => {
         />
       )}
 
-      <div className="mb-8 mt-2">
-        <h1 className="text-3xl font-semibold">Payroll - Branch #{branchId}</h1>
-      </div>
+      <PageHeader
+        title={`Payroll - Branch #${branchId}`}
+        subtitle="Manage employee payroll and salary payments"
+      />
 
       {/* Date Filter Component */}
       <DateFilter dateFilter={dateFilter} />
 
-      {/* Summary Cards using StatCard component */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-[100vw]">
-        <StatCard
+      {/* Stats Bar */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <AdvancedMetricCard
           title="Total Staff"
+          subtitle="All employees"
           value={summaryData.totalStaff}
+          icon="inventory"
+          format="number"
         />
-        <StatCard
+
+        <AdvancedMetricCard
           title="Paid Staff"
+          subtitle="Payment complete"
           value={summaryData.paidStaff}
+          icon="target"
+          format="number"
+          status="good"
         />
-        <StatCard
+
+        <AdvancedMetricCard
           title="Total Payroll"
-          value={`$${summaryData.totalSalaries.toLocaleString()}`}
+          subtitle="All salaries"
+          value={summaryData.totalSalaries}
+          icon="money"
+          format="currency"
+          status="neutral"
         />
-        <StatCard
+
+        <AdvancedMetricCard
           title="Pending Payments"
-          value={`$${summaryData.unpaidSalaries.toLocaleString()}`}
+          subtitle="Not yet paid"
+          value={summaryData.unpaidSalaries}
+          icon="money"
+          format="currency"
+          status={summaryData.unpaidSalaries > 0 ? "warning" : "good"}
         />
       </div>
 
       {/* Action Bar */}
-      <ActionBar
+      <EnhancedActionBar
         searchValue={filters.searchTerm}
         onSearchChange={filters.setSearchInput}
-        searchPlaceholder="Search"
+        searchPlaceholder="Search staff by name or role..."
+        showViewToggle={false}
       />
 
       {/* Staff Table Component */}
@@ -108,7 +126,7 @@ const StaffManagementPage = () => {
         filters={filters}
         branchId={branchId}
       />
-    </div>
+    </PageContainer>
   );
 };
 

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FolderTree, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
@@ -10,8 +11,12 @@ import CategoryModal from "./_components/category-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useCategoryData } from "@/lib/hooks/useCategoryData";
 import { MenuCategoryOption } from "@/lib/types/menu";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
+import { logError } from "@/lib/util/logger";
 
 const CategoriesManagementPage = () => {
+  const router = useRouter();
   const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -43,6 +48,7 @@ const CategoriesManagementPage = () => {
 
     // Utility
     parentCategories,
+    refreshData,
   } = useCategoryData();
 
   // Enhanced action handlers with consistent toast notifications
@@ -74,7 +80,10 @@ const CategoriesManagementPage = () => {
     const categoryId = categoryToDelete.ID;
 
     if (!categoryId) {
-      console.error("❌ Category ID is missing");
+      logError("Category ID is missing", new Error("Category ID is undefined"), {
+        component: "CategoriesManagement",
+        action: "confirmDelete",
+      });
       globalShowToast("Category ID is missing", "error");
       return;
     }
@@ -87,13 +96,18 @@ const CategoriesManagementPage = () => {
 
       if (result.success) {
         globalShowToast("Category deleted successfully", "success");
-        window.location.reload();
+        await refreshData();
       } else {
         globalShowToast(result.message || "Failed to delete category", "error");
       }
     } catch (error: any) {
-      console.error("Error deleting category:", error);
+      logError("Error deleting category", error, {
+        component: "CategoriesManagement",
+        action: "confirmDelete",
+        categoryId: categoryToDelete?.ID,
+      });
       globalShowToast(error.message || "Failed to delete category", "error");
+      router.refresh();
     }
   };
 
@@ -103,14 +117,13 @@ const CategoriesManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Menu Categories</h1>
-        <p className="text-gray-600 text-sm mt-1">Organize your menu with categories and subcategories</p>
-      </header>
+      <PageHeader
+        title="Menu Categories"
+        subtitle="Organize your menu with categories and subcategories"
+      />
 
       {/* Enhanced Action Bar */}
       <EnhancedActionBar
@@ -317,7 +330,7 @@ const CategoriesManagementPage = () => {
         cancelText="Cancel"
         variant="destructive"
       />
-    </div>
+    </PageContainer>
   );
 };
 
