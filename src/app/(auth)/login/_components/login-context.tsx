@@ -221,10 +221,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
     setError(null);
 
     try {
-        pin: pin.replace(/./g, "*"),
-        role,
-      });
-
       const response = await authService.pinLogin(pin, role || "manager");
 
       if (response.success && response.user) {
