@@ -53,7 +53,7 @@ export interface DataTableProps<T> {
   multipleMobileButtons?: boolean; // New property to enable multiple mobile buttons
 }
 
-const DataTableComponent = <T extends Record<string, any>>({
+export const DataTable = <T extends Record<string, any>>({
   data,
   columns,
   actions = [],
@@ -356,8 +356,5 @@ const DataTableComponent = <T extends Record<string, any>>({
     </div>
   );
 };
-
-export const DataTable = React.memo(DataTableComponent) as typeof DataTableComponent;
-DataTable.displayName = 'DataTable';
 
 export default DataTable;
