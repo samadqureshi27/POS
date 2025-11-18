@@ -11,6 +11,7 @@ import MenuItemModal from "./_components/menu-item-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useMenuItemData } from "@/lib/hooks/useMenuItemData";
 import { MenuItemOption } from "@/lib/types/menu";
+import { formatPrice } from "@/lib/util/formatters";
 
 const MenuItemsManagementPage = () => {
   const router = useRouter();
@@ -227,7 +228,7 @@ const MenuItemsManagementPage = () => {
                   {item.Currency}
                 </div>
                 <span className="text-sm font-semibold text-gray-900">
-                  {item.BasePrice.toFixed(2)}
+                  {formatPrice(item.BasePrice)}
                 </span>
               </div>
             ),
@@ -337,7 +338,7 @@ const MenuItemsManagementPage = () => {
                       </span>
                     </div>
                     <span className="text-sm font-bold text-gray-900">
-                      {item.BasePrice.toFixed(2)}
+                      {formatPrice(item.BasePrice)}
                     </span>
                   </div>
 

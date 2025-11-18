@@ -11,6 +11,7 @@ import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeData } from "@/lib/hooks/useRecipeData";
 import { RecipeOption } from "@/lib/types/recipes";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { formatPrice, formatCurrency } from "@/lib/util/formatters";
 
 // add view only modal for recipe items with compact view
 
@@ -361,7 +362,7 @@ const RecipesManagementPage = () => {
                   {/* Cost Placeholder (can be implemented later) */}
                   <div className="text-xs text-gray-500">
                     {item.totalCost ? (
-                      <span className="font-semibold text-gray-700">${item.totalCost.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-700">${formatPrice(item.totalCost)}</span>
                     ) : (
                       <span className="italic">Cost: N/A</span>
                     )}

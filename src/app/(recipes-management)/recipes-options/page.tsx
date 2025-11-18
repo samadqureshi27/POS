@@ -10,6 +10,7 @@ import RecipeVariantModal from "./_components/recipe-variant-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeVariants } from "@/lib/hooks/useRecipeVariations";
 import { RecipeVariant } from "@/lib/types/recipe-variants";
+import { formatPrice } from "@/lib/util/formatters";
 
 const RecipeVariationsPage = () => {
   const { showToast: globalShowToast } = useToast();
@@ -235,7 +236,7 @@ const RecipeVariationsPage = () => {
             header: "Cost Adjustment",
             render: (item) => (
               <span className="text-sm font-semibold text-gray-700">
-                {item.baseCostAdjustment ? `$${item.baseCostAdjustment.toFixed(2)}` : "—"}
+                {item.baseCostAdjustment ? `$${formatPrice(item.baseCostAdjustment)}` : "—"}
               </span>
             ),
             className: "w-36",
@@ -337,7 +338,7 @@ const RecipeVariationsPage = () => {
                   {/* Cost Adjustment */}
                   <div className="text-xs text-gray-500">
                     {item.baseCostAdjustment ? (
-                      <span className="font-semibold text-gray-700">+${item.baseCostAdjustment.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-700">+${formatPrice(item.baseCostAdjustment)}</span>
                     ) : (
                       <span className="italic">No cost adj.</span>
                     )}
