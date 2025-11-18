@@ -5,16 +5,22 @@ const REMOTE_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
   "https://api.tritechtechnologyllc.com";
 
-const DEFAULT_TENANT_SLUG = 'extraction-testt';
-
 /**
  * Get tenant slug from request headers or environment
+ * Throws an error if tenant slug is not configured
  */
 export function getTenantSlug(req: Request): string {
-  // Priority: header > env var > default
+  // Priority: header > env var
   const fromHeader = req.headers.get("x-tenant-id");
+  if (fromHeader) return fromHeader;
+
   const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG;
-  return fromHeader || envSlug || DEFAULT_TENANT_SLUG;
+  if (envSlug) return envSlug;
+
+  // No default - tenant slug MUST be explicitly configured
+  throw new Error(
+    'Tenant slug not configured. Please set NEXT_PUBLIC_TENANT_SLUG environment variable.'
+  );
 }
 
 /**

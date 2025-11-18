@@ -8,6 +8,13 @@ export async function POST(req: Request) {
     const payload = await req.json().catch(() => ({}));
     const url = `${getRemoteBase()}/t/auth/reset-password`;
 
+    // Log request for debugging (password masked)
+    console.log('Reset Password Request:', {
+      url,
+      headers: buildTenantHeaders(req, false),
+      body: { ...payload, password: "***" },
+    });
+
     const res = await fetch(url, {
       method: "POST",
       headers: buildTenantHeaders(req, false),
