@@ -97,7 +97,30 @@
 
 **Potential Impact:** Could eliminate 200+ lines per page with generic ManagementPage component
 
+### Session 5 Continued - Formatter Consolidation (Commit: 7fcc062)
+36. ✅ **Created formatters.ts** - Centralized ALL formatting logic (271 lines)
+37. ✅ **Analyzed formatting patterns** - Found 40+ scattered inline format calls
+
+**New Utility:** `src/lib/util/formatters.ts`
+
+**Functions Created:**
+- **Currency & Numbers:** formatCurrency(), formatPrice(), formatNumber(), formatCompactNumber(), formatTickValue()
+- **IDs:** formatID(), formatStaffId(), formatBranchId()
+- **Dates:** formatDisplayDate(), formatDateTime(), formatTime(), getPeriodLabel(), getDayAbbreviation()
+- **Specific:** formatCNIC(), formatPhone(), formatPercentage(), formatFileSize(), truncateText()
+
+**Scattered Calls Identified:**
+- `.toLocaleString()` - 21 occurrences across 15 files → **formatCurrency()**
+- `.toFixed(2)` - 10 occurrences across 7 files → **formatPrice()**
+- `padStart(3, "0")` - 9 occurrences across 7 files → **formatID()**
+
+**Impact:** Single source of truth for 40+ inline formatting calls, consistent formatting app-wide
+
 **Total Lines Removed (All Sessions):** 1,352+ lines of duplicated code
+
+**Total Utilities Created This Session:**
+- useDataManager.ts (436 lines) - Eliminates 752 lines from hooks
+- formatters.ts (271 lines) - Consolidates 40+ scattered format calls
 
 ---
 
