@@ -61,6 +61,26 @@ export function getInventoryStatusColor(status: InventoryStatus): string {
 }
 
 /**
+ * Get icon component for inventory status
+ * @param status - Inventory status
+ * @returns React element with appropriate icon and color
+ * @example
+ * import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
+ * const icon = getInventoryStatusIcon("critical");
+ */
+export function getInventoryStatusIcon(status: InventoryStatus) {
+  // Import icons dynamically to avoid circular dependencies
+  // Consumers should import the required icons from lucide-react
+  const iconMap = {
+    "critical": { name: "AlertTriangle", className: "text-red-500" },
+    "low": { name: "Clock", className: "text-amber-500" },
+    "good": { name: "CheckCircle", className: "text-green-500" },
+    "normal": { name: "CheckCircle", className: "text-gray-500" },
+  };
+  return iconMap[status] || { name: "CheckCircle", className: "text-gray-500" };
+}
+
+/**
  * Get color class for active/inactive status
  * @param status - Active/Inactive status
  * @returns Tailwind color class
