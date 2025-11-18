@@ -37,6 +37,15 @@ export function formatPrice(value: number): string {
 }
 
 /**
+ * Format decimal number with specified precision
+ * @example formatDecimal(12.567, 1) // "12.6"
+ * @example formatDecimal(42.5) // "42.5" (default 1 decimal)
+ */
+export function formatDecimal(value: number, decimals: number = 1): string {
+  return value.toFixed(decimals);
+}
+
+/**
  * Format number with thousands separator
  * @example formatNumber(1234567) // "1,234,567"
  */

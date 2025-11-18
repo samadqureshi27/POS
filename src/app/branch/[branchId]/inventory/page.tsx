@@ -9,6 +9,8 @@ import StatCard from "@/components/ui/summary-card";
 import InventoryModal from "./_components/inventory-modal";
 import InventoryTable from "./_components/inventory-table";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 const InventoryManagementPage = () => {
   const params = useParams();
   const branchId = parseInt(params?.branchId as string) || 1;
@@ -62,17 +64,15 @@ const InventoryManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-h-screen mt-17">
+    <PageContainer>
       <Toaster position="top-right" />
 
-      <div className="mb-8 mt-2">
-        <h1 className="text-3xl font-semibold">
-          Inventory Management - Branch #{branchId}
-        </h1>
-      </div>
+      <PageHeader
+        title={`Inventory Management - Branch #${branchId}`}
+      />
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 max-w-[100vw] lg:grid-cols-2 gap-4 mb-8 lg:max-w-[50vw]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <StatCard
           title={`Most Used (${statistics.mostUsedItem.count} times)`}
           value={statistics.mostUsedItem.name}
@@ -121,7 +121,7 @@ const InventoryManagementPage = () => {
         onSubmit={handleModalSubmit}
         onFormDataChange={updateFormData}
       />
-    </div>
+    </PageContainer>
   );
 };
 export default InventoryManagementPage;

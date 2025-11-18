@@ -13,6 +13,8 @@ import { useStaffModal } from "@/lib/hooks/useStaffModal";
 import { useStaffFiltering } from "@/lib/hooks/useSatffFiltering";
 import { useSelection } from "@/lib/hooks/selection";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 const EmployeeRecordsPage = () => {
   const params = useParams();
   const branchId = params?.branchId as string;
@@ -103,7 +105,7 @@ const EmployeeRecordsPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-h-screen w-full mt-17">
+    <PageContainer>
       {toast && (
         <Toast
           message={toast.message}
@@ -112,14 +114,12 @@ const EmployeeRecordsPage = () => {
         />
       )}
 
-      <div className="mb-8 mt-2">
-        <h1 className="text-3xl font-semibold">
-          Staff Management - Branch #{branchId}
-        </h1>
-      </div>
+      <PageHeader
+        title={`Staff Management - Branch #${branchId}`}
+      />
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 max-w-[100vw] lg:grid-cols-2 gap-4 mb-8 lg:max-w-[50vw]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <StatCard
           title="Total Staff"
           value={staffItems.length}
@@ -171,7 +171,7 @@ const EmployeeRecordsPage = () => {
         isFormValid={isFormValid}
         showToast={showToast}
       />
-    </div>
+    </PageContainer>
   );
 };
 
