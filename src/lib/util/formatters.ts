@@ -240,11 +240,19 @@ export function formatPhone(value: string): string {
 }
 
 /**
- * Format percentage
+ * Format decimal as percentage
  * @example formatPercentage(0.125) // "12.5%"
  */
 export function formatPercentage(value: number, decimals: number = 1): string {
   return `${(value * 100).toFixed(decimals)}%`;
+}
+
+/**
+ * Format raw percentage value
+ * @example formatPercentageValue(12.5) // "12.5%"
+ */
+export function formatPercentageValue(value: number, decimals: number = 1): string {
+  return `${value.toFixed(decimals)}%`;
 }
 
 /**

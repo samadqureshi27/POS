@@ -15,7 +15,7 @@ import {
   Download,
   Calendar
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/util/formatters';
+import { formatCurrency, formatPercentageValue } from '@/lib/util/formatters';
 
 export interface InventoryVarianceData {
   itemName: string;
@@ -181,7 +181,7 @@ export const InventoryVarianceCard: React.FC<InventoryVarianceProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {item.variancePercentage > 0 ? '+' : ''}{item.variancePercentage.toFixed(1)}%
+                    {item.variancePercentage > 0 ? '+' : ''}{formatPercentageValue(item.variancePercentage)}
                   </p>
                 </div>
 
@@ -220,7 +220,7 @@ export const InventoryVarianceCard: React.FC<InventoryVarianceProps> = ({
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Inventory Accuracy</span>
             <span className="font-medium">
-              {((data.length - criticalItems - warningItems) / data.length * 100).toFixed(1)}%
+              {formatPercentageValue((data.length - criticalItems - warningItems) / data.length * 100)}
             </span>
           </div>
           <Progress

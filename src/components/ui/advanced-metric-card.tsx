@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { formatCurrency } from "@/lib/util/formatters";
+import { formatCurrency, formatPercentageValue } from "@/lib/util/formatters";
 import { Card, CardContent } from './card';
 import { Badge } from './badge';
 import {
@@ -170,7 +170,7 @@ export const AdvancedMetricCard: React.FC<AdvancedMetricCardProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Progress to goal</span>
-                <span>{targetProgress.percentage.toFixed(1)}%</span>
+                <span>{formatPercentageValue(targetProgress.percentage)}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
