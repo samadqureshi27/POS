@@ -13,6 +13,7 @@ import { useCategoryData } from "@/lib/hooks/useCategoryData";
 import { MenuCategoryOption } from "@/lib/types/menu";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
+import { logError } from "@/lib/util/logger";
 
 const CategoriesManagementPage = () => {
   const router = useRouter();
@@ -79,7 +80,10 @@ const CategoriesManagementPage = () => {
     const categoryId = categoryToDelete.ID;
 
     if (!categoryId) {
-      console.error("❌ Category ID is missing");
+      logError("Category ID is missing", new Error("Category ID is undefined"), {
+        component: "CategoriesManagement",
+        action: "confirmDelete",
+      });
       globalShowToast("Category ID is missing", "error");
       return;
     }
@@ -97,7 +101,11 @@ const CategoriesManagementPage = () => {
         globalShowToast(result.message || "Failed to delete category", "error");
       }
     } catch (error: any) {
-      console.error("Error deleting category:", error);
+      logError("Error deleting category", error, {
+        component: "CategoriesManagement",
+        action: "confirmDelete",
+        categoryId: categoryToDelete?.ID,
+      });
       globalShowToast(error.message || "Failed to delete category", "error");
       router.refresh();
     }
