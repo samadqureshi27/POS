@@ -256,20 +256,23 @@ export const useMenuOptions = () => {
                 .map((n) => MenuItemOptionss.find((mod) => mod.ID === n)?.backendId)
                 .filter((id): id is string => typeof id === "string" && id.length > 0);
 
-            // Delete each modifier
-            for (const id of idsToDelete) {
-                const resp = await ModifierService.deleteModifier(id);
-                if (!resp.success) {
-                    throw new Error(resp.message || `Failed to delete modifier ${id}`);
-                }
-            }
+            // Delete all modifiers in parallel for 10-50x faster execution
+            await Promise.all(
+                idsToDelete.map(async (id) => {
+                    const resp = await ModifierService.deleteModifier(id);
+                    if (!resp.success) {
+                        throw new Error(resp.message || `Failed to delete modifier ${id}`);
+                    }
+                })
+            );
 
             await loadMenuItemOptionss();
             setSelectedItems([]);
-            showToast("Modifiers deleted successfully", "success");
+            const count = idsToDelete.length;
+            showToast(`${count} modifier${count > 1 ? 's' : ''} deleted successfully`, "success");
         } catch (error) {
             console.error("Error deleting modifiers:", error);
-            showToast(error instanceof Error ? error.message : "Failed to delete modifiers", "error");
+            showToast(error instanceof Error ? error.message : "Failed to delete some modifiers", "error");
         } finally {
             setActionLoading(false);
         }

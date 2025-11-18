@@ -62,23 +62,29 @@ const AUTH_RESET_PASSWORD_PATH = process.env.NEXT_PUBLIC_API_AUTH_RESET_PASSWORD
 const AUTH_CREATE_STAFF_PATH = process.env.NEXT_PUBLIC_API_AUTH_CREATE_STAFF || '/t/auth/create-staff';
 const AUTH_USERS_BASE_PATH = process.env.NEXT_PUBLIC_API_AUTH_USERS || '/t/auth/users';
 
-// Default tenant slug - can be overridden by env var
-const DEFAULT_TENANT_SLUG = 'extraction-testt';
-
 const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || 'true').toLowerCase() === 'true'; // default to proxy
 function buildUrl(path: string) {
   return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
 }
 
+/**
+ * Get tenant slug from environment or localStorage
+ * Throws an error if tenant slug is not configured
+ */
 function getTenantSlug(): string {
-  // Priority: env var > localStorage > default
+  // Priority: env var > localStorage
   const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || '';
   if (envSlug) return envSlug;
+
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('tenant_slug');
     if (stored) return stored;
   }
-  return DEFAULT_TENANT_SLUG;
+
+  // No default - tenant slug MUST be explicitly configured
+  throw new Error(
+    'Tenant slug not configured. Please set NEXT_PUBLIC_TENANT_SLUG environment variable.'
+  );
 }
 
 function getTenantId(): string | null {

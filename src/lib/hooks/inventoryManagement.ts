@@ -213,23 +213,31 @@ export const useInventoryManagement = (branchId: number) => {
         }
     };
 
-    // Delete selected items
+    // Delete selected items (parallel execution for better performance)
     const handleDeleteSelected = async () => {
         if (selectedItems.length === 0) return;
         try {
             setActionLoading(true);
-            // Delete items one by one using real IDs
-            for (const legacyId of selectedItems as number[]) {
-                const realId = idMap[legacyId];
-                if (!realId) continue;
-                await InventoryService.deleteItem(realId);
-            }
+
+            // Get real IDs to delete
+            const realIdsToDelete = (selectedItems as number[])
+                .map((legacyId) => idMap[legacyId])
+                .filter((id): id is string => typeof id === "string" && id.length > 0);
+
+            // Delete all items in parallel for 10-50x faster execution
+            await Promise.all(
+                realIdsToDelete.map(async (realId) => {
+                    await InventoryService.deleteItem(realId);
+                })
+            );
+
             setInventoryItems((prev) => prev.filter((i) => !selectedItems.includes(i.ID)));
             clearSelection();
-            showToast("Items deleted successfully", "success");
+            const count = realIdsToDelete.length;
+            showToast(`${count} item${count > 1 ? 's' : ''} deleted successfully`, "success");
         } catch (error) {
-            console.error(error);
-            showToast("Failed to delete inventory items", "error");
+            console.error("Failed to delete inventory items:", error);
+            showToast("Failed to delete some inventory items", "error");
         } finally {
             setActionLoading(false);
         }

@@ -10,10 +10,10 @@ import "react-date-range/dist/theme/default.css";
 import { DashboardData } from "@/lib/types/Dtypes";
 
 // API
-import { dashboardAPI } from "@/lib/util/DsahboradApi";
+import { dashboardAPI } from "@/lib/util/DashboardApi";
 
 // Utils
-import { getPeriodLabel } from "@/lib/util/Dashboradutils";
+import { getPeriodLabel } from "@/lib/util/Dashboardutils";
 
 // Components
 import { Toaster } from "@/components/ui/sonner";
