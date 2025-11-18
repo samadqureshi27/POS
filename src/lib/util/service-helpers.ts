@@ -66,11 +66,30 @@ export function getTenantInfo(): { id: string | null; slug: string | null } {
 
 /**
  * Build standardized headers for API requests
- * @param includeContentType - Whether to include Content-Type header (default: true)
+ * @param includeContentTypeOrExtra - Boolean for includeContentType, or object for extra headers
+ * @param skipContentType - Whether to skip Content-Type header (for FormData uploads)
  * @returns Headers object ready for fetch requests
  */
-export function buildHeaders(includeContentType: boolean = true): HeadersInit {
+export function buildHeaders(
+  includeContentTypeOrExtra: boolean | Record<string, string> = true,
+  skipContentType?: boolean
+): HeadersInit {
   const headers: Record<string, string> = {};
+
+  // Handle overloaded parameters
+  let includeContentType = true;
+  let extraHeaders: Record<string, string> = {};
+
+  if (typeof includeContentTypeOrExtra === "boolean") {
+    includeContentType = includeContentTypeOrExtra;
+  } else {
+    extraHeaders = includeContentTypeOrExtra;
+  }
+
+  // Override if skipContentType is explicitly set
+  if (skipContentType !== undefined) {
+    includeContentType = !skipContentType;
+  }
 
   // Content-Type header (JSON by default)
   if (includeContentType) {
@@ -91,7 +110,8 @@ export function buildHeaders(includeContentType: boolean = true): HeadersInit {
     headers["x-tenant-id"] = slug;
   }
 
-  return headers;
+  // Merge extra headers (they can override defaults)
+  return { ...headers, ...extraHeaders };
 }
 
 /**

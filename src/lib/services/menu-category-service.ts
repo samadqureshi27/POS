@@ -1,3 +1,7 @@
+// Menu Category Service
+import { MenuCategory, MenuCategoryPayload, ApiResponse } from "@/lib/types/menu";
+import { buildHeaders } from "@/lib/util/service-helpers";
+
 export class MenuCategoryService {
   /**
    * Get all menu categories
