@@ -51,7 +51,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
       padding === "tight" && "p-4",
       maxWidth === "container" && "max-w-7xl mx-auto",
       maxWidth === "full" && "w-full",
-      hasSubmenu && "mt-16", // Add top margin for submenu (submenu height ~64px)
+      hasSubmenu && "mt-28", // Add top margin for navbar (64px) + submenu (~52px) = ~116px
       className
     )}>
       {children}

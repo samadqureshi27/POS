@@ -159,7 +159,7 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
         <div className={cn(
           showImportExport ? 'grid grid-cols-1 md:grid-cols-2 items-center' : 'mb-8',
           'max-w-[100vw] mb-8',
-          hasSubmenu ? 'mt-14' : 'mt-2'
+          hasSubmenu ? 'mt-28' : 'mt-2'
         )}>
           <Skeleton className="h-9 w-64 rounded-lg" />
           {showImportExport && (
@@ -235,7 +235,7 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
       <div className={cn("bg-background min-h-screen w-full p-6", containerClassName)}>
         {/* Header */}
         {showHeader && (
-          <div className={cn("mb-8", hasSubmenu ? 'mt-14' : 'mt-2')}>
+          <div className={cn("mb-8", hasSubmenu ? 'mt-28' : 'mt-2')}>
             <Skeleton className="h-9 w-64 rounded-lg" />
           </div>
         )}
