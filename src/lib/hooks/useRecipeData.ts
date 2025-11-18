@@ -4,6 +4,7 @@ import { RecipeService } from "@/lib/services/recipe-service";
 import { InventoryService } from "@/lib/services/inventory-service";
 import { RecipeOption, Ingredient, RecipePayload } from "../types/recipes";
 import { useMemo } from "react";
+import { logError } from "@/lib/util/logger";
 
 export const useRecipeData = () => {
   const hook = useDataManager<any, RecipeOption>({
@@ -146,7 +147,11 @@ export const useRecipeData = () => {
         hook.openEditModal(item);
       }
     } catch (error) {
-      console.error("Error fetching recipe details:", error);
+      logError("Error fetching recipe details", error, {
+        component: "useRecipeData",
+        action: "openEditModal",
+        recipeId: item._id || item.ID,
+      });
       hook.openEditModal(item);
     }
   };
