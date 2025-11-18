@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Loader2, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { RecipeService } from "@/lib/services/recipe-service";
-import { RecipeVariantService } from "@/lib/services/recipe-variant-service";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
