@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { logError } from "@/lib/util/logger";
 
 /**
  * Generic Data Manager Hook
@@ -127,7 +128,12 @@ export function useDataManager<TRaw = any, TTransformed = any>(
       const listFn = (service as any)[listMethod] || service.list;
 
       if (!listFn) {
-        console.error(`Service does not have ${listMethod} method`);
+        logError(new Error(`Service does not have ${listMethod} method`), {
+          component: "useDataManager",
+          action: "loadItems",
+          entityName,
+          metadata: { listMethod }
+        });
         return;
       }
 
@@ -158,12 +164,20 @@ export function useDataManager<TRaw = any, TTransformed = any>(
 
         setItems(transformedData);
       } else {
-        console.error(`Failed to load ${entityName}s:`, response.message);
+        logError(new Error(response.message || `Failed to load ${entityName}s`), {
+          component: "useDataManager",
+          action: "loadItems",
+          entityName
+        });
         showToast(response.message || `Failed to load ${entityName}s`, "error");
         setItems([]);
       }
     } catch (error: any) {
-      console.error(`Error fetching ${entityName}s:`, error);
+      logError(error as Error, {
+        component: "useDataManager",
+        action: "loadItems",
+        entityName
+      });
       showToast(`Failed to load ${entityName}s`, "error");
       setItems([]);
     } finally {
@@ -180,7 +194,12 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         const result = await loadFn();
         return { key, result };
       } catch (error) {
-        console.error(`Error loading ${key}:`, error);
+        logError(error as Error, {
+          component: "useDataManager",
+          action: "loadAdditionalData",
+          entityName,
+          metadata: { dataKey: key }
+        });
         return { key, result: [] };
       }
     });
@@ -253,7 +272,11 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         throw new Error(response.message || `Failed to create ${entityName}`);
       }
     } catch (error: any) {
-      console.error(`Error creating ${entityName}:`, error);
+      logError(error as Error, {
+        component: "useDataManager",
+        action: "createItem",
+        entityName
+      });
       showToast(error.message || `Failed to create ${entityName}`, "error");
       return { success: false, error };
     } finally {
@@ -280,7 +303,12 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         throw new Error(response.message || `Failed to update ${entityName}`);
       }
     } catch (error: any) {
-      console.error(`Error updating ${entityName}:`, error);
+      logError(error as Error, {
+        component: "useDataManager",
+        action: "updateItem",
+        entityName,
+        entityId: id
+      });
       showToast(error.message || `Failed to update ${entityName}`, "error");
       return { success: false, error };
     } finally {
@@ -314,7 +342,12 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         throw new Error(`Failed to delete ${failedCount} of ${itemIds.length} ${entityName}s`);
       }
     } catch (error: any) {
-      console.error(`Error deleting ${entityName}s:`, error);
+      logError(error as Error, {
+        component: "useDataManager",
+        action: "deleteItems",
+        entityName,
+        metadata: { itemIds, count: itemIds.length }
+      });
       showToast(error.message || `Failed to delete ${entityName}s`, "error");
       return { success: false, error };
     } finally {
@@ -366,7 +399,12 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         setEditingItem(item);
       }
     } catch (error) {
-      console.error(`Error fetching ${entityName} details:`, error);
+      logError(error as Error, {
+        component: "useDataManager",
+        action: "openEditModal",
+        entityName,
+        entityId: item.ID || item.id || item._id
+      });
       setEditingItem(item);
     }
     setIsModalOpen(true);
