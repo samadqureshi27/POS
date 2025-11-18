@@ -55,7 +55,7 @@ const statusConfig = {
   neutral: { color: 'bg-gray-100 text-gray-800', icon: Minus }
 };
 
-export const AdvancedMetricCard: React.FC<AdvancedMetricCardProps> = ({
+const AdvancedMetricCardComponent: React.FC<AdvancedMetricCardProps> = ({
   title,
   value,
   subtitle,
@@ -193,3 +193,6 @@ export const AdvancedMetricCard: React.FC<AdvancedMetricCardProps> = ({
     </Card>
   );
 };
+
+export const AdvancedMetricCard = React.memo(AdvancedMetricCardComponent);
+AdvancedMetricCard.displayName = 'AdvancedMetricCard';

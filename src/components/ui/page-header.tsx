@@ -25,7 +25,7 @@ export interface PageHeaderProps {
   titleClassName?: string;
 }
 
-export const PageHeader: React.FC<PageHeaderProps> = ({
+const PageHeaderComponent: React.FC<PageHeaderProps> = ({
   title,
   subtitle,
   actions,
@@ -59,5 +59,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     </div>
   );
 };
+
+export const PageHeader = React.memo(PageHeaderComponent);
+PageHeader.displayName = 'PageHeader';
 
 export default PageHeader;

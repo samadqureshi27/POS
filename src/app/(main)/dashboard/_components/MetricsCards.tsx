@@ -2,8 +2,6 @@
 
 import React from "react";
 import { DashboardMetrics } from "@/lib/types/Dtypes";
-import { Card, CardContent } from "@/components/ui/card";
-import StatCard from "@/components/ui/summary-card";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 
 interface MetricsCardsProps {
