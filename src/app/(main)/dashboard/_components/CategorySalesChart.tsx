@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { formatCurrency } from "@/lib/util/formatters";
 
 // Sample data that would come from your POS system
 const categorySalesData = [
@@ -57,7 +58,7 @@ export const CategorySalesChart: React.FC = () => {
                 boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
               }}
               formatter={(value: any, name: string, props: any) => [
-                `${value}% (PKR ${props.payload.revenue.toLocaleString()})`,
+                `${value}% (PKR ${formatCurrency(props.payload.revenue)})`,
                 name
               ]}
             />
@@ -77,7 +78,7 @@ export const CategorySalesChart: React.FC = () => {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-gray-900 font-medium">{item.value}%</span>
-              <span className="text-gray-600">PKR {item.revenue.toLocaleString()}</span>
+              <span className="text-gray-600">PKR {formatCurrency(item.revenue)}</span>
             </div>
           </div>
         ))}
@@ -86,7 +87,7 @@ export const CategorySalesChart: React.FC = () => {
       <div className="mt-4 pt-4 border-t border-gray-200">
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium text-gray-700">Total Revenue</span>
-          <span className="text-lg font-bold text-gray-900">PKR {totalRevenue.toLocaleString()}</span>
+          <span className="text-lg font-bold text-gray-900">PKR {formatCurrency(totalRevenue)}</span>
         </div>
       </div>
     </div>
