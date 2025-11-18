@@ -11,6 +11,8 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import InventoryItemModal from "./_components/inventory-item-modal";
 import ImportResultsDialog from "./_components/import-results-dialog";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default function ItemsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -281,58 +283,50 @@ export default function ItemsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-50">
-      {/* Main Content */}
-      <div className="md:ml-2 p-4 md:p-8">
-        {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Inventory Hub
-              </h1>
-              <p className="text-gray-600 text-sm mt-1">Manage your items, units, and stock levels</p>
-            </div>
+    <PageContainer>
+      <PageHeader
+        title="Inventory Hub"
+        subtitle="Manage your items, units, and stock levels"
+        actions={
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.xlsx"
+              onChange={handleImport}
+              className="hidden"
+            />
+            <Button
+              onClick={handleDownloadTemplate}
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              <FileDown className="h-4 w-4 mr-2" />
+              Template
+            </Button>
+            <Button
+              onClick={handleImportClick}
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+            <Button
+              onClick={handleExport}
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              disabled={items.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </>
+        }
+      />
 
-            {/* CSV Import/Export Buttons */}
-            <div className="flex gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xlsx"
-                onChange={handleImport}
-                className="hidden"
-              />
-              <Button
-                onClick={handleDownloadTemplate}
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                <FileDown className="h-4 w-4 mr-2" />
-                Template
-              </Button>
-              <Button
-                onClick={handleImportClick}
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Import
-              </Button>
-              <Button
-                onClick={handleExport}
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                disabled={items.length === 0}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
-          </div>
-
-          {/* Stats Bar */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      {/* Stats Bar */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <AdvancedMetricCard
               title="Total Items"
               subtitle="All inventory"
@@ -367,11 +361,10 @@ export default function ItemsPage() {
               format="number"
               status={stats.outOfStock > 0 ? "critical" : "good"}
             />
-          </div>
-        </div>
+      </div>
 
-        {/* Action Bar */}
-        <EnhancedActionBar
+      {/* Action Bar */}
+      <EnhancedActionBar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder="Search items by name, SKU, or barcode..."
@@ -679,7 +672,6 @@ export default function ItemsPage() {
             );
           }}
         />
-      </div>
 
       <InventoryItemModal
         isOpen={isItemModalOpen}
@@ -718,6 +710,6 @@ export default function ItemsPage() {
         cancelText="Skip Duplicates"
         variant="default"
       />
-    </div>
+    </PageContainer>
   );
 }
