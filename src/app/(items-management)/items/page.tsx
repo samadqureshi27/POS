@@ -14,6 +14,7 @@ import { InventoryService, type InventoryItem } from "@/lib/services/inventory-s
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
+import { logError } from "@/lib/util/logger";
 
 export default function ItemsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -96,7 +97,10 @@ export default function ItemsPage() {
         calculateStats(filteredItems);
       }
     } else {
-      console.error("Failed to load items:", response.message);
+      logError("Failed to load items", new Error(response.message), {
+        component: "ItemsManagement",
+        action: "loadItems",
+      });
     }
     setLoading(false);
   };
@@ -193,7 +197,10 @@ export default function ItemsPage() {
         toast.error(`Failed to download template: ${response.message}`);
       }
     } catch (error) {
-      console.error('Error downloading template:', error);
+      logError('Error downloading template', error, {
+        component: "ItemsManagement",
+        action: "handleDownloadTemplate",
+      });
       toast.error('Failed to download template. Please try again.');
     }
   };
@@ -220,7 +227,10 @@ export default function ItemsPage() {
         toast.error(`Failed to export items: ${response.message}`);
       }
     } catch (error) {
-      console.error('Error exporting items:', error);
+      logError('Error exporting items', error, {
+        component: "ItemsManagement",
+        action: "handleExport",
+      });
       toast.error('Failed to export items. Please try again.');
     }
   };
@@ -272,7 +282,10 @@ export default function ItemsPage() {
         toast.error(`Import failed: ${response.message || 'Unknown error occurred'}`);
       }
     } catch (error) {
-      console.error('Error importing items:', error);
+      logError('Error importing items', error, {
+        component: "ItemsManagement",
+        action: "processImport",
+      });
       toast.error('Failed to import file. Please check the file format and try again.');
     } finally {
       // Reset file input and pending file
