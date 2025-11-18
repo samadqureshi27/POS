@@ -14,6 +14,7 @@ import { dashboardAPI } from "@/lib/util/DsahboradApi";
 
 // Utils
 import { getPeriodLabel } from "@/lib/util/Dashboradutils";
+import { logError } from "@/lib/util/logger";
 
 // Components
 import { Toaster } from "@/components/ui/sonner";
@@ -70,7 +71,11 @@ const Dashboard = () => {
       setDashboardData(data);
       setLastUpdated(new Date().toISOString());
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      logError("Error fetching dashboard data", error, {
+        component: "Dashboard",
+        action: "loadDashboardData",
+        period,
+      });
       showToast("Failed to load dashboard data", "error");
     } finally {
       if (showLoading) {
@@ -134,7 +139,11 @@ const Dashboard = () => {
         await loadDashboardData(period, false);
       }
     } catch (error) {
-      console.error("Error changing period:", error);
+      logError("Error changing period", error, {
+        component: "Dashboard",
+        action: "handlePeriodChange",
+        period,
+      });
       showToast("Failed to load data for selected period", "error");
     }
   }, [loadDashboardData, showToast, customDateRange]);
@@ -172,7 +181,10 @@ const Dashboard = () => {
     if (!isInitialized.current) {
       isInitialized.current = true;
       loadDashboardData(selectedPeriod).catch(error => {
-        console.error('Initial dashboard load failed:', error);
+        logError('Initial dashboard load failed', error, {
+          component: "Dashboard",
+          action: "useEffect:initialLoad",
+        });
         showToast('Failed to initialize dashboard', 'error');
       });
     }
