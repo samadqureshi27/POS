@@ -15,6 +15,7 @@ import { toast } from "sonner";
 
 // Components
 import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { DashboardHeader } from "./_components/DashboardHeader";
 import { PeriodSelector } from "@/components/ui/period-selector";
 import { MetricsCards } from "./_components/MetricsCards";
@@ -124,16 +125,20 @@ const Dashboard = () => {
           </div>
 
           {/* Key Daily Metrics */}
-          <MetricsCards metrics={dashboardData.metrics} />
+          <ErrorBoundary>
+            <MetricsCards metrics={dashboardData.metrics} />
+          </ErrorBoundary>
 
           {/* Futuristic Sales Visualization */}
-          <div className="mb-6">
-            <FuturisticSalesVisual
-              revenueData={dashboardData.revenueData}
-              bestSellingItems={dashboardData.bestSellingItems}
-              selectedPeriod={selectedPeriod}
-            />
-          </div>
+          <ErrorBoundary>
+            <div className="mb-6">
+              <FuturisticSalesVisual
+                revenueData={dashboardData.revenueData}
+                bestSellingItems={dashboardData.bestSellingItems}
+                selectedPeriod={selectedPeriod}
+              />
+            </div>
+          </ErrorBoundary>
 
           {/* Customer & Payment Insights */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -168,10 +173,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <CustomerAnalytics
-            visitData={dashboardData.visitData}
-            getPeriodLabel={getPeriodLabelWithCustomRange}
-          />
+          <ErrorBoundary>
+            <CustomerAnalytics
+              visitData={dashboardData.visitData}
+              getPeriodLabel={getPeriodLabelWithCustomRange}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* 3. Product & Menu Insights */}
@@ -183,10 +190,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <CategorySalesChart />
-            <HourlySalesChart />
-          </div>
+          <ErrorBoundary>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <CategorySalesChart />
+              <HourlySalesChart />
+            </div>
+          </ErrorBoundary>
         </div>
 
         {/* 4. Monthly P&L View */}
@@ -320,7 +329,9 @@ const Dashboard = () => {
           </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <InventoryStatusChart />
+                <ErrorBoundary>
+                  <InventoryStatusChart />
+                </ErrorBoundary>
 
             {/* Strategic KPIs Panel */}
             <div className="space-y-6">
