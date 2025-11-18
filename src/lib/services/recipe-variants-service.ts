@@ -1,5 +1,6 @@
 // Recipe Variants Service (Paginated)
 import { buildHeaders } from "@/lib/util/service-helpers";
+import { logError } from "@/lib/util/logger";
 
 export interface RecipeVariant {
   _id?: string;
@@ -101,7 +102,10 @@ export class RecipeVariantsService {
         pagination: pagination,
       };
     } catch (error: any) {
-      console.error("Error fetching recipe variants:", error);
+      logError("Error fetching recipe variants", error, {
+        component: "RecipeVariantsService",
+        action: "listVariants",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch recipe variants",
@@ -145,7 +149,10 @@ export class RecipeVariantsService {
         data: variant,
       };
     } catch (error: any) {
-      console.error("Error fetching recipe variant:", error);
+      logError("Error fetching recipe variant", error, {
+        component: "RecipeVariantsService",
+        action: "getVariant",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch recipe variant",
@@ -187,7 +194,10 @@ export class RecipeVariantsService {
         message: data.message || "Recipe variant created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating recipe variant:", error);
+      logError("Error creating recipe variant", error, {
+        component: "RecipeVariantsService",
+        action: "createVariant",
+      });
       return {
         success: false,
         message: error.message || "Failed to create recipe variant",
@@ -229,7 +239,10 @@ export class RecipeVariantsService {
         message: data.message || "Recipe variant updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating recipe variant:", error);
+      logError("Error updating recipe variant", error, {
+        component: "RecipeVariantsService",
+        action: "updateVariant",
+      });
       return {
         success: false,
         message: error.message || "Failed to update recipe variant",
@@ -261,7 +274,10 @@ export class RecipeVariantsService {
         message: data.message || "Recipe variant deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting recipe variant:", error);
+      logError("Error deleting recipe variant", error, {
+        component: "RecipeVariantsService",
+        action: "deleteVariant",
+      });
       return {
         success: false,
         message: error.message || "Failed to delete recipe variant",
@@ -301,7 +317,11 @@ export class RecipeVariantsService {
         data: variants,
       };
     } catch (error: any) {
-      console.error("Error fetching recipe variants:", error);
+      logError("Error fetching recipe variants", error, {
+        component: "RecipeVariantsService",
+        action: "getVariantsByRecipeId",
+        recipeId,
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch recipe variants",
