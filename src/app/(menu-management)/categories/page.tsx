@@ -11,6 +11,8 @@ import CategoryModal from "./_components/category-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useCategoryData } from "@/lib/hooks/useCategoryData";
 import { MenuCategoryOption } from "@/lib/types/menu";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 const CategoriesManagementPage = () => {
   const router = useRouter();
@@ -107,14 +109,13 @@ const CategoriesManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer>
       <Toaster position="top-right" />
 
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Menu Categories</h1>
-        <p className="text-gray-600 text-sm mt-1">Organize your menu with categories and subcategories</p>
-      </header>
+      <PageHeader
+        title="Menu Categories"
+        subtitle="Organize your menu with categories and subcategories"
+      />
 
       {/* Enhanced Action Bar */}
       <EnhancedActionBar
@@ -321,7 +322,7 @@ const CategoriesManagementPage = () => {
         cancelText="Cancel"
         variant="destructive"
       />
-    </div>
+    </PageContainer>
   );
 };
 
