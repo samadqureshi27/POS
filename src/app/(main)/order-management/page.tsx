@@ -18,6 +18,8 @@ import OrderTable from "./_components/order-table";
 import { OrderItem, OrderStats } from "@/lib/types";
 import { OrderAPI } from "@/lib/util/order-api";
 import { useOrderFilters } from "@/lib/hooks/useOrderFilter";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 const OrderManagementPage = () => {
   const [items, setItems] = useState<OrderItem[]>([]);
@@ -114,7 +116,7 @@ const OrderManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-h-screen">
+    <PageContainer>
       {toast && (
         <Toast
           message={toast.message}
@@ -123,7 +125,7 @@ const OrderManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-8">Order Management</h1>
+      <PageHeader title="Order Management" />
 
       {/* Time Period Selector */}
       <PeriodSelector
@@ -374,7 +376,7 @@ const OrderManagementPage = () => {
           loading={loading}
         />
       </DashboardSection>
-    </div>
+    </PageContainer>
   );
 };
 
