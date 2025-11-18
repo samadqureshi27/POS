@@ -6,7 +6,7 @@ import { toast } from "sonner";
 // Components
 import { StarRating } from '@/components/ui/StarRating';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
-import { formatCurrency } from "@/lib/util/formatters";
+import { formatCurrency, formatDisplayDate } from "@/lib/util/formatters";
 import  {MetricCard } from '@/components/ui/MetricCard';
 import { AdvancedMetricCard } from '@/components/ui/advanced-metric-card';
 import { DashboardSection } from '@/components/ui/dashboard-section';
@@ -116,14 +116,6 @@ const AnalyticsDashboard = () => {
       setError("Failed to load custom date range data");
     }
   }, [customDateRange, handleCustomDateRange, setError]);
-
-  const formatDisplayDate = (date: Date) => {
-    if (!date) return '';
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
-  };
 
   const handleBackClick = useCallback(() => {
     router.push('/');
