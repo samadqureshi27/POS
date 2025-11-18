@@ -97,9 +97,12 @@
 
 **Potential Impact:** Could eliminate 200+ lines per page with generic ManagementPage component
 
-### Session 5 Continued - Formatter Consolidation (Commit: 7fcc062)
+### Session 5 Continued - Formatter Consolidation (Commits: 7fcc062 → 1a293ff)
 36. ✅ **Created formatters.ts** - Centralized ALL formatting logic (271 lines)
 37. ✅ **Analyzed formatting patterns** - Found 40+ scattered inline format calls
+38. ✅ **Migrated formatPrice()** - 5 .toFixed(2) calls in menu pages (89cfaa6)
+39. ✅ **Migrated formatCurrency()** - 5 .toLocaleString() calls in dashboard (7699ec8)
+40. ✅ **Migrated formatID()** - 6 padStart(3,"0") calls across tables (1a293ff)
 
 **New Utility:** `src/lib/util/formatters.ts`
 
@@ -109,12 +112,18 @@
 - **Dates:** formatDisplayDate(), formatDateTime(), formatTime(), getPeriodLabel(), getDayAbbreviation()
 - **Specific:** formatCNIC(), formatPhone(), formatPercentage(), formatFileSize(), truncateText()
 
-**Scattered Calls Identified:**
-- `.toLocaleString()` - 21 occurrences across 15 files → **formatCurrency()**
-- `.toFixed(2)` - 10 occurrences across 7 files → **formatPrice()**
-- `padStart(3, "0")` - 9 occurrences across 7 files → **formatID()**
+**Formatters Successfully Migrated:**
+- `.toFixed(2)` - 5 of 10 migrated → **formatPrice()** ✅
+- `.toLocaleString()` - 5 of 21 migrated → **formatCurrency()** ✅
+- `padStart(3, "0")` - 6 of 9 migrated → **formatID()** ✅
+- **Total: 16 scattered format calls eliminated!**
 
-**Impact:** Single source of truth for 40+ inline formatting calls, consistent formatting app-wide
+**Files Updated with Formatters:**
+- menu-items/page.tsx, recipes-management/page.tsx, recipes-options/page.tsx
+- dashboard/CategorySalesChart.tsx, dashboard/HourlySalesChart.tsx
+- branches-management/page.tsx, branch-table.tsx, pos-table.tsx, payroll-staff-table.tsx, customer-profile-card.tsx
+
+**Impact:** Single source of truth for formatting, 16 inline calls consolidated, ~25 more identified for future migration
 
 **Total Lines Removed (All Sessions):** 1,352+ lines of duplicated code
 
