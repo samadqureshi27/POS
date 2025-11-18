@@ -4,6 +4,7 @@ import { MenuItemOptions } from "@/lib/types/menuItemOptions";
 import { useToast } from "@/lib/hooks";
 import { AddonsGroupsService } from "@/lib/services/addons-groups-service";
 import { AddonsItemsService } from "@/lib/services/addons-items-service";
+import { logError } from "@/lib/util/logger";
 
 // Map API Modifier to frontend MenuItemOptions
 const mapApiModifierToItem = (apiMod: TenantModifier, index: number): MenuItemOptions => {
@@ -115,7 +116,10 @@ export const useMenuOptions = () => {
                 throw new Error(response.message || "Failed to fetch modifiers");
             }
         } catch (error) {
-            console.error("Error fetching modifiers:", error);
+            logError("Error fetching modifiers", error, {
+                component: "useMenuOptions",
+                action: "loadMenuItemOptionss"
+            });
             showToast(error instanceof Error ? error.message : "Failed to load modifiers", "error");
         } finally {
             setLoading(false);
@@ -179,7 +183,12 @@ export const useMenuOptions = () => {
                 showToast(response.message || "Failed to create add-on items", "error");
             }
         } catch (error) {
-            console.error("Error creating add-on items:", error);
+            logError("Error creating add-on items", error, {
+                component: "useMenuOptions",
+                action: "handleCreateItem",
+                categoryId: itemData.categoryId,
+                groupId: itemData.groupId
+            });
             showToast(error instanceof Error ? error.message : "Failed to create add-on items", "error");
         } finally {
             setActionLoading(false);
@@ -238,7 +247,11 @@ export const useMenuOptions = () => {
                 showToast(response.message || "Failed to update modifier", "error");
             }
         } catch (error) {
-            console.error("Error updating modifier:", error);
+            logError("Error updating modifier", error, {
+                component: "useMenuOptions",
+                action: "handleUpdateItem",
+                modifierId: editingItem.backendId
+            });
             showToast(error instanceof Error ? error.message : "Failed to update modifier", "error");
         } finally {
             setActionLoading(false);
@@ -268,7 +281,11 @@ export const useMenuOptions = () => {
             setSelectedItems([]);
             showToast("Modifiers deleted successfully", "success");
         } catch (error) {
-            console.error("Error deleting modifiers:", error);
+            logError("Error deleting modifiers", error, {
+                component: "useMenuOptions",
+                action: "handleDeleteSelected",
+                selectedCount: selectedItems.length
+            });
             showToast(error instanceof Error ? error.message : "Failed to delete modifiers", "error");
         } finally {
             setActionLoading(false);

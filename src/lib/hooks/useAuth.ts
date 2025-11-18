@@ -5,6 +5,7 @@
 import React, { useState, useEffect, useContext, createContext, ReactNode, useCallback } from 'react';
 import { User, AuthContextType, LoginResponse, UserRole } from '@/lib/types/auth';
 import authService from '@/lib/auth-service';
+import { logError } from '@/lib/util/logger';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -54,7 +55,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       }
     } catch (error) {
-      console.error('Auth initialization error:', error);
+      logError('Auth initialization error', error, {
+        component: "useAuth",
+        action: "initializeAuth"
+      });
       await handleLogout();
     } finally {
       setIsLoading(false);
@@ -79,7 +83,11 @@ const login = useCallback(
         };
       }
     } catch (error) {
-      console.error('useAuth Login error:', error);
+      logError('Login error', error, {
+        component: "useAuth",
+        action: "login",
+        email
+      });
       return { success: false, error: 'Network error during login' };
     } finally {
       setIsLoading(false);
@@ -102,7 +110,11 @@ const login = useCallback(
         };
       }
     } catch (error) {
-      console.error('PIN login error:', error);
+      logError('PIN login error', error, {
+        component: "useAuth",
+        action: "pinLogin",
+        role
+      });
       return { success: false, error: 'Network error during PIN login' };
     } finally {
       setIsLoading(false);
@@ -113,7 +125,10 @@ const login = useCallback(
     try {
       await authService.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      logError('Logout error', error, {
+        component: "useAuth",
+        action: "handleLogout"
+      });
     } finally {
       setUser(null);
       setIsAuthenticated(false);
@@ -140,7 +155,10 @@ const login = useCallback(
       await handleLogout();
       return false;
     } catch (error) {
-      console.error('Refresh auth error:', error);
+      logError('Refresh auth error', error, {
+        component: "useAuth",
+        action: "refreshAuth"
+      });
       await handleLogout();
       return false;
     }
