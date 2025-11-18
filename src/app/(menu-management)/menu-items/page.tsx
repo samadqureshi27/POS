@@ -14,6 +14,7 @@ import { MenuItemOption } from "@/lib/types/menu";
 import { formatPrice } from "@/lib/util/formatters";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
+import { logError } from "@/lib/util/logger";
 
 const MenuItemsManagementPage = () => {
   const router = useRouter();
@@ -83,7 +84,10 @@ const MenuItemsManagementPage = () => {
     const itemId = itemToDelete.ID;
 
     if (!itemId) {
-      console.error("❌ Menu item ID is missing");
+      logError("Menu item ID is missing", new Error("Menu item ID is undefined"), {
+        component: "MenuItemsManagement",
+        action: "confirmDelete",
+      });
       globalShowToast("Menu item ID is missing", "error");
       return;
     }
@@ -101,7 +105,11 @@ const MenuItemsManagementPage = () => {
         globalShowToast(result.message || "Failed to delete menu item", "error");
       }
     } catch (error: any) {
-      console.error("Error deleting menu item:", error);
+      logError("Error deleting menu item", error, {
+        component: "MenuItemsManagement",
+        action: "confirmDelete",
+        itemId: itemToDelete?.ID,
+      });
       globalShowToast(error.message || "Failed to delete menu item", "error");
       router.refresh();
     }
