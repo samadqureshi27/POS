@@ -5,6 +5,7 @@ import { OrderItem } from '@/lib/types/customer-profile';
 import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import FilterDropdown from '@/components/ui/filter-dropdown';
+import { getOrderTypeColor, getOrderStatusColor } from '@/lib/util/status-helpers';
 
 
 interface OrdersTableProps {
@@ -27,21 +28,11 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
     searchTerm
 }) => {
     const getTypeClassName = (type: string) => {
-        return `hover:bg-gray-100 ${type === "Dine in"
-            ? "text-yellow-400"
-            : type === "Takeaway"
-                ? "text-green-400"
-                : "text-blue-400"
-            }`;
+        return `hover:bg-gray-100 ${getOrderTypeColor(type)}`;
     };
 
     const getStatusClassName = (status: string) => {
-        return `hover:bg-gray-100 ${status === "Completed"
-            ? "text-green-400"
-            : status === "Pending"
-                ? "text-blue-400"
-                : "text-red-400"
-            }`;
+        return `hover:bg-gray-100 ${getOrderStatusColor(status as any)}`;
     };
 
     const uniqueTypes = Array.from(new Set(orders.map((order) => order.Type))).map(type => ({
