@@ -1,6 +1,7 @@
 // src/lib/services/menu-item-service.ts
 
 import AuthService from "@/lib/auth-service";
+import { buildHeaders } from "@/lib/util/service-helpers";
 
 export interface ItemVariant {
   name: string;

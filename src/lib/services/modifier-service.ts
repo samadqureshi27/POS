@@ -1,6 +1,7 @@
 // src/lib/services/modifier-service.ts
 
 import AuthService from "@/lib/auth-service";
+import { buildHeaders } from "@/lib/util/service-helpers";
 
 export interface ModifierOption {
   name: string;

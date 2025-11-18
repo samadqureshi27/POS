@@ -1,6 +1,7 @@
 // src/lib/services/addons-items-service.ts
 
 import AuthService from "@/lib/auth-service";
+import { buildHeaders } from "@/lib/util/service-helpers";
 
 // ==================== Types ====================
 
