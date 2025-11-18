@@ -15,6 +15,8 @@ import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 import { BranchItem } from "@/lib/types/branch";
 import { formatID } from "@/lib/util/formatters";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 const BranchManagementPage = () => {
   const router = useRouter();
@@ -77,17 +79,16 @@ const BranchManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer>
       <Toaster position="top-right" />
 
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Branch Management</h1>
-        <p className="text-gray-600 text-sm mt-1">Manage your restaurant branches and locations</p>
-      </header>
+      <PageHeader
+        title="Branch Management"
+        subtitle="Manage your restaurant branches and locations"
+      />
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 max-w-4xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <AdvancedMetricCard
           title="Total Branches"
           subtitle="All locations"
@@ -302,9 +303,8 @@ const BranchManagementPage = () => {
         onFormDataChange={updateFormData}
         onStatusChange={handleStatusChange}
       />
-    </div>
+    </PageContainer>
   );
 };
-
 
 export default BranchManagementPage;
