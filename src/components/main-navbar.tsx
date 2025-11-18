@@ -186,8 +186,8 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
                   ref={profileButtonRef}
                   className="inline-flex items-center justify-center hover:bg-yellow-600/10 transition-colors duration-200 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500/20"
                 >
-                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
-                    <AvatarFallback className="bg-yellow-600 text-black font-semibold text-sm">
+                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-yellow-500/30">
+                    <AvatarFallback className="bg-yellow-500 text-gray-900 font-bold text-sm">
                       {userData.initials}
                     </AvatarFallback>
                   </Avatar>
@@ -296,8 +296,8 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
             {/* User Info Section */}
             <div className="px-3 py-3 border-b border-gray-700 mb-2">
               <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-yellow-600 text-black font-semibold">
+                <Avatar className="h-10 w-10 border-2 border-yellow-500/30">
+                  <AvatarFallback className="bg-yellow-500 text-gray-900 font-bold">
                     {userData.initials}
                   </AvatarFallback>
                 </Avatar>
