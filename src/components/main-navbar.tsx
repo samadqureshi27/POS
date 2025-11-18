@@ -33,6 +33,7 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
   const [showLogoutOverlay, setShowLogoutOverlay] = useState(false);
   const [showNotificationsOverlay, setShowNotificationsOverlay] = useState(false);
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const notificationsOverlayRef = useRef<HTMLDivElement>(null);
