@@ -69,7 +69,6 @@ export default function ImportResultsDialog({
   }
 
   // Debug: Log what results we're receiving
-  console.log('Dialog received results:', JSON.stringify(results, null, 2));
 
   const hasErrors = results.errors && results.errors.length > 0;
   const hasWarnings = results.warnings && results.warnings.length > 0;

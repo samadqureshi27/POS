@@ -61,8 +61,6 @@ export const useRecipeVariants = () => {
         order: "desc",
       });
 
-      console.log("✅ Loaded recipe variants:", response);
-
       if (response.success && response.data) {
         setVariants(response.data);
 
@@ -96,7 +94,6 @@ export const useRecipeVariants = () => {
     try {
       const response = await RecipeService.listRecipes();
       if (response.success && response.data) {
-        console.log("✅ Loaded recipes for variants:", response.data.length, "items");
         setRecipes(response.data);
       } else {
         console.error("Failed to load recipes:", response.message);
@@ -113,7 +110,6 @@ export const useRecipeVariants = () => {
     try {
       const response = await InventoryService.listItems();
       if (response.success && response.data) {
-        console.log("✅ Loaded inventory items for variants:", response.data.length, "items");
         setInventoryItems(response.data);
       } else {
         console.error("Failed to load inventory:", response.message);
@@ -204,15 +200,12 @@ export const useRecipeVariants = () => {
 
   const openEditModal = useCallback(async (variant: RecipeVariant) => {
     try {
-      console.log("🔄 Opening edit modal for variant:", variant);
-
       // Fetch full variant details if needed
       const variantId = variant._id;
       if (variantId) {
         const response = await RecipeVariantsService.getVariant(variantId);
 
         if (response.success && response.data) {
-          console.log("✅ Full variant data loaded:", response.data);
           setEditingItem(response.data);
         } else {
           setEditingItem(variant);

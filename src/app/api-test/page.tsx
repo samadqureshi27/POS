@@ -27,7 +27,6 @@ export default function ApiTestPage() {
         defaultBranchId: null
       };
 
-      console.log('🔐 Request:', { url, headers, body: { ...body, password: '***' } });
 
       const res = await fetch(url, {
         method: 'POST',
@@ -37,7 +36,6 @@ export default function ApiTestPage() {
 
       const data = await res.json();
 
-      console.log('📡 Response:', { status: res.status, data });
 
       setResponse({
         status: res.status,

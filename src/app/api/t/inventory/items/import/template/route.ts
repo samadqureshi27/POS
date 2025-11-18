@@ -10,7 +10,6 @@ export async function GET(req: Request) {
 
     const url = `${getRemoteBase()}/t/inventory/items/import/template?sample=${sample}`;
 
-    console.log("🔄 Proxy: Template download", { url });
 
     // Create AbortController for timeout
     const controller = new AbortController();
@@ -24,7 +23,6 @@ export async function GET(req: Request) {
 
     clearTimeout(timeoutId);
 
-    console.log("📡 Template Response:", { status: res.status, ok: res.ok });
 
     if (!res.ok) {
       console.error("❌ Template Error:", res.status, res.statusText);

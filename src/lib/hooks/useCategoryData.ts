@@ -29,7 +29,6 @@ export const useCategoryData = () => {
     try {
       setLoading(true);
       const response = await MenuCategoryService.listCategories();
-      console.log("📦 Raw response for categories:", response);
 
       if (response.success) {
         let categoriesArray = response.data;
@@ -44,8 +43,6 @@ export const useCategoryData = () => {
             categoriesArray = [];
           }
         }
-
-        console.log("✅ Loaded categories:", categoriesArray.length);
 
         // Transform categories to match the expected format
         const transformedCategories = categoriesArray.map((cat: any) => ({
@@ -106,7 +103,6 @@ export const useCategoryData = () => {
   const createCategory = useCallback(async (itemData: any) => {
     try {
       setActionLoading(true);
-      console.log("📤 Creating category with data:", itemData);
 
       const response = await MenuCategoryService.createCategory(itemData);
       if (response.success && response.data) {
@@ -128,7 +124,6 @@ export const useCategoryData = () => {
   const updateCategory = useCallback(async (id: string, itemData: any) => {
     try {
       setActionLoading(true);
-      console.log("📤 Updating category:", id, itemData);
 
       const response = await MenuCategoryService.updateCategory(id, itemData);
       if (response.success && response.data) {
@@ -201,7 +196,6 @@ export const useCategoryData = () => {
 
   const openEditModal = useCallback(async (item: MenuCategoryOption) => {
     try {
-      console.log("🔄 openEditModal called with item:", item);
       const categoryId = item.ID;
       const response = await MenuCategoryService.getCategory(categoryId);
 

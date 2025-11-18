@@ -131,10 +131,8 @@ export default function InventoryItemModal({
       CategoriesService.listCategories({ limit: 1000 }),
     ]);
 
-    console.log('Units loaded:', unitsRes);
 
     if (unitsRes.success && unitsRes.data) {
-      console.log('Setting units:', unitsRes.data.length, 'units');
       setUnits(unitsRes.data);
     } else {
       console.error('Failed to load units:', unitsRes.message);
@@ -181,7 +179,6 @@ export default function InventoryItemModal({
       }
     }
 
-    console.log('Saving item with data:', JSON.stringify(submitData, null, 2));
     setLoading(true);
     await onSave(submitData);
     setLoading(false);

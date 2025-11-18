@@ -55,12 +55,10 @@ const NewPasswordOverlay: React.FC = () => {
     try {
       // Convert OTP array to string to use as token
       const token = otpCode.join("");
-      console.log("Resetting password with token:", token);
 
       const response = await authService.resetPassword(token, newPassword);
 
       if (response.success) {
-        console.log("Password reset successful");
 
         // First, hide all other overlays immediately
         setShowVerification(false);

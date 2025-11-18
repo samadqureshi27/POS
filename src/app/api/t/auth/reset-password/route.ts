@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     const payload = await req.json().catch(() => ({}));
     const url = `${getRemoteBase()}/t/auth/reset-password`;
 
-    console.log("🔄 Proxy: /t/auth/reset-password", {
       url,
       headers: buildTenantHeaders(req, false),
       body: { ...payload, password: "***" },
@@ -25,7 +24,6 @@ export async function POST(req: Request) {
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-    console.log("📡 Proxy Response (reset-password):", { status: res.status, ok: res.ok });
 
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),

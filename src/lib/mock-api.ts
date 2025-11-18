@@ -215,10 +215,6 @@ export class MockApiService {
       this.db.storeResetToken(email, resetToken);
       this.db.storeOtpCode(email, otpCode);
       
-      console.log('📧 Mock Email Sent:');
-      console.log(`To: ${email}`);
-      console.log(`OTP Code: ${otpCode}`);
-      console.log(`Reset Token: ${resetToken}`);
       
       return {
         success: true,
@@ -345,10 +341,6 @@ export class MockApiService {
       // 2. Notify administrators
       // 3. Send email to manager
       
-      console.log('🎫 PIN Reset Request Created:');
-      console.log(`Ticket ID: ${ticketId}`);
-      console.log(`Manager ID: ${managerId || 'current-manager'}`);
-      console.log(`Timestamp: ${new Date().toISOString()}`);
       
       return {
         success: true,

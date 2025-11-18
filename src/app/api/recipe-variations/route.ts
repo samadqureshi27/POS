@@ -16,7 +16,6 @@ export async function GET(req: NextRequest) {
     const queryString = searchParams.toString();
     const url = `${REMOTE_BASE}/t/recipe-variations${queryString ? `?${queryString}` : ""}`;
 
-    console.log("🔍 [Recipe variations API] GET request:", url);
 
     const response = await fetch(url, {
       method: "GET",
@@ -24,7 +23,6 @@ export async function GET(req: NextRequest) {
     });
 
     const data = await response.json();
-    console.log("📦 [Recipe variations API] Response:", data);
 
     if (!response.ok) {
       return NextResponse.json(
@@ -52,8 +50,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const url = `${REMOTE_BASE}/t/recipe-variations`;
 
-    console.log("📤 [Recipe variations API] POST request:", url);
-    console.log("📦 [Recipe variations API] Body:", body);
 
     const response = await fetch(url, {
       method: "POST",
@@ -62,7 +58,6 @@ export async function POST(req: NextRequest) {
     });
 
     const data = await response.json();
-    console.log("📦 [Recipe variations API] Response:", data);
 
     if (!response.ok) {
       return NextResponse.json(

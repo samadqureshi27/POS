@@ -138,7 +138,6 @@ export class RecipeVariantsService {
       });
 
       const data = await response.json();
-      console.log("🔍 RecipeVariantsService.listVariants - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -166,9 +165,6 @@ export class RecipeVariantsService {
         variants = data.items;
       }
 
-      console.log("✅ RecipeVariantsService.listVariants - Extracted variants:", Array.isArray(variants) ? variants.length : typeof variants);
-      console.log("📄 RecipeVariantsService.listVariants - Pagination:", pagination);
-
       return {
         success: true,
         data: variants,
@@ -194,7 +190,6 @@ export class RecipeVariantsService {
       });
 
       const data = await response.json();
-      console.log("🔍 RecipeVariantsService.getVariant - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -215,8 +210,6 @@ export class RecipeVariantsService {
         variant = data.data;
       }
 
-      console.log("✅ RecipeVariantsService.getVariant - Extracted variant:", variant);
-
       return {
         success: true,
         data: variant,
@@ -235,8 +228,6 @@ export class RecipeVariantsService {
    */
   static async createVariant(variantData: RecipeVariantFormData): Promise<ApiResponse<RecipeVariant>> {
     try {
-      console.log("📤 RecipeVariantsService.createVariant - Sending data:", variantData);
-
       const response = await fetch("/api/recipe-variations", {
         method: "POST",
         headers: buildHeaders(),
@@ -244,7 +235,6 @@ export class RecipeVariantsService {
       });
 
       const data = await response.json();
-      console.log("📦 RecipeVariantsService.createVariant - Response:", data);
 
       if (!response.ok) {
         return {
@@ -280,8 +270,6 @@ export class RecipeVariantsService {
    */
   static async updateVariant(id: string, variantData: Partial<RecipeVariantFormData>): Promise<ApiResponse<RecipeVariant>> {
     try {
-      console.log("📤 RecipeVariantsService.updateVariant - Sending data:", { id, variantData });
-
       const response = await fetch(`/api/recipe-variations/${id}`, {
         method: "PUT",
         headers: buildHeaders(),
@@ -289,7 +277,6 @@ export class RecipeVariantsService {
       });
 
       const data = await response.json();
-      console.log("📦 RecipeVariantsService.updateVariant - Response:", data);
 
       if (!response.ok) {
         return {
@@ -325,15 +312,12 @@ export class RecipeVariantsService {
    */
   static async deleteVariant(id: string): Promise<ApiResponse<void>> {
     try {
-      console.log("🗑️ RecipeVariantsService.deleteVariant - Deleting:", id);
-
       const response = await fetch(`/api/recipe-variations/${id}`, {
         method: "DELETE",
         headers: buildHeaders(),
       });
 
       const data = await response.json();
-      console.log("📦 RecipeVariantsService.deleteVariant - Response:", data);
 
       if (!response.ok) {
         return {
@@ -366,7 +350,6 @@ export class RecipeVariantsService {
       });
 
       const data = await response.json();
-      console.log("🔍 RecipeVariantsService.getVariantsByRecipeId - Raw API response:", data);
 
       if (!response.ok) {
         return {

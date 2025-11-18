@@ -64,7 +64,6 @@ export class RecipeVariantService {
       });
 
       const data = await response.json();
-      console.log("🔍 RecipeVariantService.listRecipeVariants - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -91,8 +90,6 @@ export class RecipeVariantService {
         variants = data.items;
       }
 
-      console.log("✅ RecipeVariantService.listRecipeVariants - Extracted variants:", Array.isArray(variants) ? variants.length : typeof variants);
-
       return {
         success: true,
         data: variants,
@@ -117,7 +114,6 @@ export class RecipeVariantService {
       });
 
       const data = await response.json();
-      console.log("🔍 RecipeVariantService.listVariantsForRecipe - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -144,8 +140,6 @@ export class RecipeVariantService {
         variants = data.items;
       }
 
-      console.log("✅ RecipeVariantService.listVariantsForRecipe - Extracted variants:", Array.isArray(variants) ? variants.length : typeof variants);
-
       return {
         success: true,
         data: variants,
@@ -170,7 +164,6 @@ export class RecipeVariantService {
       });
 
       const data = await response.json();
-      console.log("🔍 RecipeVariantService.getRecipeVariant - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -190,9 +183,6 @@ export class RecipeVariantService {
       else if (data.data) {
         variant = data.data;
       }
-
-      console.log("✅ RecipeVariantService.getRecipeVariant - Extracted variant:", variant);
-      console.log("  - Ingredients:", variant.ingredients);
 
       return {
         success: true,

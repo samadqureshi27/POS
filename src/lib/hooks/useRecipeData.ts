@@ -59,7 +59,6 @@ export const useRecipeData = () => {
     try {
       const response = await InventoryService.listItems();
       if (response.success && response.data) {
-        console.log("✅ Loaded inventory items for recipes:", response.data.length, "items");
         setInventoryItems(response.data);
       } else {
         console.error("Failed to load inventory:", response.message);
@@ -73,7 +72,6 @@ export const useRecipeData = () => {
   const loadAvailableRecipeOptions = useCallback(async () => {
     try {
       const response = await RecipeService.listRecipes();
-      console.log("📦 Raw response for available recipes:", response);
 
       if (response.success) {
         // Handle different response formats
@@ -92,10 +90,7 @@ export const useRecipeData = () => {
           }
         }
 
-        console.log("✅ Loaded available recipe options:", recipesArray.length);
-
         if (recipesArray.length === 0) {
-          console.warn("No recipes found in response");
           setAvailableRecipeOptions([]);
           return;
         }
@@ -133,7 +128,6 @@ export const useRecipeData = () => {
     try {
       setLoading(true);
       const response = await RecipeService.listRecipes();
-      console.log("📦 Raw response for recipes:", response);
 
       if (response.success) {
         // Handle different response formats
@@ -152,10 +146,7 @@ export const useRecipeData = () => {
           }
         }
 
-        console.log("✅ Loaded real recipes:", recipesArray.length);
-
         if (recipesArray.length === 0) {
-          console.warn("No recipes found - this is normal if you haven't created any yet");
           setRecipeOptions([]);
           setLoading(false);
           return;
@@ -237,8 +228,6 @@ export const useRecipeData = () => {
     try {
       setActionLoading(true);
 
-      console.log("📤 Creating recipe with data:", itemData);
-
       const response = await RecipeService.createRecipe(itemData);
       if (response.success && response.data) {
         await Promise.all([
@@ -262,8 +251,6 @@ export const useRecipeData = () => {
   const updateRecipe = useCallback(async (id: string, itemData: any) => {
     try {
       setActionLoading(true);
-
-      console.log("📤 Updating recipe:", id, itemData);
 
       const response = await RecipeService.updateRecipe(id, itemData);
       if (response.success && response.data) {
@@ -295,8 +282,6 @@ export const useRecipeData = () => {
       const recipesToDelete = recipeOptions.filter((recipe) =>
         itemIds.includes(recipe.ID)
       );
-
-      console.log("🗑️ Deleting recipes:", recipesToDelete);
 
       // Delete each recipe using RecipeService
       const deletePromises = recipesToDelete.map(async (recipe) => {
@@ -358,21 +343,14 @@ export const useRecipeData = () => {
 
   const openEditModal = useCallback(async (item: RecipeOption) => {
     try {
-      console.log("🔄 openEditModal called with item:", item);
-
       // Fetch full recipe details including ingredients (without variants for edit modal)
       const recipeId = item._id || item.ID.toString();
-      console.log("📡 Fetching recipe details for ID:", recipeId);
 
       const response = await RecipeService.getRecipe(recipeId, false);
-      console.log("📦 Recipe details response:", response);
 
       if (response.success && response.data) {
         // Extract the actual recipe from the nested structure
         const recipeData = response.data.recipe || response.data;
-        console.log("✅ Recipe data received:", recipeData);
-        console.log("  - Ingredients count:", recipeData.ingredients?.length || 0);
-        console.log("  - Ingredients:", recipeData.ingredients);
 
         // Merge the full recipe data with the item
         const fullRecipe = {
@@ -380,7 +358,6 @@ export const useRecipeData = () => {
           ingredients: recipeData.ingredients || [],
           description: recipeData.description,
         };
-        console.log("🔀 Merged full recipe:", fullRecipe);
         setEditingItem(fullRecipe as any);
       } else {
         console.error("❌ Failed to fetch recipe details:", response.message);

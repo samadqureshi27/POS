@@ -77,7 +77,6 @@ export class MenuCategoryService {
       });
 
       const data = await response.json();
-      console.log("🔍 MenuCategoryService.listCategories - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -104,8 +103,6 @@ export class MenuCategoryService {
         categories = data.items;
       }
 
-      console.log("✅ MenuCategoryService.listCategories - Extracted categories:", Array.isArray(categories) ? categories.length : typeof categories);
-
       return {
         success: true,
         data: categories,
@@ -130,7 +127,6 @@ export class MenuCategoryService {
       });
 
       const data = await response.json();
-      console.log("🔍 MenuCategoryService.getCategory - Raw API response:", data);
 
       if (!response.ok) {
         return {
@@ -150,8 +146,6 @@ export class MenuCategoryService {
       else if (data.data) {
         category = data.data;
       }
-
-      console.log("✅ MenuCategoryService.getCategory - Extracted category:", category);
 
       return {
         success: true,

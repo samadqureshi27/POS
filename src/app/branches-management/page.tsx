@@ -56,13 +56,11 @@ const BranchManagementPage = () => {
   const handleBranchClick = (branchId: number) => {
     const item = branchItems.find((b) => b["Branch-ID"] === branchId);
     const targetId = item?.backendId ?? String(branchId);
-    console.log('Navigating to branch:', targetId);
     router.push(`/branch/${targetId}/pos`);
   };
 
   const handleDelete = async (branch: BranchItem) => {
     // TODO: Implement delete functionality when backend endpoint is available
-    console.log("Delete branch:", branch);
     alert("Delete functionality will be implemented when backend endpoint is available");
   };
 

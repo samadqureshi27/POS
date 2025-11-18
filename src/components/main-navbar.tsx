@@ -26,6 +26,7 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
   const [showLogoutOverlay, setShowLogoutOverlay] = useState(false);
   const [showNotificationsOverlay, setShowNotificationsOverlay] = useState(false);
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const notificationsOverlayRef = useRef<HTMLDivElement>(null);
@@ -276,19 +277,18 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
             <div className="px-3 py-3 border-b border-gray-700 mb-2">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden flex-shrink-0">
-                  <img 
-                    src={userData.avatar} 
-                    alt="User avatar"
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = `<span class="text-sm font-medium text-gray-300">${userData.initials}</span>`;
-                      }
-                    }}
-                  />
+                  {!avatarError ? (
+                    <img
+                      src={userData.avatar}
+                      alt="User avatar"
+                      className="h-full w-full object-cover"
+                      onError={() => setAvatarError(true)}
+                    />
+                  ) : (
+                    <span className="text-sm font-medium text-gray-300">
+                      {userData.initials}
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white truncate">

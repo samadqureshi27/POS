@@ -1,16 +1,34 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
+import { LoginRequestSchema } from "@/lib/validations/api-schemas";
+import { ZodError } from "zod";
 
 export async function POST(req: Request) {
   try {
-    const payload = await req.json().catch(() => ({}));
-    const url = `${getRemoteBase()}/t/auth/login`;
+    // Validate request body against schema
+    const body = await req.json().catch(() => ({}));
 
-    console.log('🔄 Proxy: /t/auth/login', {
-      url,
-      headers: buildTenantHeaders(req),
-      body: { ...payload, password: '***' }
-    });
+    let payload;
+    try {
+      payload = LoginRequestSchema.parse(body);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Validation failed',
+            errors: error.errors.map(err => ({
+              field: err.path.join('.'),
+              message: err.message,
+            })),
+          },
+          { status: 400 }
+        );
+      }
+      throw error;
+    }
+
+    const url = `${getRemoteBase()}/t/auth/login`;
 
     const res = await fetch(url, {
       method: "POST",
@@ -22,8 +40,6 @@ export async function POST(req: Request) {
     const body = contentType.includes("application/json")
       ? await res.json().catch(() => ({}))
       : await res.text();
-
-    console.log('📡 Proxy Response:', { status: res.status, ok: res.ok });
 
     // Attempt to set httpOnly session cookie when login succeeds
     let token: string | undefined;

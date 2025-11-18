@@ -19,19 +19,16 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     url = `${getRemoteBase()}/t/recipes/${params.id}/with-variants?activeOnly=${activeOnly}&page=${page}&limit=${limit}`;
   }
 
-  console.log("🌐 GET /api/recipes/[id] - Proxying to:", url);
 
   const res = await fetch(url, {
     method: "GET",
     headers: buildTenantHeaders(req, true)
   });
 
-  console.log("✅ Backend response status:", res.status);
 
   const contentType = res.headers.get("content-type");
   if (contentType?.includes("application/json")) {
     const data = await res.json();
-    console.log("📦 Backend response:", JSON.stringify(data).substring(0, 300));
     return NextResponse.json(data, { status: res.status });
   }
 

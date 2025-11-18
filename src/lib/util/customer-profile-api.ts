@@ -234,11 +234,9 @@ export class CustomerAPI {
 
     static async getCustomerById(id: number): Promise<ApiResponse<CustomerItem>> {
         await this.delay(500);
-        console.log(`Looking for customer with ID: ${id}`);
         const customer = this.mockCustomers.find((c) => c.Customer_ID === id);
 
         if (!customer) {
-            console.log(`Customer with ID ${id} not found`);
             return {
                 success: false,
                 data: {} as CustomerItem,
@@ -246,7 +244,6 @@ export class CustomerAPI {
             };
         }
 
-        console.log(`Found customer:`, customer);
         return {
             success: true,
             data: customer,
@@ -259,7 +256,6 @@ export class CustomerAPI {
     ): Promise<ApiResponse<OrderItem[]>> {
         await this.delay(600);
         const orders = this.mockOrders[customerId] || [];
-        console.log(`Orders for customer ${customerId}:`, orders);
         return {
             success: true,
             data: orders,

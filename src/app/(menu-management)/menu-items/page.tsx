@@ -71,7 +71,6 @@ const MenuItemsManagementPage = () => {
   const confirmDelete = async () => {
     if (!itemToDelete) return;
 
-    console.log("🗑️ Deleting menu item:", itemToDelete);
 
     const itemId = itemToDelete.ID;
 
@@ -81,13 +80,11 @@ const MenuItemsManagementPage = () => {
       return;
     }
 
-    console.log("🔄 Deleting menu item with ID:", itemId);
 
     try {
       const MenuService = (await import("@/lib/services/menu-service")).MenuService;
 
       const result = await MenuService.deleteMenuItem(itemId);
-      console.log("Delete result:", result);
 
       if (result.success) {
         globalShowToast("Menu item deleted successfully", "success");

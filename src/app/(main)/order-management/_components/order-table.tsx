@@ -103,7 +103,6 @@ const OrderTable: React.FC<OrderTableProps> = ({
       icon: <Eye className="h-4 w-4" />,
       onClick: (record) => {
         // Handle details action
-        console.log("View details for order:", record.Order);
       }
     }
   ];

@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const url = `${getRemoteBase()}/t/inventory/items/import`;
 
-    console.log("🔄 Proxy: Items import", { url });
 
     // Build headers without Content-Type to let fetch set it for FormData
     const headers = buildTenantHeaders(req, true);
@@ -27,7 +26,6 @@ export async function POST(req: Request) {
 
     clearTimeout(timeoutId);
 
-    console.log("📡 Import Response:", { status: res.status, ok: res.ok });
 
     const contentType = res.headers.get("content-type");
     if (contentType?.includes("application/json")) {

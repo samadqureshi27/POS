@@ -5,7 +5,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   try {
     const url = `${getRemoteBase()}/t/branches/${params.id}/summary`;
 
-    console.log('🔄 Proxy: GET /t/branches/:id/summary', { url });
 
     const res = await fetch(url, {
       method: "GET",
@@ -17,7 +16,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-    console.log('📡 Proxy Response:', { status: res.status, ok: res.ok });
 
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),

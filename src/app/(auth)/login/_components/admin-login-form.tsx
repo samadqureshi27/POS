@@ -33,13 +33,8 @@ const AdminLoginForm: React.FC = () => {
   };
 
   const handleLogin = () => {
-    console.log("Form data:", { email, password });
-    console.log("Email length:", email.length, "Password length:", password.length);
-
     if (validateForm()) {
       handleAdminLogin(email, password);
-    } else {
-      console.log("Form validation failed");
     }
   };
 
