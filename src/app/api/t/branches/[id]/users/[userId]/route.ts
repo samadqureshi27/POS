@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function POST(req: Request, { params }: { params: { id: string; userId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
   try {
-    const url = `${getRemoteBase()}/t/branches/${params.id}/users/${params.userId}`;
+    const { id, userId } = await params;
+    const url = `${getRemoteBase()}/t/branches/${id}/users/${userId}`;
 
 
     const res = await fetch(url, {
@@ -33,9 +34,10 @@ export async function POST(req: Request, { params }: { params: { id: string; use
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string; userId: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
   try {
-    const url = `${getRemoteBase()}/t/branches/${params.id}/users/${params.userId}`;
+    const { id, userId } = await params;
+    const url = `${getRemoteBase()}/t/branches/${id}/users/${userId}`;
 
 
     const res = await fetch(url, {

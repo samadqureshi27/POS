@@ -3,7 +3,8 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const { searchParams } = new URL(req.url);
 
   // Check if requesting with variants
@@ -12,11 +13,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   const page = searchParams.get("page") || "1";
   const limit = searchParams.get("limit") || "50";
 
-  let url = `${getRemoteBase()}/t/recipes/${params.id}`;
+  let url = `${getRemoteBase()}/t/recipes/${id}`;
 
   // Use the /with-variants endpoint if variants are requested
   if (withVariants === "true" || withVariants === "1") {
-    url = `${getRemoteBase()}/t/recipes/${params.id}/with-variants?activeOnly=${activeOnly}&page=${page}&limit=${limit}`;
+    url = `${getRemoteBase()}/t/recipes/${id}/with-variants?activeOnly=${activeOnly}&page=${page}&limit=${limit}`;
   }
 
 
@@ -36,9 +37,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   return new NextResponse(text, { status: res.status });
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const payload = await req.json().catch(() => ({}));
-  const url = `${getRemoteBase()}/t/recipes/${params.id}`;
+  const url = `${getRemoteBase()}/t/recipes/${id}`;
 
   const res = await fetch(url, {
     method: "PUT",
@@ -56,8 +58,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   return new NextResponse(text, { status: res.status });
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  const url = `${getRemoteBase()}/t/recipes/${params.id}`;
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const url = `${getRemoteBase()}/t/recipes/${id}`;
 
   const res = await fetch(url, {
     method: "DELETE",
