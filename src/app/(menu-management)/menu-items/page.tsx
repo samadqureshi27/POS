@@ -12,6 +12,8 @@ import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useMenuItemData } from "@/lib/hooks/useMenuItemData";
 import { MenuItemOption } from "@/lib/types/menu";
 import { formatPrice } from "@/lib/util/formatters";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 const MenuItemsManagementPage = () => {
   const router = useRouter();
@@ -111,14 +113,13 @@ const MenuItemsManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer>
       <Toaster position="top-right" />
 
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Menu Items</h1>
-        <p className="text-gray-600 text-sm mt-1">Manage your menu items with pricing and details</p>
-      </header>
+      <PageHeader
+        title="Menu Items"
+        subtitle="Manage your menu items with pricing and details"
+      />
 
       {/* Enhanced Action Bar */}
       <EnhancedActionBar
@@ -379,7 +380,7 @@ const MenuItemsManagementPage = () => {
         cancelText="Cancel"
         variant="destructive"
       />
-    </div>
+    </PageContainer>
   );
 };
 
