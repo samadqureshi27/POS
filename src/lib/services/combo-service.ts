@@ -1,6 +1,6 @@
 // src/lib/services/combo-service.ts
 
-import AuthService from "@/lib/auth-service";
+import { api, normalizeApiResponse } from "@/lib/util/api-client";
 
 export interface ComboCourse {
   name: string;
@@ -30,167 +30,142 @@ export interface ApiListResponse<T> {
   data?: T;
 }
 
-const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
-const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "true").toLowerCase() === "true";
 const COMBOS_BASE = "/t/catalog/combos";
-
-function buildUrl(path: string) {
-  return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
-}
-
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken") ||
-      null
-    );
-  }
-  return null;
-}
-
-function getTenantSlug(): string | null {
-  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || "";
-  if (envSlug) return envSlug;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_slug") || null;
-  }
-  return null;
-}
-
-function getTenantId(): string | null {
-  const envId = process.env.NEXT_PUBLIC_TENANT_ID || "";
-  if (envId) return envId;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_id") || null;
-  }
-  return null;
-}
-
-function buildHeaders(extra?: Record<string, string>) {
-  const token = getToken();
-  const slug = getTenantSlug();
-  const id = getTenantId();
-
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-  };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return { ...headers, ...(extra || {}) };
-}
 
 export const ComboService = {
   async listCombos(params?: { q?: string; page?: number; limit?: number; active?: boolean }): Promise<ApiListResponse<TenantCombo[]>> {
-    const q = params?.q ?? "";
-    const page = params?.page ?? 1;
-    const limit = params?.limit ?? 50;
-    const active = params?.active;
+    try {
+      const q = params?.q ?? "";
+      const page = params?.page ?? 1;
+      const limit = params?.limit ?? 50;
+      const active = params?.active;
 
-    let url = buildUrl(`${COMBOS_BASE}?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`);
-    if (active !== undefined) url += `&active=${active}`;
+      let path = `${COMBOS_BASE}?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`;
+      if (active !== undefined) path += `&active=${active}`;
 
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<TenantCombo[]>(response);
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `List combos failed (${res.status})` };
+      // Handle different API response structures
+      let items = normalized.data;
+      if (response.items) {
+        items = response.items;
+      } else if (response.result) {
+        items = response.result;
+      }
+
+      return {
+        success: normalized.success,
+        data: items,
+        message: normalized.message,
+      };
+    } catch (error: any) {
+      console.error("Error listing combos:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to list combos",
+      };
     }
-
-    // Backend returns: { status, message, items: [...], count, page, limit }
-    const items: TenantCombo[] = data?.items ?? data?.result ?? [];
-    return { success: true, data: items };
   },
 
   async getCombo(id: string): Promise<ApiListResponse<TenantCombo>> {
-    const url = buildUrl(`${COMBOS_BASE}/${id}`);
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+    try {
+      const response = await api.get(`${COMBOS_BASE}/${id}`);
+      const normalized = normalizeApiResponse<TenantCombo>(response);
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Get combo failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message,
+      };
+    } catch (error: any) {
+      console.error("Error getting combo:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to get combo",
+      };
     }
-
-    const combo: TenantCombo = data?.result ?? data;
-    return { success: true, data: combo };
   },
 
   async createCombo(payload: Partial<TenantCombo>): Promise<ApiListResponse<TenantCombo>> {
-    const url = buildUrl(`${COMBOS_BASE}`);
+    try {
+      // Generate slug from name if not provided
+      const slug = payload.slug || payload.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
-    // Generate slug from name if not provided
-    const slug = payload.slug || payload.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const apiPayload = {
+        name: payload.name,
+        slug: slug,
+        priceMode: payload.priceMode ?? "fixed",
+        basePrice: payload.basePrice ?? 0,
+        currency: payload.currency ?? "PKR",
+        courses: payload.courses ?? [],
+        branchIds: payload.branchIds ?? [],
+        active: payload.active ?? true,
+      };
 
-    // Map to API format
-    const apiPayload = {
-      name: payload.name,
-      slug: slug,
-      priceMode: payload.priceMode ?? "fixed",
-      basePrice: payload.basePrice ?? 0,
-      currency: payload.currency ?? "PKR",
-      courses: payload.courses ?? [],
-      branchIds: payload.branchIds ?? [],
-      active: payload.active ?? true,
-    };
+      const response = await api.post(COMBOS_BASE, apiPayload);
+      const normalized = normalizeApiResponse<TenantCombo>(response);
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Create combo failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Combo created successfully",
+      };
+    } catch (error: any) {
+      console.error("Error creating combo:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to create combo",
+      };
     }
-
-    const combo: TenantCombo = data?.result ?? data;
-    return { success: true, data: combo };
   },
 
   async updateCombo(id: string, payload: Partial<TenantCombo>): Promise<ApiListResponse<TenantCombo>> {
-    const url = buildUrl(`${COMBOS_BASE}/${id}`);
+    try {
+      // Only include fields being updated
+      const apiPayload: any = {};
+      if (payload.name !== undefined) apiPayload.name = payload.name;
+      if (payload.slug !== undefined) apiPayload.slug = payload.slug;
+      if (payload.priceMode !== undefined) apiPayload.priceMode = payload.priceMode;
+      if (payload.basePrice !== undefined) apiPayload.basePrice = payload.basePrice;
+      if (payload.currency !== undefined) apiPayload.currency = payload.currency;
+      if (payload.courses !== undefined) apiPayload.courses = payload.courses;
+      if (payload.branchIds !== undefined) apiPayload.branchIds = payload.branchIds;
+      if (payload.active !== undefined) apiPayload.active = payload.active;
 
-    // Only include fields being updated
-    const apiPayload: any = {};
-    if (payload.name !== undefined) apiPayload.name = payload.name;
-    if (payload.slug !== undefined) apiPayload.slug = payload.slug;
-    if (payload.priceMode !== undefined) apiPayload.priceMode = payload.priceMode;
-    if (payload.basePrice !== undefined) apiPayload.basePrice = payload.basePrice;
-    if (payload.currency !== undefined) apiPayload.currency = payload.currency;
-    if (payload.courses !== undefined) apiPayload.courses = payload.courses;
-    if (payload.branchIds !== undefined) apiPayload.branchIds = payload.branchIds;
-    if (payload.active !== undefined) apiPayload.active = payload.active;
+      const response = await api.put(`${COMBOS_BASE}/${id}`, apiPayload);
+      const normalized = normalizeApiResponse<TenantCombo>(response);
 
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Update combo failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Combo updated successfully",
+      };
+    } catch (error: any) {
+      console.error("Error updating combo:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to update combo",
+      };
     }
-
-    const combo: TenantCombo = data?.result ?? data;
-    return { success: true, data: combo };
   },
 
   async deleteCombo(id: string): Promise<ApiListResponse<null>> {
-    const url = buildUrl(`${COMBOS_BASE}/${id}`);
-    const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });
+    try {
+      const response = await api.delete(`${COMBOS_BASE}/${id}`);
+      const normalized = normalizeApiResponse(response);
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      return { success: false, message: data?.message || `Delete combo failed (${res.status})` };
+      return {
+        success: normalized.success,
+        message: normalized.message || "Combo deleted successfully",
+        data: null,
+      };
+    } catch (error: any) {
+      console.error("Error deleting combo:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to delete combo",
+      };
     }
-
-    return { success: true, data: null };
   },
 };

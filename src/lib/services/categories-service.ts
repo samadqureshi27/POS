@@ -1,6 +1,6 @@
 // src/lib/services/categories-service.ts
 
-import AuthService from "@/lib/auth-service";
+import { api, normalizeApiResponse } from "@/lib/util/api-client";
 
 // ==================== Types ====================
 
@@ -22,62 +22,6 @@ export interface ApiResponse<T> {
   data?: T;
 }
 
-// ==================== Configuration ====================
-
-const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
-const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "true").toLowerCase() === "true";
-
-function buildUrl(path: string) {
-  return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
-}
-
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken") ||
-      null
-    );
-  }
-  return null;
-}
-
-function getTenantSlug(): string | null {
-  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || "";
-  if (envSlug) return envSlug;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_slug") || null;
-  }
-  return null;
-}
-
-function getTenantId(): string | null {
-  const envId = process.env.NEXT_PUBLIC_TENANT_ID || "";
-  if (envId) return envId;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_id") || null;
-  }
-  return null;
-}
-
-function buildHeaders(extra?: Record<string, string>) {
-  const token = getToken();
-  const slug = getTenantSlug();
-  const id = getTenantId();
-
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-  };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return { ...headers, ...(extra || {}) };
-}
-
 // ==================== Categories Service ====================
 
 export const CategoriesService = {
@@ -90,38 +34,65 @@ export const CategoriesService = {
     sort?: string;
     order?: "asc" | "desc";
   }): Promise<ApiResponse<Category[]>> {
-    const q = params?.q ?? "";
-    const page = params?.page ?? 1;
-    const limit = params?.limit ?? 100;
+    try {
+      const q = params?.q ?? "";
+      const page = params?.page ?? 1;
+      const limit = params?.limit ?? 100;
 
-    let url = buildUrl(`/t/inventory/categories?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`);
-    if (params?.isActive !== undefined) url += `&isActive=${params.isActive}`;
-    if (params?.sort) url += `&sort=${params.sort}`;
-    if (params?.order) url += `&order=${params.order}`;
+      let path = `/t/inventory/categories?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`;
+      if (params?.isActive !== undefined) path += `&isActive=${params.isActive}`;
+      if (params?.sort) path += `&sort=${params.sort}`;
+      if (params?.order) path += `&order=${params.order}`;
 
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<Category[]>(response);
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `List categories failed (${res.status})` };
+      // Handle different API response structures
+      let categories = normalized.data;
+      if (response.items) {
+        categories = response.items;
+      } else if (response.result) {
+        categories = response.result;
+      }
+
+      return {
+        success: normalized.success,
+        data: categories,
+        message: normalized.message,
+      };
+    } catch (error: any) {
+      console.error("Error fetching categories:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to fetch categories",
+      };
     }
-
-    const categories: Category[] = data?.items ?? data?.result ?? data?.data ?? [];
-    return { success: true, data: categories };
   },
 
   // Get single category
   async getCategory(id: string): Promise<ApiResponse<Category>> {
-    const url = buildUrl(`/t/inventory/categories/${id}`);
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+    try {
+      const response = await api.get(`/t/inventory/categories/${id}`);
+      const normalized = normalizeApiResponse<Category>(response);
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Get category failed (${res.status})` };
+      // Handle different API response structures
+      let category = normalized.data;
+      if (response.result) {
+        category = response.result;
+      }
+
+      return {
+        success: normalized.success,
+        data: category,
+        message: normalized.message,
+      };
+    } catch (error: any) {
+      console.error("Error fetching category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to fetch category",
+      };
     }
-
-    const category: Category = data?.result ?? data?.data ?? data;
-    return { success: true, data: category };
   },
 
   // Create category
@@ -131,66 +102,87 @@ export const CategoriesService = {
     displayOrder?: number;
     isActive?: boolean;
   }): Promise<ApiResponse<Category>> {
-    const url = buildUrl(`/t/inventory/categories`);
+    try {
+      const apiPayload = {
+        name: payload.name,
+        description: payload.description || "",
+        displayOrder: payload.displayOrder || 0,
+        isActive: payload.isActive ?? true,
+      };
 
-    const apiPayload = {
-      name: payload.name,
-      description: payload.description || "",
-      displayOrder: payload.displayOrder || 0,
-      isActive: payload.isActive ?? true,
-    };
+      const response = await api.post("/t/inventory/categories", apiPayload);
+      const normalized = normalizeApiResponse<Category>(response);
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
+      // Handle different API response structures
+      let category = normalized.data;
+      if (response.result) {
+        category = response.result;
+      }
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Create category failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: category,
+        message: normalized.message || "Category created successfully",
+      };
+    } catch (error: any) {
+      console.error("Error creating category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to create category",
+      };
     }
-
-    const category: Category = data?.result ?? data?.data ?? data;
-    return { success: true, data: category };
   },
 
   // Update category
   async updateCategory(id: string, payload: Partial<Category>): Promise<ApiResponse<Category>> {
-    const url = buildUrl(`/t/inventory/categories/${id}`);
+    try {
+      const apiPayload: any = {};
+      if (payload.name !== undefined) apiPayload.name = payload.name;
+      if (payload.slug !== undefined) apiPayload.slug = payload.slug;
+      if (payload.description !== undefined) apiPayload.description = payload.description;
+      if (payload.displayOrder !== undefined) apiPayload.displayOrder = payload.displayOrder;
+      if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
 
-    const apiPayload: any = {};
-    if (payload.name !== undefined) apiPayload.name = payload.name;
-    if (payload.slug !== undefined) apiPayload.slug = payload.slug;
-    if (payload.description !== undefined) apiPayload.description = payload.description;
-    if (payload.displayOrder !== undefined) apiPayload.displayOrder = payload.displayOrder;
-    if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
+      const response = await api.put(`/t/inventory/categories/${id}`, apiPayload);
+      const normalized = normalizeApiResponse<Category>(response);
 
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
+      // Handle different API response structures
+      let category = normalized.data;
+      if (response.result) {
+        category = response.result;
+      }
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Update category failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: category,
+        message: normalized.message || "Category updated successfully",
+      };
+    } catch (error: any) {
+      console.error("Error updating category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to update category",
+      };
     }
-
-    const category: Category = data?.result ?? data?.data ?? data;
-    return { success: true, data: category };
   },
 
   // Delete category
   async deleteCategory(id: string): Promise<ApiResponse<null>> {
-    const url = buildUrl(`/t/inventory/categories/${id}`);
-    const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });
+    try {
+      const response = await api.delete(`/t/inventory/categories/${id}`);
+      const normalized = normalizeApiResponse(response);
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      return { success: false, message: data?.message || `Delete category failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: null,
+        message: normalized.message || "Category deleted successfully",
+      };
+    } catch (error: any) {
+      console.error("Error deleting category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to delete category",
+      };
     }
-
-    return { success: true, data: null };
   },
 };

@@ -1,6 +1,6 @@
 // src/lib/services/category-service.ts
 
-import AuthService from "@/lib/auth-service";
+import { api, normalizeApiResponse } from "@/lib/util/api-client";
 
 export interface TenantCategory {
   _id?: string;
@@ -21,156 +21,149 @@ export interface ApiListResponse<T> {
   data?: T;
 }
 
-const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
-const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "true").toLowerCase() === "true";
-const CATEGORIES_BASE = "/t/menu/categories";
-
-function buildUrl(path: string) {
-  return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
-}
-
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken") ||
-      null
-    );
-  }
-  return null;
-}
-
-function getTenantSlug(): string | null {
-  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || "";
-  if (envSlug) return envSlug;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_slug") || null;
-  }
-  return null;
-}
-
-function getTenantId(): string | null {
-  const envId = process.env.NEXT_PUBLIC_TENANT_ID || "";
-  if (envId) return envId;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_id") || null;
-  }
-  return null;
-}
-
-function buildHeaders(extra?: Record<string, string>) {
-  const token = getToken();
-  const slug = getTenantSlug();
-  const id = getTenantId();
-
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-  };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return { ...headers, ...(extra || {}) };
-}
-
 export const CategoryService = {
   async listCategories(params?: { q?: string; status?: string; page?: number; limit?: number }): Promise<ApiListResponse<TenantCategory[]>> {
-    const q = params?.q ?? "";
-    const status = params?.status ?? "";
-    const page = params?.page ?? 1;
-    const limit = params?.limit ?? 50;
-    const url = buildUrl(`${CATEGORIES_BASE}?q=${encodeURIComponent(q)}&status=${encodeURIComponent(status)}&page=${page}&limit=${limit}`);
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+    try {
+      const q = params?.q ?? "";
+      const status = params?.status ?? "";
+      const page = params?.page ?? 1;
+      const limit = params?.limit ?? 50;
+      const path = `/t/menu/categories?q=${encodeURIComponent(q)}&status=${encodeURIComponent(status)}&page=${page}&limit=${limit}`;
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `List categories failed (${res.status})` };
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<TenantCategory[]>(response);
+
+      // Handle different API response structures
+      let items = normalized.data;
+      if (response.items) {
+        items = response.items;
+      } else if (response.result) {
+        items = response.result;
+      }
+
+      return {
+        success: normalized.success,
+        data: items,
+        message: normalized.message,
+      };
+    } catch (error: any) {
+      console.error("Error fetching categories:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to fetch categories",
+      };
     }
-
-    // Backend returns: { status, message, items: [...], count, page, limit }
-    const items: TenantCategory[] = data?.items ?? data?.result ?? [];
-    return { success: true, data: items };
   },
 
   async getCategory(id: string): Promise<ApiListResponse<TenantCategory>> {
-    const url = buildUrl(`${CATEGORIES_BASE}/${id}`);
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+    try {
+      const response = await api.get(`/t/menu/categories/${id}`);
+      const normalized = normalizeApiResponse<TenantCategory>(response);
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Get category failed (${res.status})` };
+      // Handle different API response structures
+      let category = normalized.data;
+      if (response.result) {
+        category = response.result;
+      }
+
+      return {
+        success: normalized.success,
+        data: category,
+        message: normalized.message,
+      };
+    } catch (error: any) {
+      console.error("Error fetching category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to fetch category",
+      };
     }
-
-    const category: TenantCategory = data?.result ?? data;
-    return { success: true, data: category };
   },
 
   async createCategory(payload: Partial<TenantCategory>): Promise<ApiListResponse<TenantCategory>> {
-    const url = buildUrl(`${CATEGORIES_BASE}`);
+    try {
+      // Generate slug from name if not provided
+      const slug = payload.slug || payload.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
-    // Generate slug from name if not provided
-    const slug = payload.slug || payload.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      // Map frontend fields to backend format
+      const apiPayload = {
+        name: payload.name,
+        slug: slug,
+        sortIndex: payload.sortIndex ?? 0,
+        isActive: payload.isActive ?? true,
+      };
 
-    // Map frontend fields to backend format
-    const apiPayload = {
-      name: payload.name,
-      slug: slug,
-      sortIndex: payload.sortIndex ?? 0,
-      isActive: payload.isActive ?? true,
-    };
+      const response = await api.post("/t/menu/categories", apiPayload);
+      const normalized = normalizeApiResponse<TenantCategory>(response);
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
+      // Handle different API response structures
+      let category = normalized.data;
+      if (response.result) {
+        category = response.result;
+      }
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Create category failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: category,
+        message: normalized.message || "Category created successfully",
+      };
+    } catch (error: any) {
+      console.error("Error creating category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to create category",
+      };
     }
-
-    const category: TenantCategory = data?.result ?? data;
-    return { success: true, data: category };
   },
 
   async updateCategory(id: string, payload: Partial<TenantCategory>): Promise<ApiListResponse<TenantCategory>> {
-    const url = buildUrl(`${CATEGORIES_BASE}/${id}`);
+    try {
+      // Map frontend fields to backend format (only include fields being updated)
+      const apiPayload: any = {};
+      if (payload.name !== undefined) apiPayload.name = payload.name;
+      if (payload.slug !== undefined) apiPayload.slug = payload.slug;
+      if (payload.sortIndex !== undefined) apiPayload.sortIndex = payload.sortIndex;
+      if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
 
-    // Map frontend fields to backend format (only include fields being updated)
-    const apiPayload: any = {};
-    if (payload.name !== undefined) apiPayload.name = payload.name;
-    if (payload.slug !== undefined) apiPayload.slug = payload.slug;
-    if (payload.sortIndex !== undefined) apiPayload.sortIndex = payload.sortIndex;
-    if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
+      const response = await api.put(`/t/menu/categories/${id}`, apiPayload);
+      const normalized = normalizeApiResponse<TenantCategory>(response);
 
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
+      // Handle different API response structures
+      let category = normalized.data;
+      if (response.result) {
+        category = response.result;
+      }
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Update category failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: category,
+        message: normalized.message || "Category updated successfully",
+      };
+    } catch (error: any) {
+      console.error("Error updating category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to update category",
+      };
     }
-
-    const category: TenantCategory = data?.result ?? data;
-    return { success: true, data: category };
   },
 
   async deleteCategory(id: string): Promise<ApiListResponse<null>> {
-    const url = buildUrl(`${CATEGORIES_BASE}/${id}`);
-    const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });
+    try {
+      const response = await api.delete(`/t/menu/categories/${id}`);
+      const normalized = normalizeApiResponse(response);
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      return { success: false, message: data?.message || `Delete category failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: null,
+        message: normalized.message || "Category deleted successfully",
+      };
+    } catch (error: any) {
+      console.error("Error deleting category:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to delete category",
+      };
     }
-
-    return { success: true, data: null };
   },
 };

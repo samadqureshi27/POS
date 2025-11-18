@@ -1,6 +1,6 @@
 // Recipe Variants Service using proper auth headers (similar to recipe-service)
 
-import AuthService from "@/lib/auth-service";
+import { api, normalizeApiResponse } from "@/lib/util/api-client";
 
 export interface VariantIngredient {
   sourceType: "inventory" | "recipe";
@@ -55,48 +55,6 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-// Helper function to get auth token
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("access_token") ||
-      sessionStorage.getItem("access_token") ||
-      null
-    );
-  }
-  return null;
-}
-
-// Helper function to get tenant info
-function getTenantInfo(): { id: string | null; slug: string | null } {
-  if (typeof window === "undefined") {
-    return { id: null, slug: null };
-  }
-  const id = localStorage.getItem("tenant_id") || sessionStorage.getItem("tenant_id");
-  const slug = localStorage.getItem("tenant_slug") || sessionStorage.getItem("tenant_slug");
-  return { id, slug };
-}
-
-// Build headers with auth and tenant
-function buildHeaders(includeContentType: boolean = true): HeadersInit {
-  const token = getToken();
-  const { id, slug } = getTenantInfo();
-
-  const headers: Record<string, string> = {};
-
-  if (includeContentType) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return headers;
-}
-
 export interface PaginationParams {
   page?: number;
   limit?: number;
@@ -130,45 +88,26 @@ export class RecipeVariantsService {
       if (params?.order) queryParams.append("order", params.order);
 
       const queryString = queryParams.toString();
-      const url = `/api/recipe-variations${queryString ? `?${queryString}` : ""}`;
+      const path = `/api/recipe-variations${queryString ? `?${queryString}` : ""}`;
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to fetch recipe variants",
-        };
-      }
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<RecipeVariant[]>(response);
 
       // Handle different API response structures
-      let variants = data;
-      let pagination = data.pagination || null;
+      let variants = normalized.data;
+      let pagination = response.pagination || null;
 
-      // If wrapped in a data property
-      if (data.data) {
-        variants = data.data;
-      }
-
-      // If it's a paginated response
-      if (data.variants) {
-        variants = data.variants;
-      }
-
-      // If response has items property
-      if (data.items) {
-        variants = data.items;
+      if (response.variants) {
+        variants = response.variants;
+      } else if (response.items) {
+        variants = response.items;
       }
 
       return {
-        success: true,
+        success: normalized.success,
         data: variants,
         pagination: pagination,
+        message: normalized.message,
       };
     } catch (error: any) {
       console.error("Error fetching recipe variants:", error);
@@ -184,35 +123,19 @@ export class RecipeVariantsService {
    */
   static async getVariant(id: string): Promise<ApiResponse<RecipeVariant>> {
     try {
-      const response = await fetch(`/api/recipe-variations/${id}`, {
-        method: "GET",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to fetch recipe variant",
-        };
-      }
+      const response = await api.get(`/api/recipe-variations/${id}`);
+      const normalized = normalizeApiResponse<RecipeVariant>(response);
 
       // Handle different API response structures
-      let variant = data;
-
-      // If wrapped in a result property (backend format)
-      if (data.result) {
-        variant = data.result;
-      }
-      // If wrapped in a data property
-      else if (data.data) {
-        variant = data.data;
+      let variant = normalized.data;
+      if (response.result) {
+        variant = response.result;
       }
 
       return {
-        success: true,
+        success: normalized.success,
         data: variant,
+        message: normalized.message,
       };
     } catch (error: any) {
       console.error("Error fetching recipe variant:", error);
@@ -228,33 +151,13 @@ export class RecipeVariantsService {
    */
   static async createVariant(variantData: RecipeVariantFormData): Promise<ApiResponse<RecipeVariant>> {
     try {
-      const response = await fetch("/api/recipe-variations", {
-        method: "POST",
-        headers: buildHeaders(),
-        body: JSON.stringify(variantData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to create recipe variant",
-        };
-      }
-
-      // Handle different API response structures
-      let variant = data;
-
-      // If wrapped in a data property
-      if (data.data) {
-        variant = data.data;
-      }
+      const response = await api.post("/api/recipe-variations", variantData);
+      const normalized = normalizeApiResponse<RecipeVariant>(response);
 
       return {
-        success: true,
-        data: variant,
-        message: data.message || "Recipe variant created successfully",
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Recipe variant created successfully",
       };
     } catch (error: any) {
       console.error("Error creating recipe variant:", error);
@@ -270,33 +173,13 @@ export class RecipeVariantsService {
    */
   static async updateVariant(id: string, variantData: Partial<RecipeVariantFormData>): Promise<ApiResponse<RecipeVariant>> {
     try {
-      const response = await fetch(`/api/recipe-variations/${id}`, {
-        method: "PUT",
-        headers: buildHeaders(),
-        body: JSON.stringify(variantData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to update recipe variant",
-        };
-      }
-
-      // Handle different API response structures
-      let variant = data;
-
-      // If wrapped in a data property
-      if (data.data) {
-        variant = data.data;
-      }
+      const response = await api.put(`/api/recipe-variations/${id}`, variantData);
+      const normalized = normalizeApiResponse<RecipeVariant>(response);
 
       return {
-        success: true,
-        data: variant,
-        message: data.message || "Recipe variant updated successfully",
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Recipe variant updated successfully",
       };
     } catch (error: any) {
       console.error("Error updating recipe variant:", error);
@@ -312,23 +195,12 @@ export class RecipeVariantsService {
    */
   static async deleteVariant(id: string): Promise<ApiResponse<void>> {
     try {
-      const response = await fetch(`/api/recipe-variations/${id}`, {
-        method: "DELETE",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to delete recipe variant",
-        };
-      }
+      const response = await api.delete(`/api/recipe-variations/${id}`);
+      const normalized = normalizeApiResponse(response);
 
       return {
-        success: true,
-        message: data.message || "Recipe variant deleted successfully",
+        success: normalized.success,
+        message: normalized.message || "Recipe variant deleted successfully",
       };
     } catch (error: any) {
       console.error("Error deleting recipe variant:", error);
@@ -344,31 +216,13 @@ export class RecipeVariantsService {
    */
   static async getVariantsByRecipeId(recipeId: string): Promise<ApiResponse<RecipeVariant[]>> {
     try {
-      const response = await fetch(`/api/recipe-variations?recipeId=${recipeId}`, {
-        method: "GET",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to fetch recipe variants",
-        };
-      }
-
-      // Handle different API response structures
-      let variants = data;
-
-      // If wrapped in a data property
-      if (data.data) {
-        variants = data.data;
-      }
+      const response = await api.get(`/api/recipe-variations?recipeId=${recipeId}`);
+      const normalized = normalizeApiResponse<RecipeVariant[]>(response);
 
       return {
-        success: true,
-        data: variants,
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message,
       };
     } catch (error: any) {
       console.error("Error fetching recipe variants:", error);

@@ -8,9 +8,9 @@ import StatCard from "@/components/ui/summary-card";
 import StaffTable from "./_components/staff-table";
 import StaffModal from "./_components/staffModal";
 import {Toast} from "@/components/ui/toast";
-import { useStaff } from "@/lib/hooks/useSatffManagement";
+import { useStaff } from "@/lib/hooks/useStaffManagement";
 import { useStaffModal } from "@/lib/hooks/useStaffModal";
-import { useStaffFiltering } from "@/lib/hooks/useSatffFiltering";
+import { useStaffFiltering } from "@/lib/hooks/useStaffFiltering";
 import { useSelection } from "@/lib/hooks/selection";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 const EmployeeRecordsPage = () => {

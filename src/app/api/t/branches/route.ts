@@ -42,11 +42,6 @@ export async function POST(req: Request) {
     const payload = await req.json().catch(() => ({}));
     const url = `${getRemoteBase()}/t/branches`;
 
-      url,
-      headers: buildTenantHeaders(req, true),
-      body: payload
-    });
-
     const res = await fetch(url, {
       method: "POST",
       headers: buildTenantHeaders(req, true),

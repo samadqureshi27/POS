@@ -1,6 +1,6 @@
 // src/lib/services/inventory-service.ts
 
-import AuthService from "@/lib/auth-service";
+import { api, normalizeApiResponse, buildApiUrl, buildApiHeaders } from "@/lib/util/api-client";
 
 // ==================== Types ====================
 
@@ -113,67 +113,6 @@ export interface InventoryStats {
   inactiveItems: number;
 }
 
-// ==================== Configuration ====================
-
-const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
-const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "true").toLowerCase() === "true";
-
-function buildUrl(path: string) {
-  return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
-}
-
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken") ||
-      null
-    );
-  }
-  return null;
-}
-
-function getTenantSlug(): string | null {
-  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || "";
-  if (envSlug) return envSlug;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_slug") || null;
-  }
-  return null;
-}
-
-function getTenantId(): string | null {
-  const envId = process.env.NEXT_PUBLIC_TENANT_ID || "";
-  if (envId) return envId;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_id") || null;
-  }
-  return null;
-}
-
-function buildHeaders(extra?: Record<string, string>, skipContentType?: boolean) {
-  const token = getToken();
-  const slug = getTenantSlug();
-  const id = getTenantId();
-
-  const headers: Record<string, string> = {
-    "Accept": "application/json",
-  };
-  
-  // Only add Content-Type if not skipped (for FormData)
-  if (!skipContentType) {
-    headers["Content-Type"] = "application/json";
-  }
-  
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return { ...headers, ...(extra || {}) };
-}
-
 // ==================== Inventory Items Service ====================
 
 export const InventoryService = {
@@ -186,17 +125,13 @@ export const InventoryService = {
       if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
 
       const queryString = queryParams.toString();
-      const url = buildUrl(`/t/inventory/stats${queryString ? `?${queryString}` : ''}`);
+      const path = `/t/inventory/stats${queryString ? `?${queryString}` : ''}`;
 
-      const res = await fetch(url, { headers: buildHeaders() });
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        return { success: false, message: data?.message || `Get stats failed (${res.status})` };
-      }
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse(response);
 
       // Map API response format to our interface
-      const apiStats = data?.result ?? data?.stats ?? data?.data ?? data;
+      const apiStats = response?.result ?? response?.stats ?? normalized.data ?? response;
       const stats: InventoryStats = {
         totalItems: apiStats.total ?? 0,
         stockItems: apiStats.tracked ?? 0,
@@ -224,147 +159,146 @@ export const InventoryService = {
     sort?: string;
     order?: "asc" | "desc";
   }): Promise<ApiResponse<InventoryItem[]>> {
-    // Build query params only when they have values
-    const queryParams = new URLSearchParams();
+    try {
+      const queryParams = new URLSearchParams();
 
-    if (params?.q) queryParams.append('q', params.q);
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.type) queryParams.append('type', params.type);
-    if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
-    if (params?.sort) queryParams.append('sort', params.sort);
-    if (params?.order) queryParams.append('order', params.order);
+      if (params?.q) queryParams.append('q', params.q);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+      if (params?.type) queryParams.append('type', params.type);
+      if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
+      if (params?.sort) queryParams.append('sort', params.sort);
+      if (params?.order) queryParams.append('order', params.order);
 
-    const queryString = queryParams.toString();
-    const url = buildUrl(`/t/inventory/items${queryString ? `?${queryString}` : ''}`);
+      const queryString = queryParams.toString();
+      const path = `/t/inventory/items${queryString ? `?${queryString}` : ''}`;
 
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<InventoryItem[]>(response);
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `List items failed (${res.status})` };
+      // Handle different API response structures
+      const items = response?.items ?? normalized.data ?? [];
+
+      return { success: true, data: items };
+    } catch (error: any) {
+      console.error("Error listing inventory items:", error);
+      return { success: false, message: error.message };
     }
-
-    const items: InventoryItem[] = data?.items ?? data?.result ?? data?.data ?? [];
-
-    // Note: Stats are now fetched from dedicated /t/inventory/stats endpoint
-    return { success: true, data: items };
   },
 
   // Get single inventory item
   async getItem(id: string): Promise<ApiResponse<InventoryItem>> {
-    const url = buildUrl(`/t/inventory/items/${id}`);
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+    try {
+      const response = await api.get(`/t/inventory/items/${id}`);
+      const normalized = normalizeApiResponse<InventoryItem>(response);
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Get item failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message,
+      };
+    } catch (error: any) {
+      console.error("Error getting inventory item:", error);
+      return { success: false, message: error.message };
     }
-
-    const item: InventoryItem = data?.result ?? data;
-    return { success: true, data: item };
   },
 
   // Create inventory item
   async createItem(payload: Partial<InventoryItem>): Promise<ApiResponse<InventoryItem>> {
-    const url = buildUrl(`/t/inventory/items`);
+    try {
+      const apiPayload: any = {
+        name: payload.name,
+        type: payload.type || "stock",
+        baseUnit: payload.baseUnit || "pc",
+        isActive: payload.isActive ?? true,
+      };
 
-    const apiPayload: any = {
-      name: payload.name,
-      type: payload.type || "stock",
-      baseUnit: payload.baseUnit || "pc",
-      isActive: payload.isActive ?? true,
-    };
+      // Optional fields - only include if provided
+      if (payload.sku) apiPayload.sku = payload.sku;
+      if (payload.categoryId) apiPayload.categoryId = payload.categoryId;
+      if (payload.purchaseUnit) apiPayload.purchaseUnit = payload.purchaseUnit;
+      if (payload.conversion !== undefined) apiPayload.conversion = payload.conversion;
+      if (payload.reorderPoint !== undefined) apiPayload.reorderPoint = payload.reorderPoint;
+      if (payload.barcode) apiPayload.barcode = payload.barcode;
+      if (payload.taxCategory) apiPayload.taxCategory = payload.taxCategory;
+      // trackStock: Let backend set default based on item type (stock items default to true)
+      if (payload.quantity !== undefined) apiPayload.quantity = payload.quantity;
 
-    // Optional fields - only include if provided
-    if (payload.sku) apiPayload.sku = payload.sku;
-    if (payload.categoryId) apiPayload.categoryId = payload.categoryId;
-    if (payload.purchaseUnit) apiPayload.purchaseUnit = payload.purchaseUnit;
-    if (payload.conversion !== undefined) apiPayload.conversion = payload.conversion;
-    if (payload.reorderPoint !== undefined) apiPayload.reorderPoint = payload.reorderPoint;
-    if (payload.barcode) apiPayload.barcode = payload.barcode;
-    if (payload.taxCategory) apiPayload.taxCategory = payload.taxCategory;
-    // trackStock: Let backend set default based on item type (stock items default to true)
-    if (payload.quantity !== undefined) apiPayload.quantity = payload.quantity;
+      const response = await api.post(`/t/inventory/items`, apiPayload);
+      const normalized = normalizeApiResponse<InventoryItem>(response);
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Create item failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Item created successfully",
+      };
+    } catch (error: any) {
+      console.error("Error creating inventory item:", error);
+      return { success: false, message: error.message };
     }
-
-    const item: InventoryItem = data?.result ?? data?.data ?? data;
-    return { success: true, data: item };
   },
 
   // Update inventory item
   async updateItem(id: string, payload: Partial<InventoryItem>): Promise<ApiResponse<InventoryItem>> {
-    const url = buildUrl(`/t/inventory/items/${id}`);
+    try {
+      const apiPayload: any = {};
+      if (payload.name !== undefined) apiPayload.name = payload.name;
+      if (payload.sku !== undefined) apiPayload.sku = payload.sku;
+      if (payload.type !== undefined) apiPayload.type = payload.type;
+      if (payload.categoryId !== undefined) apiPayload.categoryId = payload.categoryId;
+      if (payload.baseUnit !== undefined) apiPayload.baseUnit = payload.baseUnit;
+      if (payload.purchaseUnit !== undefined) apiPayload.purchaseUnit = payload.purchaseUnit;
+      if (payload.conversion !== undefined) apiPayload.conversion = payload.conversion;
+      if (payload.reorderPoint !== undefined) apiPayload.reorderPoint = payload.reorderPoint;
+      if (payload.barcode !== undefined) apiPayload.barcode = payload.barcode;
+      if (payload.taxCategory !== undefined) apiPayload.taxCategory = payload.taxCategory;
+      if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
+      if (payload.quantity !== undefined) apiPayload.quantity = payload.quantity;
+      // Only include trackStock if explicitly being changed
+      if (payload.trackStock !== undefined) apiPayload.trackStock = payload.trackStock;
 
-    const apiPayload: any = {};
-    if (payload.name !== undefined) apiPayload.name = payload.name;
-    if (payload.sku !== undefined) apiPayload.sku = payload.sku;
-    if (payload.type !== undefined) apiPayload.type = payload.type;
-    if (payload.categoryId !== undefined) apiPayload.categoryId = payload.categoryId;
-    if (payload.baseUnit !== undefined) apiPayload.baseUnit = payload.baseUnit;
-    if (payload.purchaseUnit !== undefined) apiPayload.purchaseUnit = payload.purchaseUnit;
-    if (payload.conversion !== undefined) apiPayload.conversion = payload.conversion;
-    if (payload.reorderPoint !== undefined) apiPayload.reorderPoint = payload.reorderPoint;
-    if (payload.barcode !== undefined) apiPayload.barcode = payload.barcode;
-    if (payload.taxCategory !== undefined) apiPayload.taxCategory = payload.taxCategory;
-    if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
-    if (payload.quantity !== undefined) apiPayload.quantity = payload.quantity;
-    // Only include trackStock if explicitly being changed
-    if (payload.trackStock !== undefined) apiPayload.trackStock = payload.trackStock;
+      const response = await api.put(`/t/inventory/items/${id}`, apiPayload);
+      const normalized = normalizeApiResponse<InventoryItem>(response);
 
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Update item failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Item updated successfully",
+      };
+    } catch (error: any) {
+      console.error("Error updating inventory item:", error);
+      return { success: false, message: error.message };
     }
-
-    const item: InventoryItem = data?.result ?? data?.data ?? data;
-    return { success: true, data: item };
   },
 
   // Delete inventory item
   async deleteItem(id: string): Promise<ApiResponse<null>> {
-    const url = buildUrl(`/t/inventory/items/${id}`);
-    const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });
+    try {
+      const response = await api.delete(`/t/inventory/items/${id}`);
+      const normalized = normalizeApiResponse(response);
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      return { success: false, message: data?.message || `Delete item failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: null,
+        message: normalized.message || "Item deleted successfully",
+      };
+    } catch (error: any) {
+      console.error("Error deleting inventory item:", error);
+      return { success: false, message: error.message };
     }
-
-    return { success: true, data: null };
   },
 
   // Adjust stock
   async adjustStock(payload: StockAdjustment): Promise<ApiResponse<any>> {
     try {
-      const response = await fetch(buildUrl("/t/inventory/stock/adjust"), {
-        method: "POST",
-        headers: buildHeaders(),
-        body: JSON.stringify(payload),
-      });
+      const response = await api.post("/t/inventory/stock/adjust", payload);
+      const normalized = normalizeApiResponse(response);
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return { success: true, data };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Stock adjusted successfully",
+      };
     } catch (error: any) {
       console.error("Error adjusting stock:", error);
       return { success: false, message: error.message };
@@ -379,16 +313,18 @@ export const InventoryService = {
    */
   async downloadImportTemplate(includeSample: boolean = true): Promise<ApiResponse<Blob>> {
     try {
-      const url = buildUrl(`/t/inventory/items/import/template${includeSample ? '?sample=true' : ''}`);
+      const url = buildApiUrl(`/t/inventory/items/import/template${includeSample ? '?sample=true' : ''}`);
+      const headers = buildApiHeaders();
+
       const response = await fetch(url, {
         method: "GET",
-        headers: buildHeaders({
-          'Accept': 'text/csv, application/json'
-        }),
+        headers: {
+          ...headers,
+          'Accept': 'text/csv, application/json',
+        },
       });
 
       if (!response.ok) {
-        // Try to parse as JSON first (for error responses from proxy)
         const contentType = response.headers.get('content-type') || '';
         if (contentType.includes('application/json')) {
           const errorData = await response.json();
@@ -417,14 +353,16 @@ export const InventoryService = {
       formData.append('file', file);
       formData.append('duplicatePolicy', duplicatePolicy);
 
-      const response = await fetch(buildUrl("/t/inventory/items/import"), {
+      const url = buildApiUrl("/t/inventory/items/import");
+      const headers = buildApiHeaders(false); // Skip Content-Type for FormData
+
+      const response = await fetch(url, {
         method: "POST",
-        headers: buildHeaders({}, true), // Skip Content-Type for FormData
+        headers,
         body: formData,
       });
 
       if (!response.ok) {
-        // Try to parse as JSON first (for error responses from proxy)
         const contentType = response.headers.get('content-type') || '';
         if (contentType.includes('application/json')) {
           const errorData = await response.json();
@@ -456,17 +394,18 @@ export const InventoryService = {
       if (params?.categoryId) searchParams.append('categoryId', params.categoryId);
 
       const queryString = searchParams.toString();
-      const url = buildUrl(`/t/inventory/items/export.csv${queryString ? `?${queryString}` : ''}`);
-      
+      const url = buildApiUrl(`/t/inventory/items/export.csv${queryString ? `?${queryString}` : ''}`);
+      const headers = buildApiHeaders();
+
       const response = await fetch(url, {
         method: "GET",
-        headers: buildHeaders({
-          'Accept': 'text/csv, application/json'
-        }),
+        headers: {
+          ...headers,
+          'Accept': 'text/csv, application/json',
+        },
       });
 
       if (!response.ok) {
-        // Try to parse as JSON first (for error responses from proxy)
         const contentType = response.headers.get('content-type') || '';
         if (contentType.includes('application/json')) {
           const errorData = await response.json();
@@ -586,54 +525,57 @@ export const UnitsService = {
 export const ConversionsService = {
   // List conversions
   async listConversions(): Promise<ApiResponse<Conversion[]>> {
-    const url = buildUrl(`/t/inventory/conversions`);
+    try {
+      const response = await api.get(`/t/inventory/conversions`);
+      const normalized = normalizeApiResponse<Conversion[]>(response);
 
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+      // Handle different API response structures
+      const conversions = response?.items ?? normalized.data ?? [];
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `List conversions failed (${res.status})` };
+      return { success: true, data: conversions };
+    } catch (error: any) {
+      console.error("Error listing conversions:", error);
+      return { success: false, message: error.message };
     }
-
-    const conversions: Conversion[] = data?.items ?? data?.result ?? [];
-    return { success: true, data: conversions };
   },
 
   // Create conversion
   async createConversion(payload: Partial<Conversion>): Promise<ApiResponse<Conversion>> {
-    const url = buildUrl(`/t/inventory/conversions`);
+    try {
+      const apiPayload = {
+        fromUnit: payload.fromUnit,
+        toUnit: payload.toUnit,
+        factor: payload.factor,
+      };
 
-    const apiPayload = {
-      fromUnit: payload.fromUnit,
-      toUnit: payload.toUnit,
-      factor: payload.factor,
-    };
+      const response = await api.post(`/t/inventory/conversions`, apiPayload);
+      const normalized = normalizeApiResponse<Conversion>(response);
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Create conversion failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Conversion created successfully",
+      };
+    } catch (error: any) {
+      console.error("Error creating conversion:", error);
+      return { success: false, message: error.message };
     }
-
-    const conversion: Conversion = data?.result ?? data;
-    return { success: true, data: conversion };
   },
 
   // Delete conversion
   async deleteConversion(id: string): Promise<ApiResponse<null>> {
-    const url = buildUrl(`/t/inventory/conversions/${id}`);
-    const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });
+    try {
+      const response = await api.delete(`/t/inventory/conversions/${id}`);
+      const normalized = normalizeApiResponse(response);
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      return { success: false, message: data?.message || `Delete conversion failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: null,
+        message: normalized.message || "Conversion deleted successfully",
+      };
+    } catch (error: any) {
+      console.error("Error deleting conversion:", error);
+      return { success: false, message: error.message };
     }
-
-    return { success: true, data: null };
   },
 };

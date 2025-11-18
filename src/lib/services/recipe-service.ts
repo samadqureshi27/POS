@@ -1,6 +1,6 @@
 // Real Recipe Service using proxy-helpers (similar to inventory-service)
 
-import AuthService from "@/lib/auth-service";
+import { api, normalizeApiResponse } from "@/lib/util/api-client";
 
 export interface RecipeIngredient {
   sourceType: "inventory" | "recipe";
@@ -29,89 +29,27 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-// Helper function to get auth token
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("access_token") ||
-      sessionStorage.getItem("access_token") ||
-      null
-    );
-  }
-  return null;
-}
-
-// Helper function to get tenant info
-function getTenantInfo(): { id: string | null; slug: string | null } {
-  if (typeof window === "undefined") {
-    return { id: null, slug: null };
-  }
-  const id = localStorage.getItem("tenant_id") || sessionStorage.getItem("tenant_id");
-  const slug = localStorage.getItem("tenant_slug") || sessionStorage.getItem("tenant_slug");
-  return { id, slug };
-}
-
-// Build headers with auth and tenant
-function buildHeaders(includeContentType: boolean = true): HeadersInit {
-  const token = getToken();
-  const { id, slug } = getTenantInfo();
-
-  const headers: Record<string, string> = {};
-
-  if (includeContentType) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return headers;
-}
-
 export class RecipeService {
   /**
    * Get all recipes
    */
   static async listRecipes(): Promise<ApiResponse<Recipe[]>> {
     try {
-      const response = await fetch("/api/recipes", {
-        method: "GET",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to fetch recipes",
-        };
-      }
+      const response = await api.get("/api/recipes");
+      const normalized = normalizeApiResponse<Recipe[]>(response);
 
       // Handle different API response structures
-      let recipes = data;
-
-      // If wrapped in a data property
-      if (data.data) {
-        recipes = data.data;
-      }
-
-      // If it's a paginated response
-      if (data.recipes) {
-        recipes = data.recipes;
-      }
-
-      // If response has items property
-      if (data.items) {
-        recipes = data.items;
+      let recipes = normalized.data;
+      if (response.recipes) {
+        recipes = response.recipes;
+      } else if (response.items) {
+        recipes = response.items;
       }
 
       return {
-        success: true,
+        success: normalized.success,
         data: recipes,
+        message: normalized.message,
       };
     } catch (error: any) {
       console.error("Error fetching recipes:", error);
@@ -128,43 +66,33 @@ export class RecipeService {
   static async getRecipe(id: string, includeVariants: boolean = true): Promise<ApiResponse<any>> {
     try {
       // Use the new /with-variants endpoint if variants are requested
-      let url = `/api/recipes/${id}`;
+      let path = `/api/recipes/${id}`;
       if (includeVariants) {
-        url += `?withVariants=1&activeOnly=true&page=1&limit=50`;
+        path += `?withVariants=1&activeOnly=true&page=1&limit=50`;
       }
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to fetch recipe",
-        };
-      }
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<any>(response);
 
       // The new endpoint returns: {status, message, result: {recipe, variants, count, page, limit}}
-      let recipe = data;
+      let recipe = normalized.data;
       let variants = [];
 
-      if (data.result) {
-        recipe = data.result.recipe || data.result;
-        variants = data.result.variants || [];
-      } else if (data.data) {
-        recipe = data.data.recipe || data.data;
-        variants = data.data.variants || [];
+      if (response.result) {
+        recipe = response.result.recipe || response.result;
+        variants = response.result.variants || [];
+      } else if (response.data) {
+        recipe = response.data.recipe || response.data;
+        variants = response.data.variants || [];
       }
 
       return {
-        success: true,
+        success: normalized.success,
         data: {
           recipe,
           variants: includeVariants ? variants : undefined,
         },
+        message: normalized.message,
       };
     } catch (error: any) {
       console.error("Error fetching recipe:", error);
@@ -180,25 +108,13 @@ export class RecipeService {
    */
   static async createRecipe(recipe: Partial<Recipe>): Promise<ApiResponse<Recipe>> {
     try {
-      const response = await fetch("/api/recipes", {
-        method: "POST",
-        headers: buildHeaders(),
-        body: JSON.stringify(recipe),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to create recipe",
-        };
-      }
+      const response = await api.post("/api/recipes", recipe);
+      const normalized = normalizeApiResponse<Recipe>(response);
 
       return {
-        success: true,
-        data: data.data || data,
-        message: data.message || "Recipe created successfully",
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Recipe created successfully",
       };
     } catch (error: any) {
       console.error("Error creating recipe:", error);
@@ -214,25 +130,13 @@ export class RecipeService {
    */
   static async updateRecipe(id: string, updates: Partial<Recipe>): Promise<ApiResponse<Recipe>> {
     try {
-      const response = await fetch(`/api/recipes/${id}`, {
-        method: "PUT",
-        headers: buildHeaders(),
-        body: JSON.stringify(updates),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to update recipe",
-        };
-      }
+      const response = await api.put(`/api/recipes/${id}`, updates);
+      const normalized = normalizeApiResponse<Recipe>(response);
 
       return {
-        success: true,
-        data: data.data || data,
-        message: data.message || "Recipe updated successfully",
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Recipe updated successfully",
       };
     } catch (error: any) {
       console.error("Error updating recipe:", error);
@@ -248,23 +152,12 @@ export class RecipeService {
    */
   static async deleteRecipe(id: string): Promise<ApiResponse<void>> {
     try {
-      const response = await fetch(`/api/recipes/${id}`, {
-        method: "DELETE",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to delete recipe",
-        };
-      }
+      const response = await api.delete(`/api/recipes/${id}`);
+      const normalized = normalizeApiResponse(response);
 
       return {
-        success: true,
-        message: data.message || "Recipe deleted successfully",
+        success: normalized.success,
+        message: normalized.message || "Recipe deleted successfully",
       };
     } catch (error: any) {
       console.error("Error deleting recipe:", error);

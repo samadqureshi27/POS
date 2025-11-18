@@ -38,10 +38,6 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     const payload = await req.json().catch(() => ({}));
     const url = `${getRemoteBase()}/t/branches/${params.id}`;
 
-      url,
-      body: payload
-    });
-
     const res = await fetch(url, {
       method: "PUT",
       headers: buildTenantHeaders(req, true),

@@ -1,49 +1,7 @@
 // Menu Item Service
 
-import AuthService from "@/lib/auth-service";
 import { MenuItem, MenuItemPayload, ApiResponse } from "@/lib/types/menu";
-
-// Helper function to get auth token
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("access_token") ||
-      sessionStorage.getItem("access_token") ||
-      null
-    );
-  }
-  return null;
-}
-
-// Helper function to get tenant info
-function getTenantInfo(): { id: string | null; slug: string | null } {
-  if (typeof window === "undefined") {
-    return { id: null, slug: null };
-  }
-  const id = localStorage.getItem("tenant_id") || sessionStorage.getItem("tenant_id");
-  const slug = localStorage.getItem("tenant_slug") || sessionStorage.getItem("tenant_slug");
-  return { id, slug };
-}
-
-// Build headers with auth and tenant
-function buildHeaders(includeContentType: boolean = true): HeadersInit {
-  const token = getToken();
-  const { id, slug } = getTenantInfo();
-
-  const headers: Record<string, string> = {};
-
-  if (includeContentType) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return headers;
-}
+import { api, normalizeApiResponse } from "@/lib/util/api-client";
 
 export class MenuService {
   /**
@@ -69,43 +27,23 @@ export class MenuService {
       if (params?.order) queryParams.append("order", params.order);
 
       const queryString = queryParams.toString();
-      const url = `/api/menu/items${queryString ? `?${queryString}` : ''}`;
+      const path = `/menu/items${queryString ? `?${queryString}` : ''}`;
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: buildHeaders(),
-      });
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<MenuItem[]>(response);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to fetch menu items",
-        };
-      }
-
-      // Handle different API response structures
-      let items = data;
-
-      // If wrapped in a data property
-      if (data.data) {
-        items = data.data;
-      }
-
-      // If it's a paginated response
-      if (data.items) {
-        items = data.items;
-      }
-
-      // If response has menuItems property
-      if (data.menuItems) {
-        items = data.menuItems;
+      // Handle different API response structures for items
+      let items = normalized.data;
+      if (response.items) {
+        items = response.items;
+      } else if (response.menuItems) {
+        items = response.menuItems;
       }
 
       return {
-        success: true,
+        success: normalized.success,
         data: items,
+        message: normalized.message,
       };
     } catch (error: any) {
       console.error("Error fetching menu items:", error);
@@ -121,35 +59,13 @@ export class MenuService {
    */
   static async getMenuItem(id: string): Promise<ApiResponse<MenuItem>> {
     try {
-      const response = await fetch(`/api/menu/items/${id}`, {
-        method: "GET",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to fetch menu item",
-        };
-      }
-
-      // Handle different API response structures
-      let item = data;
-
-      // If wrapped in result property
-      if (data.result) {
-        item = data.result;
-      }
-      // If wrapped in data property
-      else if (data.data) {
-        item = data.data;
-      }
+      const response = await api.get(`/menu/items/${id}`);
+      const normalized = normalizeApiResponse<MenuItem>(response);
 
       return {
-        success: true,
-        data: item,
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message,
       };
     } catch (error: any) {
       console.error("Error fetching menu item:", error);
@@ -165,25 +81,13 @@ export class MenuService {
    */
   static async createMenuItem(item: MenuItemPayload): Promise<ApiResponse<MenuItem>> {
     try {
-      const response = await fetch("/api/menu/items", {
-        method: "POST",
-        headers: buildHeaders(),
-        body: JSON.stringify(item),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to create menu item",
-        };
-      }
+      const response = await api.post("/menu/items", item);
+      const normalized = normalizeApiResponse<MenuItem>(response);
 
       return {
-        success: true,
-        data: data.data || data,
-        message: data.message || "Menu item created successfully",
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Menu item created successfully",
       };
     } catch (error: any) {
       console.error("Error creating menu item:", error);
@@ -199,25 +103,13 @@ export class MenuService {
    */
   static async updateMenuItem(id: string, updates: Partial<MenuItemPayload>): Promise<ApiResponse<MenuItem>> {
     try {
-      const response = await fetch(`/api/menu/items/${id}`, {
-        method: "PUT",
-        headers: buildHeaders(),
-        body: JSON.stringify(updates),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to update menu item",
-        };
-      }
+      const response = await api.put(`/menu/items/${id}`, updates);
+      const normalized = normalizeApiResponse<MenuItem>(response);
 
       return {
-        success: true,
-        data: data.data || data,
-        message: data.message || "Menu item updated successfully",
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Menu item updated successfully",
       };
     } catch (error: any) {
       console.error("Error updating menu item:", error);
@@ -233,23 +125,12 @@ export class MenuService {
    */
   static async deleteMenuItem(id: string): Promise<ApiResponse<void>> {
     try {
-      const response = await fetch(`/api/menu/items/${id}`, {
-        method: "DELETE",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to delete menu item",
-        };
-      }
+      const response = await api.delete(`/menu/items/${id}`);
+      const normalized = normalizeApiResponse(response);
 
       return {
-        success: true,
-        message: data.message || "Menu item deleted successfully",
+        success: normalized.success,
+        message: normalized.message || "Menu item deleted successfully",
       };
     } catch (error: any) {
       console.error("Error deleting menu item:", error);

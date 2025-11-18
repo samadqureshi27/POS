@@ -55,12 +55,6 @@ export default function ItemsPage() {
 
     if (response.success && response.data) {
       let filteredItems = response.data;
-        name: item.name,
-        type: item.type,
-        trackStock: item.trackStock,
-        quantity: item.quantity,
-        reorderPoint: item.reorderPoint
-      })));
 
       // Client-side type filtering (backend not filtering correctly)
       if (filterType !== "all") {

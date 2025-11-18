@@ -1,6 +1,6 @@
 // src/lib/services/menu-item-service.ts
 
-import AuthService from "@/lib/auth-service";
+import { api, normalizeApiResponse } from "@/lib/util/api-client";
 
 export interface ItemVariant {
   name: string;
@@ -40,60 +40,7 @@ export interface ApiListResponse<T> {
   data?: T;
 }
 
-const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
-const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "true").toLowerCase() === "true";
 const ITEMS_BASE = "/t/menu/items";
-
-function buildUrl(path: string) {
-  return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
-}
-
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken") ||
-      null
-    );
-  }
-  return null;
-}
-
-function getTenantSlug(): string | null {
-  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || "";
-  if (envSlug) return envSlug;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_slug") || null;
-  }
-  return null;
-}
-
-function getTenantId(): string | null {
-  const envId = process.env.NEXT_PUBLIC_TENANT_ID || "";
-  if (envId) return envId;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_id") || null;
-  }
-  return null;
-}
-
-function buildHeaders(extra?: Record<string, string>) {
-  const token = getToken();
-  const slug = getTenantSlug();
-  const id = getTenantId();
-
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-  };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return { ...headers, ...(extra || {}) };
-}
 
 export const MenuItemService = {
   async listItems(params?: {
@@ -105,134 +52,163 @@ export const MenuItemService = {
     includeRecipeVariants?: boolean;
     includeCategoryAddOns?: boolean;
   }): Promise<ApiListResponse<TenantMenuItem[]>> {
-    const q = params?.q ?? "";
-    const page = params?.page ?? 1;
-    const limit = params?.limit ?? 50;
-    const categoryId = params?.categoryId ?? "";
-    const status = params?.status ?? "";
-    const includeRecipeVariants = params?.includeRecipeVariants ?? false;
-    const includeCategoryAddOns = params?.includeCategoryAddOns ?? false;
+    try {
+      const q = params?.q ?? "";
+      const page = params?.page ?? 1;
+      const limit = params?.limit ?? 50;
+      const categoryId = params?.categoryId ?? "";
+      const status = params?.status ?? "";
+      const includeRecipeVariants = params?.includeRecipeVariants ?? false;
+      const includeCategoryAddOns = params?.includeCategoryAddOns ?? false;
 
-    let url = buildUrl(`${ITEMS_BASE}?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`);
-    if (categoryId) url += `&categoryId=${encodeURIComponent(categoryId)}`;
-    if (status) url += `&status=${encodeURIComponent(status)}`;
-    if (includeRecipeVariants) url += `&includeRecipeVariants=1`;
-    if (includeCategoryAddOns) url += `&includeCategoryAddOns=1`;
+      let path = `${ITEMS_BASE}?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`;
+      if (categoryId) path += `&categoryId=${encodeURIComponent(categoryId)}`;
+      if (status) path += `&status=${encodeURIComponent(status)}`;
+      if (includeRecipeVariants) path += `&includeRecipeVariants=1`;
+      if (includeCategoryAddOns) path += `&includeCategoryAddOns=1`;
 
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<TenantMenuItem[]>(response);
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `List items failed (${res.status})` };
+      // Handle different API response structures
+      let items = normalized.data;
+      if (response.items) {
+        items = response.items;
+      } else if (response.result) {
+        items = response.result;
+      }
+
+      return {
+        success: normalized.success,
+        data: items,
+        message: normalized.message,
+      };
+    } catch (error: any) {
+      console.error("Error listing menu items:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to list menu items",
+      };
     }
-
-    // Backend returns: { status, message, items: [...], count, page, limit }
-    const items: TenantMenuItem[] = data?.items ?? data?.result ?? [];
-    return { success: true, data: items };
   },
 
   async getItem(id: string, params?: {
     includeRecipeVariants?: boolean;
     includeCategoryAddOns?: boolean;
   }): Promise<ApiListResponse<TenantMenuItem>> {
-    const includeRecipeVariants = params?.includeRecipeVariants ?? false;
-    const includeCategoryAddOns = params?.includeCategoryAddOns ?? false;
+    try {
+      const includeRecipeVariants = params?.includeRecipeVariants ?? false;
+      const includeCategoryAddOns = params?.includeCategoryAddOns ?? false;
 
-    let url = buildUrl(`${ITEMS_BASE}/${id}`);
-    const queryParams = [];
-    if (includeRecipeVariants) queryParams.push(`includeRecipeVariants=1`);
-    if (includeCategoryAddOns) queryParams.push(`includeCategoryAddOns=1`);
-    if (queryParams.length > 0) url += `?${queryParams.join("&")}`;
+      let path = `${ITEMS_BASE}/${id}`;
+      const queryParams = [];
+      if (includeRecipeVariants) queryParams.push(`includeRecipeVariants=1`);
+      if (includeCategoryAddOns) queryParams.push(`includeCategoryAddOns=1`);
+      if (queryParams.length > 0) path += `?${queryParams.join("&")}`;
 
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<TenantMenuItem>(response);
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Get item failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message,
+      };
+    } catch (error: any) {
+      console.error("Error getting menu item:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to get menu item",
+      };
     }
-
-    const item: TenantMenuItem = data?.result ?? data;
-    return { success: true, data: item };
   },
 
   async createItem(payload: Partial<TenantMenuItem>): Promise<ApiListResponse<TenantMenuItem>> {
-    const url = buildUrl(`${ITEMS_BASE}`);
+    try {
+      // Slug is auto-generated by backend - don't send it
+      const apiPayload = {
+        name: payload.name,
+        categoryIds: payload.categoryIds ?? [],
+        imageUrl: payload.imageUrl ?? "",
+        description: payload.description ?? "",
+        variants: payload.variants ?? [],
+        modifiers: payload.modifiers ?? [],
+        isActive: payload.isActive ?? true,
+        featured: payload.featured ?? false,
+        priority: payload.priority ?? 0,
+        trackStock: payload.trackStock ?? false,
+        stockQty: payload.stockQty ?? 0,
+        minStockThreshold: payload.minStockThreshold ?? 0,
+      };
 
-    // Slug is auto-generated by backend - don't send it
-    // Map to API format
-    const apiPayload = {
-      name: payload.name,
-      categoryIds: payload.categoryIds ?? [],
-      imageUrl: payload.imageUrl ?? "",
-      description: payload.description ?? "",
-      variants: payload.variants ?? [],
-      modifiers: payload.modifiers ?? [],
-      isActive: payload.isActive ?? true,
-      featured: payload.featured ?? false,
-      priority: payload.priority ?? 0,
-      trackStock: payload.trackStock ?? false,
-      stockQty: payload.stockQty ?? 0,
-      minStockThreshold: payload.minStockThreshold ?? 0,
-    };
+      const response = await api.post(ITEMS_BASE, apiPayload);
+      const normalized = normalizeApiResponse<TenantMenuItem>(response);
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Create item failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Menu item created successfully",
+      };
+    } catch (error: any) {
+      console.error("Error creating menu item:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to create menu item",
+      };
     }
-
-    const item: TenantMenuItem = data?.result ?? data;
-    return { success: true, data: item };
   },
 
   async updateItem(id: string, payload: Partial<TenantMenuItem>): Promise<ApiListResponse<TenantMenuItem>> {
-    const url = buildUrl(`${ITEMS_BASE}/${id}`);
+    try {
+      // Only include fields being updated
+      // Slug is auto-generated by backend - don't send it
+      const apiPayload: any = {};
+      if (payload.name !== undefined) apiPayload.name = payload.name;
+      if (payload.categoryIds !== undefined) apiPayload.categoryIds = payload.categoryIds;
+      if (payload.imageUrl !== undefined) apiPayload.imageUrl = payload.imageUrl;
+      if (payload.description !== undefined) apiPayload.description = payload.description;
+      if (payload.variants !== undefined) apiPayload.variants = payload.variants;
+      if (payload.modifiers !== undefined) apiPayload.modifiers = payload.modifiers;
+      if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
+      if (payload.featured !== undefined) apiPayload.featured = payload.featured;
+      if (payload.priority !== undefined) apiPayload.priority = payload.priority;
+      if (payload.trackStock !== undefined) apiPayload.trackStock = payload.trackStock;
+      if (payload.stockQty !== undefined) apiPayload.stockQty = payload.stockQty;
+      if (payload.minStockThreshold !== undefined) apiPayload.minStockThreshold = payload.minStockThreshold;
 
-    // Only include fields being updated
-    // Slug is auto-generated by backend - don't send it
-    const apiPayload: any = {};
-    if (payload.name !== undefined) apiPayload.name = payload.name;
-    if (payload.categoryIds !== undefined) apiPayload.categoryIds = payload.categoryIds;
-    if (payload.imageUrl !== undefined) apiPayload.imageUrl = payload.imageUrl;
-    if (payload.description !== undefined) apiPayload.description = payload.description;
-    if (payload.variants !== undefined) apiPayload.variants = payload.variants;
-    if (payload.modifiers !== undefined) apiPayload.modifiers = payload.modifiers;
-    if (payload.isActive !== undefined) apiPayload.isActive = payload.isActive;
-    if (payload.featured !== undefined) apiPayload.featured = payload.featured;
-    if (payload.priority !== undefined) apiPayload.priority = payload.priority;
-    if (payload.trackStock !== undefined) apiPayload.trackStock = payload.trackStock;
-    if (payload.stockQty !== undefined) apiPayload.stockQty = payload.stockQty;
-    if (payload.minStockThreshold !== undefined) apiPayload.minStockThreshold = payload.minStockThreshold;
+      const response = await api.put(`${ITEMS_BASE}/${id}`, apiPayload);
+      const normalized = normalizeApiResponse<TenantMenuItem>(response);
 
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: buildHeaders(),
-      body: JSON.stringify(apiPayload),
-    });
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      return { success: false, message: data?.message || `Update item failed (${res.status})` };
+      return {
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Menu item updated successfully",
+      };
+    } catch (error: any) {
+      console.error("Error updating menu item:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to update menu item",
+      };
     }
-
-    const item: TenantMenuItem = data?.result ?? data;
-    return { success: true, data: item };
   },
 
   async deleteItem(id: string): Promise<ApiListResponse<null>> {
-    const url = buildUrl(`${ITEMS_BASE}/${id}`);
-    const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });
+    try {
+      const response = await api.delete(`${ITEMS_BASE}/${id}`);
+      const normalized = normalizeApiResponse(response);
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      return { success: false, message: data?.message || `Delete item failed (${res.status})` };
+      return {
+        success: normalized.success,
+        message: normalized.message || "Menu item deleted successfully",
+        data: null,
+      };
+    } catch (error: any) {
+      console.error("Error deleting menu item:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to delete menu item",
+      };
     }
-
-    return { success: true, data: null };
   },
 };

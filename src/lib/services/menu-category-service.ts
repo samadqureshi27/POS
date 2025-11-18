@@ -1,49 +1,7 @@
 // Menu Category Service
 
-import AuthService from "@/lib/auth-service";
 import { MenuCategory, MenuCategoryPayload, ApiResponse } from "@/lib/types/menu";
-
-// Helper function to get auth token
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("access_token") ||
-      sessionStorage.getItem("access_token") ||
-      null
-    );
-  }
-  return null;
-}
-
-// Helper function to get tenant info
-function getTenantInfo(): { id: string | null; slug: string | null } {
-  if (typeof window === "undefined") {
-    return { id: null, slug: null };
-  }
-  const id = localStorage.getItem("tenant_id") || sessionStorage.getItem("tenant_id");
-  const slug = localStorage.getItem("tenant_slug") || sessionStorage.getItem("tenant_slug");
-  return { id, slug };
-}
-
-// Build headers with auth and tenant
-function buildHeaders(includeContentType: boolean = true): HeadersInit {
-  const token = getToken();
-  const { id, slug } = getTenantInfo();
-
-  const headers: Record<string, string> = {};
-
-  if (includeContentType) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return headers;
-}
+import { api, normalizeApiResponse } from "@/lib/util/api-client";
 
 export class MenuCategoryService {
   /**
@@ -69,43 +27,23 @@ export class MenuCategoryService {
       if (params?.order) queryParams.append("order", params.order);
 
       const queryString = queryParams.toString();
-      const url = `/api/menu/categories${queryString ? `?${queryString}` : ''}`;
+      const path = `/menu/categories${queryString ? `?${queryString}` : ''}`;
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to fetch menu categories",
-        };
-      }
+      const response = await api.get(path);
+      const normalized = normalizeApiResponse<MenuCategory[]>(response);
 
       // Handle different API response structures
-      let categories = data;
-
-      // If wrapped in a data property
-      if (data.data) {
-        categories = data.data;
-      }
-
-      // If it's a paginated response
-      if (data.categories) {
-        categories = data.categories;
-      }
-
-      // If response has items property
-      if (data.items) {
-        categories = data.items;
+      let categories = normalized.data;
+      if (response.items) {
+        categories = response.items;
+      } else if (response.categories) {
+        categories = response.categories;
       }
 
       return {
-        success: true,
+        success: normalized.success,
         data: categories,
+        message: normalized.message,
       };
     } catch (error: any) {
       console.error("Error fetching menu categories:", error);
@@ -121,35 +59,19 @@ export class MenuCategoryService {
    */
   static async getCategory(id: string): Promise<ApiResponse<MenuCategory>> {
     try {
-      const response = await fetch(`/api/menu/categories/${id}`, {
-        method: "GET",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to fetch menu category",
-        };
-      }
+      const response = await api.get(`/menu/categories/${id}`);
+      const normalized = normalizeApiResponse<MenuCategory>(response);
 
       // Handle different API response structures
-      let category = data;
-
-      // If wrapped in result property
-      if (data.result) {
-        category = data.result;
-      }
-      // If wrapped in data property
-      else if (data.data) {
-        category = data.data;
+      let category = normalized.data;
+      if (response.result) {
+        category = response.result;
       }
 
       return {
-        success: true,
+        success: normalized.success,
         data: category,
+        message: normalized.message,
       };
     } catch (error: any) {
       console.error("Error fetching menu category:", error);
@@ -165,25 +87,13 @@ export class MenuCategoryService {
    */
   static async createCategory(category: MenuCategoryPayload): Promise<ApiResponse<MenuCategory>> {
     try {
-      const response = await fetch("/api/menu/categories", {
-        method: "POST",
-        headers: buildHeaders(),
-        body: JSON.stringify(category),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to create menu category",
-        };
-      }
+      const response = await api.post("/menu/categories", category);
+      const normalized = normalizeApiResponse<MenuCategory>(response);
 
       return {
-        success: true,
-        data: data.data || data,
-        message: data.message || "Menu category created successfully",
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Menu category created successfully",
       };
     } catch (error: any) {
       console.error("Error creating menu category:", error);
@@ -199,25 +109,13 @@ export class MenuCategoryService {
    */
   static async updateCategory(id: string, updates: Partial<MenuCategoryPayload>): Promise<ApiResponse<MenuCategory>> {
     try {
-      const response = await fetch(`/api/menu/categories/${id}`, {
-        method: "PUT",
-        headers: buildHeaders(),
-        body: JSON.stringify(updates),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to update menu category",
-        };
-      }
+      const response = await api.put(`/menu/categories/${id}`, updates);
+      const normalized = normalizeApiResponse<MenuCategory>(response);
 
       return {
-        success: true,
-        data: data.data || data,
-        message: data.message || "Menu category updated successfully",
+        success: normalized.success,
+        data: normalized.data,
+        message: normalized.message || "Menu category updated successfully",
       };
     } catch (error: any) {
       console.error("Error updating menu category:", error);
@@ -233,23 +131,12 @@ export class MenuCategoryService {
    */
   static async deleteCategory(id: string): Promise<ApiResponse<void>> {
     try {
-      const response = await fetch(`/api/menu/categories/${id}`, {
-        method: "DELETE",
-        headers: buildHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to delete menu category",
-        };
-      }
+      const response = await api.delete(`/menu/categories/${id}`);
+      const normalized = normalizeApiResponse(response);
 
       return {
-        success: true,
-        message: data.message || "Menu category deleted successfully",
+        success: normalized.success,
+        message: normalized.message || "Menu category deleted successfully",
       };
     } catch (error: any) {
       console.error("Error deleting menu category:", error);
