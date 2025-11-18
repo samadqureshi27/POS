@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export interface GlobalSkeletonProps {
   // Page type
   type?: 'dashboard' | 'management' | 'simple' | 'settings';
-  
+
   // Layout options
   showHeader?: boolean;
   showSummaryCards?: boolean;
@@ -15,12 +15,13 @@ export interface GlobalSkeletonProps {
   showImportExport?: boolean;
   showPeriodSelector?: boolean;
   showCharts?: boolean;
-  
+  hasSubmenu?: boolean; // For pages with submenu navigation
+
   // Content options
   summaryCardCount?: number;
   contentRows?: number;
   tableRows?: number;
-  
+
   // Styling
   className?: string;
   containerClassName?: string;
@@ -34,6 +35,7 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
   showImportExport = false,
   showPeriodSelector = false,
   showCharts = false,
+  hasSubmenu = false,
   summaryCardCount = 2,
   contentRows = 6,
   tableRows = 8,
@@ -156,7 +158,8 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
         {/* Header */}
         <div className={cn(
           showImportExport ? 'grid grid-cols-1 md:grid-cols-2 items-center' : 'mb-8',
-          'max-w-[100vw] mb-8 mt-2'
+          'max-w-[100vw] mb-8',
+          hasSubmenu ? 'mt-14' : 'mt-2'
         )}>
           <Skeleton className="h-9 w-64 rounded-lg" />
           {showImportExport && (
@@ -232,7 +235,7 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
       <div className={cn("bg-background min-h-screen w-full p-6", containerClassName)}>
         {/* Header */}
         {showHeader && (
-          <div className="mb-8 mt-2">
+          <div className={cn("mb-8", hasSubmenu ? 'mt-14' : 'mt-2')}>
             <Skeleton className="h-9 w-64 rounded-lg" />
           </div>
         )}
