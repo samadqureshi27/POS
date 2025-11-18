@@ -6,6 +6,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
+import { formatDisplayDate } from '@/lib/util/formatters';
 
 interface PeriodSelectorProps {
   selectedPeriod: string;
@@ -29,13 +30,6 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
     from: customDateRange?.[0]?.startDate,
     to: customDateRange?.[0]?.endDate,
   });
-
-  const formatDisplayDate = (date: Date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
-  };
 
   // Update local state when customDateRange changes
   useEffect(() => {

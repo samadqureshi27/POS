@@ -16,6 +16,7 @@ import { useDateFilter } from "@/lib/hooks/useDateFilter";
 import { useStaffData } from "@/lib/hooks/usePayrollStaffData";
 import { useFilters } from "@/lib/hooks/payrollFilter";
 import { useToast } from "@/lib/hooks/toast";
+import { formatCurrency } from "@/lib/util/formatters";
 
 const StaffManagementPage = () => {
   // For demo purposes, let's set a default branch ID since we can't access real routing
@@ -86,11 +87,11 @@ const StaffManagementPage = () => {
         />
         <StatCard
           title="Total Payroll"
-          value={`$${summaryData.totalSalaries.toLocaleString()}`}
+          value={`$${formatCurrency(summaryData.totalSalaries)}`}
         />
         <StatCard
           title="Pending Payments"
-          value={`$${summaryData.unpaidSalaries.toLocaleString()}`}
+          value={`$${formatCurrency(summaryData.unpaidSalaries)}`}
         />
       </div>
 

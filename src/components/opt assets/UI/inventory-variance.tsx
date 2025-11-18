@@ -15,6 +15,7 @@ import {
   Download,
   Calendar
 } from 'lucide-react';
+import { formatCurrency } from '@/lib/util/formatters';
 
 export interface InventoryVarianceData {
   itemName: string;
@@ -106,7 +107,7 @@ export const InventoryVarianceCard: React.FC<InventoryVarianceProps> = ({
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span>Last Audit: {lastAuditDate}</span>
           <Separator orientation="vertical" className="h-4" />
-          <span>Total Cost Impact: PKR {totalVarianceCost.toLocaleString()}</span>
+          <span>Total Cost Impact: PKR {formatCurrency(totalVarianceCost)}</span>
         </div>
       </CardHeader>
 
@@ -186,7 +187,7 @@ export const InventoryVarianceCard: React.FC<InventoryVarianceProps> = ({
 
                 <div className="text-right">
                   <p className="text-sm font-medium">
-                    PKR {Math.abs(item.costImpact).toLocaleString()}
+                    PKR {formatCurrency(Math.abs(item.costImpact))}
                   </p>
                   <p className="text-xs text-muted-foreground">Cost Impact</p>
                 </div>

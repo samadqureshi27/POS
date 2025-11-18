@@ -5,6 +5,7 @@ import { CustomerProfileCard } from './customer-profile-card';
 import { CustomerFeedbackCard } from './customer-feedback-card';
 import { MetricCard } from './metric-card';
 import { OrderChart } from './order-chart';
+import { formatCurrency } from '@/lib/util/formatters';
 
 interface CustomerMetricsSectionProps {
     customer: CustomerItem;
@@ -37,7 +38,7 @@ export const CustomerMetricsSection: React.FC<CustomerMetricsSectionProps> = ({
                             label="Total Orders"
                         />
                         <MetricCard
-                            value={totalSpent.toLocaleString()}
+                            value={formatCurrency(totalSpent)}
                             label="Total Spent (PKR)"
                         />
                         <MetricCard

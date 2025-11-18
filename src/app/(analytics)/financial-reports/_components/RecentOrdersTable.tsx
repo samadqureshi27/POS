@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DataTable, DataTableColumn } from '@/components/ui/data-table';
 import { OrderItem } from '@/lib/types/analytics';
+import { formatCurrency } from '@/lib/util/formatters';
 
 interface RecentOrdersTableProps {
   orders: OrderItem[];
@@ -67,7 +68,7 @@ export const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({
       key: "total",
       title: "Total",
       dataIndex: "Total",
-      render: (value) => <span className="font-medium">PKR {value.toLocaleString()}</span>
+      render: (value) => <span className="font-medium">PKR {formatCurrency(value)}</span>
     },
     {
       key: "status",
