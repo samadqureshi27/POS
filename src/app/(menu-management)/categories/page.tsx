@@ -109,7 +109,7 @@ const CategoriesManagementPage = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
       <PageHeader

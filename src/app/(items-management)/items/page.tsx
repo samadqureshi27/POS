@@ -13,6 +13,7 @@ import ImportResultsDialog from "./_components/import-results-dialog";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
+import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 export default function ItemsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -281,6 +282,10 @@ export default function ItemsPage() {
       setPendingImportFile(null);
     }
   };
+
+  if (loading) {
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={4} showActionBar={true} />;
+  }
 
   return (
     <PageContainer>

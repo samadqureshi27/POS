@@ -67,7 +67,7 @@ const AddOnsPage = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
       <PageHeader

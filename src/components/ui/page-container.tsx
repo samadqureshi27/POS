@@ -29,6 +29,12 @@ export interface PageContainerProps {
    * - "container": max-w-7xl mx-auto
    */
   maxWidth?: "full" | "container";
+
+  /**
+   * Whether this page has a submenu
+   * Adds top margin to account for fixed submenu positioning
+   */
+  hasSubmenu?: boolean;
 }
 
 export const PageContainer: React.FC<PageContainerProps> = ({
@@ -36,6 +42,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
   className,
   padding = "default",
   maxWidth = "full",
+  hasSubmenu = false,
 }) => {
   return (
     <div className={cn(
@@ -44,6 +51,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
       padding === "tight" && "p-4",
       maxWidth === "container" && "max-w-7xl mx-auto",
       maxWidth === "full" && "w-full",
+      hasSubmenu && "mt-16", // Add top margin for submenu (submenu height ~64px)
       className
     )}>
       {children}
