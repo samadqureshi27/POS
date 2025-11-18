@@ -12,6 +12,8 @@ import { useRecipeData } from "@/lib/hooks/useRecipeData";
 import { RecipeOption } from "@/lib/types/recipes";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { formatPrice, formatCurrency } from "@/lib/util/formatters";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 // add view only modal for recipe items with compact view
 
@@ -120,14 +122,14 @@ const RecipesManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
       {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Recipes Management</h1>
-        <p className="text-gray-600 text-sm mt-1">Manage your final recipes and sub-recipes</p>
-      </header>
+      <PageHeader
+        title="Recipes Management"
+        subtitle="Manage your final recipes and sub-recipes"
+      />
 
       {/* Enhanced Action Bar */}
       <EnhancedActionBar
@@ -397,7 +399,7 @@ const RecipesManagementPage = () => {
         cancelText="Cancel"
         variant="destructive"
       />
-    </div>
+    </PageContainer>
   );
 };
 

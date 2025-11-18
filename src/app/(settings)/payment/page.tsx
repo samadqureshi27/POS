@@ -7,6 +7,8 @@ import { useToast } from "@/lib/hooks";
 import PaymentModal from "./_components/payment-modal";
 import PaymentTable from "./_components/payment-table";;
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
+import { PageContainer } from '@/components/ui/page-container';
+import { PageHeader } from '@/components/ui/page-header';
 import { usePaymentManagement } from "@/lib/hooks/usePaymentManagement";
 
 const PaymentManagementPage = () => {
@@ -56,16 +58,14 @@ const PaymentManagementPage = () => {
   };
 
   if (loading) {
-    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={3} showActionBar={true} />;
+    return <GlobalSkeleton type="management" showActionBar={false} />;
   }
 
   return (
-    <div className="p-6  bg-background min-h-screen">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
-      <h1 className="text-3xl font-semibold mb-8 mt-20">
-        Payment Management
-      </h1>
+      <PageHeader title="Payment Management" />
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 max-w-[100vw] lg:grid-cols-2 gap-4 mb-8 lg:max-w-[50vw]">
@@ -118,7 +118,7 @@ const PaymentManagementPage = () => {
         onFormDataChange={updateFormData}
         onStatusChange={handleStatusChange}
       />
-    </div>
+    </PageContainer>
   );
 };
 

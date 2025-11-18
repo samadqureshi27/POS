@@ -11,6 +11,8 @@ import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeVariants } from "@/lib/hooks/useRecipeVariations";
 import { RecipeVariant } from "@/lib/types/recipe-variants";
 import { formatPrice } from "@/lib/util/formatters";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 const RecipeVariationsPage = () => {
   const { showToast: globalShowToast } = useToast();
@@ -87,16 +89,14 @@ const RecipeVariationsPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
       {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Recipe Variations</h1>
-        <p className="text-gray-600 text-sm mt-1">
-          Manage size, flavor, crust, and custom variations for your recipes
-        </p>
-      </header>
+      <PageHeader
+        title="Recipe Variations"
+        subtitle="Manage size, flavor, crust, and custom variations for your recipes"
+      />
 
       {/* Enhanced Action Bar */}
       <EnhancedActionBar
@@ -370,7 +370,7 @@ const RecipeVariationsPage = () => {
         actionLoading={actionLoading}
         showToast={globalShowToast}
       />
-    </div>
+    </PageContainer>
   );
 };
 
