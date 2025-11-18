@@ -14,6 +14,7 @@ import { dashboardAPI } from "@/lib/util/DashboardApi";
 
 // Utils
 import { getPeriodLabel } from "@/lib/util/Dashboardutils";
+import { useDashboardData } from "@/lib/hooks/useDashboardData";
 
 // Components
 import { Toaster } from "@/components/ui/sonner";
