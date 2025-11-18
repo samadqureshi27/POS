@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { DashboardData } from '@/lib/types/Dtypes';
-import { dashboardAPI } from '@/lib/util/DsahboradApi';
+import { dashboardAPI } from '@/lib/util/DashboardApi';
 import { logError } from '@/lib/util/logger';
 
 export interface UseDashboardDataReturn {
