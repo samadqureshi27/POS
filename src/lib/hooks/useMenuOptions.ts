@@ -108,19 +108,31 @@ export const useMenuOptions = () => {
     const loadMenuItemOptionss = async () => {
         try {
             setLoading(true);
-            const response = await ModifierService.listModifiers();
+            const response = await AddonsGroupsService.listGroups();
             if (response.success && response.data) {
-                const mapped = response.data.map((mod, idx) => mapApiModifierToItem(mod, idx));
+                // Map addon groups to MenuItemOptions format
+                const mapped = response.data.map((group, idx) => ({
+                    ID: idx + 1,
+                    Name: group.name || "",
+                    DisplayType: "Radio" as const, // Default to Radio
+                    Priority: group.displayOrder || idx + 1,
+                    OptionValue: [],
+                    OptionPrice: [],
+                    backendId: group._id || group.id,
+                    categoryId: group.categoryId,
+                    groupId: group._id || group.id,
+                    groupName: group.name,
+                }));
                 setMenuItemOptionss(mapped.sort((a, b) => a.Priority - b.Priority));
             } else {
-                throw new Error(response.message || "Failed to fetch modifiers");
+                throw new Error(response.message || "Failed to fetch addon groups");
             }
         } catch (error) {
-            logError("Error fetching modifiers", error, {
+            logError("Error fetching addon groups", error, {
                 component: "useMenuOptions",
                 action: "loadMenuItemOptionss"
             });
-            showToast(error instanceof Error ? error.message : "Failed to load modifiers", "error");
+            showToast(error instanceof Error ? error.message : "Failed to load addon groups", "error");
         } finally {
             setLoading(false);
         }
@@ -128,8 +140,8 @@ export const useMenuOptions = () => {
 
     const filteredItems = MenuItemOptionss.filter((item) => {
         const matchesSearch =
-            item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.Priority.toString().includes(searchTerm);
+            (item.Name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.Priority || "").toString().includes(searchTerm);
         const matchesStatus = DisplayFilter
             ? item.DisplayType === DisplayFilter
             : true;

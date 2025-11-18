@@ -110,7 +110,7 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange })
   };
 
   const filteredGroups = groups.filter((group) =>
-    group.name.toLowerCase().includes(groupInput.toLowerCase())
+    group.name?.toLowerCase().includes(groupInput.toLowerCase())
   );
 
   return (
