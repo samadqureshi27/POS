@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { CustomerItem } from '@/lib/types/customer-profile';
 import { ProfilePicture } from './profile-picture';
 import { StarRating } from './star-rating';
+import { formatID } from "@/lib/util/formatters";
 
 interface CustomerProfileCardProps {
     customer: CustomerItem;
@@ -30,7 +31,7 @@ export const CustomerProfileCard: React.FC<CustomerProfileCardProps> = ({
                 <div className="space-y-4 text-base">
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">ID:</span>
-                        <span>#{String(customer.Customer_ID).padStart(3, "0")}</span>
+                        <span>{formatID(customer.Customer_ID)}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Contact:</span>

@@ -14,6 +14,7 @@ import BranchModal from "./_components/branch-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 import { BranchItem } from "@/lib/types/branch";
+import { formatID } from "@/lib/util/formatters";
 
 const BranchManagementPage = () => {
   const router = useRouter();
@@ -162,7 +163,7 @@ const BranchManagementPage = () => {
             header: "Branch ID",
             render: (item) => (
               <span className="font-mono text-gray-700">
-                #{String(item["Branch-ID"]).padStart(3, "0")}
+                {formatID(item["Branch-ID"])}
               </span>
             ),
             className: "w-28",
@@ -235,7 +236,7 @@ const BranchManagementPage = () => {
 
                 {/* Branch ID Badge - Top Right */}
                 <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm bg-blue-600 text-white">
-                  #{String(item["Branch-ID"]).padStart(3, "0")}
+                  {formatID(item["Branch-ID"])}
                 </div>
 
                 {/* Hover Actions Overlay */}

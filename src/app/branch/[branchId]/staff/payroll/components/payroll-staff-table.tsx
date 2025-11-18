@@ -6,6 +6,7 @@ import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/dat
 import { Badge } from "@/components/ui/badge";
 import FilterDropdown from "@/components/ui/filter-dropdown";
 import { StaffTableProps, StaffItem } from "@/lib/types/payroll";
+import { formatID } from "@/lib/util/formatters";
 
 export const StaffTable: React.FC<StaffTableProps> = ({
     filteredItems,
@@ -41,7 +42,7 @@ export const StaffTable: React.FC<StaffTableProps> = ({
             title: "Staff ID",
             dataIndex: "STAFF_ID",
             width: "100px",
-            render: (value) => `#${String(value).padStart(3, "0")}`
+            render: (value) => formatID(value)
         },
         {
             key: "name",
