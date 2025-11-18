@@ -2,31 +2,37 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, Info, UserCircle2, LogOut, Settings, HelpCircle, Mail } from 'lucide-react';
+import { Bell, Info, LogOut, Settings, HelpCircle, Mail, UserCircle2 } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useNavigation } from '@/lib/hooks/useNavigation';
 import { getPageTitle } from '@/lib/navigation';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 type NavbarProps = {
   title?: string; // defaults to "Home"
 };
 
-// Custom hook to get user data (you can replace this with your actual user data fetching logic)
-const useUserData = () => {
-  return {
-    name: "John Doe",
-    email: "john.doe@company.com",
-    avatar: "/api/placeholder/40/40",
-    initials: "JD"
-  };
+// Helper to generate initials from username or email
+const getInitials = (username?: string, email?: string): string => {
+  if (username && username.length >= 2) {
+    const parts = username.split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return username.substring(0, 2).toUpperCase();
+  }
+  if (email) {
+    return email.substring(0, 2).toUpperCase();
+  }
+  return "U";
 };
 
 export default function Navbar({ title = 'Home' }: NavbarProps) {
   const [showLogoutOverlay, setShowLogoutOverlay] = useState(false);
   const [showNotificationsOverlay, setShowNotificationsOverlay] = useState(false);
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
-  const [avatarError, setAvatarError] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const notificationsOverlayRef = useRef<HTMLDivElement>(null);
@@ -38,7 +44,15 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
   const router = useRouter();
   const { pathname } = useNavigation();
   const pageTitle = getPageTitle(pathname);
-  const userData = useUserData();
+  const { user, logout } = useAuth();
+
+  // Generate user display data
+  const userData = {
+    name: user?.username || "Guest User",
+    email: user?.email || "guest@pos.com",
+    role: user?.role || "guest",
+    initials: getInitials(user?.username, user?.email)
+  };
 
   // ✅ Notifications are now stateful
   const [notifications, setNotifications] = useState([
@@ -113,8 +127,9 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
     setShowInfoOverlay(true);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setShowLogoutOverlay(false);
+    await logout();
     router.push('/login');
   };
 
@@ -165,13 +180,18 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
                 </div>
 
                 {/* Profile button */}
-                <IconButton
-                  ariaLabel="Profile"
+                <button
+                  aria-label="Profile"
                   onClick={handleProfileClick}
                   ref={profileButtonRef}
+                  className="inline-flex items-center justify-center hover:bg-yellow-600/10 transition-colors duration-200 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500/20"
                 >
-                  <UserCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
-                </IconButton>
+                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
+                    <AvatarFallback className="bg-yellow-600 text-black font-semibold text-sm">
+                      {userData.initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
               </div>
             </div>
           </div>
@@ -276,20 +296,11 @@ export default function Navbar({ title = 'Home' }: NavbarProps) {
             {/* User Info Section */}
             <div className="px-3 py-3 border-b border-gray-700 mb-2">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden flex-shrink-0">
-                  {!avatarError ? (
-                    <img
-                      src={userData.avatar}
-                      alt="User avatar"
-                      className="h-full w-full object-cover"
-                      onError={() => setAvatarError(true)}
-                    />
-                  ) : (
-                    <span className="text-sm font-medium text-gray-300">
-                      {userData.initials}
-                    </span>
-                  )}
-                </div>
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-yellow-600 text-black font-semibold">
+                    {userData.initials}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white truncate">
                     {userData.name}
