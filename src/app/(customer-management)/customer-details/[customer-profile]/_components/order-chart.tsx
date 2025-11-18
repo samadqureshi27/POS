@@ -10,6 +10,7 @@ import {
     Tooltip,
 } from "recharts";
 import { OrderItem } from '@/lib/types/customer-profile';
+import { formatCurrency } from '@/lib/util/formatters';
 
 interface OrderChartProps {
     orders: OrderItem[];
@@ -29,7 +30,7 @@ export const OrderChart: React.FC<OrderChartProps> = ({ orders }) => {
                         <XAxis dataKey="Date" />
                         <YAxis />
                         <Tooltip
-                            formatter={(value: number) => value.toLocaleString()}
+                            formatter={(value: number) => formatCurrency(value)}
                         />
                         <Bar dataKey="Total" fill="#3b82f6" />
                     </BarChart>

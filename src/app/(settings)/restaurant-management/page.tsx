@@ -6,6 +6,8 @@ import { Toast } from '@/components/ui/toast';
 import { useToast } from '@/lib/hooks/toast';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { Toaster } from '@/components/ui/sonner';
+import { PageContainer } from '@/components/ui/page-container';
+import { PageHeader } from '@/components/ui/page-header';
 import { useRestaurantProfile } from '@/lib/hooks/useRestaurantProfile';
 import { BasicInfoCard } from './_components/basic-info-card';
 import { ContactInfoCard } from './_components/contact-info-card';
@@ -29,53 +31,48 @@ const RestaurantProfilePage = () => {
   const { toast, toastVisible, hideToast } = useToast();
 
   if (loading) {
-    return <GlobalSkeleton type="settings" showHeader={true} />;
+    return <GlobalSkeleton type="management" showActionBar={false} />;
   }
 
   return (
-    <div className="p-6 min-h-screen bg-background w-full">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
-      <div className="flex-1 justify-center items-center w-full ">
-        <div className="mt-20">
-          {/* Header */}
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
-            <h1 className="text-3xl font-semibold mb-5 text-foreground">
-              Restaurant Profile
-            </h1>
-            <ActionButtons
-              hasChanges={hasChanges}
-              saving={saving}
-              resetting={false}
-              onSave={handleSave}
-              onReset={resetForm}
-            />
-          </div>
+      <PageHeader
+        title="Restaurant Profile"
+        actions={
+          <ActionButtons
+            hasChanges={hasChanges}
+            saving={saving}
+            resetting={false}
+            onSave={handleSave}
+            onReset={resetForm}
+          />
+        }
+      />
 
-          {/* Three cards in a row with equal height */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <BasicInfoCard
-              formData={formData}
-              onInputChange={handleInputChange}
-              onDropdownChange={handleDropdownChange}
-            />
+      {/* Three cards in a row with equal height */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <BasicInfoCard
+          formData={formData}
+          onInputChange={handleInputChange}
+          onDropdownChange={handleDropdownChange}
+        />
 
-            <ContactInfoCard
-              formData={formData}
-              onInputChange={handleInputChange}
-            />
+        <ContactInfoCard
+          formData={formData}
+          onInputChange={handleInputChange}
+        />
 
-            <LogoHoursCard
-              formData={formData}
-              previewUrl={previewUrl}
-              onInputChange={handleInputChange}
-              onLogoChange={handleLogoChange}
-              onRemoveLogo={removeLogo}
-            />
-          </div>
-        </div>
+        <LogoHoursCard
+          formData={formData}
+          previewUrl={previewUrl}
+          onInputChange={handleInputChange}
+          onLogoChange={handleLogoChange}
+          onRemoveLogo={removeLogo}
+        />
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

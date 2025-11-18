@@ -1,6 +1,7 @@
 // src/lib/services/addons-groups-service.ts
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 // ==================== Types ====================
 
@@ -54,7 +55,10 @@ export const AddonsGroupsService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error listing addon groups:", error);
+      logError("Error listing addon groups", error, {
+        component: "AddonsGroupsService",
+        action: "listGroups",
+      });
       return {
         success: false,
         message: error.message || "Failed to list addon groups",
@@ -74,7 +78,11 @@ export const AddonsGroupsService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error getting addon group:", error);
+      logError("Error getting addon group", error, {
+        component: "AddonsGroupsService",
+        action: "getGroup",
+        groupId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to get addon group",
@@ -108,7 +116,10 @@ export const AddonsGroupsService = {
         message: normalized.message || "Addon group created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating addon group:", error);
+      logError("Error creating addon group", error, {
+        component: "AddonsGroupsService",
+        action: "createGroup",
+      });
       return {
         success: false,
         message: error.message || "Failed to create addon group",
@@ -134,7 +145,11 @@ export const AddonsGroupsService = {
         message: normalized.message || "Addon group updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating addon group:", error);
+      logError("Error updating addon group", error, {
+        component: "AddonsGroupsService",
+        action: "updateGroup",
+        groupId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update addon group",
@@ -154,7 +169,11 @@ export const AddonsGroupsService = {
         data: null,
       };
     } catch (error: any) {
-      console.error("Error deleting addon group:", error);
+      logError("Error deleting addon group", error, {
+        component: "AddonsGroupsService",
+        action: "deleteGroup",
+        groupId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete addon group",

@@ -4,6 +4,7 @@ import { useSelection } from "./selection";
 import { useToast } from './toast';
 import { usePosModal } from "./posModal";
 import { PosItem } from "@/lib/types/pos";
+import { logError } from "@/lib/util/logger";
 
 export const usePosManagement = (branchId: string) => {
     const [posItems, setPosItems] = useState<PosItem[]>([]);
@@ -51,7 +52,11 @@ export const usePosManagement = (branchId: string) => {
                 throw new Error(response.message || "Failed to fetch POS items");
             }
         } catch (error) {
-            console.error("Error fetching POS items:", error);
+            logError("Error fetching POS items", error, {
+                component: "usePosManagement",
+                action: "loadPosItems",
+                branchId,
+            });
             showToast("Failed to load POS items", "error");
         } finally {
             setLoading(false);
@@ -81,7 +86,11 @@ export const usePosManagement = (branchId: string) => {
                 showToast(response.message || "POS created successfully", "success");
             }
         } catch (error) {
-            console.error("Error creating POS:", error);
+            logError("Error creating POS", error, {
+                component: "usePosManagement",
+                action: "handleCreateItem",
+                branchId,
+            });
             showToast("Failed to create POS", "error");
         } finally {
             setActionLoading(false);

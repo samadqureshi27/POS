@@ -1,6 +1,7 @@
 // src/lib/services/modifier-service.ts
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 export interface ModifierOption {
   name: string;
@@ -52,7 +53,10 @@ export const ModifierService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error listing modifiers:", error);
+      logError("Error listing modifiers", error, {
+        component: "ModifierService",
+        action: "listModifiers",
+      });
       return {
         success: false,
         message: error.message || "Failed to list modifiers",
@@ -71,7 +75,11 @@ export const ModifierService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error getting modifier:", error);
+      logError("Error getting modifier", error, {
+        component: "ModifierService",
+        action: "getModifier",
+        modifierId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to get modifier",
@@ -99,7 +107,10 @@ export const ModifierService = {
         message: normalized.message || "Modifier created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating modifier:", error);
+      logError("Error creating modifier", error, {
+        component: "ModifierService",
+        action: "createModifier",
+      });
       return {
         success: false,
         message: error.message || "Failed to create modifier",
@@ -127,7 +138,11 @@ export const ModifierService = {
         message: normalized.message || "Modifier updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating modifier:", error);
+      logError("Error updating modifier", error, {
+        component: "ModifierService",
+        action: "updateModifier",
+        modifierId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update modifier",
@@ -146,7 +161,11 @@ export const ModifierService = {
         data: null,
       };
     } catch (error: any) {
-      console.error("Error deleting modifier:", error);
+      logError("Error deleting modifier", error, {
+        component: "ModifierService",
+        action: "deleteModifier",
+        modifierId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete modifier",

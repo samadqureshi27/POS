@@ -1,6 +1,7 @@
 // src/lib/services/menu-item-service.ts
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 export interface ItemVariant {
   name: string;
@@ -84,7 +85,10 @@ export const MenuItemService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error listing menu items:", error);
+      logError("Error listing menu items", error, {
+        component: "MenuItemService",
+        action: "listItems",
+      });
       return {
         success: false,
         message: error.message || "Failed to list menu items",
@@ -115,7 +119,11 @@ export const MenuItemService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error getting menu item:", error);
+      logError("Error getting menu item", error, {
+        component: "MenuItemService",
+        action: "getItem",
+        itemId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to get menu item",
@@ -150,7 +158,10 @@ export const MenuItemService = {
         message: normalized.message || "Menu item created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating menu item:", error);
+      logError("Error creating menu item", error, {
+        component: "MenuItemService",
+        action: "createItem",
+      });
       return {
         success: false,
         message: error.message || "Failed to create menu item",
@@ -185,7 +196,11 @@ export const MenuItemService = {
         message: normalized.message || "Menu item updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating menu item:", error);
+      logError("Error updating menu item", error, {
+        component: "MenuItemService",
+        action: "updateItem",
+        itemId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update menu item",
@@ -204,7 +219,11 @@ export const MenuItemService = {
         data: null,
       };
     } catch (error: any) {
-      console.error("Error deleting menu item:", error);
+      logError("Error deleting menu item", error, {
+        component: "MenuItemService",
+        action: "deleteItem",
+        itemId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete menu item",

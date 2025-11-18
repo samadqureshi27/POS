@@ -1,6 +1,7 @@
 // src/lib/services/combo-service.ts
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 export interface ComboCourse {
   name: string;
@@ -60,7 +61,10 @@ export const ComboService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error listing combos:", error);
+      logError("Error listing combos", error, {
+        component: "ComboService",
+        action: "listCombos",
+      });
       return {
         success: false,
         message: error.message || "Failed to list combos",
@@ -79,7 +83,11 @@ export const ComboService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error getting combo:", error);
+      logError("Error getting combo", error, {
+        component: "ComboService",
+        action: "getCombo",
+        comboId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to get combo",
@@ -112,7 +120,10 @@ export const ComboService = {
         message: normalized.message || "Combo created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating combo:", error);
+      logError("Error creating combo", error, {
+        component: "ComboService",
+        action: "createCombo",
+      });
       return {
         success: false,
         message: error.message || "Failed to create combo",
@@ -142,7 +153,11 @@ export const ComboService = {
         message: normalized.message || "Combo updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating combo:", error);
+      logError("Error updating combo", error, {
+        component: "ComboService",
+        action: "updateCombo",
+        comboId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update combo",
@@ -161,7 +176,11 @@ export const ComboService = {
         data: null,
       };
     } catch (error: any) {
-      console.error("Error deleting combo:", error);
+      logError("Error deleting combo", error, {
+        component: "ComboService",
+        action: "deleteCombo",
+        comboId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete combo",

@@ -2,6 +2,7 @@ import React from "react";
 import { History, Database, RefreshCw, Download, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BackupHistoryItem } from '@/lib/types/backup';
+import { getStatusBgClass } from '@/lib/util/status-helpers';
 
 interface BackupHistoryCardProps {
     backupHistory: BackupHistoryItem[];
@@ -18,15 +19,6 @@ export const BackupHistoryCard: React.FC<BackupHistoryCardProps> = ({
     onRestore,
     onDelete,
 }) => {
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "completed": return "text-gray-600 bg-gray-100";
-            case "failed": return "text-red-600 bg-red-100";
-            case "in-progress": return "text-blue-600 bg-blue-100";
-            default: return "text-gray-600 bg-gray-100";
-        }
-    };
-
     return (
         <Card className="shadow-sm flex flex-col h-[500px]">
             <CardHeader className="flex-shrink-0">
@@ -53,7 +45,7 @@ export const BackupHistoryCard: React.FC<BackupHistoryCardProps> = ({
                                             <p className="font-medium">{backup.date}</p>
                                             <p className="text-sm text-gray-500">{backup.size} • {backup.type}</p>
                                         </div>
-                                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(backup.status)}`}>
+                                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusBgClass(backup.status)}`}>
                                             {backup.status}
                                         </span>
                                     </div>

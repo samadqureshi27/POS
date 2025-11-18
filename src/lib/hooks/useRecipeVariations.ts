@@ -7,6 +7,7 @@ import {
   RecipeVariant,
   RecipeVariantFormData,
 } from "../types/recipe-variants";
+import { logError } from "@/lib/util/logger";
 
 export const useRecipeVariants = () => {
   // State management
@@ -74,13 +75,23 @@ export const useRecipeVariants = () => {
           setTotalPages(Math.ceil(response.data.length / itemsPerPage));
         }
       } else {
-        console.error("Failed to load variants:", response.message);
+        logError(new Error(response.message || "Failed to load variants"), {
+          component: "useRecipeVariants",
+          action: "loadVariants",
+          entityName: "recipe variants",
+          metadata: { currentPage, itemsPerPage }
+        });
         setVariants([]);
         setTotalItems(0);
         setTotalPages(0);
       }
     } catch (error) {
-      console.error("Error fetching recipe variants:", error);
+      logError(error as Error, {
+        component: "useRecipeVariants",
+        action: "loadVariants",
+        entityName: "recipe variants",
+        metadata: { currentPage, itemsPerPage }
+      });
       setVariants([]);
       setTotalItems(0);
       setTotalPages(0);
@@ -96,11 +107,19 @@ export const useRecipeVariants = () => {
       if (response.success && response.data) {
         setRecipes(response.data);
       } else {
-        console.error("Failed to load recipes:", response.message);
+        logError(new Error(response.message || "Failed to load recipes"), {
+          component: "useRecipeVariants",
+          action: "loadRecipes",
+          entityName: "recipes"
+        });
         setRecipes([]);
       }
     } catch (error) {
-      console.error("Error loading recipes:", error);
+      logError(error as Error, {
+        component: "useRecipeVariants",
+        action: "loadRecipes",
+        entityName: "recipes"
+      });
       setRecipes([]);
     }
   }, []);
@@ -112,11 +131,19 @@ export const useRecipeVariants = () => {
       if (response.success && response.data) {
         setInventoryItems(response.data);
       } else {
-        console.error("Failed to load inventory:", response.message);
+        logError(new Error(response.message || "Failed to load inventory"), {
+          component: "useRecipeVariants",
+          action: "loadInventoryItems",
+          entityName: "inventory items"
+        });
         setInventoryItems([]);
       }
     } catch (error) {
-      console.error("Error loading inventory:", error);
+      logError(error as Error, {
+        component: "useRecipeVariants",
+        action: "loadInventoryItems",
+        entityName: "inventory items"
+      });
       setInventoryItems([]);
     }
   }, []);
@@ -147,7 +174,11 @@ export const useRecipeVariants = () => {
         throw new Error(response.message || "Failed to create recipe variant");
       }
     } catch (error: any) {
-      console.error("Error creating variant:", error);
+      logError(error as Error, {
+        component: "useRecipeVariants",
+        action: "createVariant",
+        entityName: "recipe variant"
+      });
       return { success: false, error: error.message };
     } finally {
       setActionLoading(false);
@@ -166,7 +197,12 @@ export const useRecipeVariants = () => {
         throw new Error(response.message || "Failed to update recipe variant");
       }
     } catch (error: any) {
-      console.error("Error updating variant:", error);
+      logError(error as Error, {
+        component: "useRecipeVariants",
+        action: "updateVariant",
+        entityName: "recipe variant",
+        entityId: id
+      });
       return { success: false, error: error.message };
     } finally {
       setActionLoading(false);
@@ -185,7 +221,12 @@ export const useRecipeVariants = () => {
         throw new Error(response.message || "Failed to delete recipe variant");
       }
     } catch (error: any) {
-      console.error("Error deleting variant:", error);
+      logError(error as Error, {
+        component: "useRecipeVariants",
+        action: "deleteVariant",
+        entityName: "recipe variant",
+        entityId: id
+      });
       return { success: false, error: error.message };
     } finally {
       setActionLoading(false);
@@ -214,7 +255,12 @@ export const useRecipeVariants = () => {
         setEditingItem(variant);
       }
     } catch (error) {
-      console.error("Error loading variant details:", error);
+      logError(error as Error, {
+        component: "useRecipeVariants",
+        action: "openEditModal",
+        entityName: "recipe variant",
+        entityId: variant._id
+      });
       setEditingItem(variant);
     }
     setIsModalOpen(true);

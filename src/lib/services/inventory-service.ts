@@ -1,6 +1,7 @@
 // src/lib/services/inventory-service.ts
 
 import { api, normalizeApiResponse, buildApiUrl, buildApiHeaders } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 // ==================== Types ====================
 
@@ -144,7 +145,10 @@ export const InventoryService = {
 
       return { success: true, data: stats };
     } catch (error: any) {
-      console.error("Error getting inventory stats:", error);
+      logError("Error getting inventory stats", error, {
+        component: "InventoryService",
+        action: "getStats",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -181,7 +185,10 @@ export const InventoryService = {
 
       return { success: true, data: items };
     } catch (error: any) {
-      console.error("Error listing inventory items:", error);
+      logError("Error listing inventory items", error, {
+        component: "InventoryService",
+        action: "listItems",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -198,7 +205,11 @@ export const InventoryService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error getting inventory item:", error);
+      logError("Error getting inventory item", error, {
+        component: "InventoryService",
+        action: "getItem",
+        itemId: id,
+      });
       return { success: false, message: error.message };
     }
   },
@@ -233,7 +244,10 @@ export const InventoryService = {
         message: normalized.message || "Item created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating inventory item:", error);
+      logError("Error creating inventory item", error, {
+        component: "InventoryService",
+        action: "createItem",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -266,7 +280,11 @@ export const InventoryService = {
         message: normalized.message || "Item updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating inventory item:", error);
+      logError("Error updating inventory item", error, {
+        component: "InventoryService",
+        action: "updateItem",
+        itemId: id,
+      });
       return { success: false, message: error.message };
     }
   },
@@ -283,7 +301,11 @@ export const InventoryService = {
         message: normalized.message || "Item deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting inventory item:", error);
+      logError("Error deleting inventory item", error, {
+        component: "InventoryService",
+        action: "deleteItem",
+        itemId: id,
+      });
       return { success: false, message: error.message };
     }
   },
@@ -300,7 +322,10 @@ export const InventoryService = {
         message: normalized.message || "Stock adjusted successfully",
       };
     } catch (error: any) {
-      console.error("Error adjusting stock:", error);
+      logError("Error adjusting stock", error, {
+        component: "InventoryService",
+        action: "adjustStock",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -337,7 +362,10 @@ export const InventoryService = {
       const blob = await response.blob();
       return { success: true, data: blob };
     } catch (error: any) {
-      console.error("Error downloading import template:", error);
+      logError("Error downloading import template", error, {
+        component: "InventoryService",
+        action: "downloadImportTemplate",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -375,7 +403,10 @@ export const InventoryService = {
       const data = await response.json();
       return { success: true, data };
     } catch (error: any) {
-      console.error("Error importing items:", error);
+      logError("Error importing items", error, {
+        component: "InventoryService",
+        action: "importItems",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -418,7 +449,10 @@ export const InventoryService = {
       const blob = await response.blob();
       return { success: true, data: blob };
     } catch (error: any) {
-      console.error("Error exporting items:", error);
+      logError("Error exporting items", error, {
+        component: "InventoryService",
+        action: "exportItems",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -461,7 +495,10 @@ export const UnitsService = {
 
       return { success: true, data: allUnits };
     } catch (error: any) {
-      console.error("Error listing units:", error);
+      logError("Error listing units", error, {
+        component: "InventoryService",
+        action: "listUnits",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -494,7 +531,10 @@ export const UnitsService = {
 
       return { success: true, data: newUnit };
     } catch (error: any) {
-      console.error("Error creating unit:", error);
+      logError("Error creating unit", error, {
+        component: "InventoryService",
+        action: "createUnit",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -514,7 +554,10 @@ export const UnitsService = {
 
       return { success: true, data: null };
     } catch (error: any) {
-      console.error("Error deleting unit:", error);
+      logError("Error deleting unit", error, {
+        component: "InventoryService",
+        action: "deleteUnit",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -534,7 +577,10 @@ export const ConversionsService = {
 
       return { success: true, data: conversions };
     } catch (error: any) {
-      console.error("Error listing conversions:", error);
+      logError("Error listing conversions", error, {
+        component: "ConversionsService",
+        action: "listConversions",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -557,7 +603,10 @@ export const ConversionsService = {
         message: normalized.message || "Conversion created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating conversion:", error);
+      logError("Error creating conversion", error, {
+        component: "ConversionsService",
+        action: "createConversion",
+      });
       return { success: false, message: error.message };
     }
   },
@@ -574,7 +623,11 @@ export const ConversionsService = {
         message: normalized.message || "Conversion deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting conversion:", error);
+      logError("Error deleting conversion", error, {
+        component: "ConversionsService",
+        action: "deleteConversion",
+        conversionId: id,
+      });
       return { success: false, message: error.message };
     }
   },

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { GeneralSettings } from "@/lib/types";
 
 import { SettingsAPI } from "../util/gsettings-api";
+import { logError } from "@/lib/util/logger";
 
 interface UseSettingsReturn {
   settings: GeneralSettings | null;
@@ -44,7 +45,10 @@ export const useSettings = ({
       setSettings(response.data);
       setOriginalSettings(response.data);
     } catch (error) {
-      console.error('Settings loading error:', error);
+      logError('Settings loading error', error, {
+        component: "useSettings",
+        action: "loadSettings",
+      });
       onError("Failed to load settings");
     } finally {
       setLoading(false);
@@ -76,7 +80,10 @@ export const useSettings = ({
         throw new Error(response.message);
       }
     } catch (error) {
-      console.error('Settings save error:', error);
+      logError('Settings save error', error, {
+        component: "useSettings",
+        action: "handleSave",
+      });
       onError("Failed to save settings. Please try again.");
     } finally {
       setSaving(false);
@@ -97,7 +104,10 @@ export const useSettings = ({
         throw new Error(response.message);
       }
     } catch (error) {
-      console.error('Settings reset error:', error);
+      logError('Settings reset error', error, {
+        component: "useSettings",
+        action: "handleResetToDefaults",
+      });
       onError("Failed to reset settings. Please try again.");
     } finally {
       setResetting(false);

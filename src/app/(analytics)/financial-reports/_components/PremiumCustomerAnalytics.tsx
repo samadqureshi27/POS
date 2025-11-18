@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, ResponsiveContainer, Tooltip, AreaChart, Area, XAxis, YAxis, PieChart, Pie, Cell } from "recharts";
 import { Users, TrendingUp, Heart, Target, DollarSign, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { formatTickValue } from "@/lib/util/formatters";
 
 interface PremiumCustomerAnalyticsProps {
   analyticsData: any;
@@ -154,7 +155,7 @@ const PremiumCustomerAnalytics: React.FC<PremiumCustomerAnalyticsProps> = ({ ana
                       fontSize: "12px"
                     }}
                     formatter={(value: any, name: string) => [
-                      name === 'customers' ? `${value} customers` : `PKR ${(value / 1000).toFixed(0)}K`,
+                      name === 'customers' ? `${value} customers` : `PKR ${formatTickValue(value)}`,
                       name === 'customers' ? 'Customers' : 'Revenue'
                     ]}
                   />

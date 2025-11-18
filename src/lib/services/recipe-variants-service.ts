@@ -1,6 +1,7 @@
-// Recipe Variants Service using proper auth headers (similar to recipe-service)
+// Recipe Variants Service (Paginated)
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 export interface VariantIngredient {
   sourceType: "inventory" | "recipe";
@@ -13,65 +14,57 @@ export interface VariantIngredient {
 
 export interface RecipeVariant {
   _id?: string;
+  id?: string;
   recipeId: string;
   name: string;
-  description?: string;
-  type: "size" | "flavor" | "crust" | "custom";
-  sizeMultiplier?: number;
-  baseCostAdjustment?: number;
-  crustType?: string;
-  ingredients: VariantIngredient[];
-  metadata?: {
-    menuDisplayName?: string;
-    availability?: string[];
-    [key: string]: any;
-  };
+  price: number;
   isActive?: boolean;
-  totalCost?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  sku?: string;
+  description?: string;
 }
 
 export interface RecipeVariantFormData {
-  recipeId: string | string[]; // Can be single string or array of recipe IDs
+  recipeId: string;
   name: string;
+  price: number;
+  isActive?: boolean;
+  sku?: string;
   description?: string;
-  type: "size" | "flavor" | "crust" | "custom";
+  type?: "size" | "flavor" | "crust" | "custom";
   sizeMultiplier?: number;
   baseCostAdjustment?: number;
   crustType?: string;
-  ingredients: VariantIngredient[];
+  ingredients?: VariantIngredient[];
   metadata?: {
     menuDisplayName?: string;
     availability?: string[];
     [key: string]: any;
   };
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
 }
 
 export interface PaginationParams {
   page?: number;
   limit?: number;
   sort?: string;
-  order?: "asc" | "desc";
+  order?: string;
 }
 
 export interface PaginatedResponse<T> {
   success: boolean;
+  message?: string;
   data?: T[];
   pagination?: {
     page: number;
     limit: number;
     total: number;
     totalPages: number;
-  };
+  } | null;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
   message?: string;
+  data?: T;
 }
 
 export class RecipeVariantsService {
@@ -110,7 +103,10 @@ export class RecipeVariantsService {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching recipe variants:", error);
+      logError("Error fetching recipe variants", error, {
+        component: "RecipeVariantsService",
+        action: "listVariants",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch recipe variants",
@@ -138,7 +134,10 @@ export class RecipeVariantsService {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching recipe variant:", error);
+      logError("Error fetching recipe variant", error, {
+        component: "RecipeVariantsService",
+        action: "getVariant",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch recipe variant",
@@ -160,7 +159,10 @@ export class RecipeVariantsService {
         message: normalized.message || "Recipe variant created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating recipe variant:", error);
+      logError("Error creating recipe variant", error, {
+        component: "RecipeVariantsService",
+        action: "createVariant",
+      });
       return {
         success: false,
         message: error.message || "Failed to create recipe variant",
@@ -182,7 +184,10 @@ export class RecipeVariantsService {
         message: normalized.message || "Recipe variant updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating recipe variant:", error);
+      logError("Error updating recipe variant", error, {
+        component: "RecipeVariantsService",
+        action: "updateVariant",
+      });
       return {
         success: false,
         message: error.message || "Failed to update recipe variant",
@@ -203,7 +208,10 @@ export class RecipeVariantsService {
         message: normalized.message || "Recipe variant deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting recipe variant:", error);
+      logError("Error deleting recipe variant", error, {
+        component: "RecipeVariantsService",
+        action: "deleteVariant",
+      });
       return {
         success: false,
         message: error.message || "Failed to delete recipe variant",
@@ -225,7 +233,11 @@ export class RecipeVariantsService {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching recipe variants:", error);
+      logError("Error fetching recipe variants", error, {
+        component: "RecipeVariantsService",
+        action: "getVariantsByRecipeId",
+        recipeId,
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch recipe variants",

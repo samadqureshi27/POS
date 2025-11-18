@@ -2,6 +2,7 @@
 
 import { MenuCategory, MenuCategoryPayload, ApiResponse } from "@/lib/types/menu";
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 export class MenuCategoryService {
   /**
@@ -46,7 +47,10 @@ export class MenuCategoryService {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching menu categories:", error);
+      logError("Error fetching menu categories", error, {
+        component: "MenuCategoryService",
+        action: "listCategories",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch menu categories",
@@ -74,7 +78,11 @@ export class MenuCategoryService {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching menu category:", error);
+      logError("Error fetching menu category", error, {
+        component: "MenuCategoryService",
+        action: "getCategory",
+        categoryId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch menu category",
@@ -96,7 +104,10 @@ export class MenuCategoryService {
         message: normalized.message || "Menu category created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating menu category:", error);
+      logError("Error creating menu category", error, {
+        component: "MenuCategoryService",
+        action: "createCategory",
+      });
       return {
         success: false,
         message: error.message || "Failed to create menu category",
@@ -118,7 +129,11 @@ export class MenuCategoryService {
         message: normalized.message || "Menu category updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating menu category:", error);
+      logError("Error updating menu category", error, {
+        component: "MenuCategoryService",
+        action: "updateCategory",
+        categoryId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update menu category",
@@ -139,7 +154,11 @@ export class MenuCategoryService {
         message: normalized.message || "Menu category deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting menu category:", error);
+      logError("Error deleting menu category", error, {
+        component: "MenuCategoryService",
+        action: "deleteCategory",
+        categoryId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete menu category",

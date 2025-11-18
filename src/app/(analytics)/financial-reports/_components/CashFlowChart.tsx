@@ -2,6 +2,7 @@
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
+import { formatTickValue, formatCompactNumber } from "@/lib/util/formatters";
 
 // Sample cash flow data
 const cashFlowData = [
@@ -35,7 +36,7 @@ export const CashFlowChart: React.FC = () => {
             <DollarSign size={24} className="text-green-600" />
             <div>
               <div className="text-2xl font-bold text-green-700">
-                PKR {(currentCash / 1000).toFixed(0)}K
+                PKR {formatTickValue(currentCash)}
               </div>
               <div className="text-xs text-green-600">Current Cash Position</div>
             </div>
@@ -46,7 +47,7 @@ export const CashFlowChart: React.FC = () => {
             <TrendingUp size={24} className="text-blue-600" />
             <div>
               <div className="text-2xl font-bold text-blue-700">
-                PKR {(avgMonthlyFlow / 1000).toFixed(0)}K
+                PKR {formatTickValue(avgMonthlyFlow)}
               </div>
               <div className="text-xs text-blue-600">Avg Monthly Flow</div>
             </div>
@@ -57,7 +58,7 @@ export const CashFlowChart: React.FC = () => {
             <TrendingUp size={24} className="text-purple-600" />
             <div>
               <div className="text-2xl font-bold text-purple-700">
-                PKR {(totalCashFlow / 1000).toFixed(0)}K
+                PKR {formatTickValue(totalCashFlow)}
               </div>
               <div className="text-xs text-purple-600">6-Month Total</div>
             </div>
@@ -90,7 +91,7 @@ export const CashFlowChart: React.FC = () => {
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12, fill: "#6b7280" }}
-              tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+              tickFormatter={(value) => formatTickValue(value)}
             />
             <YAxis
               yAxisId="cumulative"
@@ -98,7 +99,7 @@ export const CashFlowChart: React.FC = () => {
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12, fill: "#8b5cf6" }}
-              tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+              tickFormatter={(value) => formatTickValue(value)}
             />
             <Tooltip
               contentStyle={{
@@ -110,7 +111,7 @@ export const CashFlowChart: React.FC = () => {
                 boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
               }}
               formatter={(value: any, name: string) => [
-                `PKR ${(value / 1000).toFixed(1)}K`,
+                `PKR ${formatCompactNumber(value)}`,
                 name === "operating" ? "Operating CF" :
                 name === "investing" ? "Investing CF" :
                 name === "financing" ? "Financing CF" :

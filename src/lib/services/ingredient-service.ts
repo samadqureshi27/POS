@@ -1,6 +1,7 @@
 // src/lib/services/ingredient-service.ts
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 export interface TenantIngredient {
   _id?: string;
@@ -51,7 +52,10 @@ export const IngredientService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error listing ingredients:", error);
+      logError("Error listing ingredients", error, {
+        component: "IngredientService",
+        action: "listIngredients",
+      });
       return {
         success: false,
         message: error.message || "Failed to list ingredients",
@@ -70,7 +74,11 @@ export const IngredientService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error getting ingredient:", error);
+      logError("Error getting ingredient", error, {
+        component: "IngredientService",
+        action: "getIngredient",
+        ingredientId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to get ingredient",
@@ -99,7 +107,10 @@ export const IngredientService = {
         message: normalized.message || "Ingredient created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating ingredient:", error);
+      logError("Error creating ingredient", error, {
+        component: "IngredientService",
+        action: "createIngredient",
+      });
       return {
         success: false,
         message: error.message || "Failed to create ingredient",
@@ -127,7 +138,11 @@ export const IngredientService = {
         message: normalized.message || "Ingredient updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating ingredient:", error);
+      logError("Error updating ingredient", error, {
+        component: "IngredientService",
+        action: "updateIngredient",
+        ingredientId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update ingredient",
@@ -146,7 +161,11 @@ export const IngredientService = {
         data: null,
       };
     } catch (error: any) {
-      console.error("Error deleting ingredient:", error);
+      logError("Error deleting ingredient", error, {
+        component: "IngredientService",
+        action: "deleteIngredient",
+        ingredientId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete ingredient",

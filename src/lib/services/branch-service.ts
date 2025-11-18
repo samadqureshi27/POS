@@ -1,6 +1,7 @@
 // src/lib/services/branch-service.ts
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 export interface TenantBranch {
   id?: string;
@@ -54,7 +55,10 @@ export const BranchService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching branches:", error);
+      logError("Error fetching branches", error, {
+        component: "BranchService",
+        action: "listBranches",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch branches",
@@ -73,7 +77,11 @@ export const BranchService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching branch:", error);
+      logError("Error fetching branch", error, {
+        component: "BranchService",
+        action: "getBranch",
+        branchId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch branch",
@@ -92,7 +100,10 @@ export const BranchService = {
         message: normalized.message || "Branch created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating branch:", error);
+      logError("Error creating branch", error, {
+        component: "BranchService",
+        action: "createBranch",
+      });
       return {
         success: false,
         message: error.message || "Failed to create branch",
@@ -111,7 +122,11 @@ export const BranchService = {
         message: normalized.message || "Branch updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating branch:", error);
+      logError("Error updating branch", error, {
+        component: "BranchService",
+        action: "updateBranch",
+        branchId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update branch",
@@ -130,7 +145,11 @@ export const BranchService = {
         message: normalized.message || "Branch deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting branch:", error);
+      logError("Error deleting branch", error, {
+        component: "BranchService",
+        action: "deleteBranch",
+        branchId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete branch",
@@ -149,7 +168,11 @@ export const BranchService = {
         message: normalized.message || "Default branch set successfully",
       };
     } catch (error: any) {
-      console.error("Error setting default branch:", error);
+      logError("Error setting default branch", error, {
+        component: "BranchService",
+        action: "setDefault",
+        branchId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to set default branch",
@@ -168,7 +191,11 @@ export const BranchService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching branch settings:", error);
+      logError("Error fetching branch settings", error, {
+        component: "BranchService",
+        action: "getSettings",
+        branchId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch branch settings",
@@ -187,7 +214,11 @@ export const BranchService = {
         message: normalized.message || "Branch settings updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating branch settings:", error);
+      logError("Error updating branch settings", error, {
+        component: "BranchService",
+        action: "updateSettings",
+        branchId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update branch settings",
@@ -206,7 +237,12 @@ export const BranchService = {
         message: normalized.message || "User attached successfully",
       };
     } catch (error: any) {
-      console.error("Error attaching user:", error);
+      logError("Error attaching user", error, {
+        component: "BranchService",
+        action: "attachUser",
+        branchId: id,
+        userId,
+      });
       return {
         success: false,
         message: error.message || "Failed to attach user",
@@ -225,7 +261,12 @@ export const BranchService = {
         message: normalized.message || "User detached successfully",
       };
     } catch (error: any) {
-      console.error("Error detaching user:", error);
+      logError("Error detaching user", error, {
+        component: "BranchService",
+        action: "detachUser",
+        branchId: id,
+        userId,
+      });
       return {
         success: false,
         message: error.message || "Failed to detach user",

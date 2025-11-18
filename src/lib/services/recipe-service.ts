@@ -1,6 +1,7 @@
-// Real Recipe Service using proxy-helpers (similar to inventory-service)
+// Recipe Service
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 export interface RecipeIngredient {
   sourceType: "inventory" | "recipe";
@@ -12,20 +13,36 @@ export interface RecipeIngredient {
 
 export interface Recipe {
   _id?: string;
+  id?: string;
   name: string;
-  type: "sub" | "final";
+  slug?: string;
   description?: string;
-  ingredients: RecipeIngredient[];
+  category?: string;
   isActive?: boolean;
-  totalCost?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  ingredients?: any[];
+  instructions?: string;
+  prepTime?: number;
+  cookTime?: number;
+  servings?: number;
+}
+
+export interface RecipePayload {
+  name: string;
+  slug?: string;
+  description?: string;
+  category?: string;
+  isActive?: boolean;
+  ingredients?: any[];
+  instructions?: string;
+  prepTime?: number;
+  cookTime?: number;
+  servings?: number;
 }
 
 export interface ApiResponse<T> {
   success: boolean;
-  data?: T;
   message?: string;
+  data?: T;
   error?: string;
 }
 
@@ -52,7 +69,10 @@ export class RecipeService {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching recipes:", error);
+      logError("Error fetching recipes", error, {
+        component: "RecipeService",
+        action: "listRecipes",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch recipes",
@@ -95,7 +115,10 @@ export class RecipeService {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching recipe:", error);
+      logError("Error fetching recipe", error, {
+        component: "RecipeService",
+        action: "getRecipe",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch recipe",
@@ -117,7 +140,10 @@ export class RecipeService {
         message: normalized.message || "Recipe created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating recipe:", error);
+      logError("Error creating recipe", error, {
+        component: "RecipeService",
+        action: "createRecipe",
+      });
       return {
         success: false,
         message: error.message || "Failed to create recipe",
@@ -139,7 +165,10 @@ export class RecipeService {
         message: normalized.message || "Recipe updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating recipe:", error);
+      logError("Error updating recipe", error, {
+        component: "RecipeService",
+        action: "updateRecipe",
+      });
       return {
         success: false,
         message: error.message || "Failed to update recipe",
@@ -160,7 +189,10 @@ export class RecipeService {
         message: normalized.message || "Recipe deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting recipe:", error);
+      logError("Error deleting recipe", error, {
+        component: "RecipeService",
+        action: "deleteRecipe",
+      });
       return {
         success: false,
         message: error.message || "Failed to delete recipe",

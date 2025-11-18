@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { formatCurrency, formatPercentageValue } from "@/lib/util/formatters";
 import { Card, CardContent } from './card';
 import { Badge } from './badge';
 import {
@@ -54,7 +55,7 @@ const statusConfig = {
   neutral: { color: 'bg-gray-100 text-gray-800', icon: Minus }
 };
 
-export const AdvancedMetricCard: React.FC<AdvancedMetricCardProps> = ({
+const AdvancedMetricCardComponent: React.FC<AdvancedMetricCardProps> = ({
   title,
   value,
   subtitle,
@@ -73,11 +74,11 @@ export const AdvancedMetricCard: React.FC<AdvancedMetricCardProps> = ({
 
     switch (format) {
       case 'currency':
-        return `PKR ${val.toLocaleString()}`;
+        return `PKR ${formatCurrency(val)}`;
       case 'percentage':
         return `${val}%`;
       default:
-        return val.toLocaleString();
+        return formatCurrency(val);
     }
   };
 
@@ -169,7 +170,7 @@ export const AdvancedMetricCard: React.FC<AdvancedMetricCardProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Progress to goal</span>
-                <span>{targetProgress.percentage.toFixed(1)}%</span>
+                <span>{formatPercentageValue(targetProgress.percentage)}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
@@ -192,3 +193,6 @@ export const AdvancedMetricCard: React.FC<AdvancedMetricCardProps> = ({
     </Card>
   );
 };
+
+export const AdvancedMetricCard = React.memo(AdvancedMetricCardComponent);
+AdvancedMetricCard.displayName = 'AdvancedMetricCard';

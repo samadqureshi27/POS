@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -103,7 +104,7 @@ export default function CategoryModal({
 
   const handleSave = async () => {
     if (!formData.name) {
-      alert("Please fill in all required fields (Name)");
+      toast.error("Please fill in all required fields (Name)");
       return;
     }
 

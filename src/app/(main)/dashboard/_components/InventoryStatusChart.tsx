@@ -2,6 +2,7 @@
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { getInventoryStatusColor, type InventoryStatus } from "@/lib/util/status-helpers";
 
 // Sample data that would come from your inventory system
 const inventoryData = [
@@ -14,15 +15,6 @@ const inventoryData = [
 ];
 
 export const InventoryStatusChart: React.FC = () => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "critical": return "#ef4444";
-      case "low": return "#f59e0b";
-      case "good": return "#10b981";
-      default: return "#6b7280";
-    }
-  };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "critical": return <AlertTriangle size={16} className="text-red-500" />;
@@ -120,11 +112,11 @@ export const InventoryStatusChart: React.FC = () => {
             />
             <Bar
               dataKey="current"
-              fill={(entry: any) => getStatusColor(entry.status)}
+              fill={(entry: any) => getInventoryStatusColor(entry.status as InventoryStatus)}
               radius={[4, 4, 0, 0]}
             >
               {inventoryData.map((entry, index) => (
-                <Bar key={`bar-${index}`} fill={getStatusColor(entry.status)} />
+                <Bar key={`bar-${index}`} fill={getInventoryStatusColor(entry.status as InventoryStatus)} />
               ))}
             </Bar>
           </BarChart>

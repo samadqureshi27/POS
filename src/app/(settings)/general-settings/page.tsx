@@ -10,6 +10,8 @@ import { Toaster } from "@/components/ui/sonner";
 import ActionButtons from '@/components/ui/setting-buttons';
 import SettingsCards from './_components/cards';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 
 const GeneralSettingsPage = () => {
@@ -29,38 +31,35 @@ const GeneralSettingsPage = () => {
     onError: (message) => showToast(message, "error"),
   });
 
-  // Single loading check - no early return with null
   if (loading || !settings) {
-    return <GlobalSkeleton type="simple" showHeader={true} contentRows={6} />;
+    return <GlobalSkeleton type="management" showActionBar={false} />;
   }
 
   return (
-    <div className="p-6 min-h-screen w-full bg-background">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
-      <div className="flex-1 justify-center items-center w-full ">
-        <div className="mt-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
-            <h1 className="text-3xl font-semibold mb-5 text-foreground">
-              General Settings
-            </h1>
+      <PageHeader
+        title="General Settings"
+        subtitle="Configure system-wide settings for your restaurant"
+      />
 
-            <ActionButtons
-              hasChanges={hasChanges}
-              saving={saving}
-              resetting={resetting}
-              onSave={handleSave}
-              onReset={handleResetToDefaults}
-            />
-          </div>
-
-          <SettingsCards
-            settings={settings}
-            onSettingChange={handleSettingChange}
-          />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
+        <div></div>
+        <ActionButtons
+          hasChanges={hasChanges}
+          saving={saving}
+          resetting={resetting}
+          onSave={handleSave}
+          onReset={handleResetToDefaults}
+        />
       </div>
-    </div>
+
+      <SettingsCards
+        settings={settings}
+        onSettingChange={handleSettingChange}
+      />
+    </PageContainer>
   );
 };
 

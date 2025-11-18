@@ -1,6 +1,7 @@
 // src/lib/services/addons-items-service.ts
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 // ==================== Types ====================
 
@@ -72,7 +73,10 @@ export const AddonsItemsService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error listing addon items:", error);
+      logError("Error listing addon items", error, {
+        component: "AddonsItemsService",
+        action: "listItems",
+      });
       return {
         success: false,
         message: error.message || "Failed to list addon items",
@@ -92,7 +96,11 @@ export const AddonsItemsService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error getting addon item:", error);
+      logError("Error getting addon item", error, {
+        component: "AddonsItemsService",
+        action: "getItem",
+        itemId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to get addon item",
@@ -134,7 +142,10 @@ export const AddonsItemsService = {
         message: normalized.message || "Addon item created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating addon item:", error);
+      logError("Error creating addon item", error, {
+        component: "AddonsItemsService",
+        action: "createItem",
+      });
       return {
         success: false,
         message: error.message || "Failed to create addon item",
@@ -164,7 +175,10 @@ export const AddonsItemsService = {
         message: normalized.message || "Addon items created successfully",
       };
     } catch (error: any) {
-      console.error("Error bulk creating addon items:", error);
+      logError("Error bulk creating addon items", error, {
+        component: "AddonsItemsService",
+        action: "bulkCreateItems",
+      });
       return {
         success: false,
         message: error.message || "Failed to bulk create addon items",
@@ -191,7 +205,11 @@ export const AddonsItemsService = {
         message: normalized.message || "Addon item updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating addon item:", error);
+      logError("Error updating addon item", error, {
+        component: "AddonsItemsService",
+        action: "updateItem",
+        itemId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update addon item",
@@ -211,7 +229,11 @@ export const AddonsItemsService = {
         data: null,
       };
     } catch (error: any) {
-      console.error("Error deleting addon item:", error);
+      logError("Error deleting addon item", error, {
+        component: "AddonsItemsService",
+        action: "deleteItem",
+        itemId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete addon item",

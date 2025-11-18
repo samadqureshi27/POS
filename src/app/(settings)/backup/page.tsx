@@ -13,6 +13,7 @@ import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { BackupPageHeader } from './_components/backup-page-header';
 import { BackupSettingsCard } from './_components/backup-settings-card';
 import { BackupHistoryCard } from './_components/backup-history-cards';
+import { PageContainer } from "@/components/ui/page-container";
 
 const BackupRecoveryPage = () => {
   // Custom hooks
@@ -36,13 +37,13 @@ const BackupRecoveryPage = () => {
   } = useBackup({ showToast, showModal });
 
   if (loading) {
-    return <GlobalSkeleton type="settings" showHeader={true} />;
+    return <GlobalSkeleton type="management" showActionBar={false} />;
   }
 
   if (!settings) return null;
 
   return (
-    <div className="p-6 min-h-screen bg-background w-full">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
       <BackupModal
@@ -55,36 +56,29 @@ const BackupRecoveryPage = () => {
         confirmText={modal.isDestructive ? "Delete" : "Restore"}
       />
 
-      <div className="flex-1 justify-center items-center w-full px-6">
-        <div className="mt-20">
-          {/* Header */}
-          <BackupPageHeader
-            handleCreateBackup={handleCreateBackup}
-            handleSave={handleSave}
-            creatingBackup={creatingBackup}
-            saving={saving}
-            hasChanges={hasChanges}
-          />
+      <BackupPageHeader
+        handleCreateBackup={handleCreateBackup}
+        handleSave={handleSave}
+        creatingBackup={creatingBackup}
+        saving={saving}
+        hasChanges={hasChanges}
+      />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Backup Settings */}
-            <BackupSettingsCard
-              settings={settings}
-              handleSettingChange={handleSettingChange}
-            />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <BackupSettingsCard
+          settings={settings}
+          handleSettingChange={handleSettingChange}
+        />
 
-            {/* Backup History */}
-            <BackupHistoryCard
-              backupHistory={backupHistory}
-              restoring={restoring}
-              deleting={deleting}
-              onRestore={handleRestoreBackup}
-              onDelete={handleDeleteBackup}
-            />
-          </div>
-        </div>
+        <BackupHistoryCard
+          backupHistory={backupHistory}
+          restoring={restoring}
+          deleting={deleting}
+          onRestore={handleRestoreBackup}
+          onDelete={handleDeleteBackup}
+        />
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

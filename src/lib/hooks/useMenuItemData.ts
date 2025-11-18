@@ -1,398 +1,144 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useDataManager } from './useDataManager';
 import { MenuService } from "@/lib/services/menu-service";
 import { MenuCategoryService } from "@/lib/services/menu-category-service";
 import { RecipeService } from "@/lib/services/recipe-service";
-import { MenuItem, MenuItemOption, ToastMessage, extractId } from "@/lib/types/menu";
+import { MenuItemOption, extractId } from "@/lib/types/menu";
+import { useMemo } from "react";
 
 export const useMenuItemData = () => {
-  // State management
-  const [menuItems, setMenuItems] = useState<MenuItemOption[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [recipes, setRecipes] = useState<any[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const hook = useDataManager<any, MenuItemOption>({
+    service: MenuService,
+    entityName: 'menu item',
+    listMethod: 'listMenuItems',
+    getMethod: 'getMenuItem',
+    createMethod: 'createMenuItem',
+    updateMethod: 'updateMenuItem',
+    deleteMethod: 'deleteMenuItem',
+    transformData: (item, index, additionalData) => {
+      const categories = additionalData?.categories || [];
+      const recipes = additionalData?.recipes || [];
 
-  // Filter states
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+      const categoryId = extractId(item.categoryId);
+      const recipeId = extractId(item.recipeId);
 
-  // Modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<MenuItemOption | null>(null);
+      const category = categories.find((c: any) => c._id === categoryId);
+      const recipe = recipes.find((r: any) => r._id === recipeId);
 
-  // Initialize data
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const loadInitialData = async () => {
-    await Promise.all([
-      loadMenuItems(),
-      loadCategories(),
-      loadRecipes()
-    ]);
-  };
-
-  const loadCategories = useCallback(async () => {
-    try {
-      const response = await MenuCategoryService.listCategories();
-      if (response.success && response.data) {
-        let categoriesArray = response.data;
-        if (!Array.isArray(categoriesArray)) {
-          categoriesArray = (response.data as any).categories ||
+      return {
+        ID: item._id || item.id,
+        Name: item.name,
+        Code: item.code || "",
+        Status: item.isActive === false ? "Inactive" : "Active",
+        Description: item.description || "",
+        Category: category?.name || "",
+        CategoryId: categoryId,
+        Recipe: recipe?.name || "",
+        RecipeId: recipeId,
+        BasePrice: item.pricing?.basePrice || 0,
+        Currency: item.pricing?.currency || "SAR",
+        PriceIncludesTax: item.pricing?.priceIncludesTax || false,
+        Tags: item.tags || [],
+        DisplayOrder: item.displayOrder || 0,
+        ImageUrl: item.media?.[0]?.url || "",
+        _raw: item,
+      };
+    },
+    extractDataArray: (response) => {
+      if (Array.isArray(response)) return response;
+      return response.items || response.data || response.menuItems || [];
+    },
+    customFilter: (item, filters) => {
+      const matchesSearch = item.Name.toLowerCase().includes(filters.searchTerm?.toLowerCase() || '') ||
+                           item.Code.toLowerCase().includes(filters.searchTerm?.toLowerCase() || '');
+      const matchesStatus = !filters.statusFilter || item.Status === filters.statusFilter;
+      const matchesCategory = !filters.categoryFilter || item.CategoryId === filters.categoryFilter;
+      return matchesSearch && matchesStatus && matchesCategory;
+    },
+    additionalData: {
+      categories: async () => {
+        const response = await MenuCategoryService.listCategories();
+        if (response.success && response.data) {
+          let categoriesArray = response.data;
+          if (!Array.isArray(categoriesArray)) {
+            categoriesArray = (response.data as any).categories ||
+                            (response.data as any).data ||
+                            (response.data as any).items || [];
+          }
+          return categoriesArray;
+        }
+        return [];
+      },
+      recipes: async () => {
+        const response = await RecipeService.listRecipes();
+        if (response.success && response.data) {
+          let recipesArray = response.data;
+          if (!Array.isArray(recipesArray)) {
+            recipesArray = (response.data as any).recipes ||
                           (response.data as any).data ||
                           (response.data as any).items || [];
-        }
-        setCategories(categoriesArray);
-      }
-    } catch (error) {
-      console.error("Error loading categories:", error);
-    }
-  }, []);
-
-  const loadRecipes = useCallback(async () => {
-    try {
-      const response = await RecipeService.listRecipes();
-      if (response.success && response.data) {
-        let recipesArray = response.data;
-        if (!Array.isArray(recipesArray)) {
-          recipesArray = (response.data as any).recipes ||
-                        (response.data as any).data ||
-                        (response.data as any).items || [];
-        }
-        setRecipes(recipesArray);
-      }
-    } catch (error) {
-      console.error("Error loading recipes:", error);
-    }
-  }, []);
-
-  const loadMenuItems = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await MenuService.listMenuItems();
-
-      if (response.success) {
-        let itemsArray = response.data;
-
-        if (!Array.isArray(itemsArray)) {
-          console.warn("Response data is not an array, checking for nested data...");
-          if (response.data && typeof response.data === 'object') {
-            itemsArray = (response.data as any).items ||
-                        (response.data as any).data ||
-                        (response.data as any).menuItems || [];
-          } else {
-            itemsArray = [];
           }
+          return recipesArray;
         }
-
-        // Transform menu items to match the expected format
-        const transformedItems = itemsArray.map((item: any) => {
-          // Extract string IDs from potentially populated objects
-          const categoryId = extractId(item.categoryId);
-          const recipeId = extractId(item.recipeId);
-
-          // Find category and recipe names
-          const category = categories.find(c => c._id === categoryId);
-          const recipe = recipes.find(r => r._id === recipeId);
-
-          return {
-            ID: item._id || item.id,
-            Name: item.name,
-            Code: item.code || "",
-            Status: item.isActive === false ? "Inactive" : "Active",
-            Description: item.description || "",
-            Category: category?.name || "",
-            CategoryId: categoryId,
-            Recipe: recipe?.name || "",
-            RecipeId: recipeId,
-            BasePrice: item.pricing?.basePrice || 0,
-            Currency: item.pricing?.currency || "SAR",
-            PriceIncludesTax: item.pricing?.priceIncludesTax || false,
-            Tags: item.tags || [],
-            DisplayOrder: item.displayOrder || 0,
-            ImageUrl: item.media?.[0]?.url || "",
-            _raw: item, // Store raw data for editing
-          };
-        });
-        setMenuItems(transformedItems);
-      } else {
-        console.error("Failed to load menu items:", response.message);
-        showToast(response.message || "Failed to load menu items", "error");
-        setMenuItems([]);
-      }
-    } catch (error) {
-      console.error("Error fetching menu items:", error);
-      showToast("Failed to load menu items", "error");
-      setMenuItems([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [categories, recipes]);
-
-  // Reload menu items when categories or recipes change
-  useEffect(() => {
-    if (categories.length > 0 || recipes.length > 0) {
-      loadMenuItems();
-    }
-  }, [categories, recipes]);
-
-  // Computed values
-  const filteredItems = menuItems.filter((item) => {
-    const matchesSearch = item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.Code.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "" || item.Status === statusFilter;
-    const matchesCategory = categoryFilter === "" || item.CategoryId === categoryFilter;
-    return matchesSearch && matchesStatus && matchesCategory;
+        return [];
+      },
+    },
   });
 
-  const isAllSelected =
-    selectedItems.length === filteredItems.length && filteredItems.length > 0;
+  // Computed values
+  const availableCategories = useMemo(() =>
+    [...new Set(
+      hook.items
+        .map(item => ({ id: item.CategoryId, name: item.Category }))
+        .filter(cat => cat.id)
+    )],
+    [hook.items]
+  );
 
-  // Get unique categories from menu items
-  const availableCategories = [...new Set(
-    menuItems
-      .map(item => ({ id: item.CategoryId, name: item.Category }))
-      .filter(cat => cat.id)
-  )];
-
-  // Statistics
-  const menuItemStats = {
-    total: menuItems.length,
-    active: menuItems.filter(item => item.Status === "Active").length,
-    inactive: menuItems.filter(item => item.Status === "Inactive").length,
+  const menuItemStats = useMemo(() => ({
+    total: hook.items.length,
+    active: hook.items.filter(item => item.Status === "Active").length,
+    inactive: hook.items.filter(item => item.Status === "Inactive").length,
     byCategory: availableCategories.reduce((acc, category) => {
-      acc[category.name] = menuItems.filter(item => item.CategoryId === category.id).length;
+      acc[category.name] = hook.items.filter(item => item.CategoryId === category.id).length;
       return acc;
     }, {} as Record<string, number>)
-  };
+  }), [hook.items, availableCategories]);
 
-  // Utility functions
-  const showToast = useCallback((message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  }, []);
-
-  // CRUD Operations
-  const createMenuItem = useCallback(async (itemData: any) => {
-    try {
-      setActionLoading(true);
-
-      const response = await MenuService.createMenuItem(itemData);
-      if (response.success && response.data) {
-        await loadMenuItems();
-        showToast(response.message || "Menu item created successfully", "success");
-        return { success: true, data: response.data };
-      } else {
-        throw new Error(response.message || "Failed to create menu item");
-      }
-    } catch (error: any) {
-      console.error("Error creating menu item:", error);
-      showToast(error.message || "Failed to create menu item", "error");
-      return { success: false, error };
-    } finally {
-      setActionLoading(false);
-    }
-  }, [showToast, loadMenuItems]);
-
-  const updateMenuItem = useCallback(async (id: string, itemData: any) => {
-    try {
-      setActionLoading(true);
-
-      const response = await MenuService.updateMenuItem(id, itemData);
-      if (response.success && response.data) {
-        await loadMenuItems();
-        showToast(response.message || "Menu item updated successfully", "success");
-        return { success: true, data: response.data };
-      } else {
-        throw new Error(response.message || "Failed to update menu item");
-      }
-    } catch (error: any) {
-      console.error("Error updating menu item:", error);
-      showToast(error.message || "Failed to update menu item", "error");
-      return { success: false, error };
-    } finally {
-      setActionLoading(false);
-    }
-  }, [showToast, loadMenuItems]);
-
-  const deleteMenuItems = useCallback(async (itemIds: string[]) => {
-    if (itemIds.length === 0) return { success: false };
-
-    try {
-      setActionLoading(true);
-      const deletePromises = itemIds.map(id => MenuService.deleteMenuItem(id));
-      const results = await Promise.all(deletePromises);
-
-      const allSuccessful = results.every((result) => result.success);
-
-      if (allSuccessful) {
-        await loadMenuItems();
-        setSelectedItems([]);
-        showToast(`${itemIds.length} menu item(s) deleted successfully`, "success");
-        return { success: true };
-      } else {
-        const failedCount = results.filter((r) => !r.success).length;
-        throw new Error(`Failed to delete ${failedCount} of ${itemIds.length} menu items`);
-      }
-    } catch (error: any) {
-      console.error("Error deleting menu items:", error);
-      showToast(error.message || "Failed to delete menu items", "error");
-      return { success: false, error };
-    } finally {
-      setActionLoading(false);
-    }
-  }, [showToast, loadMenuItems]);
-
-  // Selection handlers
-  const handleSelectItem = useCallback((itemId: string, checked: boolean) => {
-    setSelectedItems((prev) =>
-      checked
-        ? [...prev, itemId]
-        : prev.filter((id) => id !== itemId)
-    );
-  }, []);
-
-  const handleSelectAll = useCallback((checked: boolean) => {
-    setSelectedItems(checked ? filteredItems.map((item) => item.ID) : []);
-  }, [filteredItems]);
-
-  const clearSelection = useCallback(() => {
-    setSelectedItems([]);
-  }, []);
-
-  // Modal handlers
-  const openAddModal = useCallback(() => {
-    if (selectedItems.length > 0) return;
-    setEditingItem(null);
-    setIsModalOpen(true);
-  }, [selectedItems.length]);
-
-  const openEditModal = useCallback(async (item: MenuItemOption) => {
-    try {
-      const itemId = item.ID;
-      const response = await MenuService.getMenuItem(itemId);
-
-      if (response.success && response.data) {
-        const fullItem = {
-          ...item,
-          _raw: response.data,
-        };
-        setEditingItem(fullItem);
-      } else {
-        setEditingItem(item);
-      }
-    } catch (error) {
-      console.error("Error fetching menu item details:", error);
-      setEditingItem(item);
-    }
-    setIsModalOpen(true);
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setIsModalOpen(false);
-    setEditingItem(null);
-  }, []);
-
-  const handleModalSubmit = useCallback(async (data: any) => {
-    let result;
-
-    if (editingItem) {
-      result = await updateMenuItem(editingItem.ID, data);
-    } else {
-      result = await createMenuItem(data);
-    }
-
-    if (result.success) {
-      setIsModalOpen(false);
-      setEditingItem(null);
-      setSelectedItems([]);
-    }
-
-    return result;
-  }, [editingItem, updateMenuItem, createMenuItem]);
-
-  // Filter handlers
-  const updateSearchTerm = useCallback((term: string) => {
-    setSearchTerm(term);
-  }, []);
-
-  const updateStatusFilter = useCallback((status: "" | "Active" | "Inactive") => {
-    setStatusFilter(status);
-  }, []);
-
-  const updateCategoryFilter = useCallback((category: string) => {
-    setCategoryFilter(category);
-  }, []);
-
-  const clearFilters = useCallback(() => {
-    setSearchTerm("");
-    setStatusFilter("");
-    setCategoryFilter("");
-  }, []);
-
-  // Refresh data
-  const refreshData = useCallback(async () => {
-    await loadInitialData();
-  }, []);
-
-  // Return all data and functions
+  // Return with backwards-compatible API
   return {
-    // Data
-    menuItems,
-    categories,
-    recipes,
-    filteredItems,
-    selectedItems,
-    loading,
-    actionLoading,
-    toast,
-
-    // Filter states
-    searchTerm,
-    statusFilter,
-    categoryFilter,
-
-    // Modal states
-    isModalOpen,
-    editingItem,
-
-    // Computed values
-    isAllSelected,
+    menuItems: hook.items,
+    categories: hook.additionalDataValues?.categories || [],
+    recipes: hook.additionalDataValues?.recipes || [],
+    filteredItems: hook.filteredItems,
+    selectedItems: hook.selectedItems,
+    loading: hook.loading,
+    actionLoading: hook.actionLoading,
+    toast: hook.toast,
+    searchTerm: hook.searchTerm,
+    statusFilter: hook.filters.statusFilter || "",
+    categoryFilter: hook.filters.categoryFilter || "",
+    isModalOpen: hook.isModalOpen,
+    editingItem: hook.editingItem,
+    isAllSelected: hook.isAllSelected,
     availableCategories,
     menuItemStats,
-
-    // CRUD operations
-    createMenuItem,
-    updateMenuItem,
-    deleteMenuItems: () => deleteMenuItems(selectedItems),
-
-    // Selection handlers
-    handleSelectItem,
-    handleSelectAll,
-    clearSelection,
-
-    // Modal handlers
-    openAddModal,
-    openEditModal,
-    closeModal,
-    handleModalSubmit,
-
-    // Filter handlers
-    updateSearchTerm,
-    updateStatusFilter,
-    updateCategoryFilter,
-    clearFilters,
-
-    // Utility functions
-    showToast,
-    refreshData,
-
-    // Toast handler
-    dismissToast: () => setToast(null),
+    createMenuItem: hook.create,
+    updateMenuItem: hook.update,
+    deleteMenuItems: () => hook.delete(hook.selectedItems),
+    handleSelectItem: hook.handleSelectItem,
+    handleSelectAll: hook.handleSelectAll,
+    clearSelection: hook.clearSelection,
+    openAddModal: hook.openAddModal,
+    openEditModal: hook.openEditModal,
+    closeModal: hook.closeModal,
+    handleModalSubmit: hook.handleModalSubmit,
+    updateSearchTerm: hook.updateSearchTerm,
+    updateStatusFilter: (status: "" | "Active" | "Inactive") => hook.updateFilter('statusFilter', status),
+    updateCategoryFilter: (category: string) => hook.updateFilter('categoryFilter', category),
+    clearFilters: hook.clearFilters,
+    showToast: hook.showToast,
+    refreshData: hook.refreshData,
+    dismissToast: hook.dismissToast,
   };
 };

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Notification } from '../types/notifications';
 import { NotificationAPI } from '../util/notifications.api';
+import { logError } from '@/lib/util/logger';
 
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -13,7 +14,10 @@ export const useNotifications = () => {
       const data = await NotificationAPI.getNotifications();
       setNotifications(data);
     } catch (error) {
-      console.error('Failed to load notifications:', error);
+      logError('Failed to load notifications', error, {
+        component: "useNotifications",
+        action: "loadNotifications",
+      });
     } finally {
       setLoading(false);
     }
@@ -26,7 +30,11 @@ export const useNotifications = () => {
         prev.map(n => n.id === id ? { ...n, read: true } : n)
       );
     } catch (error) {
-      console.error('Failed to mark as read:', error);
+      logError('Failed to mark as read', error, {
+        component: "useNotifications",
+        action: "markAsRead",
+        notificationId: id,
+      });
     }
   };
 
@@ -35,7 +43,10 @@ export const useNotifications = () => {
       await NotificationAPI.markAllAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     } catch (error) {
-      console.error('Failed to mark all as read:', error);
+      logError('Failed to mark all as read', error, {
+        component: "useNotifications",
+        action: "markAllAsRead",
+      });
     }
   };
 
@@ -44,7 +55,11 @@ export const useNotifications = () => {
       await NotificationAPI.deleteNotification(id);
       setNotifications(prev => prev.filter(n => n.id !== id));
     } catch (error) {
-      console.error('Failed to delete notification:', error);
+      logError('Failed to delete notification', error, {
+        component: "useNotifications",
+        action: "deleteNotification",
+        notificationId: id,
+      });
     }
   };
 

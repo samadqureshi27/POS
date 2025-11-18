@@ -1,10 +1,10 @@
 // lib/hooks/BranchModal.ts
 import { useState, useEffect } from "react";
 import { BranchItem, BranchModalFormData } from "@/lib/types/branch";
+import { useModalState } from "./useModalState";
 
 export const useBranchModal = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<BranchItem | null>(null);
+    const { isOpen, editingItem, openCreate, openEdit, close } = useModalState<BranchItem>();
     const [formData, setFormData] = useState<BranchModalFormData>({
         Branch_Name: "",
         Status: "Active",
@@ -35,11 +35,11 @@ export const useBranchModal = () => {
                 postalCode: "",
             });
         }
-    }, [editingItem, isModalOpen]);
+    }, [editingItem, isOpen]);
 
     // Handle body overflow when modal is open
     useEffect(() => {
-        if (isModalOpen) {
+        if (isOpen) {
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "unset";
@@ -48,21 +48,18 @@ export const useBranchModal = () => {
         return () => {
             document.body.style.overflow = "unset";
         };
-    }, [isModalOpen]);
+    }, [isOpen]);
 
     const openCreateModal = () => {
-        setEditingItem(null);
-        setIsModalOpen(true);
+        openCreate();
     };
 
     const openEditModal = (item: BranchItem) => {
-        setEditingItem(item);
-        setIsModalOpen(true);
+        openEdit(item);
     };
 
     const closeModal = () => {
-        setIsModalOpen(false);
-        setEditingItem(null);
+        close();
     };
 
     const handleStatusChange = (isActive: boolean) => {
@@ -77,7 +74,7 @@ export const useBranchModal = () => {
     };
 
     return {
-        isModalOpen,
+        isModalOpen: isOpen,
         editingItem,
         formData,
         openCreateModal,

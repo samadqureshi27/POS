@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { InventoryItem, InventoryModalFormData } from "@/lib/types/inventory";
 import { calculateStatus } from "@/lib/utils";
+import { useModalState } from "./useModalState";
 
 export const useInventoryModal = (branchId: number) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+    const { isOpen, editingItem, openCreate, openEdit, close } = useModalState<InventoryItem>();
     const [formData, setFormData] = useState<InventoryModalFormData>({
         Name: "",
         Unit: "",
@@ -17,7 +17,6 @@ export const useInventoryModal = (branchId: number) => {
     });
 
     const openCreateModal = () => {
-        setEditingItem(null);
         setFormData({
             Name: "",
             Unit: "",
@@ -28,11 +27,10 @@ export const useInventoryModal = (branchId: number) => {
             Threshold: 0,
             supplier: "",
         });
-        setIsModalOpen(true);
+        openCreate();
     };
 
     const openEditModal = (item: InventoryItem) => {
-        setEditingItem(item);
         setFormData({
             Name: item.Name,
             Unit: item.Unit,
@@ -43,12 +41,10 @@ export const useInventoryModal = (branchId: number) => {
             Threshold: item.Threshold,
             supplier: item.supplier,
         });
-        setIsModalOpen(true);
+        openEdit(item);
     };
 
     const closeModal = () => {
-        setIsModalOpen(false);
-        setEditingItem(null);
         setFormData({
             Name: "",
             Unit: "",
@@ -59,6 +55,7 @@ export const useInventoryModal = (branchId: number) => {
             Threshold: 0,
             supplier: "",
         });
+        close();
     };
 
     const updateFormData = (updates: Partial<InventoryModalFormData>) => {
@@ -78,7 +75,7 @@ export const useInventoryModal = (branchId: number) => {
     }, [formData.InitialStock, formData.AddedStock, formData.Threshold]);
 
     return {
-        isModalOpen,
+        isModalOpen: isOpen,
         editingItem,
         formData,
         openCreateModal,

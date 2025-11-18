@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { CustomerItem, OrderItem } from '@/lib/types/customer-profile';
 import { CustomerAPI } from '../util/customer-profile-api';
+import { logError } from '@/lib/util/logger';
 
 export const useCustomerProfile = (customerId: number | null) => {
     const [customer, setCustomer] = useState<CustomerItem | null>(null);
@@ -30,7 +31,11 @@ export const useCustomerProfile = (customerId: number | null) => {
                 setOrders(ordersResponse.data);
             }
         } catch (error) {
-            console.error("Failed to load customer data", error);
+            logError("Failed to load customer data", error, {
+                component: "useCustomerProfile",
+                action: "loadCustomerData",
+                customerId: id,
+            });
             setError("Failed to load customer data");
         } finally {
             setLoading(false);

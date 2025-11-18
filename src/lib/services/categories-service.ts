@@ -1,6 +1,7 @@
 // src/lib/services/categories-service.ts
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
+import { logError } from "@/lib/util/logger";
 
 // ==================== Types ====================
 
@@ -61,7 +62,10 @@ export const CategoriesService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching categories:", error);
+      logError("Error fetching categories", error, {
+        component: "CategoriesService",
+        action: "listCategories",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch categories",
@@ -87,7 +91,11 @@ export const CategoriesService = {
         message: normalized.message,
       };
     } catch (error: any) {
-      console.error("Error fetching category:", error);
+      logError("Error fetching category", error, {
+        component: "CategoriesService",
+        action: "getCategory",
+        categoryId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch category",
@@ -125,7 +133,10 @@ export const CategoriesService = {
         message: normalized.message || "Category created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating category:", error);
+      logError("Error creating category", error, {
+        component: "CategoriesService",
+        action: "createCategory",
+      });
       return {
         success: false,
         message: error.message || "Failed to create category",
@@ -158,7 +169,11 @@ export const CategoriesService = {
         message: normalized.message || "Category updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating category:", error);
+      logError("Error updating category", error, {
+        component: "CategoriesService",
+        action: "updateCategory",
+        categoryId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update category",
@@ -178,7 +193,11 @@ export const CategoriesService = {
         message: normalized.message || "Category deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting category:", error);
+      logError("Error deleting category", error, {
+        component: "CategoriesService",
+        action: "deleteCategory",
+        categoryId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete category",

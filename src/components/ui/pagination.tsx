@@ -21,7 +21,7 @@ export interface PaginationProps {
   showItemCount?: boolean;
 }
 
-export function Pagination({
+const PaginationComponent = ({
   currentPage,
   totalPages,
   onPageChange,
@@ -29,7 +29,7 @@ export function Pagination({
   itemsPerPage,
   className,
   showItemCount = true,
-}: PaginationProps) {
+}: PaginationProps) => {
   // Generate page numbers to display
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
@@ -186,4 +186,7 @@ export function Pagination({
       </div>
     </div>
   );
-}
+};
+
+export const Pagination = React.memo(PaginationComponent);
+Pagination.displayName = 'Pagination';

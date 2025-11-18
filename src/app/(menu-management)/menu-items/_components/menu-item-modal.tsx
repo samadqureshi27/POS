@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { RecipeService } from "@/lib/services/recipe-service";
-import { RecipeVariantService } from "@/lib/services/recipe-variant-service";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatPrice } from "@/lib/util/formatters";
 import { MenuItemOption, MenuItemPayload, extractId } from "@/lib/types/menu";
+import { logError } from "@/lib/util/logger";
 
 interface MenuItemModalProps {
   isOpen: boolean;
@@ -171,7 +173,11 @@ export default function MenuItemModal({
         setRecipeVariations([]);
       }
     } catch (error) {
-      console.error("Error fetching recipe variations:", error);
+      logError("Error fetching recipe variations", error, {
+        component: "MenuItemModal",
+        action: "fetchRecipeVariations",
+        recipeId,
+      });
       setLoadingVariations(false);
       setRecipeVariations([]);
     }
@@ -232,7 +238,11 @@ export default function MenuItemModal({
           setRecipeVariations([]);
         }
       } catch (error) {
-        console.error("Error fetching recipe details:", error);
+        logError("Error fetching recipe details", error, {
+          component: "MenuItemModal",
+          action: "handleFieldChange:recipeId",
+          recipeId: value,
+        });
         setLoadingVariations(false);
         setRecipeVariations([]);
       }
@@ -271,12 +281,12 @@ export default function MenuItemModal({
 
   const handleSave = async () => {
     if (!formData.name || !formData.categoryId) {
-      alert("Please fill in all required fields (Name, Category)");
+      toast.error("Please fill in all required fields (Name, Category)");
       return;
     }
 
     if (!formData.pricing?.basePrice || formData.pricing.basePrice <= 0) {
-      alert("Please enter a valid price");
+      toast.error("Please enter a valid price");
       return;
     }
 
@@ -291,7 +301,7 @@ export default function MenuItemModal({
         : undefined;
 
       if (!categoryId) {
-        alert("Category is required");
+        toast.error("Category is required");
         return;
       }
 
@@ -319,7 +329,11 @@ export default function MenuItemModal({
       await onSubmit(payload);
       onClose();
     } catch (error) {
-      console.error("Error saving menu item:", error);
+      logError("Error saving menu item", error, {
+        component: "MenuItemModal",
+        action: "handleSave",
+        itemName: formData.name,
+      });
     }
   };
 
@@ -522,7 +536,7 @@ export default function MenuItemModal({
                           </span>
                           {variation.baseCostAdjustment && (
                             <span className="text-sm font-semibold text-gray-700">
-                              +${variation.baseCostAdjustment.toFixed(2)}
+                              +${formatPrice(variation.baseCostAdjustment)}
                             </span>
                           )}
                         </div>
