@@ -1,3 +1,51 @@
+// Recipe Variants Service (Paginated)
+import { buildHeaders } from "@/lib/util/service-helpers";
+
+export interface RecipeVariant {
+  _id?: string;
+  id?: string;
+  recipeId: string;
+  name: string;
+  price: number;
+  isActive?: boolean;
+  sku?: string;
+  description?: string;
+}
+
+export interface RecipeVariantFormData {
+  recipeId: string;
+  name: string;
+  price: number;
+  isActive?: boolean;
+  sku?: string;
+  description?: string;
+}
+
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  order?: string;
+}
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  message?: string;
+  data?: T[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  } | null;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
+
 export class RecipeVariantsService {
   /**
    * Get all recipe variants with pagination support

@@ -1,3 +1,40 @@
+// Recipe Service
+import { buildHeaders } from "@/lib/util/service-helpers";
+
+export interface Recipe {
+  _id?: string;
+  id?: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  category?: string;
+  isActive?: boolean;
+  ingredients?: any[];
+  instructions?: string;
+  prepTime?: number;
+  cookTime?: number;
+  servings?: number;
+}
+
+export interface RecipePayload {
+  name: string;
+  slug?: string;
+  description?: string;
+  category?: string;
+  isActive?: boolean;
+  ingredients?: any[];
+  instructions?: string;
+  prepTime?: number;
+  cookTime?: number;
+  servings?: number;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
+
 export class RecipeService {
   /**
    * Get all recipes

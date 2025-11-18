@@ -1,3 +1,32 @@
+// Recipe Variant Service
+import { buildHeaders } from "@/lib/util/service-helpers";
+
+export interface RecipeVariant {
+  _id?: string;
+  id?: string;
+  recipeId: string;
+  name: string;
+  price: number;
+  isActive?: boolean;
+  sku?: string;
+  description?: string;
+}
+
+export interface RecipeVariantPayload {
+  recipeId: string;
+  name: string;
+  price: number;
+  isActive?: boolean;
+  sku?: string;
+  description?: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
+
 export class RecipeVariantService {
   /**
    * Get all recipe variants
@@ -250,9 +279,9 @@ export class RecipeVariantService {
     try {
       const deletePromises = ids.map(id => this.deleteRecipeVariant(id));
       const results = await Promise.all(deletePromises);
-      
+
       const failedDeletes = results.filter(result => !result.success);
-      
+
       if (failedDeletes.length > 0) {
         return {
           success: false,
