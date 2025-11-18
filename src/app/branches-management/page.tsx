@@ -3,6 +3,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Building2, Plus, MapPin } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
@@ -13,6 +14,9 @@ import BranchModal from "./_components/branch-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
 import { BranchItem } from "@/lib/types/branch";
+import { formatID } from "@/lib/util/formatters";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 const BranchManagementPage = () => {
   const router = useRouter();
@@ -61,7 +65,7 @@ const BranchManagementPage = () => {
 
   const handleDelete = async (branch: BranchItem) => {
     // TODO: Implement delete functionality when backend endpoint is available
-    alert("Delete functionality will be implemented when backend endpoint is available");
+    toast.error("Delete functionality will be implemented when backend endpoint is available");
   };
 
   // Show loading while checking authentication
@@ -75,17 +79,16 @@ const BranchManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer>
       <Toaster position="top-right" />
 
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Branch Management</h1>
-        <p className="text-gray-600 text-sm mt-1">Manage your restaurant branches and locations</p>
-      </header>
+      <PageHeader
+        title="Branch Management"
+        subtitle="Manage your restaurant branches and locations"
+      />
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 max-w-4xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <AdvancedMetricCard
           title="Total Branches"
           subtitle="All locations"
@@ -161,7 +164,7 @@ const BranchManagementPage = () => {
             header: "Branch ID",
             render: (item) => (
               <span className="font-mono text-gray-700">
-                #{String(item["Branch-ID"]).padStart(3, "0")}
+                {formatID(item["Branch-ID"])}
               </span>
             ),
             className: "w-28",
@@ -234,7 +237,7 @@ const BranchManagementPage = () => {
 
                 {/* Branch ID Badge - Top Right */}
                 <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm bg-blue-600 text-white">
-                  #{String(item["Branch-ID"]).padStart(3, "0")}
+                  {formatID(item["Branch-ID"])}
                 </div>
 
                 {/* Hover Actions Overlay */}
@@ -300,9 +303,8 @@ const BranchManagementPage = () => {
         onFormDataChange={updateFormData}
         onStatusChange={handleStatusChange}
       />
-    </div>
+    </PageContainer>
   );
 };
-
 
 export default BranchManagementPage;

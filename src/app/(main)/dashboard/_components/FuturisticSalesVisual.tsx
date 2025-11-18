@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, RadialBarChart, RadialBar } from "recharts";
 import { TrendingUp, Crown, Zap, Target, DollarSign, Activity } from "lucide-react";
+import { formatTickValue, formatCompactNumber } from "@/lib/util/formatters";
 
 interface FuturisticSalesVisualProps {
   revenueData: any[];
@@ -66,13 +67,13 @@ const FuturisticSalesVisual: React.FC<FuturisticSalesVisualProps> = ({
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">Current Hour</p>
               <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                PKR {(currentRevenue / 1000).toFixed(1)}K
+                PKR {formatCompactNumber(currentRevenue)}
               </p>
             </div>
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">Projected Daily</p>
               <p className="text-2xl font-bold text-slate-700">
-                PKR {(projectedDaily / 1000).toFixed(0)}K
+                PKR {formatTickValue(projectedDaily)}
               </p>
             </div>
           </div>
@@ -112,7 +113,7 @@ const FuturisticSalesVisual: React.FC<FuturisticSalesVisualProps> = ({
                     fontSize: "12px"
                   }}
                   formatter={(value: any, name: string) => [
-                    `PKR ${(value / 1000).toFixed(1)}K`,
+                    `PKR ${formatCompactNumber(value)}`,
                     name === 'revenue' ? 'Actual' : 'Target'
                   ]}
                   labelFormatter={(label) => `${label}:00`}

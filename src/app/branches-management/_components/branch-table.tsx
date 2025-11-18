@@ -6,6 +6,7 @@ import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/dat
 import { StatusBadge } from "@/components/ui/status-badge";
 import FilterDropdown from "@/components/ui/filter-dropdown";
 import { BranchTableProps } from "@/lib/types/branch";
+import { formatID } from "@/lib/util/formatters";
 
 const BranchTable: React.FC<BranchTableProps> = ({
     branchItems,
@@ -29,7 +30,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
             key: "branchId",
             title: "Branch ID",
             dataIndex: "Branch-ID",
-            render: (value) => `#${String(value).padStart(3, "0")}`
+            render: (value) => formatID(value)
         },
         {
             key: "branchName",

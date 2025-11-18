@@ -47,7 +47,7 @@ interface EnhancedActionBarProps {
   containerClassName?: string;
 }
 
-const EnhancedActionBar: React.FC<EnhancedActionBarProps> = ({
+const EnhancedActionBarComponent: React.FC<EnhancedActionBarProps> = ({
   // Search defaults
   searchValue = "",
   onSearchChange,
@@ -180,5 +180,8 @@ const EnhancedActionBar: React.FC<EnhancedActionBarProps> = ({
     </div>
   );
 };
+
+const EnhancedActionBar = React.memo(EnhancedActionBarComponent);
+EnhancedActionBar.displayName = 'EnhancedActionBar';
 
 export default EnhancedActionBar;

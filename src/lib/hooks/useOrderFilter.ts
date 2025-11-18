@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { OrderItem, DateRangeType } from '@/lib/types';
 import { OrderAPI } from '@/lib/util/order-api';
+import { logError } from '@/lib/util/logger';
 
 export const useOrderFilters = (items: OrderItem[]) => {
   const [filteredItems, setFilteredItems] = useState<OrderItem[]>([]);
@@ -91,7 +92,10 @@ export const useOrderFilters = (items: OrderItem[]) => {
         setFilteredItems(periodFilteredData);
       }
     } catch (error) {
-      console.error("Error applying filters:", error);
+      logError("Error applying filters", error, {
+        component: "useOrderFilters",
+        action: "applyFilters",
+      });
       setFilteredItems(items); // Fallback to original data
     }
   };

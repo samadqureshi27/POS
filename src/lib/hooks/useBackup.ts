@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { BackupSettings, BackupHistoryItem } from "@/lib/types/backup";
 import { BackupAPI } from "../util/backup-api";
+import { logError } from "@/lib/util/logger";
 
 interface UseBackupProps {
     showToast: (message: string, type: "success" | "error") => void;
@@ -107,7 +108,11 @@ export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
                     showToast("Failed to create backup", "error");
                 }
             } catch (error) {
-                console.error("Backup creation error:", error);
+                logError("Backup creation error", error, {
+                    component: "useBackup",
+                    action: "handleCreateBackup",
+                    backupType: type,
+                });
                 showToast("Failed to create backup", "error");
             } finally {
                 setCreatingBackup(false);

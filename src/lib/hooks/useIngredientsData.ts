@@ -6,6 +6,7 @@ import {
   ToastMessage,
   FilterOptions
 } from "@/lib/types/ingredients";
+import { logError } from "@/lib/util/logger";
 
 
 export const useIngredientsData = () => {
@@ -102,7 +103,10 @@ export const useIngredientsData = () => {
         showToast(response.message || "Failed to load ingredients", "error");
       }
     } catch (error) {
-      console.error("Error loading ingredients:", error);
+      logError("Error loading ingredients", error, {
+        component: "useIngredientsData",
+        action: "loadIngredients",
+      });
       showToast("Failed to load ingredients", "error");
     } finally {
       setLoading(false);
@@ -184,7 +188,11 @@ export const useIngredientsData = () => {
         showToast(response.message || "Failed to add ingredient", "error");
       }
     } catch (error) {
-      console.error("Error adding ingredient:", error);
+      logError("Error adding ingredient", error, {
+        component: "useIngredientsData",
+        action: "addItem",
+        ingredientName: newItem.Name,
+      });
       showToast("Failed to add ingredient", "error");
     } finally {
       setActionLoading(false);
@@ -214,7 +222,12 @@ export const useIngredientsData = () => {
         showToast(response.message || "Failed to update ingredient", "error");
       }
     } catch (error) {
-      console.error("Error updating ingredient:", error);
+      logError("Error updating ingredient", error, {
+        component: "useIngredientsData",
+        action: "updateItem",
+        ingredientId: updatedItem.backendId,
+        ingredientName: updatedItem.Name,
+      });
       showToast("Failed to update ingredient", "error");
     } finally {
       setActionLoading(false);

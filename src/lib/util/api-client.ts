@@ -13,6 +13,7 @@
  */
 
 import { getAccessToken } from './token-manager';
+import { API_CONFIG } from '@/lib/constants';
 
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || '';
@@ -130,9 +131,9 @@ interface RetryConfig {
 }
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
-  maxRetries: 3,
-  retryDelay: 1000,
-  retryOn: [408, 429, 500, 502, 503, 504], // Timeout, rate limit, server errors
+  maxRetries: API_CONFIG.MAX_RETRIES,
+  retryDelay: API_CONFIG.RETRY_DELAY,
+  retryOn: API_CONFIG.RETRY_STATUS_CODES,
 };
 
 /**
@@ -169,7 +170,7 @@ export async function apiClient<T = any>(
       // Check if we should retry based on status code
       if (!response.ok && config.retryOn?.includes(response.status) && attempt < (config.maxRetries || 0)) {
         lastError = new ApiError(response.status, `HTTP ${response.status}`, null);
-        await sleep((config.retryDelay || 1000) * Math.pow(2, attempt)); // Exponential backoff
+        await sleep((config.retryDelay || API_CONFIG.RETRY_DELAY) * Math.pow(2, attempt)); // Exponential backoff
         continue;
       }
 
@@ -183,7 +184,7 @@ export async function apiClient<T = any>(
       }
 
       // Wait before retrying
-      await sleep((config.retryDelay || 1000) * Math.pow(2, attempt));
+      await sleep((config.retryDelay || API_CONFIG.RETRY_DELAY) * Math.pow(2, attempt));
     }
   }
 

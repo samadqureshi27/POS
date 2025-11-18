@@ -6,6 +6,7 @@ import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/dat
 import { StatusBadge } from "@/components/ui/status-badge";
 import FilterDropdown from "@/components/ui/filter-dropdown";
 import { PosTableProps } from "@/lib/types/pos";
+import { formatID } from "@/lib/util/formatters";
 
 const PosTable: React.FC<PosTableProps> = ({
     posItems,
@@ -31,7 +32,7 @@ const PosTable: React.FC<PosTableProps> = ({
             key: "posId",
             title: "POS ID",
             dataIndex: "POS_ID",
-            render: (value) => `#${String(value).padStart(3, "0")}`
+            render: (value) => formatID(value)
         },
         {
             key: "posName",

@@ -2,7 +2,7 @@
 
 // Dashboard.tsx - Main Dashboard Component
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -17,7 +17,7 @@ import { getPeriodLabel } from "@/lib/util/Dashboardutils";
 
 // Components
 import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { DashboardHeader } from "./_components/DashboardHeader";
 import { PeriodSelector } from "@/components/ui/period-selector";
 import { MetricsCards } from "./_components/MetricsCards";
@@ -34,52 +34,8 @@ import FuturisticSalesVisual from "./_components/FuturisticSalesVisual";
 
 // Main Dashboard Component
 const Dashboard = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState("Week");
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<string>("");
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
-  const [customDateRange, setCustomDateRange] = useState([
-    {
-      startDate: new Date(),
-      endDate: new Date(),
-      key: "selection",
-    },
-  ]);
-
-  // Modal states
-  const [showInventoryModal, setShowInventoryModal] = useState(false);
-  const [showExpenseModal, setShowExpenseModal] = useState(false);
-
-  const periods = ["Today", "Week", "Month", "Quarter", "Year", "Custom"];
-  const calendarRef = useRef<HTMLDivElement>(null);
-  const isInitialized = useRef(false);
-
-  // Add debug logging
-
-  // Modified load dashboard data function with optional loading parameter
-  const loadDashboardData = useCallback(async (period: string, showLoading = true, startDate?: string, endDate?: string) => {
-    try {
-      if (showLoading) {
-        setLoading(true);
-      }
-
-      const data = await dashboardAPI.getDashboardData(period, startDate, endDate);
-      setDashboardData(data);
-      setLastUpdated(new Date().toISOString());
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      showToast("Failed to load dashboard data", "error");
-    } finally {
-      if (showLoading) {
-        setLoading(false);
-      }
-    }
-  }, []);
-
-  const showToast = useCallback((message: string, type: "success" | "error" | "info") => {
+  // Toast callback for the hook
+  const handleToast = useCallback((message: string, type: 'success' | 'error' | 'info') => {
     switch (type) {
       case "success":
         toast.success(message);
@@ -95,49 +51,24 @@ const Dashboard = () => {
     }
   }, []);
 
-  const handleRefresh = useCallback(async () => {
-    try {
-      setRefreshing(true);
+  // Dashboard data hook
+  const {
+    dashboardData,
+    loading,
+    refreshing,
+    lastUpdated,
+    selectedPeriod,
+    customDateRange,
+    showDatePicker,
+    setCustomDateRange,
+    setShowDatePicker,
+    handlePeriodChange,
+    handleRefresh,
+  } = useDashboardData("Week", handleToast);
 
-      let data;
-      if (selectedPeriod === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) {
-        const startDate = customDateRange[0].startDate.toISOString().split('T')[0];
-        const endDate = customDateRange[0].endDate.toISOString().split('T')[0];
-        data = await dashboardAPI.refreshDashboardData(selectedPeriod, startDate, endDate);
-      } else {
-        data = await dashboardAPI.refreshDashboardData(selectedPeriod);
-      }
-
-      setDashboardData(data);
-      setLastUpdated(new Date().toISOString());
-      showToast("Dashboard refreshed successfully", "success");
-    } catch (error) {
-      showToast("Failed to refresh dashboard", "error");
-    } finally {
-      setRefreshing(false);
-    }
-  }, [selectedPeriod, showToast, customDateRange]);
-
-  // Modified period change handler - no loading animation for period changes
-  const handlePeriodChange = useCallback(async (period: string) => {
-    try {
-      setSelectedPeriod(period);
-      setShowDatePicker(false);
-
-      // For Custom period, check if we have date range data
-      if (period === "Custom" && customDateRange?.[0]?.startDate && customDateRange?.[0]?.endDate) {
-        const startDate = customDateRange[0].startDate.toISOString().split('T')[0];
-        const endDate = customDateRange[0].endDate.toISOString().split('T')[0];
-        await loadDashboardData(period, false, startDate, endDate);
-      } else {
-        // Load data without showing loading spinner for period changes
-        await loadDashboardData(period, false);
-      }
-    } catch (error) {
-      console.error("Error changing period:", error);
-      showToast("Failed to load data for selected period", "error");
-    }
-  }, [loadDashboardData, showToast, customDateRange]);
+  // Modal states (component-specific UI state)
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
 
   const getPeriodLabelWithCustomRange = useCallback(() => {
     return getPeriodLabel(selectedPeriod, customDateRange);
@@ -145,38 +76,13 @@ const Dashboard = () => {
 
   // Handle inventory submission
   const handleInventorySubmit = useCallback((inventory: any) => {
-    showToast(`Inventory ${inventory.actionType} of ${inventory.quantity} ${inventory.unit} for ${inventory.itemName} has been processed!`, "success");
-  }, [showToast]);
+    handleToast(`Inventory ${inventory.actionType} of ${inventory.quantity} ${inventory.unit} for ${inventory.itemName} has been processed!`, "success");
+  }, [handleToast]);
 
   // Handle expense submission
   const handleExpenseSubmit = useCallback((expense: any) => {
-    showToast(`Expense of PKR ${expense.amount} for ${expense.category} has been added successfully!`, "success");
-  }, [showToast]);
-
-  // Click outside handler for calendar
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
-        setShowDatePicker(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  // Initial data load - only run once
-  useEffect(() => {
-    if (!isInitialized.current) {
-      isInitialized.current = true;
-      loadDashboardData(selectedPeriod).catch(error => {
-        console.error('Initial dashboard load failed:', error);
-        showToast('Failed to initialize dashboard', 'error');
-      });
-    }
-  }, []); // Empty dependency array - only run once
+    handleToast(`Expense of PKR ${expense.amount} for ${expense.category} has been added successfully!`, "success");
+  }, [handleToast]);
 
   if (loading) {
     return <GlobalSkeleton type="dashboard" showHeader={true} showSummaryCards={true} showPeriodSelector={true} showCharts={true} summaryCardCount={4} />;
@@ -186,7 +92,6 @@ const Dashboard = () => {
     return (
       <ErrorMessage
         message="Failed to load dashboard data"
-        onDismiss={() => setDashboardData(null)}
       />
     );
   }
@@ -222,16 +127,20 @@ const Dashboard = () => {
           </div>
 
           {/* Key Daily Metrics */}
-          <MetricsCards metrics={dashboardData.metrics} />
+          <ErrorBoundary>
+            <MetricsCards metrics={dashboardData.metrics} />
+          </ErrorBoundary>
 
           {/* Futuristic Sales Visualization */}
-          <div className="mb-6">
-            <FuturisticSalesVisual
-              revenueData={dashboardData.revenueData}
-              bestSellingItems={dashboardData.bestSellingItems}
-              selectedPeriod={selectedPeriod}
-            />
-          </div>
+          <ErrorBoundary>
+            <div className="mb-6">
+              <FuturisticSalesVisual
+                revenueData={dashboardData.revenueData}
+                bestSellingItems={dashboardData.bestSellingItems}
+                selectedPeriod={selectedPeriod}
+              />
+            </div>
+          </ErrorBoundary>
 
           {/* Customer & Payment Insights */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -266,10 +175,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <CustomerAnalytics
-            visitData={dashboardData.visitData}
-            getPeriodLabel={getPeriodLabelWithCustomRange}
-          />
+          <ErrorBoundary>
+            <CustomerAnalytics
+              visitData={dashboardData.visitData}
+              getPeriodLabel={getPeriodLabelWithCustomRange}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* 3. Product & Menu Insights */}
@@ -281,10 +192,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <CategorySalesChart />
-            <HourlySalesChart />
-          </div>
+          <ErrorBoundary>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <CategorySalesChart />
+              <HourlySalesChart />
+            </div>
+          </ErrorBoundary>
         </div>
 
         {/* 4. Monthly P&L View */}
@@ -418,7 +331,9 @@ const Dashboard = () => {
           </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <InventoryStatusChart />
+                <ErrorBoundary>
+                  <InventoryStatusChart />
+                </ErrorBoundary>
 
             {/* Strategic KPIs Panel */}
             <div className="space-y-6">

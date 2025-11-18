@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { GeneralSettings } from '@/lib/types';
 import { OPTIONS } from '@/lib/util/drop-down-settings';
 import SettingsDropdown from './Dropdown';
+import { formatDecimal } from '@/lib/util/formatters';
 
 interface CurrencyPricingCardProps {
     settings: GeneralSettings;
@@ -17,7 +18,7 @@ interface CurrencyPricingCardProps {
 const CurrencyPricingCard: React.FC<CurrencyPricingCardProps> = ({ settings, onSettingChange }) => {
     const formatPreview = (amount: number) => {
         const decimals = settings.decimalPlaces || 2;
-        const formatted = amount.toFixed(decimals);
+        const formatted = formatDecimal(amount, decimals);
         const currency = settings.currency || "USD";
         return settings.currencyPosition === "after" ? `${formatted} ${currency}` : `${currency} ${formatted}`;
     };

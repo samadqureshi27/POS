@@ -1,49 +1,7 @@
 // Menu Category Service
-
-import AuthService from "@/lib/auth-service";
 import { MenuCategory, MenuCategoryPayload, ApiResponse } from "@/lib/types/menu";
-
-// Helper function to get auth token
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("access_token") ||
-      sessionStorage.getItem("access_token") ||
-      null
-    );
-  }
-  return null;
-}
-
-// Helper function to get tenant info
-function getTenantInfo(): { id: string | null; slug: string | null } {
-  if (typeof window === "undefined") {
-    return { id: null, slug: null };
-  }
-  const id = localStorage.getItem("tenant_id") || sessionStorage.getItem("tenant_id");
-  const slug = localStorage.getItem("tenant_slug") || sessionStorage.getItem("tenant_slug");
-  return { id, slug };
-}
-
-// Build headers with auth and tenant
-function buildHeaders(includeContentType: boolean = true): HeadersInit {
-  const token = getToken();
-  const { id, slug } = getTenantInfo();
-
-  const headers: Record<string, string> = {};
-
-  if (includeContentType) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return headers;
-}
+import { buildHeaders } from "@/lib/util/service-helpers";
+import { logError } from "@/lib/util/logger";
 
 export class MenuCategoryService {
   /**
@@ -108,7 +66,10 @@ export class MenuCategoryService {
         data: categories,
       };
     } catch (error: any) {
-      console.error("Error fetching menu categories:", error);
+      logError("Error fetching menu categories", error, {
+        component: "MenuCategoryService",
+        action: "listCategories",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch menu categories",
@@ -152,7 +113,11 @@ export class MenuCategoryService {
         data: category,
       };
     } catch (error: any) {
-      console.error("Error fetching menu category:", error);
+      logError("Error fetching menu category", error, {
+        component: "MenuCategoryService",
+        action: "getCategory",
+        categoryId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch menu category",
@@ -186,7 +151,10 @@ export class MenuCategoryService {
         message: data.message || "Menu category created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating menu category:", error);
+      logError("Error creating menu category", error, {
+        component: "MenuCategoryService",
+        action: "createCategory",
+      });
       return {
         success: false,
         message: error.message || "Failed to create menu category",
@@ -220,7 +188,11 @@ export class MenuCategoryService {
         message: data.message || "Menu category updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating menu category:", error);
+      logError("Error updating menu category", error, {
+        component: "MenuCategoryService",
+        action: "updateCategory",
+        categoryId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update menu category",
@@ -252,7 +224,11 @@ export class MenuCategoryService {
         message: data.message || "Menu category deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting menu category:", error);
+      logError("Error deleting menu category", error, {
+        component: "MenuCategoryService",
+        action: "deleteCategory",
+        categoryId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete menu category",
