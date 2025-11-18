@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatPrice } from "@/lib/util/formatters";
 import { MenuItemOption, MenuItemPayload, extractId } from "@/lib/types/menu";
 
 interface MenuItemModalProps {

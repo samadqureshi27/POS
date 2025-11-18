@@ -3,6 +3,7 @@ import { Edit2, UtensilsCrossed, Package, ChevronDown } from "lucide-react";
 import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 import { RecipeVariant, DisplayFilterType } from "@/lib/types/recipe-options";
 import { RecipeService, Recipe } from "@/lib/services/recipe-service";
+import { formatPrice } from "@/lib/util/formatters";
 
 interface RecipeVariantTableProps {
   items: RecipeVariant[];

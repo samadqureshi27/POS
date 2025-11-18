@@ -10,6 +10,7 @@ import MenuModal from "./_components/menu-modal";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import { useMenuOptions } from "@/lib/hooks/useMenuOptions";
 import { MenuItemOptions } from "@/lib/types/menuItemOptions";
+import { formatPrice } from "@/lib/util/formatters";
 
 const AddOnsPage = () => {
   const { showToast: globalShowToast } = useToast();
