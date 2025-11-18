@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Package, Plus, Upload, Download, FileDown, Edit2, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import InventoryItemModal from "./_components/inventory-item-modal";
 import ImportResultsDialog from "./_components/import-results-dialog";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
@@ -25,10 +27,16 @@ export default function ItemsPage() {
   // Modals
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
-  
+
   // Import Results Dialog
   const [importResults, setImportResults] = useState<any>(null);
   const [isImportResultsOpen, setIsImportResultsOpen] = useState(false);
+
+  // Confirmation Dialogs
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
+  const [duplicatePolicyDialogOpen, setDuplicatePolicyDialogOpen] = useState(false);
+  const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
 
   // Stats
   const [stats, setStats] = useState({
@@ -118,20 +126,26 @@ export default function ItemsPage() {
     setIsItemModalOpen(true);
   };
 
-  const handleDeleteItem = async (item: InventoryItem) => {
-    if (!window.confirm(`Delete "${item.name}"?`)) return;
+  const handleDeleteItem = (item: InventoryItem) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
 
-    const itemId = item._id || item.id;
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    const itemId = itemToDelete._id || itemToDelete.id;
     if (!itemId) {
-      alert("Item ID is missing");
+      toast.error("Item ID is missing");
       return;
     }
 
     const response = await InventoryService.deleteItem(itemId);
     if (response.success) {
+      toast.success(`Deleted "${itemToDelete.name}" successfully`);
       loadItems();
     } else {
-      alert(`Failed to delete item: ${response.message}`);
+      toast.error(`Failed to delete item: ${response.message}`);
     }
   };
 
@@ -140,7 +154,7 @@ export default function ItemsPage() {
     if (editingItem) {
       const itemId = editingItem._id || editingItem.id;
       if (!itemId) {
-        alert("Item ID is missing");
+        toast.error("Item ID is missing");
         return;
       }
       response = await InventoryService.updateItem(itemId, data);
@@ -149,10 +163,11 @@ export default function ItemsPage() {
     }
 
     if (response.success) {
+      toast.success(editingItem ? "Item updated successfully" : "Item created successfully");
       setIsItemModalOpen(false);
       loadItems();
     } else {
-      alert(`Failed to save item: ${response.message}`);
+      toast.error(`Failed to save item: ${response.message}`);
     }
   };
 
@@ -170,12 +185,13 @@ export default function ItemsPage() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+        toast.success('Template downloaded successfully');
       } else {
-        alert(`Failed to download template: ${response.message}`);
+        toast.error(`Failed to download template: ${response.message}`);
       }
     } catch (error) {
       console.error('Error downloading template:', error);
-      alert('Failed to download template. Please try again.');
+      toast.error('Failed to download template. Please try again.');
     }
   };
 
@@ -185,7 +201,7 @@ export default function ItemsPage() {
         q: searchQuery,
         // categoryId can be added here when category filtering is implemented
       });
-      
+
       if (response.success && response.data) {
         // Create download link
         const url = window.URL.createObjectURL(response.data);
@@ -196,12 +212,13 @@ export default function ItemsPage() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+        toast.success('Items exported successfully');
       } else {
-        alert(`Failed to export items: ${response.message}`);
+        toast.error(`Failed to export items: ${response.message}`);
       }
     } catch (error) {
       console.error('Error exporting items:', error);
-      alert('Failed to export items. Please try again.');
+      toast.error('Failed to export items. Please try again.');
     }
   };
 
@@ -209,7 +226,7 @@ export default function ItemsPage() {
     fileInputRef.current?.click();
   };
 
-  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -217,23 +234,25 @@ export default function ItemsPage() {
     const allowedTypes = ['.csv', '.xlsx'];
     const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!allowedTypes.includes(fileExtension)) {
-      alert('Please select a CSV or XLSX file.');
+      toast.error('Please select a CSV or XLSX file.');
       return;
     }
 
+    // Store file and show duplicate policy dialog
+    setPendingImportFile(file);
+    setDuplicatePolicyDialogOpen(true);
+  };
+
+  const processImport = async (duplicatePolicy: 'update' | 'skip') => {
+    if (!pendingImportFile) return;
+
     try {
-      const duplicatePolicy = window.confirm(
-        'How would you like to handle duplicate items?\n\nOK = Update existing items\nCancel = Skip duplicates'
-      ) ? 'update' : 'skip';
-
-      const response = await InventoryService.importItems(file, duplicatePolicy);
-
-      // Debug: Log the complete API response structure
+      const response = await InventoryService.importItems(pendingImportFile, duplicatePolicy);
 
       if (response.success && response.data) {
         // The API response is in response.data, so we need to map it correctly
         const apiData = response.data;
-        
+
         setImportResults({
           success: apiData.success !== undefined ? apiData.success : true,
           message: apiData.message || 'Import completed successfully',
@@ -247,16 +266,17 @@ export default function ItemsPage() {
         setIsImportResultsOpen(true);
         loadItems(); // Refresh the items list
       } else {
-        alert(`Import failed: ${response.message || 'Unknown error occurred'}`);
+        toast.error(`Import failed: ${response.message || 'Unknown error occurred'}`);
       }
     } catch (error) {
       console.error('Error importing items:', error);
-      alert('Failed to import file. Please check the file format and try again.');
-    }
-
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      toast.error('Failed to import file. Please check the file format and try again.');
+    } finally {
+      // Reset file input and pending file
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setPendingImportFile(null);
     }
   };
 
@@ -673,6 +693,31 @@ export default function ItemsPage() {
          onClose={() => setIsImportResultsOpen(false)}
          results={importResults}
        />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Item"
+        description={`Are you sure you want to delete "${itemToDelete?.name}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
+
+      {/* Duplicate Policy Dialog */}
+      <ConfirmDialog
+        open={duplicatePolicyDialogOpen}
+        onOpenChange={setDuplicatePolicyDialogOpen}
+        title="Handle Duplicate Items"
+        description="How would you like to handle duplicate items in the import file?"
+        onConfirm={() => processImport('update')}
+        onCancel={() => processImport('skip')}
+        confirmText="Update Existing"
+        cancelText="Skip Duplicates"
+        variant="default"
+      />
     </div>
   );
 }

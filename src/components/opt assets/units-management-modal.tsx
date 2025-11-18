@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { UnitsService, ConversionsService, type Unit, type Conversion } from "@/lib/services/inventory-service";
 
 interface UnitsManagementModalProps {
@@ -34,6 +35,12 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
     toUnit: "",
     factor: "",
   });
+
+  // Confirmation Dialog states
+  const [deleteUnitDialogOpen, setDeleteUnitDialogOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [deleteConversionDialogOpen, setDeleteConversionDialogOpen] = useState(false);
+  const [conversionToDelete, setConversionToDelete] = useState<{ id: string; fromUnit: string; toUnit: string } | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -64,10 +71,15 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
     }
   };
 
-  const handleDeleteUnit = async (id: string) => {
-    if (!window.confirm("Delete this unit?")) return;
+  const handleDeleteUnit = (id: string, name: string) => {
+    setUnitToDelete({ id, name });
+    setDeleteUnitDialogOpen(true);
+  };
 
-    const response = await UnitsService.deleteUnit(id);
+  const confirmDeleteUnit = async () => {
+    if (!unitToDelete) return;
+
+    const response = await UnitsService.deleteUnit(unitToDelete.id);
     if (response.success) {
       loadData();
       if (onRefresh) onRefresh();
@@ -89,10 +101,15 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
     }
   };
 
-  const handleDeleteConversion = async (id: string) => {
-    if (!window.confirm("Delete this conversion?")) return;
+  const handleDeleteConversion = (id: string, fromUnit: string, toUnit: string) => {
+    setConversionToDelete({ id, fromUnit, toUnit });
+    setDeleteConversionDialogOpen(true);
+  };
 
-    const response = await ConversionsService.deleteConversion(id);
+  const confirmDeleteConversion = async () => {
+    if (!conversionToDelete) return;
+
+    const response = await ConversionsService.deleteConversion(conversionToDelete.id);
     if (response.success) {
       loadData();
     }
@@ -214,7 +231,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => unit.id && handleDeleteUnit(unit.id as string)}
+                            onClick={() => unit.id && handleDeleteUnit(unit.id as string, unit.name)}
                             className="text-red-600 hover:text-red-700 hover:bg-red-50 -mr-2 -mt-2"
                             disabled={!unit.id}
                           >
@@ -362,7 +379,7 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
                             size="sm"
                             onClick={() => {
                               const cid = (conversion.id as string) || (conversion._id as string);
-                              if (cid) handleDeleteConversion(cid);
+                              if (cid) handleDeleteConversion(cid, conversion.fromUnit, conversion.toUnit);
                             }}
                             className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           >
@@ -388,6 +405,30 @@ export default function UnitsManagementModal({ isOpen, onClose, onRefresh }: Uni
           </Button>
         </div>
       </DialogContent>
+
+      {/* Delete Unit Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteUnitDialogOpen}
+        onOpenChange={setDeleteUnitDialogOpen}
+        title="Delete Unit"
+        description={`Are you sure you want to delete the unit "${unitToDelete?.name}"? This action cannot be undone.`}
+        onConfirm={confirmDeleteUnit}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
+
+      {/* Delete Conversion Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConversionDialogOpen}
+        onOpenChange={setDeleteConversionDialogOpen}
+        title="Delete Conversion"
+        description={`Are you sure you want to delete the conversion from "${conversionToDelete?.fromUnit}" to "${conversionToDelete?.toUnit}"? This action cannot be undone.`}
+        onConfirm={confirmDeleteConversion}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </Dialog>
   );
 }

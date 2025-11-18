@@ -2,6 +2,7 @@
 "use client";
 import React, { useEffect, useRef, useCallback } from "react";
 import { useRouter } from 'next/navigation';
+import { toast } from "sonner";
 // Components
 import { StarRating } from '@/components/ui/StarRating';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -135,8 +136,8 @@ const AnalyticsDashboard = () => {
     // You could also trigger a refetch of financial data
     // refetch();
 
-    // Show success message (you might want to add a toast notification here)
-    alert(`Expense of PKR ${expense.amount} for ${expense.category} has been added successfully!`);
+    // Show success message
+    toast.success(`Expense of PKR ${expense.amount} for ${expense.category} has been added successfully!`);
   }, []);
 
   // Add error boundary for debugging
@@ -146,8 +147,11 @@ const AnalyticsDashboard = () => {
         <div className="bg-card p-8 rounded-lg shadow-sm border">
           <h2 className="text-xl font-semibold text-destructive mb-4">Error Loading Dashboard</h2>
           <p className="text-muted-foreground mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => {
+              setError(null);
+              router.refresh();
+            }}
             className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90"
           >
             Retry

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FolderTree, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
@@ -12,6 +13,7 @@ import { useCategoryData } from "@/lib/hooks/useCategoryData";
 import { MenuCategoryOption } from "@/lib/types/menu";
 
 const CategoriesManagementPage = () => {
+  const router = useRouter();
   const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -43,6 +45,7 @@ const CategoriesManagementPage = () => {
 
     // Utility
     parentCategories,
+    refreshData,
   } = useCategoryData();
 
   // Enhanced action handlers with consistent toast notifications
@@ -87,13 +90,14 @@ const CategoriesManagementPage = () => {
 
       if (result.success) {
         globalShowToast("Category deleted successfully", "success");
-        window.location.reload();
+        await refreshData();
       } else {
         globalShowToast(result.message || "Failed to delete category", "error");
       }
     } catch (error: any) {
       console.error("Error deleting category:", error);
       globalShowToast(error.message || "Failed to delete category", "error");
+      router.refresh();
     }
   };
 

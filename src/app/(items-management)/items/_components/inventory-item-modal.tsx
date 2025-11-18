@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Save, Loader2, Plus, Trash2, Building2, ChevronDown } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -173,7 +174,7 @@ export default function InventoryItemModal({
       }
       // If purchaseUnit differs but no conversion set, show error
       if (submitData.purchaseUnit !== submitData.baseUnit && !submitData.conversion) {
-        alert("Conversion rate is required when purchase unit differs from base unit");
+        toast.error("Conversion rate is required when purchase unit differs from base unit");
         setLoading(false);
         return;
       }
@@ -218,11 +219,11 @@ export default function InventoryItemModal({
         handleFieldChange("categoryId", newCategoryId);
         setShowCategorySuggestions(false);
       } else {
-        alert(response.message || "Failed to create category");
+        toast.error(response.message || "Failed to create category");
       }
     } catch (error) {
       console.error("Error creating category:", error);
-      alert("Failed to create category. Please try again.");
+      toast.error("Failed to create category. Please try again.");
     }
     setAddingCategory(false);
   };

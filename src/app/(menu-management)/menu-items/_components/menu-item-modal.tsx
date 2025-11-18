@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { RecipeService } from "@/lib/services/recipe-service";
 import { RecipeVariantService } from "@/lib/services/recipe-variant-service";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
@@ -271,12 +272,12 @@ export default function MenuItemModal({
 
   const handleSave = async () => {
     if (!formData.name || !formData.categoryId) {
-      alert("Please fill in all required fields (Name, Category)");
+      toast.error("Please fill in all required fields (Name, Category)");
       return;
     }
 
     if (!formData.pricing?.basePrice || formData.pricing.basePrice <= 0) {
-      alert("Please enter a valid price");
+      toast.error("Please enter a valid price");
       return;
     }
 
@@ -291,7 +292,7 @@ export default function MenuItemModal({
         : undefined;
 
       if (!categoryId) {
-        alert("Category is required");
+        toast.error("Category is required");
         return;
       }
 

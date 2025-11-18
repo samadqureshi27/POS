@@ -3,6 +3,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Building2, Plus, MapPin } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
@@ -61,7 +62,7 @@ const BranchManagementPage = () => {
 
   const handleDelete = async (branch: BranchItem) => {
     // TODO: Implement delete functionality when backend endpoint is available
-    alert("Delete functionality will be implemented when backend endpoint is available");
+    toast.error("Delete functionality will be implemented when backend endpoint is available");
   };
 
   // Show loading while checking authentication

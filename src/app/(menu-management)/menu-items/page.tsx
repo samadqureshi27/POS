@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { UtensilsCrossed, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
@@ -12,6 +13,7 @@ import { useMenuItemData } from "@/lib/hooks/useMenuItemData";
 import { MenuItemOption } from "@/lib/types/menu";
 
 const MenuItemsManagementPage = () => {
+  const router = useRouter();
   const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -44,6 +46,9 @@ const MenuItemsManagementPage = () => {
     updateSearchTerm,
     updateStatusFilter,
     updateCategoryFilter,
+
+    // Utility
+    refreshData,
   } = useMenuItemData();
 
   // Enhanced action handlers with consistent toast notifications
@@ -88,13 +93,14 @@ const MenuItemsManagementPage = () => {
 
       if (result.success) {
         globalShowToast("Menu item deleted successfully", "success");
-        window.location.reload();
+        await refreshData();
       } else {
         globalShowToast(result.message || "Failed to delete menu item", "error");
       }
     } catch (error: any) {
       console.error("Error deleting menu item:", error);
       globalShowToast(error.message || "Failed to delete menu item", "error");
+      router.refresh();
     }
   };
 
