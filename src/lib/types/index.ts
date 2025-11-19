@@ -53,6 +53,8 @@ export interface GeneralSettings {
   autoPrintReceipts: boolean;
   receiptCopies: number;
   receiptFooter: string;
+  paperSize?: string;
+  receiptFormat?: string;
   requireManagerForRefunds: boolean;
   requireManagerForDiscounts: boolean;
   sessionTimeout: number;

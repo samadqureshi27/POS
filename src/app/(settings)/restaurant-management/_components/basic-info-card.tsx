@@ -41,7 +41,9 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
 
     // Use default data when formData fields are empty or undefined
     const getFieldValue = (fieldName: keyof typeof defaultRestaurantData) => {
-        return formData[fieldName] || defaultRestaurantData[fieldName] || '';
+        const value = formData[fieldName] || defaultRestaurantData[fieldName] || '';
+        // Ensure we return a string, not a File object
+        return typeof value === 'string' ? value : '';
     };
 
     return (

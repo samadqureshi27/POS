@@ -109,9 +109,10 @@ export default function CategoryModal({
     }
 
     try {
-      // Slug and code are not sent to backend - they're auto-generated
       const payload: MenuCategoryPayload = {
         name: formData.name!,
+        slug: formData.slug || "",
+        code: formData.code || "",
         description: formData.description,
         parentId: formData.parentId || null,
         isActive: formData.isActive !== false,

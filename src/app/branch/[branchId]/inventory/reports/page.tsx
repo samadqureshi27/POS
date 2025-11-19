@@ -92,7 +92,6 @@ const ReportsPage = () => {
                     subtitle={`${statistics.mostUsedItem.count} times`}
                     value={statistics.mostUsedItem.name}
                     icon="target"
-                    format="text"
                     status="good"
                 />
 
@@ -101,7 +100,6 @@ const ReportsPage = () => {
                     subtitle={`${statistics.leastUsedItem.count} times`}
                     value={statistics.leastUsedItem.name}
                     icon="inventory"
-                    format="text"
                     status="neutral"
                 />
             </div>

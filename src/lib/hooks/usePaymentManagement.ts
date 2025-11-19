@@ -9,7 +9,7 @@ import { logError } from "@/lib/util/logger";
 export const usePaymentManagement = () => {
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [statusFilter, setStatusFilter] = useState<"" | "Cash" | "Card" | "Online">("");
+    const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
     const [taxTypeFilter, setTaxTypeFilter] = useState("");
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
@@ -65,7 +65,7 @@ export const usePaymentManagement = () => {
             item.Name.toLowerCase().includes(q) ||
             item.ID.toString().includes(q) ||
             item.TaxType.toLowerCase().includes(q);
-        const matchesStatus = statusFilter ? item.PaymentType === statusFilter : true;
+        const matchesStatus = statusFilter ? item.Status === statusFilter : true;
         const matchesTaxType = taxTypeFilter ? item.TaxType === taxTypeFilter : true;
         return matchesQuery && matchesStatus && matchesTaxType;
     });

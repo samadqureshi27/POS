@@ -18,6 +18,7 @@ export interface Recipe {
   slug?: string;
   description?: string;
   category?: string;
+  type?: "sub" | "final";
   isActive?: boolean;
   ingredients?: any[];
   instructions?: string;

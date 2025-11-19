@@ -167,7 +167,7 @@ const InventoryManagementPage = () => {
             options: [
               { label: "All Status", value: "" },
               { label: "Low", value: "Low", color: "red" },
-              { label: "Medium", value: "Medium", color: "yellow" },
+              { label: "Medium", value: "Medium", color: "default" },
               { label: "High", value: "High", color: "green" },
             ],
             activeValue: statusFilter,
@@ -180,9 +180,18 @@ const InventoryManagementPage = () => {
         onPrimaryAction={handleAddItem}
         primaryActionLabel="Add Item"
         primaryActionIcon={<Plus className="h-5 w-5 mr-2" />}
-        onSecondaryAction={selectedItems.length > 0 ? handleDeleteItem : undefined}
-        secondaryActionLabel="Delete Selected"
-        secondaryActionDisabled={selectedItems.length === 0}
+        secondaryActions={
+          selectedItems.length > 0 ? (
+            <Button
+              variant="destructive"
+              onClick={handleDeleteItem}
+              disabled={selectedItems.length === 0}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected
+            </Button>
+          ) : undefined
+        }
       />
 
       {/* Inventory Grid */}
@@ -197,7 +206,7 @@ const InventoryManagementPage = () => {
         getItemId={(item) => item.ID}
         onEdit={handleEditItem}
         onDelete={(item) => {
-          handleSelectItem(item.ID);
+          handleSelectItem(item.ID, true);
           setDeleteDialogOpen(true);
         }}
         customActions={(item) => (
@@ -214,7 +223,7 @@ const InventoryManagementPage = () => {
               variant="ghost"
               size="sm"
               onClick={() => {
-                handleSelectItem(item.ID);
+                handleSelectItem(item.ID, true);
                 setDeleteDialogOpen(true);
               }}
               className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"

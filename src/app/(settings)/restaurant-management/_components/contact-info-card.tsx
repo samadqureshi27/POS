@@ -24,7 +24,9 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({
 }) => {
     // Use default data when formData fields are empty or undefined
     const getFieldValue = (fieldName: keyof typeof defaultContactData) => {
-        return formData[fieldName] || defaultContactData[fieldName] || '';
+        const value = formData[fieldName] || defaultContactData[fieldName] || '';
+        // Ensure we return a string, not a File object
+        return typeof value === 'string' ? value : '';
     };
 
     return (

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
+import { BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { getInventoryStatusColor, type InventoryStatus } from "@/lib/util/status-helpers";
 
@@ -112,11 +112,10 @@ export const InventoryStatusChart: React.FC = () => {
             />
             <Bar
               dataKey="current"
-              fill={(entry: any) => getInventoryStatusColor(entry.status as InventoryStatus)}
               radius={[4, 4, 0, 0]}
             >
               {inventoryData.map((entry, index) => (
-                <Bar key={`bar-${index}`} fill={getInventoryStatusColor(entry.status as InventoryStatus)} />
+                <Cell key={`cell-${index}`} fill={getInventoryStatusColor(entry.status as InventoryStatus)} />
               ))}
             </Bar>
           </BarChart>

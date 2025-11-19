@@ -173,6 +173,7 @@ export function extractId(value: string | PopulatedRef | undefined | null): stri
 export interface MenuCategoryOption {
   ID: string;
   Name: string;
+  Slug?: string;
   Code: string;
   Status: "Active" | "Inactive";
   Description: string;
