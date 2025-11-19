@@ -9,11 +9,20 @@ function isPublicPath(pathname: string): boolean {
     '/favicon.ico',
   ];
   if (publicPaths.includes(pathname)) return true;
+
   // Static and image assets
   if (pathname.startsWith('/_next')) return true;
   if (pathname.startsWith('/public')) return true;
-  // API routes should bypass auth guard
-  if (pathname.startsWith('/api')) return true;
+
+  // Only specific API routes are public (authentication endpoints)
+  const publicApiRoutes = [
+    '/api/t/auth/login',
+    '/api/t/auth/forgot-password',
+    '/api/t/auth/pin-login',
+    '/api/t/auth/reset-password',
+  ];
+  if (publicApiRoutes.some(route => pathname.startsWith(route))) return true;
+
   return false;
 }
 
@@ -68,13 +77,31 @@ export function middleware(req: NextRequest) {
   const { nextUrl, cookies } = req;
   const pathname = nextUrl.pathname;
 
-  // Bypass for public & API routes
+  // Bypass for public pages and public API routes
   if (isPublicPath(pathname)) {
     const res = NextResponse.next();
     return addSecurityHeaders(res);
   }
 
-  // Check for a valid session token (cookie-based)
+  // Protected API routes require authentication
+  if (pathname.startsWith('/api')) {
+    const token = cookies.get('accessToken')?.value;
+
+    if (!token) {
+      return addSecurityHeaders(
+        NextResponse.json(
+          { error: 'Authentication required', message: 'Please log in to access this resource' },
+          { status: 401 }
+        )
+      );
+    }
+
+    // Token exists, allow the request to proceed
+    const res = NextResponse.next();
+    return addSecurityHeaders(res);
+  }
+
+  // Check for a valid session token for page routes
   const token = cookies.get('accessToken')?.value;
 
   if (!token) {

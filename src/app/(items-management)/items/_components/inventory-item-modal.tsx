@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Save, Loader2, Plus, Trash2, Building2, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
+import { Save, Loader2, Plus, Trash2, Building2, ChevronDown, Package } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -173,7 +174,7 @@ export default function InventoryItemModal({
       }
       // If purchaseUnit differs but no conversion set, show error
       if (submitData.purchaseUnit !== submitData.baseUnit && !submitData.conversion) {
-        alert("Conversion rate is required when purchase unit differs from base unit");
+        toast.error("Conversion rate is required when purchase unit differs from base unit");
         setLoading(false);
         return;
       }
@@ -218,11 +219,11 @@ export default function InventoryItemModal({
         handleFieldChange("categoryId", newCategoryId);
         setShowCategorySuggestions(false);
       } else {
-        alert(response.message || "Failed to create category");
+        toast.error(response.message || "Failed to create category");
       }
     } catch (error) {
       console.error("Error creating category:", error);
-      alert("Failed to create category. Please try again.");
+      toast.error("Failed to create category. Please try again.");
     }
     setAddingCategory(false);
   };
@@ -276,34 +277,50 @@ export default function InventoryItemModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl h-[85vh] overflow-hidden bg-white border border-gray-200 text-gray-900 p-0 flex flex-col">
+      <DialogContent size="3xl" fullHeight>
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
-          <DialogTitle className="text-2xl font-bold text-gray-900">
-            {editingItem ? "Edit Item" : "Add New Item"}
-          </DialogTitle>
-          <p className="text-gray-600 text-sm mt-1">
+        <div className="p-5 border-b border-gray-200 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <Package className="h-5 w-5 text-gray-700" />
+            <DialogTitle className="text-xl font-bold text-gray-900">
+              {editingItem ? "Edit Inventory Item" : "Add New Inventory Item"}
+            </DialogTitle>
+          </div>
+          <p className="text-sm text-gray-600 mt-1">
             {editingItem ? "Update item details and manage vendors & distribution" : "Create a new inventory item with basic information"}
           </p>
         </div>
 
         {/* Content */}
-        <div className="p-4 overflow-y-auto flex-1">
-          <Tabs defaultValue="basic" className="w-full h-full">
-            <TabsList className={`grid w-full ${isEditMode ? 'grid-cols-5' : 'grid-cols-2'} mb-2`}>
-              <TabsTrigger value="basic">Basic Info</TabsTrigger>
-              <TabsTrigger value="stock">Stock & Units</TabsTrigger>
-              {isEditMode && (
-                <>
-                  <TabsTrigger value="vendors">Vendors</TabsTrigger>
-                  <TabsTrigger value="branches">Branches</TabsTrigger>
-                  <TabsTrigger value="advanced">Advanced</TabsTrigger>
-                </>
-              )}
-            </TabsList>
+        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+          <Tabs defaultValue="basic" className="flex-1 flex flex-col min-h-0">
+            {/* Tab List */}
+            <div className="px-5 pt-3 pb-3 border-b border-gray-100 flex-shrink-0">
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-center">
+                  <TabsList className={`grid w-full max-w-2xl ${isEditMode ? 'grid-cols-5' : 'grid-cols-2'} h-9`}>
+                    <TabsTrigger value="basic" className="text-sm">Basic Info</TabsTrigger>
+                    <TabsTrigger value="stock" className="text-sm">Stock & Units</TabsTrigger>
+                    {isEditMode && (
+                      <>
+                        <TabsTrigger value="vendors" className="text-sm">Vendors</TabsTrigger>
+                        <TabsTrigger value="branches" className="text-sm">Branches</TabsTrigger>
+                        <TabsTrigger value="advanced" className="text-sm">Advanced</TabsTrigger>
+                      </>
+                    )}
+                  </TabsList>
+                </div>
+                <p className="text-xs text-gray-600 text-center">
+                  {!isEditMode && "💡 Add basic info first. Vendors & distribution available after saving."}
+                </p>
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto p-5 min-h-0">
 
             {/* Basic Info Tab */}
-            <TabsContent value="basic" className="space-y-4">
+            <TabsContent value="basic" className="mt-0 space-y-4">
               {/* Name */}
               <div>
                 <Label className="text-gray-700 text-sm font-medium mb-2">
@@ -422,7 +439,7 @@ export default function InventoryItemModal({
             </TabsContent>
 
             {/* Stock & Units Tab */}
-            <TabsContent value="stock" className="space-y-4">
+            <TabsContent value="stock" className="mt-0 space-y-4">
 
               {/* Base Unit */}
               <div>
@@ -546,7 +563,7 @@ export default function InventoryItemModal({
 
             {/* Vendors Tab (Edit Mode Only) */}
             {isEditMode && (
-              <TabsContent value="vendors" className="space-y-4">
+              <TabsContent value="vendors" className="mt-0 space-y-4">
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                   <p className="text-yellow-800 text-sm font-medium">
                     ⚠️ Note: Vendor management not yet connected to backend API (using mock data)
@@ -688,7 +705,7 @@ export default function InventoryItemModal({
 
             {/* Branches Tab (Edit Mode Only) */}
             {isEditMode && (
-              <TabsContent value="branches" className="space-y-4">
+              <TabsContent value="branches" className="mt-0 space-y-4">
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                   <p className="text-yellow-800 text-sm font-medium">
                     ⚠️ Note: Branch distribution not yet connected to backend API (using mock data)
@@ -771,7 +788,7 @@ export default function InventoryItemModal({
 
             {/* Advanced Tab (Edit Mode Only) */}
             {isEditMode && (
-              <TabsContent value="advanced" className="space-y-4">
+              <TabsContent value="advanced" className="mt-0 space-y-4">
                 {/* Barcode */}
                 <div>
                   <Label className="text-gray-700 text-sm font-medium mb-2">Barcode / UPC</Label>
@@ -801,42 +818,38 @@ export default function InventoryItemModal({
                 </div>
               </TabsContent>
             )}
+            </div>
           </Tabs>
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-white flex justify-between items-center flex-shrink-0">
-          <div className="text-sm text-gray-600">
-            {!isEditMode && (
-              <p>💡 Add basic info first. Vendors & distribution available after saving.</p>
+        <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end items-center gap-2 flex-shrink-0">
+          <Button
+            onClick={onClose}
+            variant="outline"
+            size="sm"
+            className="h-9"
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={!formData.name || !formData.baseUnit || loading}
+            size="sm"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                {editingItem ? "Update Item" : "Save & Close"}
+              </>
             )}
-          </div>
-          <div className="flex gap-3">
-            <Button
-              onClick={onClose}
-              variant="outline"
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!formData.name || !formData.baseUnit || loading}
-              className="bg-gray-900 hover:bg-black text-white"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {editingItem ? "Update Item" : "Create Item"}
-                </>
-              )}
-            </Button>
-          </div>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

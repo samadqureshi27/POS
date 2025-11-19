@@ -1,49 +1,8 @@
 // Menu Item Service
 
-import AuthService from "@/lib/auth-service";
 import { MenuItem, MenuItemPayload, ApiResponse } from "@/lib/types/menu";
-
-// Helper function to get auth token
-function getToken(): string | null {
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("access_token") ||
-      sessionStorage.getItem("access_token") ||
-      null
-    );
-  }
-  return null;
-}
-
-// Helper function to get tenant info
-function getTenantInfo(): { id: string | null; slug: string | null } {
-  if (typeof window === "undefined") {
-    return { id: null, slug: null };
-  }
-  const id = localStorage.getItem("tenant_id") || sessionStorage.getItem("tenant_id");
-  const slug = localStorage.getItem("tenant_slug") || sessionStorage.getItem("tenant_slug");
-  return { id, slug };
-}
-
-// Build headers with auth and tenant
-function buildHeaders(includeContentType: boolean = true): HeadersInit {
-  const token = getToken();
-  const { id, slug } = getTenantInfo();
-
-  const headers: Record<string, string> = {};
-
-  if (includeContentType) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return headers;
-}
+import { buildHeaders } from "@/lib/util/service-helpers";
+import { logError } from "@/lib/util/logger";
 
 export class MenuService {
   /**
@@ -108,7 +67,10 @@ export class MenuService {
         data: items,
       };
     } catch (error: any) {
-      console.error("Error fetching menu items:", error);
+      logError("Error fetching menu items", error, {
+        component: "MenuService",
+        action: "listMenuItems",
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch menu items",
@@ -152,7 +114,11 @@ export class MenuService {
         data: item,
       };
     } catch (error: any) {
-      console.error("Error fetching menu item:", error);
+      logError("Error fetching menu item", error, {
+        component: "MenuService",
+        action: "getMenuItem",
+        itemId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to fetch menu item",
@@ -186,7 +152,10 @@ export class MenuService {
         message: data.message || "Menu item created successfully",
       };
     } catch (error: any) {
-      console.error("Error creating menu item:", error);
+      logError("Error creating menu item", error, {
+        component: "MenuService",
+        action: "createMenuItem",
+      });
       return {
         success: false,
         message: error.message || "Failed to create menu item",
@@ -220,7 +189,11 @@ export class MenuService {
         message: data.message || "Menu item updated successfully",
       };
     } catch (error: any) {
-      console.error("Error updating menu item:", error);
+      logError("Error updating menu item", error, {
+        component: "MenuService",
+        action: "updateMenuItem",
+        itemId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to update menu item",
@@ -252,7 +225,11 @@ export class MenuService {
         message: data.message || "Menu item deleted successfully",
       };
     } catch (error: any) {
-      console.error("Error deleting menu item:", error);
+      logError("Error deleting menu item", error, {
+        component: "MenuService",
+        action: "deleteMenuItem",
+        itemId: id,
+      });
       return {
         success: false,
         message: error.message || "Failed to delete menu item",

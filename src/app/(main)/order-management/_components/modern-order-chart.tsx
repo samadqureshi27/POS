@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recha
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Package, Coffee, Utensils } from "lucide-react";
+import { formatPercentageValue } from "@/lib/util/formatters";
 
 interface OrderTypeData {
   name: string;
@@ -47,7 +48,7 @@ const CustomTooltip = ({ active, payload }: any) => {
           <span className="text-sm font-medium">{data.name}</span>
         </div>
         <div className="text-sm text-muted-foreground">
-          {data.value} orders ({data.percentage?.toFixed(1)}%)
+          {data.value} orders ({formatPercentageValue(data.percentage ?? 0)})
         </div>
       </div>
     );
@@ -139,7 +140,7 @@ const ModernOrderChart: React.FC<ModernOrderChartProps> = ({ data, loading }) =>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold">{item.value}</span>
                       <Badge variant="outline" className="text-xs h-5">
-                        {item.percentage?.toFixed(1)}%
+                        {formatPercentageValue(item.percentage ?? 0)}
                       </Badge>
                     </div>
                   </div>

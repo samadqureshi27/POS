@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { StaffItem, StaffFormData } from "@/lib/types/staff-management";
+import { useModalState } from "./useModalState";
 
 export const useStaffModal = (branchId: string) => {
-    const [editingItem, setEditingItem] = useState<StaffItem | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { isOpen, editingItem, openCreate, openEdit, close } = useModalState<StaffItem>();
     const [formData, setFormData] = useState<StaffFormData>({
         Name: "",
         Contact: "",
@@ -49,7 +49,7 @@ export const useStaffModal = (branchId: string) => {
                 Access_Code: "",
             });
         }
-    }, [editingItem, isModalOpen, branchId]);
+    }, [editingItem, isOpen, branchId]);
 
     // Clear access code when role is not Cashier or Manager
     useEffect(() => {
@@ -60,7 +60,7 @@ export const useStaffModal = (branchId: string) => {
 
     // Prevent body scroll when modal is open
     useEffect(() => {
-        if (isModalOpen) {
+        if (isOpen) {
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "unset";
@@ -69,17 +69,15 @@ export const useStaffModal = (branchId: string) => {
         return () => {
             document.body.style.overflow = "unset";
         };
-    }, [isModalOpen]);
+    }, [isOpen]);
 
-    const openModal = () => setIsModalOpen(true);
+    const openModal = () => openCreate();
     const closeModal = () => {
-        setIsModalOpen(false);
-        setEditingItem(null);
+        close();
     };
 
     const openEditModal = (item: StaffItem) => {
-        setEditingItem(item);
-        setIsModalOpen(true);
+        openEdit(item);
     };
 
     const handleStatusChange = (isActive: boolean) => {
@@ -104,7 +102,7 @@ export const useStaffModal = (branchId: string) => {
 
     return {
         editingItem,
-        isModalOpen,
+        isModalOpen: isOpen,
         formData,
         setFormData,
         openModal,

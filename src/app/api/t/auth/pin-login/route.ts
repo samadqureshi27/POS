@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { PinLoginRequestSchema } from "@/lib/validations/api-schemas";
 
 const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
 
@@ -24,15 +26,44 @@ function buildHeaders(req: Request) {
 export async function POST(req: Request) {
   try {
     const payload = await req.json().catch(() => ({}));
+
+    // Validate request body using Zod schema
+    const validationResult = PinLoginRequestSchema.safeParse(payload);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid request data',
+          details: validationResult.error.format(),
+        },
+        { status: 400 }
+      );
+    }
+
+    const validatedPayload = validationResult.data;
+
     const url = `${REMOTE_BASE}/t/auth/pin-login`;
-    const res = await fetch(url, { method: "POST", headers: buildHeaders(req), body: JSON.stringify(payload) });
+    const res = await fetch(url, {
+      method: "POST",
+      headers: buildHeaders(req),
+      body: JSON.stringify(validatedPayload)
+    });
+
     const contentType = res.headers.get("content-type") || "application/json";
-    const body = contentType.includes("application/json") ? await res.json().catch(() => ({})) : await res.text();
+    const body = contentType.includes("application/json")
+      ? await res.json().catch(() => ({}))
+      : await res.text();
+
     return new NextResponse(typeof body === "string" ? body : JSON.stringify(body), {
       status: res.status,
       headers: { "content-type": contentType },
     });
   } catch (err: any) {
-    return NextResponse.json({ success: false, message: err?.message || "Proxy POST /t/auth/pin-login failed" }, { status: 500 });
+    console.error("PIN login error:", err);
+    return NextResponse.json(
+      { success: false, message: err?.message || "Proxy POST /t/auth/pin-login failed" },
+      { status: 500 }
+    );
   }
 }

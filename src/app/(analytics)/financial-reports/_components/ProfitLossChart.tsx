@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { ComposedChart, Area, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from "recharts";
+import { formatTickValue, formatCompactNumber } from "@/lib/util/formatters";
 
 // Sample P&L data that would come from your financial system
 const profitLossData = [
@@ -47,7 +48,7 @@ export const ProfitLossChart: React.FC = () => {
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12, fill: "#6b7280" }}
-              tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+              tickFormatter={(value) => formatTickValue(value)}
             />
             <Tooltip
               contentStyle={{
@@ -59,7 +60,7 @@ export const ProfitLossChart: React.FC = () => {
                 boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
               }}
               formatter={(value: any, name: string) => [
-                `PKR ${(value / 1000).toFixed(1)}K`,
+                `PKR ${formatCompactNumber(value)}`,
                 name === "revenue" ? "Revenue" :
                 name === "cogs" ? "COGS" :
                 name === "labor" ? "Labor" :
@@ -100,7 +101,7 @@ export const ProfitLossChart: React.FC = () => {
       <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="text-center p-3 bg-green-50 rounded-lg">
           <div className="text-lg font-bold text-green-700">
-            PKR {(profitLossData[profitLossData.length - 1].revenue / 1000).toFixed(0)}K
+            PKR {formatTickValue(profitLossData[profitLossData.length - 1].revenue)}
           </div>
           <div className="text-xs text-green-600">Current Revenue</div>
         </div>

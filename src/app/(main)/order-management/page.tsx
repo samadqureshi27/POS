@@ -1,7 +1,6 @@
 // page.tsx - Refactored Main Component
 "use client";
 import React, { useState, useEffect } from "react";
-import ActionBar from "@/components/ui/action-bar";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 // Import all our new components
@@ -18,6 +17,9 @@ import OrderTable from "./_components/order-table";
 import { OrderItem, OrderStats } from "@/lib/types";
 import { OrderAPI } from "@/lib/util/order-api";
 import { useOrderFilters } from "@/lib/hooks/useOrderFilter";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
+import { logError } from "@/lib/util/logger";
 
 const OrderManagementPage = () => {
   const [items, setItems] = useState<OrderItem[]>([]);
@@ -75,7 +77,10 @@ const OrderManagementPage = () => {
         throw new Error(response.message || "Failed to fetch orders");
       }
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      logError("Error fetching orders", error, {
+        component: "OrderManagement",
+        action: "loadOrders",
+      });
       showToast("Failed to load orders", "error");
     } finally {
       setLoading(false);
@@ -92,7 +97,10 @@ const OrderManagementPage = () => {
         throw new Error(response.message || "Failed to fetch order statistics");
       }
     } catch (error) {
-      console.error("Error fetching order stats:", error);
+      logError("Error fetching order stats", error, {
+        component: "OrderManagement",
+        action: "loadOrderStats",
+      });
       showToast("Failed to load order statistics", "error");
     } finally {
       setStatsLoading(false);
@@ -114,7 +122,7 @@ const OrderManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-h-screen">
+    <PageContainer>
       {toast && (
         <Toast
           message={toast.message}
@@ -123,7 +131,7 @@ const OrderManagementPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-semibold mb-8">Order Management</h1>
+      <PageHeader title="Order Management" />
 
       {/* Time Period Selector */}
       <PeriodSelector
@@ -374,7 +382,7 @@ const OrderManagementPage = () => {
           loading={loading}
         />
       </DashboardSection>
-    </div>
+    </PageContainer>
   );
 };
 

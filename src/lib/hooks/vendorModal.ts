@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { VendorItem, VendorFormData } from "@/lib/types/vendors";
+import { useModalState } from "./useModalState";
 
 export const useVendorModal = (branchId: number) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<VendorItem | null>(null);
+    const { isOpen, editingItem, openCreate, openEdit, close } = useModalState<VendorItem>();
     const [formData, setFormData] = useState<VendorFormData>({
         Company_Name: "",
         Name: "",
@@ -13,7 +13,6 @@ export const useVendorModal = (branchId: number) => {
     });
 
     const openCreateModal = () => {
-        setEditingItem(null);
         setFormData({
             Company_Name: "",
             Name: "",
@@ -21,11 +20,10 @@ export const useVendorModal = (branchId: number) => {
             Address: "",
             Email: "",
         });
-        setIsModalOpen(true);
+        openCreate();
     };
 
     const openEditModal = (item: VendorItem) => {
-        setEditingItem(item);
         setFormData({
             Company_Name: item.Company_Name,
             Name: item.Name,
@@ -33,12 +31,10 @@ export const useVendorModal = (branchId: number) => {
             Address: item.Address,
             Email: item.Email,
         });
-        setIsModalOpen(true);
+        openEdit(item);
     };
 
     const closeModal = () => {
-        setIsModalOpen(false);
-        setEditingItem(null);
         setFormData({
             Company_Name: "",
             Name: "",
@@ -46,6 +42,7 @@ export const useVendorModal = (branchId: number) => {
             Address: "",
             Email: "",
         });
+        close();
     };
 
     const updateFormData = (updates: Partial<VendorFormData>) => {
@@ -53,7 +50,7 @@ export const useVendorModal = (branchId: number) => {
     };
 
     return {
-        isModalOpen,
+        isModalOpen: isOpen,
         editingItem,
         formData,
         openCreateModal,
