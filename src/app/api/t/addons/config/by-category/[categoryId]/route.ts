@@ -3,8 +3,8 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function GET(req: Request, { params }: { params: { categoryId: string } }) {
-  const { categoryId } = params;
+export async function GET(req: Request, { params }: { params: Promise<{ categoryId: string }> }) {
+  const { categoryId } = await params;
   const url = `${getRemoteBase()}/t/addons/config/by-category/${categoryId}`;
 
   const res = await fetch(url, {

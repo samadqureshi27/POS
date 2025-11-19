@@ -37,21 +37,21 @@ export async function POST(req: Request) {
     });
 
     const contentType = res.headers.get("content-type") || "application/json";
-    const body = contentType.includes("application/json")
+    const responseBody = contentType.includes("application/json")
       ? await res.json().catch(() => ({}))
       : await res.text();
 
     // Attempt to set httpOnly session cookie when login succeeds
     let token: string | undefined;
     try {
-      const obj = typeof body === 'string' ? JSON.parse(body) : body;
+      const obj = typeof responseBody === 'string' ? JSON.parse(responseBody) : responseBody;
       token = obj?.result?.token || obj?.token;
     } catch {
       // Non-JSON body, ignore
     }
 
     const response = new NextResponse(
-      typeof body === "string" ? body : JSON.stringify(body),
+      typeof responseBody === "string" ? responseBody : JSON.stringify(responseBody),
       {
         status: res.status,
         headers: { "content-type": contentType },

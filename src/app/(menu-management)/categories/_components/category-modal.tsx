@@ -73,7 +73,7 @@ export default function CategoryModal({
         // Fallback if no raw data
         setFormData({
           name: editingItem.Name,
-          slug: editingItem.Slug || "",
+          slug: (editingItem as any).Slug || "",
           code: editingItem.Code || "",
           description: editingItem.Description || "",
           parentId: editingItem.ParentCategory || null,
@@ -109,7 +109,7 @@ export default function CategoryModal({
 
     try {
       // Slug and code are not sent to backend - they're auto-generated
-      const payload: MenuCategoryPayload = {
+      const payload: Partial<MenuCategoryPayload> = {
         name: formData.name!,
         description: formData.description,
         parentId: formData.parentId || null,
@@ -118,7 +118,7 @@ export default function CategoryModal({
         metadata: formData.metadata || {},
       };
 
-      await onSubmit(payload);
+      await onSubmit(payload as MenuCategoryPayload);
       onClose();
     } catch (error) {
       console.error("Error saving category:", error);

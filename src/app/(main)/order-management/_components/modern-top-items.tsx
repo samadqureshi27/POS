@@ -19,7 +19,7 @@ const ModernTopItems: React.FC<ModernTopItemsProps> = ({
   title = "Top Selling Items",
   type = 'most'
 }) => {
-  const maxValue = data.length > 0 ? Math.max(...data.map(item => item.number_item)) : 100;
+  const maxValue = data.length > 0 ? Math.max(...data.map(item => Number(item.number_item))) : 100;
   const icon = type === 'most' ? Crown : BarChart3;
   const IconComponent = icon;
 
@@ -78,7 +78,7 @@ const ModernTopItems: React.FC<ModernTopItemsProps> = ({
         ) : (
           <div className="space-y-3">
             {data.slice(0, 5).map((item, index) => {
-              const percentage = (item.number_item / maxValue) * 100;
+              const percentage = (Number(item.number_item) / maxValue) * 100;
 
               return (
                 <div

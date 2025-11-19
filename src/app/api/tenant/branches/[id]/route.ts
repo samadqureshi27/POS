@@ -23,9 +23,10 @@ function buildHeaders(req: Request) {
   return headers;
 }
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const url = `${REMOTE_BASE}/t/branches/${params.id}`;
+    const { id } = await params;
+    const url = `${REMOTE_BASE}/t/branches/${id}`;
     const res = await fetch(url, { headers: buildHeaders(req) });
     const contentType = res.headers.get("content-type") || "application/json";
     const body = contentType.includes("application/json") ? await res.json().catch(() => ({})) : await res.text();
@@ -38,10 +39,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const payload = await req.json().catch(() => ({}));
-    const url = `${REMOTE_BASE}/t/branches/${params.id}`;
+    const url = `${REMOTE_BASE}/t/branches/${id}`;
     const res = await fetch(url, {
       method: "PUT",
       headers: buildHeaders(req),
@@ -58,9 +60,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const url = `${REMOTE_BASE}/t/branches/${params.id}`;
+    const { id } = await params;
+    const url = `${REMOTE_BASE}/t/branches/${id}`;
     const res = await fetch(url, {
       method: "DELETE",
       headers: buildHeaders(req),

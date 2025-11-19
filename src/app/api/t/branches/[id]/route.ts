@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const url = `${getRemoteBase()}/t/branches/${params.id}`;
+    const { id } = await params;
+    const url = `${getRemoteBase()}/t/branches/${id}`;
 
 
     const res = await fetch(url, {
@@ -33,14 +34,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const payload = await req.json().catch(() => ({}));
-    const url = `${getRemoteBase()}/t/branches/${params.id}`;
-
-      url,
-      body: payload
-    });
+    const url = `${getRemoteBase()}/t/branches/${id}`;
 
     const res = await fetch(url, {
       method: "PUT",
@@ -70,9 +68,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const url = `${getRemoteBase()}/t/branches/${params.id}`;
+    const { id } = await params;
+    const url = `${getRemoteBase()}/t/branches/${id}`;
 
 
     const res = await fetch(url, {

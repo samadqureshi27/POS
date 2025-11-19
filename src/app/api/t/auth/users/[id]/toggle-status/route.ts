@@ -23,9 +23,10 @@ function buildHeaders(req: Request) {
   return headers;
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const url = `${REMOTE_BASE}/t/auth/users/${params.id}/toggle-status`;
+    const { id } = await params;
+    const url = `${REMOTE_BASE}/t/auth/users/${id}/toggle-status`;
     const res = await fetch(url, {
       method: "PUT",
       headers: buildHeaders(req),
