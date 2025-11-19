@@ -127,7 +127,7 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 interface RetryConfig {
   maxRetries?: number;
   retryDelay?: number;
-  retryOn?: number[]; // HTTP status codes to retry on
+  retryOn?: readonly number[]; // HTTP status codes to retry on
 }
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {

@@ -1,15 +1,20 @@
 // src/types/auth.ts
 
-export type UserRole = 'superadmin' | 'admin' | 'manager' | 'cashier' | 'waiter';
+export type UserRole = 'superadmin' | 'admin' | 'owner' | 'manager' | 'cashier' | 'waiter';
 
 export interface User {
-  id: string;
-  username: string;
+  _id?: string;
+  id?: string;
+  fullName?: string;
+  username?: string;
   email: string;
-  role: UserRole;
+  roles?: string[];
+  role?: UserRole;
   pin?: string;
-  is_active: boolean;
-  created_at: string;
+  branchIds?: string[];
+  is_active?: boolean;
+  isActive?: boolean;
+  created_at?: string;
   updated_at?: string;
   created_by?: string;
 }

@@ -5,7 +5,10 @@
  * Eliminates duplicate getStatus/getStatusColor/getStatusVariant functions.
  */
 
-import type { BadgeProps } from "@/components/ui/badge";
+/**
+ * Badge variant type matching the badge component
+ */
+export type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
 /**
  * Status types used across the application
@@ -20,8 +23,8 @@ export type GeneralStatus = string;
  * @param status - Order status
  * @returns Badge variant
  */
-export function getOrderStatusVariant(status: OrderStatus): BadgeProps["variant"] {
-  const variants: Record<OrderStatus, BadgeProps["variant"]> = {
+export function getOrderStatusVariant(status: OrderStatus): BadgeVariant {
+  const variants: Record<OrderStatus, BadgeVariant> = {
     "Completed": "default",
     "Pending": "secondary",
     "Cancelled": "destructive",
@@ -119,8 +122,8 @@ export function getOrderTypeColor(type: string): string {
  * @param type - Order type
  * @returns Badge variant
  */
-export function getOrderTypeVariant(type: string): BadgeProps["variant"] {
-  const variants: Record<string, BadgeProps["variant"]> = {
+export function getOrderTypeVariant(type: string): BadgeVariant {
+  const variants: Record<string, BadgeVariant> = {
     "Dine in": "secondary",
     "Takeaway": "default",
     "Delivery": "outline",

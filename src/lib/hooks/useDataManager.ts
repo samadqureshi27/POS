@@ -48,7 +48,7 @@ export interface DataManagerConfig<TRaw, TTransformed> {
   entityName: string;
 
   /** Transform raw API data to UI format */
-  transformData?: (raw: TRaw, index?: number) => TTransformed;
+  transformData?: (raw: TRaw, index?: number, additionalData?: Record<string, any>) => TTransformed;
 
   /** Extract array from response if nested */
   extractDataArray?: (response: any) => any[];
@@ -128,7 +128,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
       const listFn = (service as any)[listMethod] || service.list;
 
       if (!listFn) {
-        logError(new Error(`Service does not have ${listMethod} method`), {
+        logError(`Service does not have ${listMethod} method`, new Error(`Service does not have ${listMethod} method`), {
           component: "useDataManager",
           action: "loadItems",
           entityName,
@@ -159,12 +159,12 @@ export function useDataManager<TRaw = any, TTransformed = any>(
 
         // Transform data if transformer provided
         const transformedData = transformData
-          ? dataArray.map((item: any, index: number) => transformData(item, index))
+          ? dataArray.map((item: any, index: number) => transformData(item, index, additionalState))
           : dataArray;
 
         setItems(transformedData);
       } else {
-        logError(new Error(response.message || `Failed to load ${entityName}s`), {
+        logError(response.message || `Failed to load ${entityName}s`, new Error(response.message || `Failed to load ${entityName}s`), {
           component: "useDataManager",
           action: "loadItems",
           entityName
@@ -173,7 +173,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         setItems([]);
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError(`Failed to load ${entityName}s`, error as Error, {
         component: "useDataManager",
         action: "loadItems",
         entityName
@@ -194,7 +194,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         const result = await loadFn();
         return { key, result };
       } catch (error) {
-        logError(error as Error, {
+        logError(`Failed to load additional data for ${key}`, error as Error, {
           component: "useDataManager",
           action: "loadAdditionalData",
           entityName,
@@ -272,7 +272,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         throw new Error(response.message || `Failed to create ${entityName}`);
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError(error.message || `Failed to create ${entityName}`, error as Error, {
         component: "useDataManager",
         action: "createItem",
         entityName
@@ -303,7 +303,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         throw new Error(response.message || `Failed to update ${entityName}`);
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError(error.message || `Failed to update ${entityName}`, error as Error, {
         component: "useDataManager",
         action: "updateItem",
         entityName,
@@ -342,7 +342,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         throw new Error(`Failed to delete ${failedCount} of ${itemIds.length} ${entityName}s`);
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError(error.message || `Failed to delete ${entityName}s`, error as Error, {
         component: "useDataManager",
         action: "deleteItems",
         entityName,
@@ -399,7 +399,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         setEditingItem(item);
       }
     } catch (error) {
-      logError(error as Error, {
+      logError(`Failed to load full ${entityName} data for editing`, error as Error, {
         component: "useDataManager",
         action: "openEditModal",
         entityName,

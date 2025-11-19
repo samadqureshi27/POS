@@ -2,45 +2,11 @@
 
 import { api, normalizeApiResponse } from "@/lib/util/api-client";
 import { logError } from "@/lib/util/logger";
-
-export interface VariantIngredient {
-  sourceType: "inventory" | "recipe";
-  sourceId: string;
-  nameSnapshot: string;
-  quantity: number;
-  unit: string;
-  costPerUnit?: number;
-}
-
-export interface RecipeVariant {
-  _id?: string;
-  id?: string;
-  recipeId: string;
-  name: string;
-  price: number;
-  isActive?: boolean;
-  sku?: string;
-  description?: string;
-}
-
-export interface RecipeVariantFormData {
-  recipeId: string;
-  name: string;
-  price: number;
-  isActive?: boolean;
-  sku?: string;
-  description?: string;
-  type?: "size" | "flavor" | "crust" | "custom";
-  sizeMultiplier?: number;
-  baseCostAdjustment?: number;
-  crustType?: string;
-  ingredients?: VariantIngredient[];
-  metadata?: {
-    menuDisplayName?: string;
-    availability?: string[];
-    [key: string]: any;
-  };
-}
+import type {
+  RecipeVariant,
+  RecipeVariantFormData,
+  VariantIngredient,
+} from "@/lib/types/recipe-variants";
 
 export interface PaginationParams {
   page?: number;

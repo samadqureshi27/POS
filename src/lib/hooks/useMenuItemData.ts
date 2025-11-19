@@ -108,8 +108,8 @@ export const useMenuItemData = () => {
   // Return with backwards-compatible API
   return {
     menuItems: hook.items,
-    categories: hook.additionalDataValues?.categories || [],
-    recipes: hook.additionalDataValues?.recipes || [],
+    categories: (hook as any).categories || [],
+    recipes: (hook as any).recipes || [],
     filteredItems: hook.filteredItems,
     selectedItems: hook.selectedItems,
     loading: hook.loading,
@@ -125,7 +125,7 @@ export const useMenuItemData = () => {
     menuItemStats,
     createMenuItem: hook.create,
     updateMenuItem: hook.update,
-    deleteMenuItems: () => hook.delete(hook.selectedItems),
+    deleteMenuItems: hook.delete,
     handleSelectItem: hook.handleSelectItem,
     handleSelectAll: hook.handleSelectAll,
     clearSelection: hook.clearSelection,

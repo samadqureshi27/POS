@@ -75,7 +75,7 @@ export const useRecipeVariants = () => {
           setTotalPages(Math.ceil(response.data.length / itemsPerPage));
         }
       } else {
-        logError(new Error(response.message || "Failed to load variants"), {
+        logError(response.message || "Failed to load variants", new Error(response.message || "Failed to load variants"), {
           component: "useRecipeVariants",
           action: "loadVariants",
           entityName: "recipe variants",
@@ -86,7 +86,7 @@ export const useRecipeVariants = () => {
         setTotalPages(0);
       }
     } catch (error) {
-      logError(error as Error, {
+      logError("Failed to load variants", error as Error, {
         component: "useRecipeVariants",
         action: "loadVariants",
         entityName: "recipe variants",
@@ -107,7 +107,7 @@ export const useRecipeVariants = () => {
       if (response.success && response.data) {
         setRecipes(response.data);
       } else {
-        logError(new Error(response.message || "Failed to load recipes"), {
+        logError(response.message || "Failed to load recipes", new Error(response.message || "Failed to load recipes"), {
           component: "useRecipeVariants",
           action: "loadRecipes",
           entityName: "recipes"
@@ -115,7 +115,7 @@ export const useRecipeVariants = () => {
         setRecipes([]);
       }
     } catch (error) {
-      logError(error as Error, {
+      logError("Failed to load recipes", error as Error, {
         component: "useRecipeVariants",
         action: "loadRecipes",
         entityName: "recipes"
@@ -131,7 +131,7 @@ export const useRecipeVariants = () => {
       if (response.success && response.data) {
         setInventoryItems(response.data);
       } else {
-        logError(new Error(response.message || "Failed to load inventory"), {
+        logError(response.message || "Failed to load inventory", new Error(response.message || "Failed to load inventory"), {
           component: "useRecipeVariants",
           action: "loadInventoryItems",
           entityName: "inventory items"
@@ -139,7 +139,7 @@ export const useRecipeVariants = () => {
         setInventoryItems([]);
       }
     } catch (error) {
-      logError(error as Error, {
+      logError("Failed to load inventory", error as Error, {
         component: "useRecipeVariants",
         action: "loadInventoryItems",
         entityName: "inventory items"
@@ -174,7 +174,7 @@ export const useRecipeVariants = () => {
         throw new Error(response.message || "Failed to create recipe variant");
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError("Failed to create recipe variant", error as Error, {
         component: "useRecipeVariants",
         action: "createVariant",
         entityName: "recipe variant"
@@ -197,7 +197,7 @@ export const useRecipeVariants = () => {
         throw new Error(response.message || "Failed to update recipe variant");
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError("Failed to update recipe variant", error as Error, {
         component: "useRecipeVariants",
         action: "updateVariant",
         entityName: "recipe variant",
@@ -221,7 +221,7 @@ export const useRecipeVariants = () => {
         throw new Error(response.message || "Failed to delete recipe variant");
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError("Failed to delete recipe variant", error as Error, {
         component: "useRecipeVariants",
         action: "deleteVariant",
         entityName: "recipe variant",
@@ -255,7 +255,7 @@ export const useRecipeVariants = () => {
         setEditingItem(variant);
       }
     } catch (error) {
-      logError(error as Error, {
+      logError("Failed to load full recipe variant data for editing", error as Error, {
         component: "useRecipeVariants",
         action: "openEditModal",
         entityName: "recipe variant",

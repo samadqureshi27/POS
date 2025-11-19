@@ -85,7 +85,7 @@ export const useRecipeData = () => {
 
   // Transform inventory to ingredients format
   const ingredients: Ingredient[] = useMemo(() => {
-    const inventoryItems = hook.additionalDataValues?.inventoryItems || [];
+    const inventoryItems = (hook as any).inventoryItems || [];
     return inventoryItems.map((item: any, index: number) => ({
       ID: item._id || item.id || index,
       Name: item.name,
@@ -95,7 +95,7 @@ export const useRecipeData = () => {
       Threshold: item.reorderPoint || 0,
       Priority: 0,
     }));
-  }, [hook.additionalDataValues?.inventoryItems]);
+  }, [(hook as any).inventoryItems]);
 
   // Computed values
   const availableCategories = useMemo(() =>
@@ -118,7 +118,7 @@ export const useRecipeData = () => {
   }), [hook.items, availableCategories]);
 
   // Custom delete handler for numeric IDs
-  const deleteRecipes = async (itemIds: number[]) => {
+  const handleDeleteRecipes = async (itemIds: number[]) => {
     if (itemIds.length === 0) return { success: false };
 
     const recipesToDelete = hook.items.filter((recipe) =>
@@ -126,7 +126,7 @@ export const useRecipeData = () => {
     );
 
     const recipeIdsToDelete = recipesToDelete.map(recipe => recipe._id || recipe.ID.toString());
-    return hook.delete(recipeIdsToDelete as any);
+    return hook.deleteItems(recipeIdsToDelete as any);
   };
 
   // Custom openEditModal to handle recipe details fetching
@@ -180,7 +180,7 @@ export const useRecipeData = () => {
   return {
     recipeOptions: hook.items,
     ingredients,
-    availableRecipeOptions: hook.additionalDataValues?.availableRecipeOptions || [],
+    availableRecipeOptions: (hook as any).availableRecipeOptions || [],
     filteredItems: hook.filteredItems,
     selectedItems: hook.selectedItems,
     loading: hook.loading,
@@ -196,7 +196,7 @@ export const useRecipeData = () => {
     recipeStats,
     createRecipe: hook.create,
     updateRecipe: hook.update,
-    deleteRecipes: () => deleteRecipes(hook.selectedItems as any),
+    deleteRecipes: () => handleDeleteRecipes(hook.selectedItems as any),
     handleSelectItem: hook.handleSelectItem,
     handleSelectAll: hook.handleSelectAll,
     clearSelection: hook.clearSelection,

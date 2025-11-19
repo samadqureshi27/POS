@@ -127,9 +127,7 @@ export const CreateStaffRequestSchema = z.object({
     .transform(email => email.toLowerCase().trim())
     .optional(),
 
-  role: z.enum(['manager', 'cashier', 'waiter'], {
-    errorMap: () => ({ message: 'Invalid role' }),
-  }),
+  role: z.enum(['manager', 'cashier', 'waiter']),
 
   pin: z
     .string()
@@ -420,7 +418,7 @@ export async function validateRequest<T>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Format Zod errors into a user-friendly format
-      const formattedErrors = error.errors.map(err => ({
+      const formattedErrors = error.issues.map(err => ({
         field: err.path.join('.'),
         message: err.message,
       }));
