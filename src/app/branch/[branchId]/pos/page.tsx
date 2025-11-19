@@ -179,9 +179,18 @@ const PosListPage = () => {
                 onPrimaryAction={handleAddPos}
                 primaryActionLabel="Add POS"
                 primaryActionIcon={<Plus className="h-5 w-5 mr-2" />}
-                onSecondaryAction={selectedItems.length > 0 ? handleDeletePos : undefined}
-                secondaryActionLabel="Delete Selected"
-                secondaryActionDisabled={selectedItems.length === 0}
+                secondaryActions={
+                    selectedItems.length > 0 ? (
+                        <Button
+                            variant="destructive"
+                            onClick={handleDeletePos}
+                            disabled={selectedItems.length === 0}
+                        >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Selected
+                        </Button>
+                    ) : undefined
+                }
             />
 
             {/* POS Grid */}
@@ -196,7 +205,7 @@ const PosListPage = () => {
                 getItemId={(item) => String(item.POS_ID)}
                 onEdit={handleEditPos}
                 onDelete={(item) => {
-                    handleSelectItem(item.POS_ID);
+                    handleSelectItem(item.POS_ID, true);
                     setDeleteDialogOpen(true);
                 }}
                 customActions={(item) => (
@@ -213,7 +222,7 @@ const PosListPage = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => {
-                                handleSelectItem(item.POS_ID);
+                                handleSelectItem(item.POS_ID, true);
                                 setDeleteDialogOpen(true);
                             }}
                             className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"

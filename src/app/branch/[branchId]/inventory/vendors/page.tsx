@@ -139,9 +139,18 @@ const VendorsPage = () => {
         onPrimaryAction={handleAddWithToast}
         primaryActionLabel="Add Vendor"
         primaryActionIcon={<Plus className="h-5 w-5 mr-2" />}
-        onSecondaryAction={selectedItems.length > 0 ? handleDeleteWithToast : undefined}
-        secondaryActionLabel="Delete Selected"
-        secondaryActionDisabled={selectedItems.length === 0}
+        secondaryActions={
+          selectedItems.length > 0 ? (
+            <Button
+              variant="destructive"
+              onClick={handleDeleteWithToast}
+              disabled={selectedItems.length === 0}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected
+            </Button>
+          ) : undefined
+        }
       />
 
       {/* Vendors Grid */}
@@ -156,7 +165,7 @@ const VendorsPage = () => {
         getItemId={(item) => String(item.Vendor_ID)}
         onEdit={openEditModal}
         onDelete={(item) => {
-          handleSelectItem(item.Vendor_ID);
+          handleSelectItem(item.Vendor_ID, true);
           setDeleteDialogOpen(true);
         }}
         customActions={(item) => (
@@ -173,7 +182,7 @@ const VendorsPage = () => {
               variant="ghost"
               size="sm"
               onClick={() => {
-                handleSelectItem(item.Vendor_ID);
+                handleSelectItem(item.Vendor_ID, true);
                 setDeleteDialogOpen(true);
               }}
               className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"

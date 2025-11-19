@@ -95,8 +95,8 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
               <Calendar
                 mode="range"
                 defaultMonth={dateRange?.from}
-                selected={dateRange}
-                onSelect={(range) => {
+                selected={dateRange as any}
+                onSelect={(range: any) => {
                   if (range) {
                     setDateRange(range);
                     if (range.from && range.to) {

@@ -93,7 +93,7 @@ const BranchManagementPage = () => {
           title="Total Branches"
           subtitle="All locations"
           value={statistics.totalBranches}
-          icon="building"
+          icon="inventory"
           format="number"
         />
         <AdvancedMetricCard

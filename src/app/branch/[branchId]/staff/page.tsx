@@ -245,9 +245,18 @@ const EmployeeRecordsPage = () => {
         onPrimaryAction={openModal}
         primaryActionLabel="Add Staff"
         primaryActionIcon={<Plus className="h-5 w-5 mr-2" />}
-        onSecondaryAction={selectedItems.length > 0 ? handleDelete : undefined}
-        secondaryActionLabel="Delete Selected"
-        secondaryActionDisabled={selectedItems.length === 0}
+        secondaryActions={
+          selectedItems.length > 0 ? (
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={selectedItems.length === 0}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected
+            </Button>
+          ) : undefined
+        }
       />
 
       {/* Staff Grid */}
@@ -262,7 +271,7 @@ const EmployeeRecordsPage = () => {
         getItemId={(item) => item.Staff_ID}
         onEdit={openEditModal}
         onDelete={(item) => {
-          handleSelectItem(item.Staff_ID);
+          handleSelectItem(item.Staff_ID, true);
           setDeleteDialogOpen(true);
         }}
         customActions={(item) => (
@@ -279,7 +288,7 @@ const EmployeeRecordsPage = () => {
               variant="ghost"
               size="sm"
               onClick={() => {
-                handleSelectItem(item.Staff_ID);
+                handleSelectItem(item.Staff_ID, true);
                 setDeleteDialogOpen(true);
               }}
               className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"

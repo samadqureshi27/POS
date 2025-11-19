@@ -14,9 +14,10 @@ import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { formatPrice } from "@/lib/util/formatters";
 import { logError } from "@/lib/util/logger";
+import type { MenuItem } from "@/lib/types/menu";
 
 // Types
-interface MenuItem {
+interface MenuItemDisplay {
   ID: string;
   Name: string;
   Description?: string;
@@ -37,7 +38,7 @@ const BranchMenuPage = () => {
   const { showToast } = useToast();
 
   // State
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItemDisplay[]>([]);
   const [branchMenuItems, setBranchMenuItems] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -61,10 +62,23 @@ const BranchMenuPage = () => {
       const { MenuService } = await import("@/lib/services/menu-service");
 
       // Fetch all menu items from base menu
-      const response = await MenuService.getMenuItems();
+      const response = await MenuService.listMenuItems();
 
       if (response.success && response.data) {
-        setMenuItems(response.data);
+        // Transform API response to display format
+        const displayItems: MenuItemDisplay[] = response.data.map((item: MenuItem) => ({
+          ID: item._id || '',
+          Name: item.name,
+          Description: item.description,
+          Category: typeof item.categoryId === 'string' ? item.categoryId : item.categoryId?.name,
+          BasePrice: item.pricing?.basePrice || 0,
+          Currency: item.pricing?.currency || 'PKR',
+          Status: item.isActive ? 'Active' as const : 'Inactive' as const,
+          ImageUrl: item.media?.[0]?.url,
+          Tags: item.tags || [],
+          Recipe: typeof item.recipeId === 'string' ? item.recipeId : item.recipeId?.name,
+        }));
+        setMenuItems(displayItems);
 
         // TODO: In a real implementation, fetch branch-specific assignments from backend
         // For now, we'll use localStorage to simulate branch menu assignments
@@ -248,7 +262,7 @@ const BranchMenuPage = () => {
             options: [
               { label: "All Items", value: "all" },
               { label: "Assigned", value: "assigned", color: "green" },
-              { label: "Unassigned", value: "unassigned", color: "gray" },
+              { label: "Unassigned", value: "unassigned", color: "default" },
             ],
             activeValue: assignmentFilter,
             onChange: (value) => setAssignmentFilter(value as "all" | "assigned" | "unassigned"),
@@ -260,7 +274,7 @@ const BranchMenuPage = () => {
       />
 
       {/* Menu Items Grid */}
-      <ResponsiveGrid<MenuItem>
+      <ResponsiveGrid<MenuItemDisplay>
         items={paginatedItems}
         loading={loading}
         loadingText="Loading menu items..."

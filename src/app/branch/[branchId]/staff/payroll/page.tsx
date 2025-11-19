@@ -96,7 +96,7 @@ const StaffManagementPage = () => {
           title="Total Payroll"
           subtitle="All salaries"
           value={summaryData.totalSalaries}
-          icon="money"
+          icon="revenue"
           format="currency"
           status="neutral"
         />
@@ -105,7 +105,7 @@ const StaffManagementPage = () => {
           title="Pending Payments"
           subtitle="Not yet paid"
           value={summaryData.unpaidSalaries}
-          icon="money"
+          icon="revenue"
           format="currency"
           status={summaryData.unpaidSalaries > 0 ? "warning" : "good"}
         />
