@@ -23,10 +23,11 @@ function buildHeaders(req: Request) {
   return headers;
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const payload = await req.json().catch(() => ({}));
-    const url = `${REMOTE_BASE}/t/auth/users/${params.id}/update-pin`;
+    const url = `${REMOTE_BASE}/t/auth/users/${id}/update-pin`;
     const res = await fetch(url, {
       method: "PUT",
       headers: buildHeaders(req),

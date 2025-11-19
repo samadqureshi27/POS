@@ -6,12 +6,14 @@ import React, { useState, useCallback } from "react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
-// Hooks
-import { useDashboardData } from "@/lib/hooks";
+// Types
+import { DashboardData } from "@/lib/types/Dtypes";
+
+// API
+import { dashboardAPI } from "@/lib/util/DashboardApi";
 
 // Utils
-import { getPeriodLabel } from "@/lib/util/Dashboradutils";
-import { toast } from "sonner";
+import { getPeriodLabel } from "@/lib/util/Dashboardutils";
 
 // Components
 import { Toaster } from "@/components/ui/sonner";

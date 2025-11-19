@@ -3,8 +3,8 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const url = `${getRemoteBase()}/t/addons/groups/${id}`;
 
   const res = await fetch(url, {
@@ -22,8 +22,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   return new NextResponse(text, { status: res.status });
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const payload = await req.json().catch(() => ({}));
   const url = `${getRemoteBase()}/t/addons/groups/${id}`;
 
@@ -43,8 +43,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   return new NextResponse(text, { status: res.status });
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const url = `${getRemoteBase()}/t/addons/groups/${id}`;
 
   const res = await fetch(url, {

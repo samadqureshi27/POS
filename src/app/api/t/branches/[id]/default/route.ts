@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const url = `${getRemoteBase()}/t/branches/${params.id}/default`;
+    const { id } = await params;
+    const url = `${getRemoteBase()}/t/branches/${id}/default`;
 
 
     const res = await fetch(url, {

@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const { searchParams } = new URL(req.url);
     const includeRecipeVariants = searchParams.get("includeRecipeVariants") || "";
     const includeCategoryAddOns = searchParams.get("includeCategoryAddOns") || "";
 
-    let url = `${getRemoteBase()}/t/menu/items/${params.id}`;
+    let url = `${getRemoteBase()}/t/menu/items/${id}`;
     const queryParams = [];
     if (includeRecipeVariants) queryParams.push(`includeRecipeVariants=${encodeURIComponent(includeRecipeVariants)}`);
     if (includeCategoryAddOns) queryParams.push(`includeCategoryAddOns=${encodeURIComponent(includeCategoryAddOns)}`);
@@ -38,10 +39,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const payload = await req.json().catch(() => ({}));
-    const url = `${getRemoteBase()}/t/menu/items/${params.id}`;
+    const url = `${getRemoteBase()}/t/menu/items/${id}`;
 
     const res = await fetch(url, {
       method: "PUT",
@@ -69,9 +71,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const url = `${getRemoteBase()}/t/menu/items/${params.id}`;
+    const { id } = await params;
+    const url = `${getRemoteBase()}/t/menu/items/${id}`;
 
     const res = await fetch(url, {
       method: "DELETE",
