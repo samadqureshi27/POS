@@ -12,10 +12,10 @@ const REMOTE_BASE = getRemoteBase();
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const url = `${REMOTE_BASE}/t/recipe-variations/${id}`;
 
 
@@ -49,10 +49,10 @@ export async function GET(
  */
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const url = `${REMOTE_BASE}/t/recipe-variations/${id}`;
 
@@ -88,10 +88,10 @@ export async function PUT(
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const url = `${REMOTE_BASE}/t/recipe-variations/${id}`;
 
 

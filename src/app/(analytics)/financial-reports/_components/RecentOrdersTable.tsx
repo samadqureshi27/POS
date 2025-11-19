@@ -97,7 +97,6 @@ export const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({
           data={displayedOrders}
           columns={columns}
           selectable={false}
-          showHeader={true}
           emptyMessage="No recent orders found"
           mobileResponsive={true}
           nameColumn="orderId"

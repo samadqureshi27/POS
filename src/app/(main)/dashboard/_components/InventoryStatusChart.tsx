@@ -112,7 +112,6 @@ export const InventoryStatusChart: React.FC = () => {
             />
             <Bar
               dataKey="current"
-              fill={(entry: any) => getInventoryStatusColor(entry.status as InventoryStatus)}
               radius={[4, 4, 0, 0]}
             >
               {inventoryData.map((entry, index) => (
