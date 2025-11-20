@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 import { useRouter } from 'next/navigation';
-import ActionBar from "@/components/ui/action-bar";
+import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import { Toast } from "@/components/ui/toast";
 import CustomerSummaryCards from "./_components/customer-summary-cards";
 import CustomerTable from "./_components/customer-table";
@@ -12,6 +12,8 @@ import { exportCustomersToCSV } from "@/lib/util/customer-details-utils";
 import { useToast } from "@/lib/hooks";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { Toaster } from "@/components/ui/sonner";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 const CustomerManagementPage = () => {
   const router = useRouter();
@@ -41,25 +43,22 @@ const CustomerManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-h-screen">
+    <PageContainer>
       <Toaster position="top-right" />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 items-center max-w-[100vw] mb-8 mt-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Loyal Customers</h1>
-
-        {/* Import/Export Controls */}
-        <ImportExportControls
-          onExport={handleExport}
-        />
-      </div>
+      <PageHeader
+        title="Loyal Customers"
+        actions={<ImportExportControls onExport={handleExport} />}
+      />
 
       {/* Summary Cards */}
       <CustomerSummaryCards summaryData={summaryData} />
 
-      <ActionBar
+      <EnhancedActionBar
         searchValue={searchTerm}
         onSearchChange={setSearchInput}
-        searchPlaceholder="Search"
+        searchPlaceholder="Search customers by name, email, or phone..."
+        showViewToggle={false}
       />
 
       {/* Customer Table */}
@@ -68,9 +67,8 @@ const CustomerManagementPage = () => {
         searchTerm={searchTerm}
         onCustomerClick={handleCustomerClick}
       />
-    </div>
+    </PageContainer>
   );
 };
-
 
 export default CustomerManagementPage;

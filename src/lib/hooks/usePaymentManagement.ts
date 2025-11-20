@@ -4,6 +4,7 @@ import { useSelection } from "./selection";
 import { useToast } from './toast';
 import { usePaymentModal } from "./paymentModal";
 import { PaymentMethod } from "@/lib/types/payment";
+import { logError } from "@/lib/util/logger";
 
 export const usePaymentManagement = () => {
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -46,7 +47,10 @@ export const usePaymentManagement = () => {
                 throw new Error(response.message || "Failed to fetch payment methods");
             }
         } catch (error) {
-            console.error("Error fetching payment methods:", error);
+            logError("Error fetching payment methods", error, {
+                component: "usePaymentManagement",
+                action: "loadPaymentMethods",
+            });
             showToast("Failed to load payment methods", "error");
         } finally {
             setLoading(false);
@@ -78,7 +82,11 @@ export const usePaymentManagement = () => {
                 showToast(response.message || "Payment method created successfully", "success");
             }
         } catch (error) {
-            console.error("Error creating payment method:", error);
+            logError("Error creating payment method", error, {
+                component: "usePaymentManagement",
+                action: "handleCreateItem",
+                paymentName: itemData.Name,
+            });
             showToast("Failed to create payment method", "error");
         } finally {
             setActionLoading(false);

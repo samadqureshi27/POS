@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 // API and Data Types
-export interface StaffItem {
+export interface PayrollStaffItem {
     STAFF_ID: string;
     Name: string;
     Contact: string;
@@ -11,6 +11,9 @@ export interface StaffItem {
     JoinDate: string;
     Branch_ID_fk: string;
 }
+
+// Legacy alias for backward compatibility
+export type StaffItem = PayrollStaffItem;
 
 export interface ApiResponse<T> {
     data: T;

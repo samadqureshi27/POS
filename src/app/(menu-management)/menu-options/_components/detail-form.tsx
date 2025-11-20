@@ -1,5 +1,6 @@
 // components/DetailsForm.tsx
 import React, { useState, useEffect } from 'react';
+import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -78,7 +79,7 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange })
   const handleAddGroup = async () => {
     if (!groupInput.trim()) return;
     if (!formData.categoryId) {
-      alert("Please select a category first");
+      toast.error("Please select a category first");
       return;
     }
 
@@ -99,17 +100,17 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange })
         });
         setShowGroupSuggestions(false);
       } else {
-        alert(res.message || "Failed to create group");
+        toast.error(res.message || "Failed to create group");
       }
     } catch (error) {
-      alert("An error occurred while creating the group");
+      toast.error("An error occurred while creating the group");
     } finally {
       setAddingGroup(false);
     }
   };
 
   const filteredGroups = groups.filter((group) =>
-    group.name.toLowerCase().includes(groupInput.toLowerCase())
+    group.name?.toLowerCase().includes(groupInput.toLowerCase())
   );
 
   return (

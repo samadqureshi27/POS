@@ -3,7 +3,7 @@
 import React from "react";
 import { LineChart, Line, XAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { RevenueData } from "@/lib/types/Dtypes";
-import { getDayAbbreviation } from "@/lib/util/Dashboradutils";
+import { getDayAbbreviation } from "@/lib/util/Dashboardutils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 interface RevenueTrendChartProps {

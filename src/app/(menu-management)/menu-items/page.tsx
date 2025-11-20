@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { UtensilsCrossed, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
@@ -10,8 +11,13 @@ import MenuItemModal from "./_components/menu-item-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useMenuItemData } from "@/lib/hooks/useMenuItemData";
 import { MenuItemOption } from "@/lib/types/menu";
+import { formatPrice } from "@/lib/util/formatters";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
+import { logError } from "@/lib/util/logger";
 
 const MenuItemsManagementPage = () => {
+  const router = useRouter();
   const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -44,6 +50,9 @@ const MenuItemsManagementPage = () => {
     updateSearchTerm,
     updateStatusFilter,
     updateCategoryFilter,
+
+    // Utility
+    refreshData,
   } = useMenuItemData();
 
   // Enhanced action handlers with consistent toast notifications
@@ -75,7 +84,10 @@ const MenuItemsManagementPage = () => {
     const itemId = itemToDelete.ID;
 
     if (!itemId) {
-      console.error("❌ Menu item ID is missing");
+      logError("Menu item ID is missing", new Error("Menu item ID is undefined"), {
+        component: "MenuItemsManagement",
+        action: "confirmDelete",
+      });
       globalShowToast("Menu item ID is missing", "error");
       return;
     }
@@ -88,13 +100,18 @@ const MenuItemsManagementPage = () => {
 
       if (result.success) {
         globalShowToast("Menu item deleted successfully", "success");
-        window.location.reload();
+        await refreshData();
       } else {
         globalShowToast(result.message || "Failed to delete menu item", "error");
       }
     } catch (error: any) {
-      console.error("Error deleting menu item:", error);
+      logError("Error deleting menu item", error, {
+        component: "MenuItemsManagement",
+        action: "confirmDelete",
+        itemId: itemToDelete?.ID,
+      });
       globalShowToast(error.message || "Failed to delete menu item", "error");
+      router.refresh();
     }
   };
 
@@ -104,14 +121,13 @@ const MenuItemsManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Menu Items</h1>
-        <p className="text-gray-600 text-sm mt-1">Manage your menu items with pricing and details</p>
-      </header>
+      <PageHeader
+        title="Menu Items"
+        subtitle="Manage your menu items with pricing and details"
+      />
 
       {/* Enhanced Action Bar */}
       <EnhancedActionBar
@@ -221,7 +237,7 @@ const MenuItemsManagementPage = () => {
                   {item.Currency}
                 </div>
                 <span className="text-sm font-semibold text-gray-900">
-                  {item.BasePrice.toFixed(2)}
+                  {formatPrice(item.BasePrice)}
                 </span>
               </div>
             ),
@@ -331,7 +347,7 @@ const MenuItemsManagementPage = () => {
                       </span>
                     </div>
                     <span className="text-sm font-bold text-gray-900">
-                      {item.BasePrice.toFixed(2)}
+                      {formatPrice(item.BasePrice)}
                     </span>
                   </div>
 
@@ -372,7 +388,7 @@ const MenuItemsManagementPage = () => {
         cancelText="Cancel"
         variant="destructive"
       />
-    </div>
+    </PageContainer>
   );
 };
 

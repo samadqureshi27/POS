@@ -12,6 +12,7 @@
  */
 
 import { z } from 'zod';
+import { VALIDATION_LIMITS } from '@/lib/constants';
 
 // =============================================================================
 // AUTHENTICATION SCHEMAS
@@ -26,14 +27,14 @@ export const LoginRequestSchema = z.object({
     .string()
     .min(1, 'Email is required')
     .email('Invalid email format')
-    .max(255, 'Email is too long')
+    .max(VALIDATION_LIMITS.EMAIL_MAX_LENGTH, 'Email is too long')
     .transform(email => email.toLowerCase().trim()),
 
   password: z
     .string()
     .min(1, 'Password is required')
-    .min(6, 'Password must be at least 6 characters')
-    .max(128, 'Password is too long'),
+    .min(VALIDATION_LIMITS.PASSWORD_MIN_LENGTH, `Password must be at least ${VALIDATION_LIMITS.PASSWORD_MIN_LENGTH} characters`)
+    .max(VALIDATION_LIMITS.PASSWORD_MAX_LENGTH, 'Password is too long'),
 
   posId: z.string().nullable().optional(),
   defaultBranchId: z.string().nullable().optional(),
@@ -81,7 +82,7 @@ export const ResetPasswordRequestSchema = z.object({
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
-    .max(128, 'Password is too long')
+    .max(VALIDATION_LIMITS.PASSWORD_MAX_LENGTH, 'Password is too long')
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
       'Password must contain at least one uppercase letter, one lowercase letter, and one number'
@@ -122,7 +123,7 @@ export const CreateStaffRequestSchema = z.object({
   email: z
     .string()
     .email('Invalid email format')
-    .max(255, 'Email is too long')
+    .max(VALIDATION_LIMITS.EMAIL_MAX_LENGTH, 'Email is too long')
     .transform(email => email.toLowerCase().trim())
     .optional(),
 
@@ -159,7 +160,7 @@ export const ResetUserPasswordRequestSchema = z.object({
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
-    .max(128, 'Password is too long'),
+    .max(VALIDATION_LIMITS.PASSWORD_MAX_LENGTH, 'Password is too long'),
 });
 
 export type ResetUserPasswordRequest = z.infer<typeof ResetUserPasswordRequestSchema>;
@@ -180,7 +181,7 @@ export const BranchRequestSchema = z.object({
 
   address: z
     .string()
-    .max(255, 'Address is too long')
+    .max(VALIDATION_LIMITS.EMAIL_MAX_LENGTH, 'Address is too long')
     .optional(),
 
   phone: z
@@ -221,7 +222,7 @@ export const InventoryItemRequestSchema = z.object({
   name: z
     .string()
     .min(1, 'Item name is required')
-    .max(200, 'Item name is too long')
+    .max(VALIDATION_LIMITS.SHORT_TEXT_MAX, 'Item name is too long')
     .transform(name => name.trim()),
 
   sku: z
@@ -263,7 +264,7 @@ export const InventoryItemRequestSchema = z.object({
 
   description: z
     .string()
-    .max(1000, 'Description is too long')
+    .max(VALIDATION_LIMITS.LONG_TEXT_MAX, 'Description is too long')
     .optional(),
 });
 
@@ -280,12 +281,12 @@ export const MenuItemRequestSchema = z.object({
   name: z
     .string()
     .min(1, 'Item name is required')
-    .max(200, 'Item name is too long')
+    .max(VALIDATION_LIMITS.SHORT_TEXT_MAX, 'Item name is too long')
     .transform(name => name.trim()),
 
   description: z
     .string()
-    .max(1000, 'Description is too long')
+    .max(VALIDATION_LIMITS.LONG_TEXT_MAX, 'Description is too long')
     .optional(),
 
   category: z
@@ -343,7 +344,7 @@ export const MenuCategoryRequestSchema = z.object({
 
   description: z
     .string()
-    .max(500, 'Description is too long')
+    .max(VALIDATION_LIMITS.MEDIUM_TEXT_MAX, 'Description is too long')
     .optional(),
 
   displayOrder: z

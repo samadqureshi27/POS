@@ -1,6 +1,6 @@
 // src/lib/services/branch-service.ts
 
-import AuthService from "@/lib/auth-service";
+import { buildHeaders } from "@/lib/util/service-helpers";
 
 export interface TenantBranch {
   id?: string;
@@ -29,55 +29,6 @@ const USE_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || "true").toLowerCase(
 const BRANCHES_BASE = "/t/branches"; // client-side proxy path
 function buildUrl(path: string) {
   return USE_PROXY ? `/api${path}` : `${REMOTE_BASE}${path}`;
-}
-
-function getToken(): string | null {
-  // Try AuthService first, then common localStorage keys
-  const t = AuthService.getToken();
-  if (t) return t;
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken") ||
-      null
-    );
-  }
-  return null;
-}
-
-function getTenantSlug(): string | null {
-  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || "";
-  if (envSlug) return envSlug;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_slug") || null;
-  }
-  return null;
-}
-
-function getTenantId(): string | null {
-  const envId = process.env.NEXT_PUBLIC_TENANT_ID || "";
-  if (envId) return envId;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tenant_id") || null;
-  }
-  return null;
-}
-
-function buildHeaders(extra?: Record<string, string>) {
-  const token = getToken();
-  const slug = getTenantSlug();
-  const id = getTenantId();
-
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-  };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  // Always use x-tenant-id (slug or id value)
-  if (id) headers["x-tenant-id"] = id;
-  else if (slug) headers["x-tenant-id"] = slug;
-
-  return { ...headers, ...(extra || {}) };
 }
 
 export const BranchService = {

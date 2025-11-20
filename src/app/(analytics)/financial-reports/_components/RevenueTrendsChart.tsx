@@ -1,6 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { revenueChartData } from '@/lib/util/AnalyticsApi';
+import { formatCurrency } from '@/lib/util/formatters';
 
 interface RevenueTrendsChartProps {
   selectedPeriod?: string;
@@ -22,14 +23,14 @@ export const RevenueTrendsChart: React.FC<RevenueTrendsChartProps> = ({ selected
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="month" stroke="#666" />
             <YAxis stroke="#666" />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'white', 
-                border: '1px solid #e5e7eb', 
-                borderRadius: '4px' 
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'white',
+                border: '1px solid #e5e7eb',
+                borderRadius: '4px'
               }}
               formatter={(value, name) => [
-                `PKR ${value.toLocaleString()}`,
+                `PKR ${formatCurrency(value)}`,
                 name === 'revenue' ? 'Revenue' : 'Orders'
               ]}
             />

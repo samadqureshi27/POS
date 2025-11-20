@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { UtensilsCrossed, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
@@ -9,13 +10,22 @@ import RecipeModal from "./_components/recipe-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeData } from "@/lib/hooks/useRecipeData";
 import { RecipeOption } from "@/lib/types/recipes";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { formatPrice, formatCurrency } from "@/lib/util/formatters";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 // add view only modal for recipe items with compact view
 
 const RecipesManagementPage = () => {
+  const router = useRouter();
   const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [recipeTypeFilter, setRecipeTypeFilter] = useState<"all" | "final" | "sub">("all");
+
+  // Confirmation Dialog state
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [recipeToDelete, setRecipeToDelete] = useState<RecipeOption | null>(null);
 
   const {
     // Data
@@ -42,6 +52,9 @@ const RecipesManagementPage = () => {
     // Filter handlers
     updateSearchTerm,
     updateStatusFilter,
+
+    // Utility
+    refreshData,
   } = useRecipeData();
 
   // Enhanced action handlers with consistent toast notifications
@@ -61,24 +74,22 @@ const RecipesManagementPage = () => {
     return result;
   };
 
-  const handleDelete = async (recipe: RecipeOption) => {
+  const handleDelete = (recipe: RecipeOption) => {
+    setRecipeToDelete(recipe);
+    setConfirmDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!recipeToDelete) return;
 
     // Get the actual MongoDB _id or fallback to ID
-    const recipeId = (recipe as any)._id || recipe.ID;
+    const recipeId = (recipeToDelete as any)._id || recipeToDelete.ID;
 
     if (!recipeId) {
       console.error("❌ Recipe ID is missing");
       globalShowToast("Recipe ID is missing", "error");
       return;
     }
-
-    // Confirm deletion
-    const confirmed = window.confirm(`Are you sure you want to delete "${recipe.Name}"?`);
-
-    if (!confirmed) {
-      return;
-    }
-
 
     try {
       // Import RecipeService at the top if not already imported
@@ -88,14 +99,14 @@ const RecipesManagementPage = () => {
 
       if (result.success) {
         globalShowToast("Recipe deleted successfully", "success");
-        // Refresh the page data
-        window.location.reload();
+        await refreshData();
       } else {
         globalShowToast(result.message || "Failed to delete recipe", "error");
       }
     } catch (error: any) {
       console.error("Error deleting recipe:", error);
       globalShowToast(error.message || "Failed to delete recipe", "error");
+      router.refresh();
     }
   };
 
@@ -111,14 +122,14 @@ const RecipesManagementPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
       {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Recipes Management</h1>
-        <p className="text-gray-600 text-sm mt-1">Manage your final recipes and sub-recipes</p>
-      </header>
+      <PageHeader
+        title="Recipes Management"
+        subtitle="Manage your final recipes and sub-recipes"
+      />
 
       {/* Enhanced Action Bar */}
       <EnhancedActionBar
@@ -353,7 +364,7 @@ const RecipesManagementPage = () => {
                   {/* Cost Placeholder (can be implemented later) */}
                   <div className="text-xs text-gray-500">
                     {item.totalCost ? (
-                      <span className="font-semibold text-gray-700">${item.totalCost.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-700">${formatPrice(item.totalCost)}</span>
                     ) : (
                       <span className="italic">Cost: N/A</span>
                     )}
@@ -376,7 +387,19 @@ const RecipesManagementPage = () => {
         actionLoading={actionLoading}
         showToast={globalShowToast}
       />
-    </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        title="Delete Recipe"
+        description={`Are you sure you want to delete "${recipeToDelete?.Name}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
+    </PageContainer>
   );
 };
 

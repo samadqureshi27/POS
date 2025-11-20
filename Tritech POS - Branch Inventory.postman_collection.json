@@ -1,0 +1,185 @@
+{
+	"info": {
+		"_postman_id": "f2aef506-7891-4ca5-ab09-5e88d3e1090f",
+		"name": "Tritech POS - Branch Inventory",
+		"description": "Branch-level inventory operations for multi-tenant POS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48720699",
+		"_collection_link": "https://qabdulsamad18-8144213.postman.co/workspace/samad's-Workspace~d933fcd7-cd8e-4fa4-8349-f7c0e98781cf/collection/48720699-f2aef506-7891-4ca5-ab09-5e88d3e1090f?action=share&source=collection_link&creator=48720699"
+	},
+	"item": [
+		{
+			"name": "List Branch Inventory",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/t/branch-inventory/items?branchId={{branchId}}&page=1&limit=50",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"t",
+						"branch-inventory",
+						"items"
+					],
+					"query": [
+						{
+							"key": "branchId",
+							"value": "{{branchId}}"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "50"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Branch Inventory Item",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"branchId\": \"{{branchId}}\",\n  \"itemId\": \"{{itemId}}\",\n  \"quantity\": 20,\n  \"reorderPoint\": 5,\n  \"minStock\": 2,\n  \"maxStock\": 200,\n  \"costPerUnit\": 10,\n  \"sellingPrice\": 15,\n  \"isActive\": true\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/t/branch-inventory/items",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"t",
+						"branch-inventory",
+						"items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Branch Inventory Item",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/t/branch-inventory/items/{{inventoryId}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"t",
+						"branch-inventory",
+						"items",
+						"{{inventoryId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Branch Inventory Item",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"quantity\": 50,\n  \"sellingPrice\": 16\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/t/branch-inventory/items/{{inventoryId}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"t",
+						"branch-inventory",
+						"items",
+						"{{inventoryId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Branch Inventory Item",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/t/branch-inventory/items/{{inventoryId}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"t",
+						"branch-inventory",
+						"items",
+						"{{inventoryId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

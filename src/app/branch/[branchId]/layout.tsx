@@ -29,6 +29,7 @@ export default function BranchLayout({ children }: { children: React.ReactNode }
         { label: "Payroll", href: `/branch/${branchId}/staff/payroll` },
       ]
     },
+    { label: "Menu", href: `/branch/${branchId}/menu` },
   ];
 
   return (

@@ -4,6 +4,7 @@ import { useSelection } from "./selection";
 import { useToast } from './toast';
 import { useVendorModal } from "./vendorModal";
 import { VendorItem, VendorFormData } from "@/lib/types/vendors";
+import { logError } from "@/lib/util/logger";
 
 export const useVendorManagement = (branchId: number) => {
     const [vendorItems, setVendorItems] = useState<VendorItem[]>([]);
@@ -49,7 +50,11 @@ export const useVendorManagement = (branchId: number) => {
                 throw new Error(response.message || "Failed to fetch vendor items");
             }
         } catch (error) {
-            console.error("Error fetching vendor items:", error);
+            logError("Error fetching vendor items", error, {
+                component: "useVendorManagement",
+                action: "loadVendorItems",
+                branchId,
+            });
             showToast("Failed to load vendor items", "error");
         } finally {
             setLoading(false);
@@ -82,7 +87,12 @@ export const useVendorManagement = (branchId: number) => {
                 showToast(response.message || "Vendor created successfully", "success");
             }
         } catch (error) {
-            console.error("Error creating vendor:", error);
+            logError("Error creating vendor", error, {
+                component: "useVendorManagement",
+                action: "handleCreateItem",
+                branchId,
+                companyName: itemData.Company_Name,
+            });
             showToast("Failed to create vendor", "error");
         } finally {
             setActionLoading(false);

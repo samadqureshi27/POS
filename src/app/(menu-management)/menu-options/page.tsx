@@ -10,6 +10,9 @@ import MenuModal from "./_components/menu-modal";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import { useMenuOptions } from "@/lib/hooks/useMenuOptions";
 import { MenuItemOptions } from "@/lib/types/menuItemOptions";
+import { formatPrice } from "@/lib/util/formatters";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 
 const AddOnsPage = () => {
   const { showToast: globalShowToast } = useToast();
@@ -64,16 +67,13 @@ const AddOnsPage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-w-full h-full overflow-y-auto thin-scroll">
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold mt-14 mb-2">Add-ons</h1>
-        <p className="text-gray-600 text-sm mt-1">
-          Manage modifiers and customization options for your menu items
-        </p>
-      </header>
+      <PageHeader
+        title="Add-ons"
+        subtitle="Manage modifiers and customization options for your menu items"
+      />
 
       {/* Enhanced Action Bar */}
       <EnhancedActionBar
@@ -273,7 +273,7 @@ const AddOnsPage = () => {
                   {item.OptionPrice && item.OptionPrice.length > 0 && (
                     <div className="text-xs text-gray-500">
                       <span className="font-semibold text-gray-700">
-                        ${Math.min(...item.OptionPrice).toFixed(2)} - ${Math.max(...item.OptionPrice).toFixed(2)}
+                        ${formatPrice(Math.min(...item.OptionPrice))} - ${formatPrice(Math.max(...item.OptionPrice))}
                       </span>
                     </div>
                   )}
@@ -294,7 +294,7 @@ const AddOnsPage = () => {
         onClose={handleCloseModal}
         isFormValid={isFormValid}
       />
-    </div>
+    </PageContainer>
   );
 };
 

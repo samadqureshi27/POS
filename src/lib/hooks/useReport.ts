@@ -3,6 +3,7 @@ import { ReportsAPI } from "../util/report-api";
 import { useToast } from './toast';
 import { useImportExport } from './importExportHook';
 import { ReportItem } from "@/lib/types/reports";
+import { logError } from "@/lib/util/logger";
 
 export const useReportsManagement = (branchId: string) => {
     const [reportItems, setReportItems] = useState<ReportItem[]>([]);
@@ -54,7 +55,11 @@ export const useReportsManagement = (branchId: string) => {
                 throw new Error(response.message || "Failed to fetch inventory items");
             }
         } catch (error) {
-            console.error("Error fetching inventory items:", error);
+            logError("Error fetching inventory items", error, {
+                component: "useReportsManagement",
+                action: "loadReportItems",
+                branchId,
+            });
             showToast("Failed to load inventory items", "error");
         } finally {
             setLoading(false);

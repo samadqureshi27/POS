@@ -1,6 +1,7 @@
 // components/NotificationMetadata.tsx
 import React from 'react';
 import { Notification } from '@/lib/types/notifications';
+import { formatCurrency } from '@/lib/util/formatters';
 
 interface NotificationMetadataProps {
   notification: Notification;
@@ -12,7 +13,7 @@ export const NotificationMetadata: React.FC<NotificationMetadataProps> = ({ noti
   return (
     <div className="mt-2 text-xs text-gray-600 space-y-1">
       {notification.type === 'payment' && notification.metadata.amount && (
-        <p>Amount: ${notification.metadata.amount.toLocaleString()}</p>
+        <p>Amount: ${formatCurrency(notification.metadata.amount)}</p>
       )}
       {notification.type === 'appointment' && notification.metadata.time && (
         <p>Time: {notification.metadata.time} • {notification.metadata.location}</p>

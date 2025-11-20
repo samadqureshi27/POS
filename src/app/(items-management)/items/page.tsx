@@ -2,13 +2,19 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Package, Plus, Upload, Download, FileDown, Edit2, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import InventoryItemModal from "./_components/inventory-item-modal";
 import ImportResultsDialog from "./_components/import-results-dialog";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
+import { GlobalSkeleton } from "@/components/ui/global-skeleton";
+import { logError } from "@/lib/util/logger";
 
 export default function ItemsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -25,10 +31,16 @@ export default function ItemsPage() {
   // Modals
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
-  
+
   // Import Results Dialog
   const [importResults, setImportResults] = useState<any>(null);
   const [isImportResultsOpen, setIsImportResultsOpen] = useState(false);
+
+  // Confirmation Dialogs
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
+  const [duplicatePolicyDialogOpen, setDuplicatePolicyDialogOpen] = useState(false);
+  const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
 
   // Stats
   const [stats, setStats] = useState({
@@ -85,7 +97,10 @@ export default function ItemsPage() {
         calculateStats(filteredItems);
       }
     } else {
-      console.error("Failed to load items:", response.message);
+      logError("Failed to load items", new Error(response.message), {
+        component: "ItemsManagement",
+        action: "loadItems",
+      });
     }
     setLoading(false);
   };
@@ -118,20 +133,26 @@ export default function ItemsPage() {
     setIsItemModalOpen(true);
   };
 
-  const handleDeleteItem = async (item: InventoryItem) => {
-    if (!window.confirm(`Delete "${item.name}"?`)) return;
+  const handleDeleteItem = (item: InventoryItem) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
 
-    const itemId = item._id || item.id;
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    const itemId = itemToDelete._id || itemToDelete.id;
     if (!itemId) {
-      alert("Item ID is missing");
+      toast.error("Item ID is missing");
       return;
     }
 
     const response = await InventoryService.deleteItem(itemId);
     if (response.success) {
+      toast.success(`Deleted "${itemToDelete.name}" successfully`);
       loadItems();
     } else {
-      alert(`Failed to delete item: ${response.message}`);
+      toast.error(`Failed to delete item: ${response.message}`);
     }
   };
 
@@ -140,7 +161,7 @@ export default function ItemsPage() {
     if (editingItem) {
       const itemId = editingItem._id || editingItem.id;
       if (!itemId) {
-        alert("Item ID is missing");
+        toast.error("Item ID is missing");
         return;
       }
       response = await InventoryService.updateItem(itemId, data);
@@ -149,10 +170,11 @@ export default function ItemsPage() {
     }
 
     if (response.success) {
+      toast.success(editingItem ? "Item updated successfully" : "Item created successfully");
       setIsItemModalOpen(false);
       loadItems();
     } else {
-      alert(`Failed to save item: ${response.message}`);
+      toast.error(`Failed to save item: ${response.message}`);
     }
   };
 
@@ -170,12 +192,16 @@ export default function ItemsPage() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+        toast.success('Template downloaded successfully');
       } else {
-        alert(`Failed to download template: ${response.message}`);
+        toast.error(`Failed to download template: ${response.message}`);
       }
     } catch (error) {
-      console.error('Error downloading template:', error);
-      alert('Failed to download template. Please try again.');
+      logError('Error downloading template', error, {
+        component: "ItemsManagement",
+        action: "handleDownloadTemplate",
+      });
+      toast.error('Failed to download template. Please try again.');
     }
   };
 
@@ -185,7 +211,7 @@ export default function ItemsPage() {
         q: searchQuery,
         // categoryId can be added here when category filtering is implemented
       });
-      
+
       if (response.success && response.data) {
         // Create download link
         const url = window.URL.createObjectURL(response.data);
@@ -196,12 +222,16 @@ export default function ItemsPage() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+        toast.success('Items exported successfully');
       } else {
-        alert(`Failed to export items: ${response.message}`);
+        toast.error(`Failed to export items: ${response.message}`);
       }
     } catch (error) {
-      console.error('Error exporting items:', error);
-      alert('Failed to export items. Please try again.');
+      logError('Error exporting items', error, {
+        component: "ItemsManagement",
+        action: "handleExport",
+      });
+      toast.error('Failed to export items. Please try again.');
     }
   };
 
@@ -209,7 +239,7 @@ export default function ItemsPage() {
     fileInputRef.current?.click();
   };
 
-  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -217,23 +247,25 @@ export default function ItemsPage() {
     const allowedTypes = ['.csv', '.xlsx'];
     const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!allowedTypes.includes(fileExtension)) {
-      alert('Please select a CSV or XLSX file.');
+      toast.error('Please select a CSV or XLSX file.');
       return;
     }
 
+    // Store file and show duplicate policy dialog
+    setPendingImportFile(file);
+    setDuplicatePolicyDialogOpen(true);
+  };
+
+  const processImport = async (duplicatePolicy: 'update' | 'skip') => {
+    if (!pendingImportFile) return;
+
     try {
-      const duplicatePolicy = window.confirm(
-        'How would you like to handle duplicate items?\n\nOK = Update existing items\nCancel = Skip duplicates'
-      ) ? 'update' : 'skip';
-
-      const response = await InventoryService.importItems(file, duplicatePolicy);
-
-      // Debug: Log the complete API response structure
+      const response = await InventoryService.importItems(pendingImportFile, duplicatePolicy);
 
       if (response.success && response.data) {
         // The API response is in response.data, so we need to map it correctly
         const apiData = response.data;
-        
+
         setImportResults({
           success: apiData.success !== undefined ? apiData.success : true,
           message: apiData.message || 'Import completed successfully',
@@ -247,72 +279,72 @@ export default function ItemsPage() {
         setIsImportResultsOpen(true);
         loadItems(); // Refresh the items list
       } else {
-        alert(`Import failed: ${response.message || 'Unknown error occurred'}`);
+        toast.error(`Import failed: ${response.message || 'Unknown error occurred'}`);
       }
     } catch (error) {
-      console.error('Error importing items:', error);
-      alert('Failed to import file. Please check the file format and try again.');
-    }
-
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      logError('Error importing items', error, {
+        component: "ItemsManagement",
+        action: "processImport",
+      });
+      toast.error('Failed to import file. Please check the file format and try again.');
+    } finally {
+      // Reset file input and pending file
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setPendingImportFile(null);
     }
   };
 
+  if (loading) {
+    return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={4} showActionBar={true} />;
+  }
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-50">
-      {/* Main Content */}
-      <div className="md:ml-2 p-4 md:p-8">
-        {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Inventory Hub
-              </h1>
-              <p className="text-gray-600 text-sm mt-1">Manage your items, units, and stock levels</p>
-            </div>
+    <PageContainer>
+      <PageHeader
+        title="Inventory Hub"
+        subtitle="Manage your items, units, and stock levels"
+        actions={
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.xlsx"
+              onChange={handleImport}
+              className="hidden"
+            />
+            <Button
+              onClick={handleDownloadTemplate}
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              <FileDown className="h-4 w-4 mr-2" />
+              Template
+            </Button>
+            <Button
+              onClick={handleImportClick}
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+            <Button
+              onClick={handleExport}
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              disabled={items.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </>
+        }
+      />
 
-            {/* CSV Import/Export Buttons */}
-            <div className="flex gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xlsx"
-                onChange={handleImport}
-                className="hidden"
-              />
-              <Button
-                onClick={handleDownloadTemplate}
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                <FileDown className="h-4 w-4 mr-2" />
-                Template
-              </Button>
-              <Button
-                onClick={handleImportClick}
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Import
-              </Button>
-              <Button
-                onClick={handleExport}
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                disabled={items.length === 0}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
-          </div>
-
-          {/* Stats Bar */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      {/* Stats Bar */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <AdvancedMetricCard
               title="Total Items"
               subtitle="All inventory"
@@ -347,11 +379,10 @@ export default function ItemsPage() {
               format="number"
               status={stats.outOfStock > 0 ? "critical" : "good"}
             />
-          </div>
-        </div>
+      </div>
 
-        {/* Action Bar */}
-        <EnhancedActionBar
+      {/* Action Bar */}
+      <EnhancedActionBar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder="Search items by name, SKU, or barcode..."
@@ -659,7 +690,6 @@ export default function ItemsPage() {
             );
           }}
         />
-      </div>
 
       <InventoryItemModal
         isOpen={isItemModalOpen}
@@ -673,6 +703,31 @@ export default function ItemsPage() {
          onClose={() => setIsImportResultsOpen(false)}
          results={importResults}
        />
-    </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Item"
+        description={`Are you sure you want to delete "${itemToDelete?.name}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
+
+      {/* Duplicate Policy Dialog */}
+      <ConfirmDialog
+        open={duplicatePolicyDialogOpen}
+        onOpenChange={setDuplicatePolicyDialogOpen}
+        title="Handle Duplicate Items"
+        description="How would you like to handle duplicate items in the import file?"
+        onConfirm={() => processImport('update')}
+        onCancel={() => processImport('skip')}
+        confirmText="Update Existing"
+        cancelText="Skip Duplicates"
+        variant="default"
+      />
+    </PageContainer>
   );
 }

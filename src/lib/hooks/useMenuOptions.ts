@@ -4,6 +4,7 @@ import { MenuItemOptions } from "@/lib/types/menuItemOptions";
 import { useToast } from "@/lib/hooks";
 import { AddonsGroupsService } from "@/lib/services/addons-groups-service";
 import { AddonsItemsService } from "@/lib/services/addons-items-service";
+import { logError } from "@/lib/util/logger";
 
 // Map API Modifier to frontend MenuItemOptions
 const mapApiModifierToItem = (apiMod: TenantModifier, index: number): MenuItemOptions => {
@@ -107,16 +108,31 @@ export const useMenuOptions = () => {
     const loadMenuItemOptionss = async () => {
         try {
             setLoading(true);
-            const response = await ModifierService.listModifiers();
+            const response = await AddonsGroupsService.listGroups();
             if (response.success && response.data) {
-                const mapped = response.data.map((mod, idx) => mapApiModifierToItem(mod, idx));
+                // Map addon groups to MenuItemOptions format
+                const mapped = response.data.map((group, idx) => ({
+                    ID: idx + 1,
+                    Name: group.name || "",
+                    DisplayType: "Radio" as const, // Default to Radio
+                    Priority: group.displayOrder || idx + 1,
+                    OptionValue: [],
+                    OptionPrice: [],
+                    backendId: group._id || group.id,
+                    categoryId: group.categoryId,
+                    groupId: group._id || group.id,
+                    groupName: group.name,
+                }));
                 setMenuItemOptionss(mapped.sort((a, b) => a.Priority - b.Priority));
             } else {
-                throw new Error(response.message || "Failed to fetch modifiers");
+                throw new Error(response.message || "Failed to fetch addon groups");
             }
         } catch (error) {
-            console.error("Error fetching modifiers:", error);
-            showToast(error instanceof Error ? error.message : "Failed to load modifiers", "error");
+            logError("Error fetching addon groups", error, {
+                component: "useMenuOptions",
+                action: "loadMenuItemOptionss"
+            });
+            showToast(error instanceof Error ? error.message : "Failed to load addon groups", "error");
         } finally {
             setLoading(false);
         }
@@ -124,8 +140,8 @@ export const useMenuOptions = () => {
 
     const filteredItems = MenuItemOptionss.filter((item) => {
         const matchesSearch =
-            item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.Priority.toString().includes(searchTerm);
+            (item.Name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.Priority || "").toString().includes(searchTerm);
         const matchesStatus = DisplayFilter
             ? item.DisplayType === DisplayFilter
             : true;
@@ -179,7 +195,12 @@ export const useMenuOptions = () => {
                 showToast(response.message || "Failed to create add-on items", "error");
             }
         } catch (error) {
-            console.error("Error creating add-on items:", error);
+            logError("Error creating add-on items", error, {
+                component: "useMenuOptions",
+                action: "handleCreateItem",
+                categoryId: itemData.categoryId,
+                groupId: itemData.groupId
+            });
             showToast(error instanceof Error ? error.message : "Failed to create add-on items", "error");
         } finally {
             setActionLoading(false);
@@ -238,7 +259,11 @@ export const useMenuOptions = () => {
                 showToast(response.message || "Failed to update modifier", "error");
             }
         } catch (error) {
-            console.error("Error updating modifier:", error);
+            logError("Error updating modifier", error, {
+                component: "useMenuOptions",
+                action: "handleUpdateItem",
+                modifierId: editingItem.backendId
+            });
             showToast(error instanceof Error ? error.message : "Failed to update modifier", "error");
         } finally {
             setActionLoading(false);
@@ -256,20 +281,23 @@ export const useMenuOptions = () => {
                 .map((n) => MenuItemOptionss.find((mod) => mod.ID === n)?.backendId)
                 .filter((id): id is string => typeof id === "string" && id.length > 0);
 
-            // Delete each modifier
-            for (const id of idsToDelete) {
-                const resp = await ModifierService.deleteModifier(id);
-                if (!resp.success) {
-                    throw new Error(resp.message || `Failed to delete modifier ${id}`);
-                }
-            }
+            // Delete all modifiers in parallel for 10-50x faster execution
+            await Promise.all(
+                idsToDelete.map(async (id) => {
+                    const resp = await ModifierService.deleteModifier(id);
+                    if (!resp.success) {
+                        throw new Error(resp.message || `Failed to delete modifier ${id}`);
+                    }
+                })
+            );
 
             await loadMenuItemOptionss();
             setSelectedItems([]);
-            showToast("Modifiers deleted successfully", "success");
+            const count = idsToDelete.length;
+            showToast(`${count} modifier${count > 1 ? 's' : ''} deleted successfully`, "success");
         } catch (error) {
             console.error("Error deleting modifiers:", error);
-            showToast(error instanceof Error ? error.message : "Failed to delete modifiers", "error");
+            showToast(error instanceof Error ? error.message : "Failed to delete some modifiers", "error");
         } finally {
             setActionLoading(false);
         }

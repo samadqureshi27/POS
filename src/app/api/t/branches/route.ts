@@ -4,11 +4,16 @@ import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helper
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const page = searchParams.get("page") || "1";
-    const limit = searchParams.get("limit") || "50";
 
-    const url = `${getRemoteBase()}/t/branches?page=${page}&limit=${limit}`;
+    // Build query params
+    const queryParams = new URLSearchParams();
+    if (searchParams.get("page")) queryParams.append("page", searchParams.get("page")!);
+    if (searchParams.get("limit")) queryParams.append("limit", searchParams.get("limit")!);
+    if (searchParams.get("q")) queryParams.append("q", searchParams.get("q")!);
+    if (searchParams.get("status")) queryParams.append("status", searchParams.get("status")!);
 
+    const queryString = queryParams.toString();
+    const url = `${getRemoteBase()}/t/branches${queryString ? `?${queryString}` : ''}`;
 
     const res = await fetch(url, {
       method: "GET",

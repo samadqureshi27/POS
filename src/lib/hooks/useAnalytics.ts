@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { AnalyticsData, CustomerItem, OrderItem } from '@/lib/types/analytics';
 import { AnalyticsAPI } from '@/lib/util/AnalyticsApi';
+import { logError } from '@/lib/util/logger';
 
 export const useDashboard = () => {
   // Analytics state
@@ -60,7 +61,11 @@ export const useDashboard = () => {
         setOrders(ordersResponse.data);
       }
     } catch (error) {
-      console.error("Failed to load dashboard data", error);
+      logError("Failed to load dashboard data", error, {
+        component: "useDashboard",
+        action: "loadDashboardData",
+        period: period || selectedPeriod,
+      });
       setError("Failed to load dashboard data");
     } finally {
       if (showLoading) {
@@ -81,7 +86,12 @@ export const useDashboard = () => {
         throw new Error(response.message || "Failed to fetch custom range data");
       }
     } catch (error) {
-      console.error("Error fetching custom range data:", error);
+      logError("Error fetching custom range data", error, {
+        component: "useDashboard",
+        action: "loadCustomRangeData",
+        startDate,
+        endDate,
+      });
       setError("Failed to load custom date range data");
     } finally {
       setLoading(false);
@@ -122,7 +132,10 @@ export const useDashboard = () => {
     if (!isInitialized.current) {
       isInitialized.current = true;
       loadDashboardData().catch(error => {
-        console.error('Initial load failed:', error);
+        logError('Initial load failed', error, {
+          component: "useDashboard",
+          action: "useEffect:initialLoad",
+        });
         setError('Failed to initialize dashboard');
       });
     }
