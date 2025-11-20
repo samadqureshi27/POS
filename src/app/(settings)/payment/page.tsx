@@ -113,7 +113,7 @@ const PaymentManagementPage = () => {
           subtitle={`${statistics.mostUsedTaxType?.[1] || 0} methods`}
           value={statistics.mostUsedTaxType?.[0] || "N/A"}
           icon="inventory"
-          format="text"
+          format="number"
           status="neutral"
         />
       </div>
@@ -135,12 +135,13 @@ const PaymentManagementPage = () => {
           },
           {
             options: [
-              { label: "All Status", value: "" },
-              { label: "Active", value: "Active", color: "green" },
-              { label: "Inactive", value: "Inactive", color: "red" },
+              { label: "All Types", value: "" },
+              { label: "Cash", value: "Cash", color: "green" },
+              { label: "Card", value: "Card", color: "blue" },
+              { label: "Online", value: "Online", color: "purple" },
             ],
             activeValue: statusFilter,
-            onChange: (value) => setStatusFilter(value as "" | "Active" | "Inactive"),
+            onChange: (value) => setStatusFilter(value as "" | "Cash" | "Card" | "Online"),
           },
         ]}
         viewMode={viewMode}
@@ -149,9 +150,19 @@ const PaymentManagementPage = () => {
         onPrimaryAction={handleAddWithToast}
         primaryActionLabel="Add Payment Method"
         primaryActionIcon={<Plus className="h-5 w-5 mr-2" />}
-        onSecondaryAction={selectedItems.length > 0 ? handleDeleteWithToast : undefined}
-        secondaryActionLabel="Delete Selected"
-        secondaryActionDisabled={selectedItems.length === 0}
+        secondaryActions={
+          selectedItems.length > 0 ? (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDeleteWithToast}
+              disabled={selectedItems.length === 0}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected
+            </Button>
+          ) : null
+        }
       />
 
       {/* Payment Methods Grid */}
@@ -166,7 +177,7 @@ const PaymentManagementPage = () => {
         getItemId={(item) => String(item.ID)}
         onEdit={openEditModal}
         onDelete={(item) => {
-          handleSelectItem(item.ID);
+          handleSelectItem(item.ID, true);
           setDeleteDialogOpen(true);
         }}
         customActions={(item) => (
@@ -183,7 +194,7 @@ const PaymentManagementPage = () => {
               variant="ghost"
               size="sm"
               onClick={() => {
-                handleSelectItem(item.ID);
+                handleSelectItem(item.ID, true);
                 setDeleteDialogOpen(true);
               }}
               className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
