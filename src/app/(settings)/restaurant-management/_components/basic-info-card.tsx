@@ -62,7 +62,7 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
                         id="restaurant-name"
                         type="text"
                         name="name"
-                        value={getFieldValue('name')}
+                        value={String(getFieldValue('name') || '')}
                         onChange={onInputChange}
                         placeholder="Enter restaurant name"
                         required

@@ -30,7 +30,7 @@ export const RevenueTrendsChart: React.FC<RevenueTrendsChartProps> = ({ selected
                 borderRadius: '4px'
               }}
               formatter={(value, name) => [
-                `PKR ${formatCurrency(value)}`,
+                `PKR ${formatCurrency(Number(value))}`,
                 name === 'revenue' ? 'Revenue' : 'Orders'
               ]}
             />
