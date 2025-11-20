@@ -21,7 +21,7 @@ export interface RecipeOption {
   IngredientValue: string[];
   IngredientPrice: number[];
   Priority: number;
-  type?: string; // Recipe type (sub/final)
+  type?: "sub" | "final"; // Recipe type (sub/final)
   totalCost?: number; // Total cost for display
   ingredients?: any[]; // Lowercase for display compatibility
   Ingredients?: RecipeIngredient[];

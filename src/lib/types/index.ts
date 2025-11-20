@@ -58,8 +58,9 @@ export interface GeneralSettings {
   sessionTimeout: number;
   enableNotifications: boolean;
   enableSounds: boolean;
-  
-  
+  paperSize?: string;
+  receiptFormat?: string;
+
   // New Order Timer Settings
   orderTimerEnabled: boolean;
   greenThresholdMinutes: number;

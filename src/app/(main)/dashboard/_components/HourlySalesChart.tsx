@@ -69,7 +69,7 @@ export const HourlySalesChart: React.FC = () => {
               }}
               formatter={(value, name) => [
                 name === "orders" ? `${value} orders` :
-                name === "revenue" ? `PKR ${formatCurrency(value)}` :
+                name === "revenue" ? `PKR ${formatCurrency(Number(value))}` :
                 `${value} min`,
                 name === "orders" ? "Orders" :
                 name === "revenue" ? "Revenue" : "Avg Time"

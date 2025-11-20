@@ -5,9 +5,10 @@ import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helper
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const url = `${getRemoteBase()}/t/branch-inventory/items/${params.id}`;
+  const { id } = await params;
+  const url = `${getRemoteBase()}/t/branch-inventory/items/${id}`;
 
   const res = await fetch(url, {
     method: "GET",
@@ -26,10 +27,11 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const payload = await req.json().catch(() => ({}));
-  const url = `${getRemoteBase()}/t/branch-inventory/items/${params.id}`;
+  const url = `${getRemoteBase()}/t/branch-inventory/items/${id}`;
 
   const res = await fetch(url, {
     method: "PUT",
@@ -49,9 +51,10 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const url = `${getRemoteBase()}/t/branch-inventory/items/${params.id}`;
+  const { id } = await params;
+  const url = `${getRemoteBase()}/t/branch-inventory/items/${id}`;
 
   const res = await fetch(url, {
     method: "DELETE",

@@ -61,7 +61,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             <Label htmlFor="paymentType" className="text-sm font-medium mb-1">
               Payment Type
             </Label>
-            <Select value={formData.PaymentType} onValueChange={(value) => onFormDataChange({ PaymentType: value })}>
+            <Select value={formData.PaymentType} onValueChange={(value) => onFormDataChange({ PaymentType: value as "Cash" | "Card" | "Online" })}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Payment Type" />
               </SelectTrigger>

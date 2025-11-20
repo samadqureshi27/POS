@@ -3,10 +3,10 @@ import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helper
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const url = `${getRemoteBase()}/t/addons/${id}`;
 
     const res = await fetch(url, {
@@ -36,10 +36,10 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const payload = await req.json().catch(() => ({}));
     const url = `${getRemoteBase()}/t/addons/${id}`;
 
@@ -71,10 +71,10 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const url = `${getRemoteBase()}/t/addons/${id}`;
 
     const res = await fetch(url, {

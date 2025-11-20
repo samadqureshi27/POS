@@ -10,6 +10,7 @@ export interface Recipe {
   description?: string;
   category?: string;
   isActive?: boolean;
+  type?: "sub" | "final";
   ingredients?: any[];
   instructions?: string;
   prepTime?: number;
