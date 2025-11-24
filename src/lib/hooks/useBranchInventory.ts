@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import { BranchInventoryService, type BranchInventoryItem, type BranchInventoryStats } from "@/lib/services/branch-inventory-service";
 import { BranchService } from "@/lib/services/branch-service";
 import { resolveBranchObjectId } from "@/lib/services/branch-resolver";
-import { InventoryService } from "@/lib/services/inventory-service";
 import { toast } from "sonner";
 import { logError } from "@/lib/util/logger";
 
@@ -13,7 +12,6 @@ export function useBranchInventory(branchId: string | number) {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [branchObjectId, setBranchObjectId] = useState<string | null>(null);
-  const [itemsLookup, setItemsLookup] = useState<Map<string, string>>(new Map());
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,28 +30,6 @@ export function useBranchInventory(branchId: string | number) {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<BranchInventoryItem | null>(null);
-
-  // Fetch inventory items for name lookup
-  const fetchInventoryItems = async (): Promise<Map<string, string>> => {
-    try {
-      const response = await InventoryService.listItems({ limit: 1000 });
-      if (response.success && response.data) {
-        const lookup = new Map<string, string>();
-        response.data.forEach(item => {
-          const id = item._id || item.id;
-          if (id && item.name) {
-            lookup.set(id, item.name);
-          }
-        });
-        setItemsLookup(lookup);
-        console.log("✅ Loaded", lookup.size, "inventory items for name lookup");
-        return lookup;
-      }
-    } catch (error) {
-      console.error("Error fetching inventory items:", error);
-    }
-    return new Map();
-  };
 
   // Fetch branch ObjectId using the production-ready resolver
   const fetchBranchObjectId = async () => {
@@ -91,7 +67,7 @@ export function useBranchInventory(branchId: string | number) {
   };
 
   // Load items from API
-  const loadItems = async (lookup?: Map<string, string>) => {
+  const loadItems = async () => {
     try {
       setLoading(true);
 
@@ -110,17 +86,18 @@ export function useBranchInventory(branchId: string | number) {
       });
 
       if (response.success && response.data) {
-        // Use provided lookup or state lookup
-        const nameLookup = lookup || itemsLookup;
-
-        // Populate item names from lookup
+        // Populate item names from nested objects (preferred) or fallback to snapshots
         const itemsWithNames = response.data.map(item => ({
           ...item,
-          itemName: nameLookup.get(item.itemId) || item.itemName || item.itemId
+          itemName: item.item?.name || item.itemNameSnapshot || item.itemName || item.itemId
         }));
 
         console.log("📦 Loaded", itemsWithNames.length, "items with names:",
-          itemsWithNames.slice(0, 2).map(i => ({ id: i.itemId, name: i.itemName })));
+          itemsWithNames.slice(0, 2).map(i => ({
+            id: i.itemId,
+            name: i.itemName,
+            fromNestedObject: !!i.item?.name
+          })));
 
         setItems(itemsWithNames);
 
@@ -280,12 +257,9 @@ export function useBranchInventory(branchId: string | number) {
     setEditingItem(null);
   };
 
-  // Initialize: Fetch inventory items for lookup, fetch branch ObjectId, then load items
+  // Initialize: Fetch branch ObjectId, then load items
   useEffect(() => {
     const initialize = async () => {
-      // Fetch inventory items for name lookup first and get the lookup map
-      const lookup = await fetchInventoryItems();
-
       // Fetch branch ObjectId
       const objectId = await fetchBranchObjectId();
 
@@ -302,8 +276,8 @@ export function useBranchInventory(branchId: string | number) {
         }
       }
 
-      // Then load items with the lookup map
-      await loadItems(lookup);
+      // Then load items (names now come from nested objects)
+      await loadItems();
     };
     initialize();
   }, [branchId]);

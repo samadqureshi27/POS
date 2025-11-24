@@ -3,7 +3,7 @@ import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helper
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const url = `${getRemoteBase()}/t/branches/${id}`;
 
 
