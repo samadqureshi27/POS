@@ -89,7 +89,67 @@ export const BranchMenuService = {
         return { success: false, message: data?.message || `Get effective menu failed (${res.status})` };
       }
 
-      const items: EffectiveMenuItem[] = data?.items ?? data?.result ?? data?.data ?? [];
+      // Extract items from various possible response structures
+      let rawItems: any[] = data?.items ?? data?.result ?? data?.data ?? data ?? [];
+
+      // Ensure items is always an array
+      if (!Array.isArray(rawItems)) {
+        console.warn("⚠️ API response is not an array, wrapping in array:", rawItems);
+        rawItems = [];
+      }
+
+      // Transform API response to EffectiveMenuItem format
+      const items: EffectiveMenuItem[] = rawItems.map((item: any) => {
+        // Extract menuItem details
+        const menuItem = item.menuItem || {};
+        const pricing = menuItem.pricing || {};
+        const category = menuItem.category || {};
+        const effective = item.effective || {};
+
+        return {
+          _id: menuItem.id || menuItem._id || item.menuItemId,
+          id: menuItem.id || menuItem._id || item.menuItemId,
+          name: menuItem.name || "Unnamed Item",
+          description: menuItem.description || "",
+          category: category.name || "",
+          categoryId: category._id || category.id || "",
+          basePrice: pricing.basePrice || 0,
+          currency: pricing.currency || "USD",
+          status: menuItem.isActive ? "active" : "inactive",
+          imageUrl: menuItem.imageUrl || menuItem.image?.url || "",
+          tags: menuItem.tags || [],
+          recipe: menuItem.recipe || "",
+          // Branch config (null/undefined if not assigned to this branch)
+          // Keep it explicitly undefined if branchConfig is null or doesn't exist
+          branchConfig: (item.branchConfig && typeof item.branchConfig === 'object' && Object.keys(item.branchConfig).length > 0) ? {
+            _id: item.branchConfig._id || item.branchConfig.id,
+            id: item.branchConfig.id || item.branchConfig._id,
+            branchId: item.branchId,
+            menuItemId: item.menuItemId,
+            isAvailable: item.branchConfig.isAvailable ?? effective.isAvailable ?? true,
+            isVisibleInPOS: item.branchConfig.isVisibleInPOS ?? effective.isVisibleInPOS ?? true,
+            isVisibleInOnline: item.branchConfig.isVisibleInOnline ?? effective.isVisibleInOnline ?? true,
+            sellingPrice: item.branchConfig.sellingPrice ?? effective.price ?? pricing.basePrice,
+            priceIncludesTax: item.branchConfig.priceIncludesTax ?? effective.priceIncludesTax ?? pricing.priceIncludesTax ?? false,
+            displayOrder: item.branchConfig.displayOrder ?? effective.displayOrder ?? 0,
+            isFeatured: item.branchConfig.isFeatured ?? false,
+            isRecommended: item.branchConfig.isRecommended ?? false,
+            labels: item.branchConfig.labels || [],
+            metadata: item.branchConfig.metadata || {},
+            createdAt: item.branchConfig.createdAt,
+            updatedAt: item.branchConfig.updatedAt,
+          } : undefined,
+          effectivePrice: effective.price ?? pricing.basePrice ?? 0,
+          isAvailableInBranch: effective.isAvailable ?? true,
+        };
+      });
+
+      console.log("✅ Transformed", items.length, "menu items");
+      console.log("First 2 items:", items.slice(0, 2).map(i => ({
+        name: i.name,
+        hasBranchConfig: !!i.branchConfig,
+        branchConfig: i.branchConfig,
+      })));
 
       return { success: true, data: items };
     } catch (error: any) {
@@ -123,7 +183,14 @@ export const BranchMenuService = {
         return { success: false, message: data?.message || `List configs failed (${res.status})` };
       }
 
-      const items: BranchMenuConfig[] = data?.items ?? data?.result ?? data?.data ?? [];
+      // Extract items from various possible response structures
+      let items: BranchMenuConfig[] = data?.items ?? data?.result ?? data?.data ?? data ?? [];
+
+      // Ensure items is always an array
+      if (!Array.isArray(items)) {
+        console.warn("⚠️ API response is not an array, wrapping in array:", items);
+        items = [];
+      }
 
       return { success: true, data: items };
     } catch (error: any) {

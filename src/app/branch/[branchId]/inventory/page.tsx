@@ -156,7 +156,7 @@ const BranchInventoryPage = () => {
             options: [
               { label: "All", value: "all" },
               { label: "Low", value: "Low", color: "red" },
-              { label: "Medium", value: "Medium", color: "yellow" },
+              { label: "Medium", value: "Medium", color: "blue" },
               { label: "High", value: "High", color: "green" },
             ],
             activeValue: stockStatusFilter,
@@ -246,7 +246,6 @@ const BranchInventoryPage = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-900">{item.itemName || `Item ${item.itemId}`}</div>
-                  <div className="text-xs text-gray-500">ID: {item.itemId}</div>
                 </div>
               </div>
             ),
@@ -350,16 +349,9 @@ const BranchInventoryPage = () => {
               {/* Card Content */}
               <div className="p-4">
                 {/* Item Name */}
-                <h3 className="text-base font-bold text-gray-900 mb-2 truncate" title={item.itemName || `Item ${item.itemId}`}>
+                <h3 className="text-base font-bold text-gray-900 mb-3 truncate" title={item.itemName || `Item ${item.itemId}`}>
                   {item.itemName || `Item ${item.itemId}`}
                 </h3>
-
-                {/* Item ID */}
-                <div className="mb-3 min-h-[1.5rem]">
-                  <p className="text-xs text-gray-600">
-                    <span className="font-medium">Item ID:</span> {item.itemId}
-                  </p>
-                </div>
 
                 {/* Stats Row */}
                 <div className="flex items-center justify-between pt-3 border-t border-gray-200 mb-3">
