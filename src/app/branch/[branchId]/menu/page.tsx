@@ -168,7 +168,17 @@ const BranchMenuPage = () => {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         showViewToggle={true}
-        onPrimaryAction={() => setAssignmentFilter("unassigned")}
+        onPrimaryAction={() => {
+          console.log("🟢 Browse Items to Add clicked");
+          // Open modal with a dummy item to trigger the menu selection dropdown
+          openAddModal({
+            _id: "",
+            id: "",
+            name: "Select Menu Item",
+            basePrice: 0,
+            category: "",
+          } as any);
+        }}
         primaryActionLabel="Browse Items to Add"
         primaryActionIcon={<Plus className="h-5 w-5 mr-2" />}
         primaryActionDisabled={!branchObjectId || loading}
@@ -191,7 +201,11 @@ const BranchMenuPage = () => {
               {isAssigned ? (
                 <>
                   <Button
-                    onClick={() => openEditModal(item)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("🔵 Configure clicked for:", item);
+                      openEditModal(item);
+                    }}
                     disabled={actionLoading}
                     className="px-4 py-2 text-sm rounded-md bg-blue-600 hover:bg-blue-700 text-white"
                   >
@@ -199,7 +213,11 @@ const BranchMenuPage = () => {
                     Configure
                   </Button>
                   <Button
-                    onClick={() => handleRemove(item)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("🔴 Remove clicked for:", item);
+                      handleRemove(item);
+                    }}
                     disabled={actionLoading}
                     className="px-4 py-2 text-sm rounded-md bg-red-600 hover:bg-red-700 text-white"
                   >
@@ -209,7 +227,11 @@ const BranchMenuPage = () => {
                 </>
               ) : (
                 <Button
-                  onClick={() => openAddModal(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log("🟢 Add to Menu clicked for:", item);
+                    openAddModal(item);
+                  }}
                   disabled={actionLoading}
                   className="px-4 py-2 text-sm rounded-md bg-green-600 hover:bg-green-700 text-white"
                 >

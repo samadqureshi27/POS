@@ -6,7 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { EffectiveMenuItem, BranchMenuConfig } from "@/lib/services/branch-menu-service";
+import { MenuItemService, type TenantMenuItem } from "@/lib/services/menu-item-service";
+import { toast } from "sonner";
 
 interface BranchMenuModalProps {
   isOpen: boolean;
@@ -30,20 +39,35 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
   // Determine if we're editing an existing config or creating a new one
   const isEditing = Boolean(item?.branchConfig);
 
-  // Form state
+  // Check if we need to show the menu item dropdown (when adding new item without pre-selection)
+  const showMenuItemDropdown = !isEditing && (!item?._id || !item?.id);
+
+  // Available menu items from main menu
+  const [availableMenuItems, setAvailableMenuItems] = useState<TenantMenuItem[]>([]);
+  const [loadingMenuItems, setLoadingMenuItems] = useState(false);
+
+  // Form state matching API structure
   const [formData, setFormData] = useState<Partial<BranchMenuConfig>>({
     branchId: branchObjectId || "",
     menuItemId: "",
-    sellingPrice: 0,
     isAvailable: true,
     isVisibleInPOS: true,
     isVisibleInOnline: true,
+    sellingPrice: undefined,
     priceIncludesTax: false,
     displayOrder: 1,
     isFeatured: false,
     isRecommended: false,
     labels: [],
+    metadata: {},
   });
+
+  // Load available menu items when modal opens for adding new items
+  useEffect(() => {
+    if (isOpen && showMenuItemDropdown) {
+      loadAvailableMenuItems();
+    }
+  }, [isOpen, showMenuItemDropdown]);
 
   // Update form data when item or branchObjectId changes
   useEffect(() => {
@@ -53,15 +77,16 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
         setFormData({
           branchId: item.branchConfig.branchId,
           menuItemId: item.branchConfig.menuItemId,
-          sellingPrice: item.branchConfig.sellingPrice || item.basePrice || 0,
           isAvailable: item.branchConfig.isAvailable ?? true,
           isVisibleInPOS: item.branchConfig.isVisibleInPOS ?? true,
           isVisibleInOnline: item.branchConfig.isVisibleInOnline ?? true,
+          sellingPrice: item.branchConfig.sellingPrice,
           priceIncludesTax: item.branchConfig.priceIncludesTax ?? false,
           displayOrder: item.branchConfig.displayOrder ?? 1,
           isFeatured: item.branchConfig.isFeatured ?? false,
           isRecommended: item.branchConfig.isRecommended ?? false,
           labels: item.branchConfig.labels || [],
+          metadata: item.branchConfig.metadata || {},
         });
       } else {
         // Adding new item to branch
@@ -69,39 +94,77 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
         setFormData({
           branchId: branchObjectId || "",
           menuItemId: itemId,
-          sellingPrice: item.basePrice || 0,
           isAvailable: true,
           isVisibleInPOS: true,
           isVisibleInOnline: true,
+          sellingPrice: item.basePrice || undefined,
           priceIncludesTax: false,
           displayOrder: 1,
           isFeatured: false,
           isRecommended: false,
           labels: [],
+          metadata: {},
         });
       }
     }
   }, [item, branchObjectId]);
+
+  const loadAvailableMenuItems = async () => {
+    try {
+      setLoadingMenuItems(true);
+      const response = await MenuItemService.listItems({ limit: 1000 });
+      if (response.success && response.data) {
+        setAvailableMenuItems(response.data);
+      }
+    } catch (error) {
+      console.error("Error loading menu items:", error);
+      toast.error("Failed to load available menu items");
+    } finally {
+      setLoadingMenuItems(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validation
     if (!formData.branchId) {
+      toast.error("Branch ID is missing. Please try again.");
       return;
     }
 
     if (!formData.menuItemId) {
+      toast.error("Please select a menu item");
       return;
+    }
+
+    // Build payload matching API structure
+    const payload: Partial<BranchMenuConfig> = {
+      branchId: formData.branchId,
+      menuItemId: formData.menuItemId,
+      isAvailable: formData.isAvailable ?? true,
+      isVisibleInPOS: formData.isVisibleInPOS ?? true,
+      isVisibleInOnline: formData.isVisibleInOnline ?? true,
+      priceIncludesTax: formData.priceIncludesTax ?? false,
+      displayOrder: formData.displayOrder ?? 1,
+      isFeatured: formData.isFeatured ?? false,
+      isRecommended: formData.isRecommended ?? false,
+      labels: formData.labels || [],
+      metadata: formData.metadata || {},
+    };
+
+    // Only include sellingPrice if it's set
+    if (formData.sellingPrice !== undefined && formData.sellingPrice !== null) {
+      payload.sellingPrice = formData.sellingPrice;
     }
 
     if (isEditing && item?.branchConfig) {
       const configId = item.branchConfig._id || item.branchConfig.id;
       if (configId) {
-        await onUpdate(configId, formData);
+        await onUpdate(configId, payload);
       }
     } else {
-      await onSave(formData);
+      await onSave(payload);
     }
   };
 
@@ -119,7 +182,14 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
     }));
   };
 
-  if (!isOpen || !item) return null;
+  console.log("🔍 Modal render check:", { isOpen, hasItem: !!item, branchObjectId });
+
+  if (!isOpen) return null;
+
+  if (!item) {
+    console.error("❌ Modal opened without item");
+    return null;
+  }
 
   // Show loading state if branch ObjectId is not available yet
   if (!branchObjectId) {
@@ -143,7 +213,7 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
               {isEditing ? "Edit Menu Configuration" : "Add to Branch Menu"}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              {item.name}
+              {showMenuItemDropdown ? "Select a menu item from the dropdown below" : item.name}
             </p>
           </div>
           <button
@@ -158,24 +228,86 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
           <div className="space-y-6">
+            {/* Menu Item Selection - Show dropdown when adding via "Browse Items" */}
+            {showMenuItemDropdown && (
+              <div>
+                <Label htmlFor="menuItemId" className="text-sm font-medium text-gray-700">
+                  Menu Item <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={formData.menuItemId}
+                  onValueChange={(value) => {
+                    handleInputChange("menuItemId", value);
+                    // Find the selected item and set its base price
+                    const selectedItem = availableMenuItems.find(
+                      (mi) => (mi._id || mi.id) === value
+                    );
+                    if (selectedItem) {
+                      // Note: MenuItemService doesn't have pricing, so we'll leave it empty
+                      handleInputChange("sellingPrice", undefined);
+                    }
+                  }}
+                  disabled={loadingMenuItems || actionLoading}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select a menu item to add" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {loadingMenuItems ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                      </div>
+                    ) : availableMenuItems.length === 0 ? (
+                      <div className="text-sm text-gray-500 py-4 text-center">
+                        No menu items available
+                      </div>
+                    ) : (
+                      availableMenuItems.map((menuItem) => (
+                        <SelectItem
+                          key={menuItem._id || menuItem.id}
+                          value={menuItem._id || menuItem.id || ""}
+                        >
+                          {menuItem.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select the menu item to add to this branch
+                </p>
+              </div>
+            )}
+
+            {/* Show item name when editing or adding from grid */}
+            {!showMenuItemDropdown && item && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
+                <Label className="text-sm font-medium text-gray-700">Menu Item</Label>
+                <p className="text-lg font-semibold text-gray-900 mt-1">{item.name}</p>
+                {item.description && (
+                  <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                )}
+              </div>
+            )}
+
             {/* Selling Price */}
             <div>
               <Label htmlFor="sellingPrice" className="text-sm font-medium text-gray-700">
-                Selling Price <span className="text-red-500">*</span>
+                Selling Price (Optional)
               </Label>
               <Input
                 id="sellingPrice"
                 type="number"
                 min="0"
                 step="0.01"
-                value={formData.sellingPrice || 0}
-                onChange={(e) => handleInputChange("sellingPrice", parseFloat(e.target.value) || 0)}
+                value={formData.sellingPrice || ""}
+                onChange={(e) => handleInputChange("sellingPrice", e.target.value ? parseFloat(e.target.value) : undefined)}
                 className="mt-1"
                 disabled={actionLoading}
-                placeholder="0.00"
+                placeholder="Leave empty to use base price"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Base price: {item.basePrice?.toFixed(2) || '0.00'}
+                Override the base menu item price for this branch
               </p>
             </div>
 
@@ -187,15 +319,15 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
               <Input
                 id="displayOrder"
                 type="number"
-                min="1"
+                min="0"
                 step="1"
-                value={formData.displayOrder || 1}
-                onChange={(e) => handleInputChange("displayOrder", parseInt(e.target.value) || 1)}
+                value={formData.displayOrder || 0}
+                onChange={(e) => handleInputChange("displayOrder", parseInt(e.target.value) || 0)}
                 className="mt-1"
                 disabled={actionLoading}
               />
               <p className="text-xs text-gray-500 mt-1">
-                Lower numbers appear first
+                Lower numbers appear first in the menu
               </p>
             </div>
 

@@ -11,6 +11,8 @@ export interface BranchInventoryItem {
   branchId: string;
   itemId: string;
   itemName?: string;
+  itemNameSnapshot?: string;
+  skuSnapshot?: string;
   quantity: number;
   reorderPoint?: number;
   minStock?: number;
@@ -20,6 +22,21 @@ export interface BranchInventoryItem {
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  // Nested objects from API
+  branch?: {
+    _id: string;
+    name: string;
+    code: string;
+    status: string;
+    [key: string]: any;
+  };
+  item?: {
+    _id: string;
+    name: string;
+    sku: string;
+    type: string;
+    [key: string]: any;
+  };
   // Frontend calculated fields
   stockStatus?: "Low" | "Medium" | "High";
 }
