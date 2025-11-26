@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Package, Plus, Edit2, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,10 +15,14 @@ import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { BranchInventoryItem } from "@/lib/services/branch-inventory-service";
+import { BranchService } from "@/lib/services/branch-service";
 
 const BranchInventoryPage = () => {
   const params = useParams();
   const branchId = (params?.branchId as string) || "";
+
+  // Branch name state
+  const [branchName, setBranchName] = useState<string>("");
 
   const {
     // Data
@@ -59,6 +63,24 @@ const BranchInventoryPage = () => {
   // Delete confirmation
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<BranchInventoryItem | null>(null);
+
+  // Fetch branch name
+  useEffect(() => {
+    const fetchBranchName = async () => {
+      if (!branchId) return;
+
+      try {
+        const response = await BranchService.getBranch(branchId);
+        if (response.success && response.data?.name) {
+          setBranchName(response.data.name);
+        }
+      } catch (error) {
+        console.error("Error fetching branch name:", error);
+      }
+    };
+
+    fetchBranchName();
+  }, [branchId]);
 
   // Paginated items
   const paginatedItems = React.useMemo(() => {
@@ -104,7 +126,7 @@ const BranchInventoryPage = () => {
       <Toaster position="top-right" />
 
       <PageHeader
-        title={`Inventory Management - Branch #${branchId}`}
+        title={`Inventory Management - ${branchName || `Branch #${branchId}`}`}
         subtitle="Track and manage inventory items for this branch"
       />
 

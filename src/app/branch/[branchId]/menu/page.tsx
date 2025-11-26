@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { UtensilsCrossed, Settings, Plus, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -16,10 +16,14 @@ import { formatPrice } from "@/lib/util/formatters";
 import { useBranchMenu } from "@/lib/hooks/useBranchMenu";
 import BranchMenuModal from "./_components/branch-menu-modal";
 import type { EffectiveMenuItem } from "@/lib/services/branch-menu-service";
+import { BranchService } from "@/lib/services/branch-service";
 
 const BranchMenuPage = () => {
   const params = useParams();
   const branchId = (params?.branchId as string) || "";
+
+  // Branch name state
+  const [branchName, setBranchName] = useState<string>("");
 
   const {
     // Data
@@ -62,6 +66,24 @@ const BranchMenuPage = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<EffectiveMenuItem | null>(null);
 
+  // Fetch branch name
+  useEffect(() => {
+    const fetchBranchName = async () => {
+      if (!branchId) return;
+
+      try {
+        const response = await BranchService.getBranch(branchId);
+        if (response.success && response.data?.name) {
+          setBranchName(response.data.name);
+        }
+      } catch (error) {
+        console.error("Error fetching branch name:", error);
+      }
+    };
+
+    fetchBranchName();
+  }, [branchId]);
+
   // Paginated items
   const paginatedItems = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -95,10 +117,12 @@ const BranchMenuPage = () => {
     <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
-      <PageHeader
-        title={`Menu Management - Branch ${branchId}`}
-        subtitle="Configure menu items for this branch with custom pricing and availability"
-      />
+      <div className="pt-6">
+        <PageHeader
+          title={`Menu Management - ${branchName || `Branch #${branchId}`}`}
+          subtitle="Configure menu items for this branch with custom pricing and availability"
+        />
+      </div>
 
       {/* Stats Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -159,7 +183,7 @@ const BranchMenuPage = () => {
             options: [
               { label: "All Items", value: "all" },
               { label: "Assigned", value: "assigned", color: "green" },
-              { label: "Unassigned", value: "unassigned", color: "gray" },
+              { label: "Unassigned", value: "unassigned", color: "default" },
             ],
             activeValue: assignmentFilter,
             onChange: (value) => setAssignmentFilter(value as "all" | "assigned" | "unassigned"),
@@ -169,7 +193,6 @@ const BranchMenuPage = () => {
         onViewModeChange={setViewMode}
         showViewToggle={true}
         onPrimaryAction={() => {
-          console.log("🟢 Browse Items to Add clicked");
           // Open modal with a dummy item to trigger the menu selection dropdown
           openAddModal({
             _id: "",
@@ -203,7 +226,6 @@ const BranchMenuPage = () => {
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log("🔵 Configure clicked for:", item);
                       openEditModal(item);
                     }}
                     disabled={actionLoading}
@@ -215,7 +237,6 @@ const BranchMenuPage = () => {
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log("🔴 Remove clicked for:", item);
                       handleRemove(item);
                     }}
                     disabled={actionLoading}
@@ -229,7 +250,6 @@ const BranchMenuPage = () => {
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    console.log("🟢 Add to Menu clicked for:", item);
                     openAddModal(item);
                   }}
                   disabled={actionLoading}
@@ -496,7 +516,8 @@ const BranchMenuPage = () => {
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
-        isOpen={deleteDialogOpen}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         title="Remove from Branch Menu"
         description={`Are you sure you want to remove "${itemToRemove?.name}" from this branch's menu? This action cannot be undone.`}
         confirmText="Remove"
@@ -506,7 +527,7 @@ const BranchMenuPage = () => {
           setDeleteDialogOpen(false);
           setItemToRemove(null);
         }}
-        variant="danger"
+        variant="destructive"
       />
     </PageContainer>
   );

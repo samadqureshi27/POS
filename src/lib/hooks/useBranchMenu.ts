@@ -84,14 +84,7 @@ export function useBranchMenu(branchId: string | number) {
 
   // Filter items based on search and filters
   const filteredItems = useMemo(() => {
-    console.log("🔍 Filtering items:", {
-      totalItems: items.length,
-      searchQuery,
-      categoryFilter,
-      assignmentFilter,
-    });
-
-    const filtered = items.filter((item) => {
+    return items.filter((item) => {
       const q = searchQuery.trim().toLowerCase();
       const matchesQuery =
         q === "" ||
@@ -106,27 +99,8 @@ export function useBranchMenu(branchId: string | number) {
         (assignmentFilter === "assigned" && item.branchConfig) ||
         (assignmentFilter === "unassigned" && !item.branchConfig);
 
-      const passes = matchesQuery && matchesCategory && matchesAssignment;
-
-      if (!passes && assignmentFilter === "unassigned") {
-        console.log("❌ Item filtered out:", {
-          name: item.name,
-          hasBranchConfig: !!item.branchConfig,
-          matchesQuery,
-          matchesCategory,
-          matchesAssignment,
-        });
-      }
-
-      return passes;
+      return matchesQuery && matchesCategory && matchesAssignment;
     });
-
-    console.log("✅ Filtered results:", filtered.length, "items");
-    if (filtered.length > 0) {
-      console.log("Sample filtered item:", filtered[0]);
-    }
-
-    return filtered;
   }, [items, searchQuery, categoryFilter, assignmentFilter]);
 
   // Get unique categories
@@ -248,23 +222,16 @@ export function useBranchMenu(branchId: string | number) {
 
   // Modal handlers
   const openAddModal = (item: EffectiveMenuItem) => {
-    console.log("🔵 Opening add modal for item:", item);
-    console.log("🔵 Current state before:", { isModalOpen, editingItem });
     setEditingItem(item);
     setIsModalOpen(true);
-    console.log("🔵 State setters called");
   };
 
   const openEditModal = (item: EffectiveMenuItem) => {
-    console.log("🔵 Opening edit modal for item:", item);
-    console.log("🔵 Current state before:", { isModalOpen, editingItem });
     setEditingItem(item);
     setIsModalOpen(true);
-    console.log("🔵 State setters called");
   };
 
   const closeModal = () => {
-    console.log("🔵 Closing modal");
     setIsModalOpen(false);
     setEditingItem(null);
   };
