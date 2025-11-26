@@ -78,23 +78,19 @@ export const BranchMenuService = {
       const queryString = queryParams.toString();
       const url = buildUrl(`/t/branch-menu/effective${queryString ? `?${queryString}` : ''}`);
 
-      console.log("📤 Fetching effective menu:", { url, branchId: params.branchId });
-
       const res = await fetch(url, { headers: buildHeaders() });
       const data = await res.json().catch(() => ({}));
-
-      console.log("📥 Effective menu response:", { status: res.status, ok: res.ok, data });
 
       if (!res.ok) {
         return { success: false, message: data?.message || `Get effective menu failed (${res.status})` };
       }
 
       // Extract items from various possible response structures
-      let rawItems: any[] = data?.items ?? data?.result ?? data?.data ?? data ?? [];
+      // API returns: { status, message, result: { items: [...] } }
+      let rawItems: any[] = data?.result?.items ?? data?.items ?? data?.result ?? data?.data ?? data ?? [];
 
       // Ensure items is always an array
       if (!Array.isArray(rawItems)) {
-        console.warn("⚠️ API response is not an array, wrapping in array:", rawItems);
         rawItems = [];
       }
 
@@ -144,13 +140,6 @@ export const BranchMenuService = {
         };
       });
 
-      console.log("✅ Transformed", items.length, "menu items");
-      console.log("First 2 items:", items.slice(0, 2).map(i => ({
-        name: i.name,
-        hasBranchConfig: !!i.branchConfig,
-        branchConfig: i.branchConfig,
-      })));
-
       return { success: true, data: items };
     } catch (error: any) {
       logError("Error getting effective branch menu", error, {
@@ -184,7 +173,8 @@ export const BranchMenuService = {
       }
 
       // Extract items from various possible response structures
-      let items: BranchMenuConfig[] = data?.items ?? data?.result ?? data?.data ?? data ?? [];
+      // API returns: { status, message, result: { items: [...] } }
+      let items: BranchMenuConfig[] = data?.result?.items ?? data?.items ?? data?.result ?? data?.data ?? data ?? [];
 
       // Ensure items is always an array
       if (!Array.isArray(items)) {
@@ -287,6 +277,28 @@ export const BranchMenuService = {
       logError("Error updating branch menu config", error, {
         component: "BranchMenuService",
         action: "updateConfig",
+      });
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Get single branch menu config by ID
+  async getConfig(id: string): Promise<ApiResponse<BranchMenuConfig>> {
+    try {
+      const url = buildUrl(`/t/branch-menu/${id}`);
+      const res = await fetch(url, { headers: buildHeaders() });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        return { success: false, message: data?.message || `Get config failed (${res.status})` };
+      }
+
+      const config: BranchMenuConfig = data?.result ?? data?.data ?? data;
+      return { success: true, data: config };
+    } catch (error: any) {
+      logError("Error getting branch menu config", error, {
+        component: "BranchMenuService",
+        action: "getConfig",
       });
       return { success: false, message: error.message };
     }
