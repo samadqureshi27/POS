@@ -1,0 +1,294 @@
+{
+	"info": {
+		"_postman_id": "8432444a-3fb1-4e29-ac8d-e98c6f2cffdf",
+		"name": "Tritech POS - Staff",
+		"description": "Staff management requests for tenant-scoped APIs. Set the baseUrl, token, tenantSlug, and optional branchId variables before running.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48917537",
+		"_collection_link": "https://dkay042-3274752.postman.co/workspace/Faraz's-Workspace~976616b6-c854-4493-86ae-6b6ff1d9e4fc/collection/48917537-8432444a-3fb1-4e29-ac8d-e98c6f2cffdf?action=share&source=collection_link&creator=48917537"
+	},
+	"item": [
+		{
+			"name": "Create staff",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					},
+					{
+						"key": "x-branch-id",
+						"value": "{{branchId}}",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"fullName\": \"Alex Doe\",\n  \"email\": \"alex@example.com\",\n  \"password\": \"Str0ng!Pass\",\n  \"branchIds\": [],\n  \"roles\": [\"staff\"],\n  \"roleGrants\": [],\n  \"pin\": \"1234\",\n  \"position\": \"Cashier\",\n  \"metadata\": { \"hireDate\": \"2024-01-01\" }\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/t/staff",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"t",
+						"staff"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List staff",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					},
+					{
+						"key": "x-branch-id",
+						"value": "{{branchId}}",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/t/staff?page=1&limit=20&status=active",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"t",
+						"staff"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "20"
+						},
+						{
+							"key": "status",
+							"value": "active"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get staff by id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					},
+					{
+						"key": "x-branch-id",
+						"value": "{{branchId}}",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/t/staff/{{staffId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"t",
+						"staff",
+						"{{staffId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update staff",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					},
+					{
+						"key": "x-branch-id",
+						"value": "{{branchId}}",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"fullName\": \"Alex Updated\",\n  \"email\": \"alex.updated@example.com\",\n  \"password\": \"NewStr0ng!Pass\",\n  \"branchIds\": [\"{{branchId}}\"],\n  \"roles\": [\"manager\"],\n  \"roleGrants\": [ { \"roleKey\": \"manager\", \"scope\": \"branch\", \"branchId\": \"{{branchId}}\" } ],\n  \"position\": \"Supervisor\",\n  \"metadata\": { \"notes\": \"Promoted\" }\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/t/staff/{{staffId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"t",
+						"staff",
+						"{{staffId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set staff PIN",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					},
+					{
+						"key": "x-branch-id",
+						"value": "{{branchId}}",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"pin\": \"9876\",\n  \"branchId\": \"{{branchId}}\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/t/staff/{{staffId}}/set-pin",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"t",
+						"staff",
+						"{{staffId}}",
+						"set-pin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set staff status",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "x-tenant-id",
+						"value": "{{tenantSlug}}"
+					},
+					{
+						"key": "x-branch-id",
+						"value": "{{branchId}}",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"status\": \"active\",\n  \"branchId\": \"{{branchId}}\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/t/staff/{{staffId}}/status",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"t",
+						"staff",
+						"{{staffId}}",
+						"status"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": []
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": []
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "tenantSlug",
+			"value": "demo-tenant"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "branchId",
+			"value": ""
+		},
+		{
+			"key": "staffId",
+			"value": ""
+		}
+	]
+}

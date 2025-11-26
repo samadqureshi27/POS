@@ -182,12 +182,9 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
     }));
   };
 
-  console.log("🔍 Modal render check:", { isOpen, hasItem: !!item, branchObjectId });
-
   if (!isOpen) return null;
 
   if (!item) {
-    console.error("❌ Modal opened without item");
     return null;
   }
 
