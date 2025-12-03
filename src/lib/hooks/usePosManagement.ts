@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PosAPI } from "../util/pos-api";
+import { PosService } from "../services/pos-service";
 import { useSelection } from "./selection";
 import { useToast } from './toast';
 import { usePosModal } from "./posModal";
@@ -9,7 +9,7 @@ import { logError } from "@/lib/util/logger";
 export const usePosManagement = (branchId: string) => {
     const [posItems, setPosItems] = useState<PosItem[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
+    const [statusFilter, setStatusFilter] = useState<"" | "active" | "inactive">("");
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
 
@@ -35,6 +35,16 @@ export const usePosManagement = (branchId: string) => {
         updateFormData,
     } = usePosModal(branchId);
 
+    // Helper function to convert PosTerminal (backend) to PosItem (frontend)
+    const convertToFrontendFormat = (terminal: any): PosItem => ({
+        POS_ID: terminal._id || terminal.id,
+        POS_Name: terminal.name,
+        Branch_ID_fk: terminal.branchId || branchId,
+        Status: terminal.status as "active" | "inactive",
+        machineId: terminal.machineId,
+        metadata: terminal.metadata,
+    });
+
     // Load POS items
     const loadPosItems = async () => {
         if (!branchId) {
@@ -45,9 +55,10 @@ export const usePosManagement = (branchId: string) => {
 
         try {
             setLoading(true);
-            const response = await PosAPI.getPosItemsByBranch(branchId);
-            if (response.success) {
-                setPosItems(response.data);
+            const response = await PosService.getTerminalsByBranch(branchId);
+            if (response.success && response.data) {
+                const convertedItems = response.data.map(convertToFrontendFormat);
+                setPosItems(convertedItems);
             } else {
                 throw new Error(response.message || "Failed to fetch POS items");
             }
@@ -75,9 +86,12 @@ export const usePosManagement = (branchId: string) => {
     const handleCreateItem = async (itemData: Omit<PosItem, "POS_ID">) => {
         try {
             setActionLoading(true);
-            const response = await PosAPI.createPosItem({
-                ...itemData,
-                Branch_ID_fk: branchId,
+            const response = await PosService.createTerminal({
+                branchId: branchId,
+                machineId: itemData.machineId || `POS-${Date.now()}`,
+                name: itemData.POS_Name,
+                status: itemData.Status || "active",
+                metadata: itemData.metadata || {},
             });
             if (response.success) {
                 await loadPosItems();
@@ -102,11 +116,16 @@ export const usePosManagement = (branchId: string) => {
         if (!editingItem) return;
         try {
             setActionLoading(true);
-            const response = await PosAPI.updatePosItem(editingItem.POS_ID, itemData);
-            if (response.success) {
+            const response = await PosService.updateTerminal(editingItem.POS_ID, {
+                name: itemData.POS_Name,
+                status: itemData.Status,
+                machineId: itemData.machineId,
+                metadata: itemData.metadata,
+            });
+            if (response.success && response.data) {
                 setPosItems(prev =>
                     prev.map(item =>
-                        item.POS_ID === editingItem.POS_ID ? response.data : item
+                        item.POS_ID === editingItem.POS_ID ? convertToFrontendFormat(response.data!) : item
                     )
                 );
                 closeModal();
@@ -124,7 +143,7 @@ export const usePosManagement = (branchId: string) => {
         if (selectedItems.length === 0) return;
         try {
             setActionLoading(true);
-            const response = await PosAPI.bulkDeletePosItems(selectedItems as string[]);
+            const response = await PosService.bulkDeleteTerminals(selectedItems as string[]);
             if (response.success) {
                 await loadPosItems();
                 clearSelection();
@@ -143,6 +162,10 @@ export const usePosManagement = (branchId: string) => {
             showToast("Please enter a POS name", "error");
             return;
         }
+        if (!formData.machineId?.trim()) {
+            showToast("Please enter a Machine ID", "error");
+            return;
+        }
         if (editingItem) {
             handleUpdateItem(formData);
         } else {
@@ -153,7 +176,7 @@ export const usePosManagement = (branchId: string) => {
     // Calculate statistics
     const statistics = {
         totalPosCount: posItems.length,
-        activePosCount: posItems.filter(item => item.Status === "Active").length,
+        activePosCount: posItems.filter(item => item.Status === "active").length,
     };
 
     // Load data on mount

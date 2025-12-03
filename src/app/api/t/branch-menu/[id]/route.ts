@@ -34,11 +34,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 // PUT - Update branch menu config by ID
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = await params;
     const payload = await req.json().catch(() => ({}));
-    const url = `${getRemoteBase()}/t/branch-menu/${id}`;
+    const url = `${getRemoteBase()}/t/branch-menu/${params.id}`;
 
     const res = await fetch(url, {
       method: "PUT",
@@ -68,10 +67,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 // DELETE - Delete branch menu config by ID
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = await params;
-    const url = `${getRemoteBase()}/t/branch-menu/${id}`;
+    const url = `${getRemoteBase()}/t/branch-menu/${params.id}`;
 
     const res = await fetch(url, {
       method: "DELETE",

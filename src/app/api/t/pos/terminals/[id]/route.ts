@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+/**
+ * GET /api/t/pos/terminals/:id
+ * Get a single POS terminal by ID
+ */
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { id } = await params;
-    const url = `${getRemoteBase()}/t/branches/${id}`;
-
+    const { id } = params;
+    const url = `${getRemoteBase()}/t/pos/terminals/${id}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -17,7 +23,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),
       {
@@ -28,17 +33,25 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   } catch (err: any) {
     console.error('❌ Proxy Error:', err);
     return NextResponse.json(
-      { success: false, message: err?.message || "Proxy GET /t/branches/:id failed" },
+      { success: false, message: err?.message || "Proxy GET /t/pos/terminals/:id failed" },
       { status: 500 }
     );
   }
 }
 
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+/**
+ * PUT /api/t/pos/terminals/:id
+ * Update a POS terminal
+ * Body: { name?, status?, machineId?, metadata? }
+ */
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { id } = await params;
+    const { id } = params;
     const payload = await req.json().catch(() => ({}));
-    const url = `${getRemoteBase()}/t/branches/${id}`;
+    const url = `${getRemoteBase()}/t/pos/terminals/${id}`;
 
     const res = await fetch(url, {
       method: "PUT",
@@ -51,7 +64,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),
       {
@@ -62,17 +74,23 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   } catch (err: any) {
     console.error('❌ Proxy Error:', err);
     return NextResponse.json(
-      { success: false, message: err?.message || "Proxy PUT /t/branches/:id failed" },
+      { success: false, message: err?.message || "Proxy PUT /t/pos/terminals/:id failed" },
       { status: 500 }
     );
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+/**
+ * DELETE /api/t/pos/terminals/:id
+ * Delete a POS terminal
+ */
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { id } = await params;
-    const url = `${getRemoteBase()}/t/branches/${id}`;
-
+    const { id } = params;
+    const url = `${getRemoteBase()}/t/pos/terminals/${id}`;
 
     const res = await fetch(url, {
       method: "DELETE",
@@ -84,7 +102,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),
       {
@@ -95,7 +112,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   } catch (err: any) {
     console.error('❌ Proxy Error:', err);
     return NextResponse.json(
-      { success: false, message: err?.message || "Proxy DELETE /t/branches/:id failed" },
+      { success: false, message: err?.message || "Proxy DELETE /t/pos/terminals/:id failed" },
       { status: 500 }
     );
   }

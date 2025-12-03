@@ -1,11 +1,24 @@
 import { NextResponse } from "next/server";
 import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+/**
+ * GET /api/t/pos/terminals
+ * List POS terminals for a branch
+ * Query params: branchId (required)
+ */
+export async function GET(req: Request) {
   try {
-    const { id } = await params;
-    const url = `${getRemoteBase()}/t/branches/${id}`;
+    const { searchParams } = new URL(req.url);
 
+    // Build query params
+    const queryParams = new URLSearchParams();
+    if (searchParams.get("branchId")) queryParams.append("branchId", searchParams.get("branchId")!);
+    if (searchParams.get("page")) queryParams.append("page", searchParams.get("page")!);
+    if (searchParams.get("limit")) queryParams.append("limit", searchParams.get("limit")!);
+    if (searchParams.get("status")) queryParams.append("status", searchParams.get("status")!);
+
+    const queryString = queryParams.toString();
+    const url = `${getRemoteBase()}/t/pos/terminals${queryString ? `?${queryString}` : ''}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -17,7 +30,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),
       {
@@ -28,20 +40,24 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   } catch (err: any) {
     console.error('❌ Proxy Error:', err);
     return NextResponse.json(
-      { success: false, message: err?.message || "Proxy GET /t/branches/:id failed" },
+      { success: false, message: err?.message || "Proxy GET /t/pos/terminals failed" },
       { status: 500 }
     );
   }
 }
 
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+/**
+ * POST /api/t/pos/terminals
+ * Create a new POS terminal
+ * Body: { branchId, machineId, name, status?, metadata? }
+ */
+export async function POST(req: Request) {
   try {
-    const { id } = await params;
     const payload = await req.json().catch(() => ({}));
-    const url = `${getRemoteBase()}/t/branches/${id}`;
+    const url = `${getRemoteBase()}/t/pos/terminals`;
 
     const res = await fetch(url, {
-      method: "PUT",
+      method: "POST",
       headers: buildTenantHeaders(req, true),
       body: JSON.stringify(payload)
     });
@@ -51,7 +67,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       ? await res.json().catch(() => ({}))
       : await res.text();
 
-
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),
       {
@@ -62,40 +77,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   } catch (err: any) {
     console.error('❌ Proxy Error:', err);
     return NextResponse.json(
-      { success: false, message: err?.message || "Proxy PUT /t/branches/:id failed" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
-    const url = `${getRemoteBase()}/t/branches/${id}`;
-
-
-    const res = await fetch(url, {
-      method: "DELETE",
-      headers: buildTenantHeaders(req, true)
-    });
-
-    const contentType = res.headers.get("content-type") || "application/json";
-    const body = contentType.includes("application/json")
-      ? await res.json().catch(() => ({}))
-      : await res.text();
-
-
-    return new NextResponse(
-      typeof body === "string" ? body : JSON.stringify(body),
-      {
-        status: res.status,
-        headers: { "content-type": contentType },
-      }
-    );
-  } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
-    return NextResponse.json(
-      { success: false, message: err?.message || "Proxy DELETE /t/branches/:id failed" },
+      { success: false, message: err?.message || "Proxy POST /t/pos/terminals failed" },
       { status: 500 }
     );
   }

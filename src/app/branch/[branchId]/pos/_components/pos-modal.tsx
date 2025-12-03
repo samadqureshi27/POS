@@ -42,7 +42,7 @@ const PosModal: React.FC<PosModalProps> = ({
     }, [isOpen]);
 
     const isFormValid = () => {
-        return formData.POS_Name.trim();
+        return formData.POS_Name.trim() && formData.machineId?.trim();
     };
 
     return (
@@ -108,6 +108,52 @@ const PosModal: React.FC<PosModalProps> = ({
                                         Give this POS terminal a descriptive name to easily identify it
                                     </p>
                                 </div>
+
+                                {/* Machine ID */}
+                                <div>
+                                    <Label htmlFor="machineId" className="text-sm font-medium">
+                                        Machine ID <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="machineId"
+                                        type="text"
+                                        value={formData.machineId || ""}
+                                        onChange={(e) =>
+                                            onFormDataChange({ machineId: e.target.value })
+                                        }
+                                        placeholder="e.g., POS-01, TERMINAL-A1"
+                                        className="mt-1.5"
+                                        required
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1.5">
+                                        Unique identifier for this POS terminal device
+                                    </p>
+                                </div>
+
+                                {/* Metadata - IP Address */}
+                                <div>
+                                    <Label htmlFor="ipAddress" className="text-sm font-medium">
+                                        IP Address (Optional)
+                                    </Label>
+                                    <Input
+                                        id="ipAddress"
+                                        type="text"
+                                        value={formData.metadata?.ip || ""}
+                                        onChange={(e) =>
+                                            onFormDataChange({
+                                                metadata: {
+                                                    ...formData.metadata,
+                                                    ip: e.target.value
+                                                }
+                                            })
+                                        }
+                                        placeholder="e.g., 10.0.0.5"
+                                        className="mt-1.5"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1.5">
+                                        Network IP address for this terminal (optional)
+                                    </p>
+                                </div>
                             </TabsContent>
 
                             <TabsContent value="settings" className="mt-0 space-y-4">
@@ -118,13 +164,13 @@ const PosModal: React.FC<PosModalProps> = ({
                                             Terminal Status
                                         </Label>
                                         <p className="text-xs text-muted-foreground">
-                                            {formData.Status === "Active"
+                                            {formData.Status === "active"
                                                 ? "This terminal is active and ready to accept orders"
                                                 : "This terminal is currently inactive"}
                                         </p>
                                     </div>
                                     <Switch
-                                        checked={formData.Status === "Active"}
+                                        checked={formData.Status === "active"}
                                         onCheckedChange={onStatusChange}
                                     />
                                 </div>
