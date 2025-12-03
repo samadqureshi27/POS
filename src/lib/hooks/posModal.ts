@@ -6,15 +6,19 @@ export const usePosModal = (branchId: string) => {
     const { isOpen, editingItem, openCreate, openEdit, close } = useModalState<PosItem>();
     const [formData, setFormData] = useState<PosModalFormData>({
         POS_Name: "",
-        Status: "Active",
+        Status: "active",
         Branch_ID_fk: branchId,
+        machineId: "",
+        metadata: {},
     });
 
     const openCreateModal = () => {
         setFormData({
             POS_Name: "",
-            Status: "Active",
+            Status: "active",
             Branch_ID_fk: branchId,
+            machineId: "",
+            metadata: {},
         });
         openCreate();
     };
@@ -24,6 +28,8 @@ export const usePosModal = (branchId: string) => {
             POS_Name: item.POS_Name,
             Status: item.Status,
             Branch_ID_fk: item.Branch_ID_fk,
+            machineId: item.machineId || "",
+            metadata: item.metadata || {},
         });
         openEdit(item);
     };
@@ -31,8 +37,10 @@ export const usePosModal = (branchId: string) => {
     const closeModal = () => {
         setFormData({
             POS_Name: "",
-            Status: "Active",
+            Status: "active",
             Branch_ID_fk: branchId,
+            machineId: "",
+            metadata: {},
         });
         close();
     };
@@ -44,7 +52,7 @@ export const usePosModal = (branchId: string) => {
     const handleStatusChange = (isActive: boolean) => {
         setFormData(prev => ({
             ...prev,
-            Status: isActive ? "Active" : "Inactive",
+            Status: isActive ? "active" : "inactive",
         }));
     };
 

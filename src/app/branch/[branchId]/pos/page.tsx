@@ -64,8 +64,8 @@ const PosListPage = () => {
     // Calculate enhanced statistics
     const enhancedStats = useMemo(() => {
         const totalPos = filteredItems.length;
-        const activePos = filteredItems.filter(item => item.Status === "Active").length;
-        const inactivePos = filteredItems.filter(item => item.Status === "Inactive").length;
+        const activePos = filteredItems.filter(item => item.Status === "active").length;
+        const inactivePos = filteredItems.filter(item => item.Status === "inactive").length;
 
         return {
             totalPos,
@@ -166,11 +166,11 @@ const PosListPage = () => {
                     {
                         options: [
                             { label: "All Status", value: "" },
-                            { label: "Active", value: "Active", color: "green" },
-                            { label: "Inactive", value: "Inactive", color: "red" },
+                            { label: "Active", value: "active", color: "green" },
+                            { label: "Inactive", value: "inactive", color: "red" },
                         ],
                         activeValue: statusFilter,
-                        onChange: (value) => setStatusFilter(value as "" | "Active" | "Inactive"),
+                        onChange: (value) => setStatusFilter(value as "" | "active" | "inactive"),
                     },
                 ]}
                 viewMode={viewMode}
@@ -251,12 +251,12 @@ const PosListPage = () => {
                         render: (item) => (
                             <div className="flex items-center gap-3">
                                 <div className={`h-10 w-10 rounded-lg flex items-center justify-center border ${
-                                    item.Status === "Active"
+                                    item.Status === "active"
                                         ? "bg-green-50 border-green-200"
                                         : "bg-red-50 border-red-200"
                                 }`}>
                                     <Monitor className={`h-5 w-5 ${
-                                        item.Status === "Active" ? "text-green-600" : "text-red-600"
+                                        item.Status === "active" ? "text-green-600" : "text-red-600"
                                     }`} />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -269,8 +269,8 @@ const PosListPage = () => {
                         key: "status",
                         header: "Status",
                         render: (item) => (
-                            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                                item.Status === "Active"
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${
+                                item.Status === "active"
                                     ? "bg-green-100 text-green-700"
                                     : "bg-red-100 text-red-700"
                             }`}>
@@ -281,7 +281,7 @@ const PosListPage = () => {
                     },
                 ]}
                 renderGridCard={(item, actions) => {
-                    const isActive = item.Status === "Active";
+                    const isActive = item.Status === "active";
 
                     return (
                         <div className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-200">
@@ -296,7 +296,7 @@ const PosListPage = () => {
                                 }`} />
 
                                 {/* Status Badge - Top Left */}
-                                <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${
+                                <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm capitalize ${
                                     isActive
                                         ? "bg-green-500 text-white"
                                         : "bg-red-500 text-white"

@@ -23,8 +23,8 @@ const PosTable: React.FC<PosTableProps> = ({
 
     const statusOptions = [
         { value: "", label: "All Status" },
-        { value: "Inactive", label: "Inactive", className: "hover:bg-red-100 text-red-400" },
-        { value: "Active", label: "Active", className: "hover:bg-green-100 text-green-400" }
+        { value: "inactive", label: "Inactive", className: "hover:bg-red-100 text-red-400" },
+        { value: "active", label: "Active", className: "hover:bg-green-100 text-green-400" }
     ];
 
     const columns: DataTableColumn<any>[] = [
