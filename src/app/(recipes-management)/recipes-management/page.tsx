@@ -57,6 +57,12 @@ const RecipesManagementPage = () => {
     refreshData,
   } = useRecipeData();
 
+  // Debug logging
+  React.useEffect(() => {
+    console.log("🏪 Recipes Page - Ingredients loaded:", ingredients?.length || 0);
+    console.log("🍲 Recipes Page - Recipe Options loaded:", availableRecipeOptions?.length || 0);
+  }, [ingredients, availableRecipeOptions]);
+
   // Enhanced action handlers with consistent toast notifications
   const handleAddWithToast = () => {
     openAddModal();
