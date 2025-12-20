@@ -29,6 +29,7 @@ export interface RecipePayload {
   prepTime?: number;
   cookTime?: number;
   servings?: number;
+  variations?: any[]; // Support inline variants
 }
 
 export interface ApiResponse<T> {
@@ -148,11 +149,15 @@ export class RecipeService {
   }
 
   /**
-   * Create new recipe
+   * Create new recipe (with optional variants)
    */
   static async createRecipe(recipe: Partial<Recipe>): Promise<ApiResponse<Recipe>> {
     try {
-      const response = await fetch("/api/recipes", {
+      // Use with-variants endpoint if variations are provided
+      const hasVariations = recipe.variations && recipe.variations.length > 0;
+      const endpoint = hasVariations ? "/api/recipes/with-variants" : "/api/recipes";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: buildHeaders(),
         body: JSON.stringify(recipe),
@@ -180,6 +185,43 @@ export class RecipeService {
       return {
         success: false,
         message: error.message || "Failed to create recipe",
+      };
+    }
+  }
+
+  /**
+   * Create recipe with variants using the dedicated endpoint
+   */
+  static async createRecipeWithVariants(recipe: Partial<Recipe>): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch("/api/recipes/with-variants", {
+        method: "POST",
+        headers: buildHeaders(),
+        body: JSON.stringify(recipe),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to create recipe with variants",
+        };
+      }
+
+      return {
+        success: true,
+        data: data.data || data,
+        message: data.message || "Recipe with variants created successfully",
+      };
+    } catch (error: any) {
+      logError("Error creating recipe with variants", error, {
+        component: "RecipeService",
+        action: "createRecipeWithVariants",
+      });
+      return {
+        success: false,
+        message: error.message || "Failed to create recipe with variants",
       };
     }
   }
