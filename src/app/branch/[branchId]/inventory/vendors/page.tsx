@@ -103,10 +103,28 @@ const VendorsPage = () => {
     <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
-      <PageHeader
-        title={`Vendors & Suppliers - Branch #${branchId}`}
-        subtitle="Manage vendors and suppliers for inventory"
-      />
+      {/* Coming Soon Content */}
+      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+        <div className="text-center px-6 py-12 max-w-md">
+          <div className="mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 mb-4">
+              <Truck className="h-10 w-10 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">Coming Soon</h1>
+          <p className="text-lg text-gray-600 mb-2">Vendors & Suppliers</p>
+          <p className="text-sm text-gray-500">
+            This feature is currently under development and will be available soon.
+          </p>
+        </div>
+      </div>
+
+      {/* Original Content - Preserved but hidden */}
+      <div className="hidden">
+        <PageHeader
+          title={`Vendors & Suppliers - Branch #${branchId}`}
+          subtitle="Manage vendors and suppliers for inventory"
+        />
 
       {/* Stats Bar */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -303,17 +321,18 @@ const VendorsPage = () => {
         onFormDataChange={updateFormData}
       />
 
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        title="Delete Vendors"
-        description={`Are you sure you want to delete ${selectedItems.length} vendor(s)? This action cannot be undone.`}
-        onConfirm={confirmDelete}
-        confirmText="Delete"
-        cancelText="Cancel"
-        variant="destructive"
-      />
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          title="Delete Vendors"
+          description={`Are you sure you want to delete ${selectedItems.length} vendor(s)? This action cannot be undone.`}
+          onConfirm={confirmDelete}
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="destructive"
+        />
+      </div>
     </PageContainer>
   );
 };

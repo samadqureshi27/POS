@@ -292,8 +292,12 @@ export function RecipeIngredientsList({
                       type="number"
                       step="any"
                       min="0"
-                      value={ingredient.quantity || ""}
-                      onChange={(e) => onUpdateIngredient(index, "quantity", parseFloat(e.target.value) || 0)}
+                      value={ingredient.quantity === 0 ? "" : (ingredient.quantity || "")}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        onUpdateIngredient(index, "quantity", val === '' ? 0 : parseFloat(val) || 0);
+                      }}
+                      onFocus={(e) => e.target.select()}
                       placeholder="0"
                       className={`h-9 rounded-md border text-center font-semibold text-sm ${
                         hasErrors && (!ingredient.quantity || ingredient.quantity <= 0)

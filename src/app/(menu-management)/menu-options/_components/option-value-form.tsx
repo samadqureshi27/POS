@@ -202,8 +202,12 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
           type="number"
           step="0.01"
           min="0"
-          value={value}
-          onChange={(e) => updateAddonItem(index, { price: Number(e.target.value) || 0 })}
+          value={value === 0 ? "" : value}
+          onChange={(e) => {
+            const val = e.target.value;
+            updateAddonItem(index, { price: val === '' ? 0 : Number(val) });
+          }}
+          onFocus={(e) => e.target.select()}
           className="w-full text-center"
           placeholder="0.00"
         />
@@ -371,8 +375,12 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
                             type="number"
                             step="0.01"
                             min="0"
-                            value={item.price}
-                            onChange={(e) => updateAddonItem(idx, { price: Number(e.target.value) || 0 })}
+                            value={item.price === 0 ? "" : item.price}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              updateAddonItem(idx, { price: val === '' ? 0 : Number(val) });
+                            }}
+                            onFocus={(e) => e.target.select()}
                             placeholder="0.00"
                           />
                         </div>

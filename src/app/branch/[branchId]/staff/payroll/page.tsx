@@ -65,67 +65,86 @@ const StaffManagementPage = () => {
         />
       )}
 
-      <PageHeader
-        title={`Payroll - Branch #${branchId}`}
-        subtitle="Manage employee payroll and salary payments"
-      />
-
-      {/* Date Filter Component */}
-      <DateFilter dateFilter={dateFilter} />
-
-      {/* Stats Bar */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <AdvancedMetricCard
-          title="Total Staff"
-          subtitle="All employees"
-          value={summaryData.totalStaff}
-          icon="inventory"
-          format="number"
-        />
-
-        <AdvancedMetricCard
-          title="Paid Staff"
-          subtitle="Payment complete"
-          value={summaryData.paidStaff}
-          icon="target"
-          format="number"
-          status="good"
-        />
-
-        <AdvancedMetricCard
-          title="Total Payroll"
-          subtitle="All salaries"
-          value={summaryData.totalSalaries}
-          icon="money"
-          format="currency"
-          status="neutral"
-        />
-
-        <AdvancedMetricCard
-          title="Pending Payments"
-          subtitle="Not yet paid"
-          value={summaryData.unpaidSalaries}
-          icon="money"
-          format="currency"
-          status={summaryData.unpaidSalaries > 0 ? "warning" : "good"}
-        />
+      {/* Coming Soon Content */}
+      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+        <div className="text-center px-6 py-12 max-w-md">
+          <div className="mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 mb-4">
+              <DollarSign className="h-10 w-10 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">Coming Soon</h1>
+          <p className="text-lg text-gray-600 mb-2">Staff Payroll</p>
+          <p className="text-sm text-gray-500">
+            This feature is currently under development and will be available soon.
+          </p>
+        </div>
       </div>
 
-      {/* Action Bar */}
-      <EnhancedActionBar
-        searchValue={filters.searchTerm}
-        onSearchChange={filters.setSearchInput}
-        searchPlaceholder="Search staff by name or role..."
-        showViewToggle={false}
-      />
+      {/* Original Content - Preserved but hidden */}
+      <div className="hidden">
+        <PageHeader
+          title={`Payroll - Branch #${branchId}`}
+          subtitle="Manage employee payroll and salary payments"
+        />
 
-      {/* Staff Table Component */}
-      <StaffTable
-        filteredItems={filters.filteredItems}
-        staffItems={staffItems}
-        filters={filters}
-        branchId={branchId}
-      />
+        {/* Date Filter Component */}
+        <DateFilter dateFilter={dateFilter} />
+
+        {/* Stats Bar */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <AdvancedMetricCard
+            title="Total Staff"
+            subtitle="All employees"
+            value={summaryData.totalStaff}
+            icon="inventory"
+            format="number"
+          />
+
+          <AdvancedMetricCard
+            title="Paid Staff"
+            subtitle="Payment complete"
+            value={summaryData.paidStaff}
+            icon="target"
+            format="number"
+            status="good"
+          />
+
+          <AdvancedMetricCard
+            title="Total Payroll"
+            subtitle="All salaries"
+            value={summaryData.totalSalaries}
+            icon="money"
+            format="currency"
+            status="neutral"
+          />
+
+          <AdvancedMetricCard
+            title="Pending Payments"
+            subtitle="Not yet paid"
+            value={summaryData.unpaidSalaries}
+            icon="money"
+            format="currency"
+            status={summaryData.unpaidSalaries > 0 ? "warning" : "good"}
+          />
+        </div>
+
+        {/* Action Bar */}
+        <EnhancedActionBar
+          searchValue={filters.searchTerm}
+          onSearchChange={filters.setSearchInput}
+          searchPlaceholder="Search staff by name or role..."
+          showViewToggle={false}
+        />
+
+        {/* Staff Table Component */}
+        <StaffTable
+          filteredItems={filters.filteredItems}
+          staffItems={staffItems}
+          filters={filters}
+          branchId={branchId}
+        />
+      </div>
     </PageContainer>
   );
 };

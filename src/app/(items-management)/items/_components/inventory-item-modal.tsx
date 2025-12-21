@@ -505,10 +505,12 @@ export default function InventoryItemModal({
                       <Input
                         type="number"
                         step="any"
-                        value={formData.conversion || ""}
-                        onChange={(e) =>
-                          handleFieldChange("conversion", parseFloat(e.target.value) || 0)
-                        }
+                        value={formData.conversion === 0 ? "" : formData.conversion || ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          handleFieldChange("conversion", val === '' ? 0 : parseFloat(val) || 0);
+                        }}
+                        onFocus={(e) => e.target.select()}
                         placeholder="e.g., 1000"
                         className="bg-white border-gray-300"
                       />
@@ -531,8 +533,12 @@ export default function InventoryItemModal({
                     </Label>
                     <Input
                       type="number"
-                      value={formData.quantity !== undefined ? formData.quantity : ""}
-                      onChange={(e) => handleFieldChange("quantity", e.target.value ? parseInt(e.target.value) : 0)}
+                      value={formData.quantity === 0 ? "" : (formData.quantity !== undefined ? formData.quantity : "")}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        handleFieldChange("quantity", val === '' ? 0 : parseInt(val) || 0);
+                      }}
+                      onFocus={(e) => e.target.select()}
                       placeholder="0"
                       className="bg-white border-gray-300 h-9 rounded-md"
                     />
@@ -548,8 +554,12 @@ export default function InventoryItemModal({
                     </Label>
                     <Input
                       type="number"
-                      value={formData.reorderPoint}
-                      onChange={(e) => handleFieldChange("reorderPoint", parseInt(e.target.value) || 0)}
+                      value={formData.reorderPoint === 0 ? "" : formData.reorderPoint || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        handleFieldChange("reorderPoint", val === '' ? 0 : parseInt(val) || 0);
+                      }}
+                      onFocus={(e) => e.target.select()}
                       placeholder="0"
                       className="bg-white border-gray-300 h-9 rounded-md"
                     />
@@ -751,8 +761,12 @@ export default function InventoryItemModal({
                               <Label className="text-xs text-gray-600">Quantity</Label>
                               <Input
                                 type="number"
-                                value={dist.quantity}
-                                onChange={(e) => updateBranchQuantity(dist.branchId, parseInt(e.target.value) || 0)}
+                                value={dist.quantity === 0 ? "" : dist.quantity || ""}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  updateBranchQuantity(dist.branchId, val === '' ? 0 : parseInt(val) || 0);
+                                }}
+                                onFocus={(e) => e.target.select()}
                                 placeholder="0"
                                 className="bg-white border-gray-300 h-9"
                               />

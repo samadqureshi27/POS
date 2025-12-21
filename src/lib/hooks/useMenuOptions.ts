@@ -69,40 +69,58 @@ export const useMenuOptions = () => {
         loadMenuItemOptionss();
     }, []);
 
-    // Modal form effect
+    // Modal form effect - Load addon items when editing
     useEffect(() => {
-        if (editingItem) {
-            setFormData({
-                Name: editingItem.Name,
-                DisplayType: editingItem.DisplayType,
-                OptionValue: [...editingItem.OptionValue],
-                OptionPrice: [...editingItem.OptionPrice],
-                Priority: editingItem.Priority,
-                selection: editingItem.selection,
-                min: editingItem.min,
-                max: editingItem.max,
-                categoryId: editingItem.categoryId,
-                groupId: editingItem.groupId,
-                groupName: editingItem.groupName,
-                addonItems: editingItem.addonItems ? [...editingItem.addonItems] : [],
-            });
-        } else {
-            const maxPriority = MenuItemOptionss.length > 0
-                ? Math.max(...MenuItemOptionss.map(item => item.Priority))
-                : 0;
+        const loadEditingData = async () => {
+            if (editingItem && editingItem.groupId) {
+                // Load addon items for this group
+                const itemsRes = await AddonsItemsService.listItems({ groupId: editingItem.groupId });
+                const addonItems = itemsRes.success && itemsRes.data
+                    ? itemsRes.data.map(item => ({
+                        sourceType: item.sourceType,
+                        sourceId: item.sourceId,
+                        nameSnapshot: item.nameSnapshot,
+                        price: item.price,
+                        unit: item.unit || "unit",
+                        isRequired: item.isRequired || false,
+                        displayOrder: item.displayOrder || 0,
+                    }))
+                    : [];
 
-            setFormData({
-                Name: "",
-                DisplayType: "Radio",
-                OptionValue: [],
-                OptionPrice: [],
-                Priority: maxPriority + 1,
-                categoryId: undefined,
-                groupId: undefined,
-                groupName: undefined,
-                addonItems: [],
-            });
-        }
+                setFormData({
+                    Name: editingItem.Name,
+                    DisplayType: editingItem.DisplayType,
+                    OptionValue: [...editingItem.OptionValue],
+                    OptionPrice: [...editingItem.OptionPrice],
+                    Priority: editingItem.Priority,
+                    selection: editingItem.selection,
+                    min: editingItem.min,
+                    max: editingItem.max,
+                    categoryId: editingItem.categoryId,
+                    groupId: editingItem.groupId,
+                    groupName: editingItem.groupName,
+                    addonItems,
+                });
+            } else {
+                const maxPriority = MenuItemOptionss.length > 0
+                    ? Math.max(...MenuItemOptionss.map(item => item.Priority))
+                    : 0;
+
+                setFormData({
+                    Name: "",
+                    DisplayType: "Radio",
+                    OptionValue: [],
+                    OptionPrice: [],
+                    Priority: maxPriority + 1,
+                    categoryId: undefined,
+                    groupId: undefined,
+                    groupName: undefined,
+                    addonItems: [],
+                });
+            }
+        };
+
+        loadEditingData();
     }, [editingItem, isModalOpen, MenuItemOptionss]);
 
     const loadMenuItemOptionss = async () => {
@@ -209,62 +227,84 @@ export const useMenuOptions = () => {
 
     const handleUpdateItem = async (itemData: Omit<MenuItemOptions, "ID">) => {
         if (!editingItem || !editingItem.backendId) {
-            showToast("Modifier ID not found", "error");
+            showToast("Add-on group ID not found", "error");
             return;
         }
 
         try {
             setActionLoading(true);
 
-            // Map DisplayType to selection + min/max
-            let selection: "single" | "multiple" = "single";
-            let min = 0;
-            let max = 1;
-
-            if (itemData.DisplayType === "Checkbox") {
-                selection = "multiple";
-                min = 0;
-                max = itemData.OptionValue.length;
-            } else if (itemData.DisplayType === "Select") {
-                selection = "single";
-                min = 0;
-                max = itemData.OptionValue.length;
-            } else { // Radio
-                selection = "single";
-                min = 0;
-                max = 1;
+            // Validate required fields
+            if (!itemData.categoryId) {
+                showToast("Please select a menu category", "error");
+                return;
             }
 
-            // Convert parallel arrays to options array
-            const options = itemData.OptionValue.map((name, idx) => ({
-                name,
-                price: itemData.OptionPrice[idx] || 0,
-            }));
+            if (!itemData.groupId) {
+                showToast("Please select or create an add-on group", "error");
+                return;
+            }
 
-            const payload: Partial<TenantModifier> = {
-                name: itemData.Name,
-                selection,
-                min,
-                max,
-                options,
+            if (!itemData.addonItems || itemData.addonItems.length === 0) {
+                showToast("Please add at least one add-on item", "error");
+                return;
+            }
+
+            // Update the group name if changed
+            if (itemData.groupName !== editingItem.groupName && itemData.groupId) {
+                const groupUpdateRes = await AddonsGroupsService.updateGroup(itemData.groupId, {
+                    name: itemData.groupName || itemData.Name,
+                });
+                if (!groupUpdateRes.success) {
+                    showToast(groupUpdateRes.message || "Failed to update group name", "error");
+                    return;
+                }
+            }
+
+            // Get existing items for this group
+            const existingItemsRes = await AddonsItemsService.listItems({ groupId: itemData.groupId });
+            const existingItems = existingItemsRes.success && existingItemsRes.data ? existingItemsRes.data : [];
+
+            // Delete all existing items
+            await Promise.all(
+                existingItems.map(async (item) => {
+                    if (item._id || item.id) {
+                        await AddonsItemsService.deleteItem(item._id || item.id || "");
+                    }
+                })
+            );
+
+            // Bulk create new items
+            const bulkPayload = {
+                groupId: itemData.groupId,
+                categoryId: itemData.categoryId,
+                items: itemData.addonItems.map((item, idx) => ({
+                    sourceType: item.sourceType,
+                    sourceId: item.sourceId,
+                    nameSnapshot: item.nameSnapshot,
+                    price: item.price,
+                    unit: item.unit || "unit",
+                    isRequired: item.isRequired || false,
+                    displayOrder: item.displayOrder || idx + 1,
+                })),
             };
 
-            const response = await ModifierService.updateModifier(editingItem.backendId, payload);
+            const response = await AddonsItemsService.bulkCreateItems(bulkPayload);
             if (response.success) {
                 await loadMenuItemOptionss(); // Reload list
                 setIsModalOpen(false);
                 setEditingItem(null);
-                showToast(response.message || "Modifier updated successfully", "success");
+                showToast("Add-on items updated successfully", "success");
             } else {
-                showToast(response.message || "Failed to update modifier", "error");
+                showToast(response.message || "Failed to update add-on items", "error");
             }
         } catch (error) {
-            logError("Error updating modifier", error, {
+            logError("Error updating add-on items", error, {
                 component: "useMenuOptions",
                 action: "handleUpdateItem",
-                modifierId: editingItem.backendId
+                groupId: itemData.groupId
             });
-            showToast(error instanceof Error ? error.message : "Failed to update modifier", "error");
+            showToast(error instanceof Error ? error.message : "Failed to update add-on items", "error");
         } finally {
             setActionLoading(false);
         }

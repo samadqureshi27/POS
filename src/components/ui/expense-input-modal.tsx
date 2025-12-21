@@ -144,8 +144,12 @@ export const ExpenseInputModal: React.FC<ExpenseInputModalProps> = ({
               type="number"
               step="0.01"
               min="0"
-              value={formData.amount || ""}
-              onChange={(e) => handleInputChange("amount", parseFloat(e.target.value) || 0)}
+              value={formData.amount === 0 ? "" : formData.amount || ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                handleInputChange("amount", val === '' ? 0 : parseFloat(val) || 0);
+              }}
+              onFocus={(e) => e.target.select()}
               placeholder="0.00"
               className={errors.amount ? "border-red-500" : ""}
             />
