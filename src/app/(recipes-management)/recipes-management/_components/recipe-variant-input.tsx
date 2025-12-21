@@ -98,11 +98,13 @@ export function RecipeVariantInput({
               type="number"
               step="0.1"
               min="0"
-              value={variant.sizeMultiplier || 1}
-              onChange={(e) =>
-                onUpdate(index, "sizeMultiplier", parseFloat(e.target.value))
-              }
-              placeholder="e.g., 0.7 for small, 1.5 for large"
+              value={variant.sizeMultiplier === 1 ? "" : (variant.sizeMultiplier || "")}
+              onChange={(e) => {
+                const val = e.target.value;
+                onUpdate(index, "sizeMultiplier", val === '' ? 1 : parseFloat(val));
+              }}
+              onFocus={(e) => e.target.select()}
+              placeholder="1.0"
             />
           </div>
         )}
@@ -129,10 +131,12 @@ export function RecipeVariantInput({
             id={`variant-cost-${index}`}
             type="number"
             step="0.01"
-            value={variant.baseCostAdjustment || 0}
-            onChange={(e) =>
-              onUpdate(index, "baseCostAdjustment", parseFloat(e.target.value))
-            }
+            value={variant.baseCostAdjustment === 0 ? "" : (variant.baseCostAdjustment || "")}
+            onChange={(e) => {
+              const val = e.target.value;
+              onUpdate(index, "baseCostAdjustment", val === '' ? 0 : parseFloat(val));
+            }}
+            onFocus={(e) => e.target.select()}
             placeholder="0.00"
           />
         </div>

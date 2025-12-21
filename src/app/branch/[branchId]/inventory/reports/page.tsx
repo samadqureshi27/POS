@@ -65,62 +65,81 @@ const ReportsPage = () => {
         <PageContainer hasSubmenu={true}>
             <Toaster position="top-right" />
 
-            {/* Header with Export Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
-                <div>
-                    <PageHeader
-                        title={`Inventory Report - Branch #${branchId}`}
-                        subtitle="View inventory usage statistics and export reports"
+            {/* Coming Soon Content */}
+            <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+                <div className="text-center px-6 py-12 max-w-md">
+                    <div className="mb-6">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 mb-4">
+                            <AlertCircle className="h-10 w-10 text-white" />
+                        </div>
+                    </div>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-3">Coming Soon</h1>
+                    <p className="text-lg text-gray-600 mb-2">Inventory Reports</p>
+                    <p className="text-sm text-gray-500">
+                        This feature is currently under development and will be available soon.
+                    </p>
+                </div>
+            </div>
+
+            {/* Original Content - Preserved but hidden */}
+            <div className="hidden">
+                {/* Header with Export Controls */}
+                <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
+                    <div>
+                        <PageHeader
+                            title={`Inventory Report - Branch #${branchId}`}
+                            subtitle="View inventory usage statistics and export reports"
+                        />
+                    </div>
+
+                    {/* Export Controls Only */}
+                    <ImportExportControls
+                        onExport={handleExport}
+                        disabled={isLoading || filteredItems.length === 0}
+                        exportLabel={isLoading ? "Exporting..." : "Export Report"}
+                        showImport={false}
+                        showExport={true}
+                        className="mt-4 md:mt-0"
                     />
                 </div>
 
-                {/* Export Controls Only */}
-                <ImportExportControls
-                    onExport={handleExport}
-                    disabled={isLoading || filteredItems.length === 0}
-                    exportLabel={isLoading ? "Exporting..." : "Export Report"}
-                    showImport={false}
-                    showExport={true}
-                    className="mt-4 md:mt-0"
+                {/* Stats Bar */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <AdvancedMetricCard
+                        title="Most Used Item"
+                        subtitle={`${statistics.mostUsedItem.count} times`}
+                        value={statistics.mostUsedItem.name}
+                        icon="target"
+                        format="text"
+                        status="good"
+                    />
+
+                    <AdvancedMetricCard
+                        title="Least Used Item"
+                        subtitle={`${statistics.leastUsedItem.count} times`}
+                        value={statistics.leastUsedItem.name}
+                        icon="inventory"
+                        format="text"
+                        status="neutral"
+                    />
+                </div>
+
+                {/* Action Bar */}
+                <EnhancedActionBar
+                    searchValue={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    searchPlaceholder="Search inventory items..."
+                    showViewToggle={false}
+                />
+
+                {/* Reports table */}
+                <ReportsTable
+                    reportItems={reportItems}
+                    filteredItems={filteredItems}
+                    unitFilter={unitFilter}
+                    onUnitFilterChange={setUnitFilter}
                 />
             </div>
-
-            {/* Stats Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <AdvancedMetricCard
-                    title="Most Used Item"
-                    subtitle={`${statistics.mostUsedItem.count} times`}
-                    value={statistics.mostUsedItem.name}
-                    icon="target"
-                    format="text"
-                    status="good"
-                />
-
-                <AdvancedMetricCard
-                    title="Least Used Item"
-                    subtitle={`${statistics.leastUsedItem.count} times`}
-                    value={statistics.leastUsedItem.name}
-                    icon="inventory"
-                    format="text"
-                    status="neutral"
-                />
-            </div>
-
-            {/* Action Bar */}
-            <EnhancedActionBar
-                searchValue={searchTerm}
-                onSearchChange={setSearchTerm}
-                searchPlaceholder="Search inventory items..."
-                showViewToggle={false}
-            />
-
-            {/* Reports table */}
-            <ReportsTable
-                reportItems={reportItems}
-                filteredItems={filteredItems}
-                unitFilter={unitFilter}
-                onUnitFilterChange={setUnitFilter}
-            />
         </PageContainer>
     );
 };

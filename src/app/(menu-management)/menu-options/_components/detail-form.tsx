@@ -273,20 +273,25 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange })
               <Input
                 id="priority"
                 type="number"
-                value={formData.Priority || ""}
+                value={formData.Priority === 0 ? "" : formData.Priority}
                 onChange={(e) => {
                   const value = e.target.value;
-                  // Only allow numbers and empty string
-                  if (value === '' || /^\d+$/.test(value)) {
+                  // Allow empty string or valid numbers
+                  if (value === '') {
                     onFormDataChange({
                       ...formData,
-                      Priority: value === '' ? 0 : Number(value)
+                      Priority: 0
+                    });
+                  } else if (/^\d+$/.test(value)) {
+                    onFormDataChange({
+                      ...formData,
+                      Priority: Number(value)
                     });
                   }
-                  // If invalid input, just ignore it (don't update state)
                 }}
+                onFocus={(e) => e.target.select()}
                 placeholder="1"
-                min={1}
+                min={0}
                 className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 w-full min-w-0"
               />
             </div>

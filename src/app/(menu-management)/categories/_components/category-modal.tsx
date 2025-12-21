@@ -242,8 +242,12 @@ export default function CategoryModal({
               <Input
                 id="displayOrder"
                 type="number"
-                value={formData.displayOrder || 0}
-                onChange={(e) => handleFieldChange("displayOrder", parseInt(e.target.value) || 0)}
+                value={formData.displayOrder === 0 ? "" : formData.displayOrder || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleFieldChange("displayOrder", val === '' ? 0 : parseInt(val) || 0);
+                }}
+                onFocus={(e) => e.target.select()}
                 placeholder="0"
               />
               <p className="text-xs text-gray-500">Lower numbers appear first</p>

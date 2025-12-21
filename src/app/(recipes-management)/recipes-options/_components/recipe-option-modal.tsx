@@ -346,9 +346,11 @@ const RecipeVariantModal: React.FC<RecipeVariantModalProps> = ({
                   min="0.1"
                   value={formData.sizeMultiplier || ''}
                   onChange={(e) => {
-                    const value = Number(e.target.value);
-                    setFormData({ ...formData, sizeMultiplier: isNaN(value) ? 1 : value });
+                    const val = e.target.value;
+                    const value = Number(val);
+                    setFormData({ ...formData, sizeMultiplier: val === '' ? 1 : (isNaN(value) ? 1 : value) });
                   }}
+                  onFocus={(e) => e.target.select()}
                   placeholder="1.0"
                   className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                 />
@@ -366,11 +368,13 @@ const RecipeVariantModal: React.FC<RecipeVariantModalProps> = ({
                   id="baseCostAdjustment"
                   type="number"
                   step="0.01"
-                  value={formData.baseCostAdjustment || ''}
+                  value={formData.baseCostAdjustment === 0 ? '' : (formData.baseCostAdjustment || '')}
                   onChange={(e) => {
-                    const value = Number(e.target.value);
-                    setFormData({ ...formData, baseCostAdjustment: isNaN(value) ? 0 : value });
+                    const val = e.target.value;
+                    const value = Number(val);
+                    setFormData({ ...formData, baseCostAdjustment: val === '' ? 0 : (isNaN(value) ? 0 : value) });
                   }}
+                  onFocus={(e) => e.target.select()}
                   placeholder="0.00"
                   className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                 />
@@ -561,11 +565,13 @@ const RecipeVariantModal: React.FC<RecipeVariantModalProps> = ({
                           type="number"
                           step="0.01"
                           min="0"
-                          value={ingredient.quantity || ''}
+                          value={ingredient.quantity === 0 ? '' : (ingredient.quantity || '')}
                           onChange={(e) => {
-                            const value = Number(e.target.value);
-                            updateIngredient(index, "quantity", isNaN(value) ? 0 : value);
+                            const val = e.target.value;
+                            const value = Number(val);
+                            updateIngredient(index, "quantity", val === '' ? 0 : (isNaN(value) ? 0 : value));
                           }}
+                          onFocus={(e) => e.target.select()}
                           placeholder="0"
                           className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                         />
@@ -590,11 +596,13 @@ const RecipeVariantModal: React.FC<RecipeVariantModalProps> = ({
                           type="number"
                           step="0.01"
                           min="0"
-                          value={ingredient.costPerUnit || ''}
+                          value={ingredient.costPerUnit === 0 ? '' : (ingredient.costPerUnit || '')}
                           onChange={(e) => {
-                            const value = Number(e.target.value);
-                            updateIngredient(index, "costPerUnit", isNaN(value) ? 0 : value);
+                            const val = e.target.value;
+                            const value = Number(val);
+                            updateIngredient(index, "costPerUnit", val === '' ? 0 : (isNaN(value) ? 0 : value));
                           }}
+                          onFocus={(e) => e.target.select()}
                           placeholder="0.00"
                           className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
                         />

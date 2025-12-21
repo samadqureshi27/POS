@@ -298,7 +298,11 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
                 min="0"
                 step="0.01"
                 value={formData.sellingPrice || ""}
-                onChange={(e) => handleInputChange("sellingPrice", e.target.value ? parseFloat(e.target.value) : undefined)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleInputChange("sellingPrice", val ? parseFloat(val) : undefined);
+                }}
+                onFocus={(e) => e.target.select()}
                 className="mt-1"
                 disabled={actionLoading}
                 placeholder="Leave empty to use base price"
@@ -318,8 +322,12 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
                 type="number"
                 min="0"
                 step="1"
-                value={formData.displayOrder || 0}
-                onChange={(e) => handleInputChange("displayOrder", parseInt(e.target.value) || 0)}
+                value={formData.displayOrder === 0 ? "" : formData.displayOrder || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleInputChange("displayOrder", val === '' ? 0 : parseInt(val) || 0);
+                }}
+                onFocus={(e) => e.target.select()}
                 className="mt-1"
                 disabled={actionLoading}
               />
