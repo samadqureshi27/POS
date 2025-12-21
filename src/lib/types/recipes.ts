@@ -42,6 +42,9 @@ export interface RecipeIngredient {
   quantity: number;
   unit: string;
   notes?: string;
+  sourceType?: "inventory" | "recipe"; // Add source type
+  sourceId?: string; // Source ID for inventory or recipe
+  nameSnapshot?: string; // Snapshot of ingredient name
 }
 
 export interface ToastMessage {
@@ -116,7 +119,23 @@ export type RecipeStatus = typeof RECIPE_STATUS[number];
 export type RecipeDifficulty = typeof RECIPE_DIFFICULTY[number];
 export type RecipeCategory = typeof RECIPE_CATEGORIES[number];
 
+// Variant types for inline creation
+export interface RecipeVariantInline {
+  name: string;
+  description?: string;
+  type: "size" | "flavor" | "crust" | "custom";
+  sizeMultiplier?: number;
+  baseCostAdjustment?: number;
+  ingredients?: RecipeIngredient[];
+  isActive: boolean;
+  crustType?: string;
+  metadata?: {
+    menuDisplayName?: string;
+    availability?: boolean;
+  };
+}
+
 // Recipe creation/update payload - use the same structure as RecipeOption without ID
 export interface RecipePayload extends Omit<RecipeOption, "ID"> {
-  // This ensures all fields from RecipeOption are included except ID
+  variations?: RecipeVariantInline[]; // Support inline variants
 }

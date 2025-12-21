@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus, UtensilsCrossed, Sparkles } from "lucide-react";
+import { Loader2, Plus, UtensilsCrossed, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { RecipeIngredientsList } from "./recipe-ingredients-list";
+import { RecipeVariantInput } from "./recipe-variant-input";
+import { RecipeVariantInline } from "@/lib/types/recipes";
 
 // API Recipe structure
 interface RecipeIngredient {
@@ -31,6 +33,7 @@ interface Recipe {
   totalCost?: number;
   createdAt?: string;
   updatedAt?: string;
+  variations?: RecipeVariantInline[];
 }
 
 interface RecipeOption {
@@ -87,25 +90,37 @@ export default function RecipeModal({
     description: "",
     ingredients: [],
     isActive: true,
+    variations: [],
   });
 
   const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredient[]>([]);
   const [ingredientInputs, setIngredientInputs] = useState<{[key: number]: string}>({});
   const [showSuggestions, setShowSuggestions] = useState<{[key: number]: boolean}>({});
   const [focusedIngredientIndex, setFocusedIngredientIndex] = useState<number | null>(null);
+  const [variants, setVariants] = useState<RecipeVariantInline[]>([]);
+  const [isVariantsExpanded, setIsVariantsExpanded] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
+      // Debug logging
+      console.log("🔍 Recipe Modal Opened");
+      console.log("📦 Available Inventory Items:", ingredients?.length || 0, ingredients);
+      console.log("🍲 Available Recipe Options:", availableRecipeOptions?.length || 0);
+
       if (editingItem) {
         const existingIngredients = editingItem.ingredients || [];
+        const existingVariants: RecipeVariantInline[] = (editingItem as any).variations || [];
         setFormData({
           name: editingItem.Name,
           type: editingItem.type || "sub",
           description: editingItem.Description,
           isActive: editingItem.Status === "Active",
           ingredients: existingIngredients,
+          variations: existingVariants,
         });
         setRecipeIngredients(existingIngredients);
+        setVariants(existingVariants);
+        setIsVariantsExpanded(existingVariants.length > 0);
 
         const inputs: {[key: number]: string} = {};
         existingIngredients.forEach((ing, index) => {
@@ -120,12 +135,16 @@ export default function RecipeModal({
           description: "",
           ingredients: [],
           isActive: true,
+          variations: [],
         });
         setRecipeIngredients([]);
+        setVariants([]);
+        setIsVariantsExpanded(false);
         setIngredientInputs({});
         setShowSuggestions({});
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, editingItem]);
 
   const handleFieldChange = (field: keyof Recipe, value: any) => {
@@ -264,6 +283,31 @@ export default function RecipeModal({
     return errors;
   };
 
+  // Variant management functions
+  const handleAddVariant = () => {
+    const newVariant: RecipeVariantInline = {
+      name: "",
+      description: "",
+      type: "size",
+      sizeMultiplier: 1,
+      baseCostAdjustment: 0,
+      ingredients: [],
+      isActive: true,
+    };
+    setVariants([...variants, newVariant]);
+    setIsVariantsExpanded(true);
+  };
+
+  const handleUpdateVariant = (index: number, field: keyof RecipeVariantInline, value: any) => {
+    const updated = [...variants];
+    updated[index] = { ...updated[index], [field]: value };
+    setVariants(updated);
+  };
+
+  const handleRemoveVariant = (index: number) => {
+    setVariants(variants.filter((_, i) => i !== index));
+  };
+
   const handleSave = async () => {
     if (!formData.name) {
       showToast("Please enter a recipe name", "error");
@@ -280,9 +324,17 @@ export default function RecipeModal({
       return;
     }
 
+    // Validate variants if any exist
+    const invalidVariants = variants.filter(v => !v.name || !v.type);
+    if (invalidVariants.length > 0) {
+      showToast(`${invalidVariants.length} variant(s) are missing required fields (name or type)`, "error");
+      return;
+    }
+
     const submitData = {
       ...formData,
       ingredients: recipeIngredients,
+      variations: variants.length > 0 ? variants : undefined, // Only include if variants exist
     };
 
     setLoading(true);
@@ -334,6 +386,73 @@ export default function RecipeModal({
           className="data-[state=checked]:bg-green-600"
         />
       </div>
+
+      {/* Variants Section - Only for Final Recipes */}
+      {recipeType === "final" && (
+        <div className="space-y-3">
+          {/* Accordion Header */}
+          <div className="bg-gradient-to-r from-amber-50 to-white border-2 border-amber-200 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setIsVariantsExpanded(!isVariantsExpanded)}
+              className="w-full p-4 flex items-center justify-between hover:bg-amber-50/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-semibold text-gray-900">
+                  Recipe Variants (Optional)
+                </Label>
+                {variants.length > 0 && (
+                  <span className="text-xs font-semibold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
+                    {variants.length}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-gray-600">
+                  Add size, flavor, or crust variants
+                </p>
+                {isVariantsExpanded ? (
+                  <ChevronUp className="h-4 w-4 text-gray-600" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-gray-600" />
+                )}
+              </div>
+            </button>
+          </div>
+
+          {/* Accordion Content */}
+          {isVariantsExpanded && (
+            <div className="space-y-3 animate-in slide-in-from-top-2">
+              <p className="text-xs text-muted-foreground px-1">
+                Create variants for this recipe (e.g., Small/Medium/Large sizes, different flavors).
+                You can also manage variants separately from the Recipes Options page.
+              </p>
+
+              {variants.map((variant, index) => (
+                <RecipeVariantInput
+                  key={index}
+                  variant={variant}
+                  index={index}
+                  ingredients={ingredients}
+                  availableRecipeOptions={availableRecipeOptions}
+                  onUpdate={handleUpdateVariant}
+                  onRemove={handleRemoveVariant}
+                />
+              ))}
+
+              <Button
+                type="button"
+                onClick={handleAddVariant}
+                variant="outline"
+                className="w-full border-dashed border-2 border-amber-300 hover:border-amber-400 hover:bg-amber-50"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Variant
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Ingredients Section Header */}
       <div className={`bg-gradient-to-r ${recipeType === "sub" ? "from-purple-50 to-white border-purple-200" : "from-blue-50 to-white border-blue-200"} border-2 rounded-lg p-4`}>
@@ -445,8 +564,15 @@ export default function RecipeModal({
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center flex-shrink-0">
-          <div className="text-xs text-gray-600">
-            {recipeIngredients.length} ingredient{recipeIngredients.length !== 1 ? 's' : ''} added
+          <div className="text-xs text-gray-600 space-x-3">
+            <span>
+              {recipeIngredients.length} ingredient{recipeIngredients.length !== 1 ? 's' : ''}
+            </span>
+            {variants.length > 0 && (
+              <span className="text-amber-700 font-semibold">
+                • {variants.length} variant{variants.length !== 1 ? 's' : ''}
+              </span>
+            )}
           </div>
           <div className="flex gap-2">
             <Button

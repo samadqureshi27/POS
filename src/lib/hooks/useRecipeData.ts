@@ -85,8 +85,9 @@ export const useRecipeData = () => {
 
   // Transform inventory to ingredients format
   const ingredients: Ingredient[] = useMemo(() => {
-    const inventoryItems = hook.additionalDataValues?.inventoryItems || [];
-    return inventoryItems.map((item: any, index: number) => ({
+    const inventoryItems = (hook as any).inventoryItems || [];
+    console.log("🔄 useRecipeData - Transforming inventory items:", inventoryItems.length, inventoryItems);
+    const transformed = inventoryItems.map((item: any, index: number) => ({
       ID: item._id || item.id || index,
       Name: item.name,
       Status: "Active" as "Active" | "Inactive",
@@ -94,8 +95,13 @@ export const useRecipeData = () => {
       Unit: item.baseUnit || "pc",
       Threshold: item.reorderPoint || 0,
       Priority: 0,
+      _id: item._id || item.id, // Add _id for compatibility
+      name: item.name, // Add lowercase name for compatibility
+      baseUnit: item.baseUnit || "pc", // Add baseUnit for compatibility
     }));
-  }, [hook.additionalDataValues?.inventoryItems]);
+    console.log("✅ useRecipeData - Transformed ingredients:", transformed.length, transformed);
+    return transformed;
+  }, [(hook as any).inventoryItems]);
 
   // Computed values
   const availableCategories = useMemo(() =>
@@ -129,18 +135,22 @@ export const useRecipeData = () => {
     return hook.delete(recipeIdsToDelete as any);
   };
 
-  // Custom openEditModal to handle recipe details fetching
+  // Custom openEditModal to handle recipe details fetching (with variants)
   const openEditModal = async (item: RecipeOption) => {
     try {
       const recipeId = item._id || item.ID.toString();
-      const response = await RecipeService.getRecipe(recipeId, false);
+      // Fetch recipe with variants if it's a final recipe
+      const includeVariants = item.type === "final";
+      const response = await RecipeService.getRecipe(recipeId, includeVariants);
 
       if (response.success && response.data) {
         const recipeData = response.data.recipe || response.data;
+        const variants = response.data.variants || [];
         const fullRecipe = {
           ...item,
           ingredients: recipeData.ingredients || [],
           description: recipeData.description,
+          variations: variants, // Include variants for editing
         };
         hook.openEditModal(fullRecipe as any);
       } else {
@@ -180,7 +190,7 @@ export const useRecipeData = () => {
   return {
     recipeOptions: hook.items,
     ingredients,
-    availableRecipeOptions: hook.additionalDataValues?.availableRecipeOptions || [],
+    availableRecipeOptions: (hook as any).availableRecipeOptions || [],
     filteredItems: hook.filteredItems,
     selectedItems: hook.selectedItems,
     loading: hook.loading,
