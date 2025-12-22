@@ -562,8 +562,12 @@ export default function MenuItemModal({
                 id="basePrice"
                 type="number"
                 step="0.01"
-                value={formData.pricing?.basePrice || 0}
-                onChange={(e) => handlePricingChange("basePrice", parseFloat(e.target.value) || 0)}
+                value={formData.pricing?.basePrice === 0 ? "" : formData.pricing?.basePrice || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handlePricingChange("basePrice", val === '' ? 0 : parseFloat(val) || 0);
+                }}
+                onFocus={(e) => e.target.select()}
                 placeholder="0.00"
               />
             </div>
@@ -614,8 +618,12 @@ export default function MenuItemModal({
               <Input
                 id="displayOrder"
                 type="number"
-                value={formData.displayOrder || 0}
-                onChange={(e) => handleFieldChange("displayOrder", parseInt(e.target.value) || 0)}
+                value={formData.displayOrder === 0 ? "" : formData.displayOrder || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleFieldChange("displayOrder", val === '' ? 0 : parseInt(val) || 0);
+                }}
+                onFocus={(e) => e.target.select()}
                 placeholder="0"
               />
               <p className="text-xs text-gray-500">Lower numbers appear first</p>

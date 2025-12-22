@@ -55,10 +55,42 @@ const AddOnsPage = () => {
   };
 
   const handleDelete = async (item: MenuItemOptions) => {
-    if (!item.backendId) return;
+    if (!item.backendId || !item.groupId) {
+      globalShowToast("Cannot delete: Invalid item ID", "error");
+      return;
+    }
 
-    // TODO: Add delete functionality
-    globalShowToast("Delete functionality coming soon", "error");
+    try {
+      // Get all items in this group
+      const { AddonsItemsService } = await import("@/lib/services/addons-items-service");
+      const itemsRes = await AddonsItemsService.listItems({ groupId: item.groupId });
+
+      if (itemsRes.success && itemsRes.data) {
+        // Delete all items in the group
+        await Promise.all(
+          itemsRes.data.map(async (addonItem) => {
+            if (addonItem._id || addonItem.id) {
+              await AddonsItemsService.deleteItem(addonItem._id || addonItem.id || "");
+            }
+          })
+        );
+      }
+
+      // Delete the group itself
+      const { AddonsGroupsService } = await import("@/lib/services/addons-groups-service");
+      const deleteRes = await AddonsGroupsService.deleteGroup(item.groupId);
+
+      if (deleteRes.success) {
+        globalShowToast("Add-on deleted successfully", "success");
+        // Reload the page data
+        window.location.reload();
+      } else {
+        globalShowToast(deleteRes.message || "Failed to delete add-on", "error");
+      }
+    } catch (error) {
+      console.error("Error deleting add-on:", error);
+      globalShowToast(error instanceof Error ? error.message : "Failed to delete add-on", "error");
+    }
   };
 
   // Show skeleton loading during initial load

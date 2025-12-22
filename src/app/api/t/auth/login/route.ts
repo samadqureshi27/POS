@@ -21,6 +21,7 @@ export async function POST(req: Request) {
               field: err.path.join('.'),
               message: err.message,
             })),
+            
           },
           { status: 400 }
         );

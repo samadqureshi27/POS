@@ -110,8 +110,12 @@ const CurrencyPricingCard: React.FC<CurrencyPricingCardProps> = ({ settings, onS
                                 type="number"
                                 min="0"
                                 max="4"
-                                value={settings.decimalPlaces}
-                                onChange={(e) => onSettingChange("decimalPlaces", parseInt(e.target.value))}
+                                value={settings.decimalPlaces === 0 ? "" : settings.decimalPlaces || ""}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  onSettingChange("decimalPlaces", val === '' ? 0 : parseInt(val));
+                                }}
+                                onFocus={(e) => e.target.select()}
                                 placeholder="2"
                                 className="h-10"
                             />
@@ -132,8 +136,12 @@ const CurrencyPricingCard: React.FC<CurrencyPricingCardProps> = ({ settings, onS
                                     step="0.1"
                                     min="0"
                                     max="100"
-                                    value={settings.taxRate}
-                                    onChange={(e) => onSettingChange("taxRate", parseFloat(e.target.value))}
+                                    value={settings.taxRate === 0 ? "" : settings.taxRate || ""}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      onSettingChange("taxRate", val === '' ? 0 : parseFloat(val));
+                                    }}
+                                    onFocus={(e) => e.target.select()}
                                     placeholder="0.0"
                                     className="h-10 pr-8"
                                 />

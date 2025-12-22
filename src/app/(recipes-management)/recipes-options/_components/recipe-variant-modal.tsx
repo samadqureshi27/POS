@@ -464,7 +464,11 @@ export default function RecipeVariantModal({
                     step="0.1"
                     min="0.1"
                     value={formData.sizeMultiplier ?? ''}
-                    onChange={(e) => handleFieldChange("sizeMultiplier", parseFloat(e.target.value) || 1)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      handleFieldChange("sizeMultiplier", val === '' ? 1 : parseFloat(val) || 1);
+                    }}
+                    onFocus={(e) => e.target.select()}
                     placeholder="1.0"
                     className="h-10 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
@@ -503,8 +507,12 @@ export default function RecipeVariantModal({
                   type="number"
                   step="0.01"
                   min="0"
-                  value={formData.baseCostAdjustment ?? ''}
-                  onChange={(e) => handleFieldChange("baseCostAdjustment", parseFloat(e.target.value) || 0)}
+                  value={formData.baseCostAdjustment === 0 ? '' : (formData.baseCostAdjustment ?? '')}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleFieldChange("baseCostAdjustment", val === '' ? 0 : parseFloat(val) || 0);
+                  }}
+                  onFocus={(e) => e.target.select()}
                   placeholder="0.00"
                   className="h-10 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />

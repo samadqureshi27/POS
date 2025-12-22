@@ -231,8 +231,12 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                 type="number"
                 min="0"
                 step="1"
-                value={formData.quantity || 0}
-                onChange={(e) => handleChange("quantity", parseInt(e.target.value) || 0)}
+                value={formData.quantity === 0 ? "" : formData.quantity || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleChange("quantity", val === '' ? 0 : parseInt(val) || 0);
+                }}
+                onFocus={(e) => e.target.select()}
                 className="mt-1"
                 disabled={actionLoading}
               />
@@ -253,8 +257,12 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                   type="number"
                   min="0"
                   step="1"
-                  value={formData.reorderPoint || 0}
-                  onChange={(e) => handleChange("reorderPoint", parseInt(e.target.value) || 0)}
+                  value={formData.reorderPoint === 0 ? "" : formData.reorderPoint || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleChange("reorderPoint", val === '' ? 0 : parseInt(val) || 0);
+                  }}
+                  onFocus={(e) => e.target.select()}
                   className="mt-1"
                   disabled={actionLoading}
                 />
@@ -270,8 +278,12 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                   type="number"
                   min="0"
                   step="1"
-                  value={formData.minStock || 0}
-                  onChange={(e) => handleChange("minStock", parseInt(e.target.value) || 0)}
+                  value={formData.minStock === 0 ? "" : formData.minStock || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleChange("minStock", val === '' ? 0 : parseInt(val) || 0);
+                  }}
+                  onFocus={(e) => e.target.select()}
                   className="mt-1"
                   disabled={actionLoading}
                 />
@@ -287,8 +299,12 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                   type="number"
                   min="0"
                   step="1"
-                  value={formData.maxStock || 0}
-                  onChange={(e) => handleChange("maxStock", parseInt(e.target.value) || 0)}
+                  value={formData.maxStock === 0 ? "" : formData.maxStock || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleChange("maxStock", val === '' ? 0 : parseInt(val) || 0);
+                  }}
+                  onFocus={(e) => e.target.select()}
                   className="mt-1"
                   disabled={actionLoading}
                 />
@@ -307,8 +323,12 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                   type="number"
                   min="0"
                   step="0.01"
-                  value={formData.costPerUnit || 0}
-                  onChange={(e) => handleChange("costPerUnit", parseFloat(e.target.value) || 0)}
+                  value={formData.costPerUnit === 0 ? "" : formData.costPerUnit || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleChange("costPerUnit", val === '' ? 0 : parseFloat(val) || 0);
+                  }}
+                  onFocus={(e) => e.target.select()}
                   className="mt-1"
                   disabled={actionLoading}
                   placeholder="0.00"
@@ -328,8 +348,12 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                   type="number"
                   min="0"
                   step="0.01"
-                  value={formData.sellingPrice || 0}
-                  onChange={(e) => handleChange("sellingPrice", parseFloat(e.target.value) || 0)}
+                  value={formData.sellingPrice === 0 ? "" : formData.sellingPrice || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleChange("sellingPrice", val === '' ? 0 : parseFloat(val) || 0);
+                  }}
+                  onFocus={(e) => e.target.select()}
                   className="mt-1"
                   disabled={actionLoading}
                   placeholder="0.00"
