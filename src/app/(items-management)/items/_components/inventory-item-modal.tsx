@@ -574,141 +574,13 @@ export default function InventoryItemModal({
             {/* Vendors Tab (Edit Mode Only) */}
             {isEditMode && (
               <TabsContent value="vendors" className="mt-0 space-y-4">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                  <p className="text-yellow-800 text-sm font-medium">
-                    ⚠️ Note: Vendor management not yet connected to backend API (using mock data)
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                  <p className="text-blue-800 text-lg font-semibold mb-2">
+                    🚀 Coming in Version 2
                   </p>
-                  <p className="text-yellow-700 text-sm mt-1">
-                    Manage suppliers for this item. You can select multiple vendors for better sourcing options.
+                  <p className="text-blue-700 text-sm">
+                    Vendor management feature will be available in the next version. You'll be able to manage suppliers for this item and select multiple vendors for better sourcing options.
                   </p>
-                </div>
-
-                {/* Add New Vendor Section */}
-                {isAddingVendor ? (
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900">Add New Vendor</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsAddingVendor(false)}
-                        className="text-gray-600"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-
-                    <div>
-                      <Label className="text-sm font-medium">Company Name *</Label>
-                      <Input
-                        value={newVendor.Company_Name}
-                        onChange={(e) => setNewVendor({ ...newVendor, Company_Name: e.target.value })}
-                        placeholder="Enter company name"
-                        className="bg-white"
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-sm font-medium">Contact Person *</Label>
-                      <Input
-                        value={newVendor.Name}
-                        onChange={(e) => setNewVendor({ ...newVendor, Name: e.target.value })}
-                        placeholder="Enter contact name"
-                        className="bg-white"
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-sm font-medium">Contact Number</Label>
-                      <Input
-                        value={newVendor.Contact}
-                        onChange={(e) => setNewVendor({ ...newVendor, Contact: e.target.value })}
-                        placeholder="Enter phone number"
-                        className="bg-white"
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-sm font-medium">Email</Label>
-                      <Input
-                        value={newVendor.Email}
-                        onChange={(e) => setNewVendor({ ...newVendor, Email: e.target.value })}
-                        placeholder="Enter email"
-                        className="bg-white"
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-sm font-medium">Address</Label>
-                      <Textarea
-                        value={newVendor.Address}
-                        onChange={(e) => setNewVendor({ ...newVendor, Address: e.target.value })}
-                        placeholder="Enter business address"
-                        className="bg-white h-20 resize-none"
-                      />
-                    </div>
-
-                    <Button
-                      onClick={handleAddNewVendor}
-                      disabled={!newVendor.Company_Name || !newVendor.Name}
-                      className="w-full bg-gray-900 hover:bg-black text-white"
-                    >
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Vendor
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={() => setIsAddingVendor(true)}
-                    variant="outline"
-                    className="w-full border-gray-300"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add New Vendor
-                  </Button>
-                )}
-
-                {/* Existing Vendors List */}
-                <div className="space-y-2">
-                  <Label className="text-gray-700 font-medium">Select Vendors</Label>
-                  {vendors.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
-                      No vendors available. Add a new vendor above.
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 gap-2">
-                      {vendors.map((vendor) => (
-                        <div
-                          key={vendor.ID}
-                          onClick={() => toggleVendor(vendor.ID)}
-                          className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                            selectedVendors.includes(vendor.ID)
-                              ? "border-gray-900 bg-gray-50"
-                              : "border-gray-200 bg-white hover:border-gray-300"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="font-semibold text-gray-900">{vendor.Company_Name}</div>
-                              <div className="text-sm text-gray-600">{vendor.Name}</div>
-                              <div className="text-xs text-gray-500">{vendor.Contact}</div>
-                            </div>
-                            <div className={`h-5 w-5 rounded border-2 flex items-center justify-center ${
-                              selectedVendors.includes(vendor.ID)
-                                ? "border-gray-900 bg-gray-900"
-                                : "border-gray-300"
-                            }`}>
-                              {selectedVendors.includes(vendor.ID) && (
-                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </TabsContent>
             )}
@@ -716,118 +588,29 @@ export default function InventoryItemModal({
             {/* Branches Tab (Edit Mode Only) */}
             {isEditMode && (
               <TabsContent value="branches" className="mt-0 space-y-4">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                  <p className="text-yellow-800 text-sm font-medium">
-                    ⚠️ Note: Branch distribution not yet connected to backend API (using mock data)
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Building2 className="h-5 w-5 text-yellow-700" />
-                    <p className="text-yellow-700 text-sm">
-                      Distribute inventory to specific branches. Specify quantity for each location.
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Building2 className="h-6 w-6 text-blue-700" />
+                    <p className="text-blue-800 text-lg font-semibold">
+                      🚀 Coming in Version 2
                     </p>
                   </div>
+                  <p className="text-blue-700 text-sm">
+                    Branch distribution feature will be available in the next version. You'll be able to distribute inventory to specific branches and specify quantity for each location.
+                  </p>
                 </div>
-
-                <Button
-                  onClick={addBranchDistribution}
-                  variant="outline"
-                  className="w-full border-gray-300"
-                  disabled={branchDistribution.length >= branches.length}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Branch Distribution
-                </Button>
-
-                {/* Branch Distribution List */}
-                <div className="space-y-3">
-                  {branchDistribution.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
-                      No branch distribution set. Add branches above to distribute inventory.
-                    </div>
-                  ) : (
-                    branchDistribution.map((dist) => {
-                      const branch = branches.find(b => b.ID === dist.branchId);
-                      if (!branch) return null;
-
-                      return (
-                        <div key={dist.branchId} className="bg-white border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-center gap-4">
-                            <div className="flex-1">
-                              <div className="font-semibold text-gray-900">{branch.name}</div>
-                              <div className="text-sm text-gray-600">{branch.location}</div>
-                            </div>
-
-                            <div className="w-32">
-                              <Label className="text-xs text-gray-600">Quantity</Label>
-                              <Input
-                                type="number"
-                                value={dist.quantity === 0 ? "" : dist.quantity || ""}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  updateBranchQuantity(dist.branchId, val === '' ? 0 : parseInt(val) || 0);
-                                }}
-                                onFocus={(e) => e.target.select()}
-                                placeholder="0"
-                                className="bg-white border-gray-300 h-9"
-                              />
-                            </div>
-
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeBranchDistribution(dist.branchId)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-
-                {branchDistribution.length > 0 && (
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-gray-900">Total Distribution:</span>
-                      <span className="text-2xl font-bold text-gray-900">
-                        {branchDistribution.reduce((sum, dist) => sum + dist.quantity, 0)} {formData.baseUnit}
-                      </span>
-                    </div>
-                  </div>
-                )}
               </TabsContent>
             )}
 
             {/* Advanced Tab (Edit Mode Only) */}
             {isEditMode && (
               <TabsContent value="advanced" className="mt-0 space-y-4">
-                {/* Barcode */}
-                <div>
-                  <Label className="text-gray-700 text-sm font-medium mb-2">Barcode / UPC</Label>
-                  <Input
-                    value={formData.barcode}
-                    onChange={(e) => handleFieldChange("barcode", e.target.value)}
-                    placeholder="Scan or enter barcode"
-                    className="bg-white border-gray-300"
-                  />
-                  <p className="text-gray-500 text-xs mt-1">
-                    Use barcode scanner or enter manually
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                  <p className="text-blue-800 text-lg font-semibold mb-2">
+                    🚀 Coming in Version 2
                   </p>
-                </div>
-
-                {/* Tax Category */}
-                <div>
-                  <Label className="text-gray-700 text-sm font-medium mb-2">Tax Category</Label>
-                  <Input
-                    value={formData.taxCategory}
-                    onChange={(e) => handleFieldChange("taxCategory", e.target.value)}
-                    placeholder="e.g., food, beverage, taxable, exempt"
-                    className="bg-white border-gray-300"
-                  />
-                  <p className="text-gray-500 text-xs mt-1">
-                    Used for tax calculations and reporting
+                  <p className="text-blue-700 text-sm">
+                    Advanced features like Barcode/UPC scanning and Tax Category management will be available in the next version for enhanced inventory control and tax reporting.
                   </p>
                 </div>
               </TabsContent>
