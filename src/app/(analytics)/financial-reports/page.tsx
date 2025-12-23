@@ -164,7 +164,26 @@ const AnalyticsDashboard = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen p-6 mt-4">
+    <div className="bg-background min-h-[calc(100vh-4rem)] p-6 mt-4 relative flex items-center justify-center overflow-hidden">
+      {/* Coming Soon Overlay */}
+      <div className="text-center space-y-2 sm:space-y-4 px-4 max-w-xs sm:max-w-md z-10">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-100 to-purple-100">
+          <TrendingUp className="w-6 h-6 sm:w-10 sm:h-10 text-blue-600" />
+        </div>
+        <div>
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">Coming Soon</h1>
+          <p className="text-xs sm:text-base text-gray-600">
+            Financial Reports feature is currently under development.
+          </p>
+        </div>
+        <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+          <Receipt className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span>Financial analytics coming soon</span>
+        </div>
+      </div>
+
+      {/* Hidden Content */}
+      <div className="hidden">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-6">
@@ -285,6 +304,8 @@ const AnalyticsDashboard = () => {
         onClose={() => setShowExpenseModal(false)}
         onSubmit={handleExpenseSubmit}
       />
+      </div>
+      {/* End Hidden Content */}
     </div>
   );
 };

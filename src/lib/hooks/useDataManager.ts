@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { logError } from "@/lib/util/logger";
 
 /**
@@ -48,7 +48,7 @@ export interface DataManagerConfig<TRaw, TTransformed> {
   entityName: string;
 
   /** Transform raw API data to UI format */
-  transformData?: (raw: TRaw, index?: number) => TTransformed;
+  transformData?: (raw: TRaw, index?: number, additionalData?: Record<string, any>) => TTransformed;
 
   /** Extract array from response if nested */
   extractDataArray?: (response: any) => any[];
@@ -112,6 +112,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
 
   // Additional state storage
   const [additionalState, setAdditionalState] = useState<Record<string, any>>({});
+  const additionalStateRef = useRef<Record<string, any>>({});
 
   // Toast utility
   const showToast = useCallback((message: string, type: "success" | "error") => {
@@ -159,7 +160,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
 
         // Transform data if transformer provided
         const transformedData = transformData
-          ? dataArray.map((item: any, index: number) => transformData(item, index))
+          ? dataArray.map((item: any, index: number) => transformData(item, index, additionalStateRef.current))
           : dataArray;
 
         setItems(transformedData);
@@ -209,16 +210,16 @@ export function useDataManager<TRaw = any, TTransformed = any>(
     results.forEach(({ key, result }) => {
       newState[key] = result;
     });
+    additionalStateRef.current = newState;
     setAdditionalState(newState);
   }, [additionalData]);
 
   // Initialize data
   useEffect(() => {
     const loadAll = async () => {
-      await Promise.all([
-        loadItems(),
-        loadAdditionalData(),
-      ]);
+      // Load additional data first, then items (so transformData has access to it)
+      await loadAdditionalData();
+      await loadItems();
     };
     loadAll();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

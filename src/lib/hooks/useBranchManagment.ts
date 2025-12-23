@@ -1,5 +1,5 @@
 // lib/hooks/useBranchManagement.ts
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 // import { BranchAPI } from "../util/branch-api";
 import { useSelection } from "./selection";
 import { useToast } from './toast';
@@ -57,7 +57,7 @@ export const useBranchManagement = () => {
     };
 
     // Load branch items
-    const loadBranchItems = async () => {
+    const loadBranchItems = useCallback(async () => {
         try {
             setLoading(true);
             const response = await BranchService.listBranches();
@@ -76,7 +76,7 @@ export const useBranchManagement = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [showToast]);
 
     // Memoized filtering
     const filteredItems = useMemo(() => {
