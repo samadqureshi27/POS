@@ -7,7 +7,7 @@ import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import { Toast } from "@/components/ui/toast";
 import { PeriodSelector } from "@/components/ui/period-selector";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
-import { DashboardSection } from "@/components/ui/dashboard-section";
+import { DashboardSection } from "@/app/(main)/dashboard/_components/DashboardSection";
 import ActionBar from "@/components/ui/action-bar";
 import OrderTypeChart from "./_components/order-type-chart";
 import ModernOrderChart from "./_components/modern-order-chart";
@@ -147,9 +147,6 @@ const OrderManagementPage = () => {
       {/* Order Performance Overview */}
       <DashboardSection
         title="Order Performance Overview"
-        subtitle="Real-time order metrics and KPIs"
-        priority="high"
-        collapsible={true}
         defaultExpanded={true}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -279,9 +276,6 @@ const OrderManagementPage = () => {
       {/* Order Analytics & Trends */}
       <DashboardSection
         title="Order Analytics & Trends"
-        subtitle="Product performance and order insights"
-        priority="medium"
-        collapsible={true}
         defaultExpanded={true}
       >
         {/* Modern Analytics Grid */}
@@ -358,9 +352,6 @@ const OrderManagementPage = () => {
       {/* Order Management & Processing */}
       <DashboardSection
         title="Order Management & Processing"
-        subtitle="Detailed order tracking and management"
-        priority="high"
-        collapsible={true}
         defaultExpanded={true}
       >
         {/* Search Bar */}

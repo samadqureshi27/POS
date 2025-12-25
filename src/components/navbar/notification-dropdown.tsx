@@ -60,7 +60,7 @@ export function NotificationDropdown({
                             <h3 className="font-semibold text-base">Notifications</h3>
                             <Link href="/Notification" className="text-xs text-[#D4AF37] hover:underline" onClick={() => setShowNotifications(false)}>View all</Link>
                         </div>
-                        <div className="max-h-[400px] overflow-y-auto">
+                        <div className="max-h-[400px] overflow-y-auto hide-scrollbar">
                             {notificationsLoading ? (
                                 <div className="p-8 text-center text-gray-500 text-sm">Loading...</div>
                             ) : notifications.length === 0 ? (

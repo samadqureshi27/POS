@@ -143,7 +143,7 @@ const Dashboard = () => {
           </ErrorBoundary>
 
           {/* Customer & Payment Insights */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
               <h3 className="text-sm font-medium text-blue-800 mb-2">Customer Flow</h3>
               <div className="text-2xl font-bold text-blue-900">142</div>
@@ -205,7 +205,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Revenue Section */}
             <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 rounded-lg border border-green-200">
               <h3 className="text-sm font-medium text-green-800 mb-4">Revenue</h3>
