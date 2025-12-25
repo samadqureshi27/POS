@@ -7,6 +7,7 @@
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
@@ -24,17 +25,37 @@ body,
 .app {
   height: 100%;
   width: 100%;
+  font-family: var(--font-manrope), system-ui, sans-serif !important;
   @apply text-sm;
 }
 
+:root {
+  --duration-standard: 400ms;
+}
+
+@layer utilities {
+  .transition-standard {
+    transition-duration: var(--duration-standard);
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .font-light {
+    font-weight: 300;
+  }
+}
+
 .hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  display: none;
+  /* Chrome, Safari and Opera */
 }
+
 /* Global CSS - Add this to your globals.css or styles.css */
 
 /* Desktop table view - default styling */
@@ -53,9 +74,11 @@ body,
 .hide-scrollbar {
   -webkit-overflow-scrolling: touch;
 }
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -167,15 +190,17 @@ body,
 /* Responsive breakpoint at 1100px */
 @media (max-width: 1100px) {
   .responsive-customer-table {
-    background: transparent !important; /* Force transparent background */
+    background: transparent !important;
+    /* Force transparent background */
     border: none !important;
     box-shadow: none !important;
   }
+
   .desktop-edit-icon {
     display: none !important;
   }
 
-    .mobile-edit-button {
+  .mobile-edit-button {
     display: flex !important;
     width: 100% !important;
     margin-left: 0 !important;
@@ -187,7 +212,8 @@ body,
 
   /* Ensure the mobile edit button appears at the bottom of each card */
   .responsive-customer-table .card-actions-cell {
-    order: 999; /* Push actions cell to the bottom */
+    order: 999;
+    /* Push actions cell to the bottom */
     margin-top: auto;
     padding-top: 1rem;
     flex-direction: column;
@@ -205,7 +231,8 @@ body,
     gap: 1rem;
     padding: 0;
     border: none !important;
-    background: transparent !important; /* Force transparent */
+    background: transparent !important;
+    /* Force transparent */
     box-shadow: none !important;
   }
 
@@ -223,7 +250,8 @@ body,
   .responsive-customer-table tr {
     display: flex;
     flex-direction: column;
-    background: #ffffff !important; /* Ensure pure white for cards */
+    background: #ffffff !important;
+    /* Ensure pure white for cards */
     border: 1px solid #e5e7eb;
     border-radius: 0.5rem;
     padding: 1rem;
@@ -235,7 +263,8 @@ body,
   }
 
   .responsive-customer-table tr:hover {
-    background: #ffffff !important; /* Keep white on hover */
+    background: #ffffff !important;
+    /* Keep white on hover */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transform: translateY(-1px);
@@ -273,7 +302,8 @@ body,
   }
 
   .responsive-customer-table .card-checkbox-cell::before {
-    display: none !important; /* Hide the checkbox label */
+    display: none !important;
+    /* Hide the checkbox label */
   }
 
   .responsive-customer-table .card-customer-id {
@@ -287,21 +317,27 @@ body,
     background: transparent !important;
     border-bottom: 1px solid #e5e7eb;
     margin-bottom: 8px;
-    justify-content: flex-start !important; /* Override the space-between */
-    padding-right: 3rem !important; /* Add space for the checkbox */
-    font-size: 1.125rem; /* 18px - bigger text */
-    font-weight: 700; /* Bold text */
+    justify-content: flex-start !important;
+    /* Override the space-between */
+    padding-right: 3rem !important;
+    /* Add space for the checkbox */
+    font-size: 1.125rem;
+    /* 18px - bigger text */
+    font-weight: 700;
+    /* Bold text */
   }
 
   .responsive-customer-table .card-name-cell::before {
-    display: none; /* Hide the "Name" label for this field */
+    display: none;
+    /* Hide the "Name" label for this field */
   }
 
   .responsive-customer-table .card-name-cell .name-content {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    justify-content: flex-start; /* Changed from flex-end to flex-start */
+    justify-content: flex-start;
+    /* Changed from flex-end to flex-start */
     width: 100%;
   }
 
@@ -330,7 +366,8 @@ body,
   }
 
   .responsive-customer-table .card-name-cell {
-    padding-right: 2.5rem !important; /* Reduce space for smaller screens */
+    padding-right: 2.5rem !important;
+    /* Reduce space for smaller screens */
   }
 }
 
@@ -474,6 +511,7 @@ body,
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
