@@ -167,8 +167,9 @@ export const useRecipeVariants = () => {
       setActionLoading(true);
       const response = await RecipeVariantsService.createVariant(variantData);
 
-      if (response.success) {
-        await loadVariants(); // Reload variants
+      if (response.success && response.data) {
+        // Optimistic update: Add new variant to local state
+        setItems(prevItems => [...prevItems, response.data]);
         return { success: true, data: response.data };
       } else {
         throw new Error(response.message || "Failed to create recipe variant");
@@ -190,8 +191,11 @@ export const useRecipeVariants = () => {
       setActionLoading(true);
       const response = await RecipeVariantsService.updateVariant(id, variantData);
 
-      if (response.success) {
-        await loadVariants(); // Reload variants
+      if (response.success && response.data) {
+        // Optimistic update: Update variant in local state
+        setItems(prevItems => prevItems.map(item =>
+          (item._id || item.id) === id ? { ...item, ...response.data } : item
+        ));
         return { success: true, data: response.data };
       } else {
         throw new Error(response.message || "Failed to update recipe variant");
@@ -215,7 +219,8 @@ export const useRecipeVariants = () => {
       const response = await RecipeVariantsService.deleteVariant(id);
 
       if (response.success) {
-        await loadVariants(); // Reload variants
+        // Optimistic update: Remove variant from local state
+        setItems(prevItems => prevItems.filter(item => (item._id || item.id) !== id));
         return { success: true };
       } else {
         throw new Error(response.message || "Failed to delete recipe variant");

@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { Settings, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
-import { useToast } from "@/lib/hooks";
+import { toast } from "sonner";
+import { Toaster } from "sonner";
 import MenuModal from "./_components/menu-modal";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import { useMenuOptions } from "@/lib/hooks/useMenuOptions";
@@ -15,7 +15,6 @@ import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 
 const AddOnsPage = () => {
-  const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const {
@@ -42,6 +41,7 @@ const AddOnsPage = () => {
 
     // Utils
     isFormValid,
+    refreshData,
   } = useMenuOptions();
 
   // Enhanced action handlers with consistent toast notifications
@@ -51,12 +51,22 @@ const AddOnsPage = () => {
 
   const handleModalSubmit = async () => {
     const result = await handleModalSubmitOriginal();
-    // Toast is already handled in the hook
+    if (result.success) {
+      toast.success("Add-on saved successfully", {
+        duration: 5000,
+        position: "top-right",
+      });
+      // Refresh to get latest data since menu-options uses different hook
+      await refreshData();
+    }
   };
 
   const handleDelete = async (item: MenuItemOptions) => {
     if (!item.backendId || !item.groupId) {
-      globalShowToast("Cannot delete: Invalid item ID", "error");
+      toast.error("Cannot delete: Invalid item ID", {
+        duration: 5000,
+        position: "top-right",
+      });
       return;
     }
 
@@ -81,15 +91,24 @@ const AddOnsPage = () => {
       const deleteRes = await AddonsGroupsService.deleteGroup(item.groupId);
 
       if (deleteRes.success) {
-        globalShowToast("Add-on deleted successfully", "success");
-        // Reload the page data
-        window.location.reload();
+        toast.success("Add-on deleted successfully", {
+          duration: 5000,
+          position: "top-right",
+        });
+        // Refresh to get latest data since menu-options uses different hook
+        await refreshData();
       } else {
-        globalShowToast(deleteRes.message || "Failed to delete add-on", "error");
+        toast.error(deleteRes.message || "Failed to delete add-on", {
+          duration: 5000,
+          position: "top-right",
+        });
       }
     } catch (error) {
       console.error("Error deleting add-on:", error);
-      globalShowToast(error instanceof Error ? error.message : "Failed to delete add-on", "error");
+      toast.error(error instanceof Error ? error.message : "Failed to delete add-on", {
+        duration: 5000,
+        position: "top-right",
+      });
     }
   };
 

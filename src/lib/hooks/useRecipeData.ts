@@ -135,6 +135,11 @@ export const useRecipeData = () => {
     return hook.delete(recipeIdsToDelete as any);
   };
 
+  // Single recipe delete
+  const deleteRecipe = async (id: string) => {
+    return hook.delete([id]);
+  };
+
   // Custom openEditModal to handle recipe details fetching (with variants)
   const openEditModal = async (item: RecipeOption) => {
     try {
@@ -206,6 +211,7 @@ export const useRecipeData = () => {
     recipeStats,
     createRecipe: hook.create,
     updateRecipe: hook.update,
+    deleteRecipe, // Single recipe delete
     deleteRecipes: () => deleteRecipes(hook.selectedItems as any),
     handleSelectItem: hook.handleSelectItem,
     handleSelectAll: hook.handleSelectAll,

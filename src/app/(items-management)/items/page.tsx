@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Package, Plus, Upload, Download, FileDown, Edit2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
@@ -19,6 +20,7 @@ import { logError } from "@/lib/util/logger";
 export default function ItemsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "stock" | "service">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "Active" | "Inactive">("all");
@@ -51,8 +53,10 @@ export default function ItemsPage() {
   });
 
   // Load items and stats
-  const loadItems = async () => {
-    setLoading(true);
+  const loadItems = async (showLoadingSkeleton = true) => {
+    if (showLoadingSkeleton) {
+      setLoading(true);
+    }
     const params: any = {
       // Use pagination parameters instead of loading everything
       page: currentPage,
@@ -115,7 +119,11 @@ export default function ItemsPage() {
   };
 
   useEffect(() => {
-    loadItems();
+    // Show loading skeleton only on initial load
+    loadItems(isInitialLoad);
+    if (isInitialLoad) {
+      setIsInitialLoad(false);
+    }
   }, [currentPage, searchQuery, filterType, filterStatus]);
 
   // Reset to first page when filters/search change
@@ -149,32 +157,93 @@ export default function ItemsPage() {
 
     const response = await InventoryService.deleteItem(itemId);
     if (response.success) {
-      toast.success(`Deleted "${itemToDelete.name}" successfully`);
-      loadItems();
+      toast.success(`Deleted "${itemToDelete.name}" successfully`, {
+        duration: 5000,
+        position: "top-right",
+      });
+      // Optimistic update: Remove item from local state
+      setItems(prevItems => prevItems.filter(item => (item._id || item.id) !== itemId));
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
     } else {
-      toast.error(`Failed to delete item: ${response.message}`);
+      toast.error(`Failed to delete item: ${response.message}`, {
+        duration: 5000,
+        position: "top-right",
+      });
     }
   };
 
   const handleItemSave = async (data: Partial<InventoryItem>) => {
-    let response;
-    if (editingItem) {
-      const itemId = editingItem._id || editingItem.id;
-      if (!itemId) {
-        toast.error("Item ID is missing");
-        return;
+    console.log("🔥 handleItemSave called with data:", data);
+    try {
+      let response;
+      if (editingItem) {
+        const itemId = editingItem._id || editingItem.id;
+        if (!itemId) {
+          toast.error("Item ID is missing");
+          return;
+        }
+        response = await InventoryService.updateItem(itemId, data);
+      } else {
+        response = await InventoryService.createItem(data);
       }
-      response = await InventoryService.updateItem(itemId, data);
-    } else {
-      response = await InventoryService.createItem(data);
-    }
 
-    if (response.success) {
-      toast.success(editingItem ? "Item updated successfully" : "Item created successfully");
-      setIsItemModalOpen(false);
-      loadItems();
-    } else {
-      toast.error(`Failed to save item: ${response.message}`);
+      console.log("API Response:", response);
+
+      if (response.success) {
+        // Show success toast FIRST
+        const message = editingItem ? "Item updated successfully" : "Item added successfully";
+        toast.success(message, {
+          duration: 5000,
+          position: "top-right",
+        });
+
+        // Close modal
+        setIsItemModalOpen(false);
+
+        // Reload items WITHOUT showing loading skeleton
+        const params: any = {
+          page: currentPage,
+          limit: itemsPerPage,
+          sort: "createdAt",
+          order: "desc"
+        };
+        if (searchQuery) params.q = searchQuery;
+        if (filterType !== "all") params.type = filterType;
+
+        const itemsResponse = await InventoryService.listItems(params);
+
+        if (itemsResponse.success && itemsResponse.data) {
+          let filteredItems = itemsResponse.data;
+
+          if (filterType !== "all") {
+            filteredItems = filteredItems.filter(item => item.type === filterType);
+          }
+
+          if (filterStatus !== "all") {
+            filteredItems = filteredItems.filter(item =>
+              filterStatus === "Active" ? item.isActive !== false : item.isActive === false
+            );
+          }
+
+          setItems(filteredItems);
+
+          const statsResponse = await InventoryService.getStats();
+          if (statsResponse.success && statsResponse.data) {
+            setStats({
+              totalItems: statsResponse.data.totalItems,
+              stockItems: statsResponse.data.stockItems,
+              lowStock: statsResponse.data.lowStock,
+              outOfStock: statsResponse.data.outOfStock,
+            });
+          }
+        }
+      } else {
+        toast.error(`Failed to save item: ${response.message}`);
+      }
+    } catch (error: any) {
+      console.error("Error saving item:", error);
+      toast.error(error?.message || "Failed to save item");
     }
   };
 
@@ -302,6 +371,7 @@ export default function ItemsPage() {
 
   return (
     <PageContainer>
+      <Toaster position="top-center" richColors expand={true} duration={3000} />
       <PageHeader
         title="Inventory Hub"
         subtitle="Manage your items, units, and stock levels"

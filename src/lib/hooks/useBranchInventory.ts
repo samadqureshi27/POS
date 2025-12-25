@@ -169,9 +169,10 @@ export function useBranchInventory(branchId: string | number) {
         branchId: objectId,
       });
 
-      if (response.success) {
+      if (response.success && response.data) {
         toast.success("Inventory item created successfully");
-        await loadItems();
+        // Optimistic update: Add new item to local state
+        setItems(prevItems => [...prevItems, response.data]);
         setIsModalOpen(false);
         setEditingItem(null);
       } else {
@@ -195,9 +196,12 @@ export function useBranchInventory(branchId: string | number) {
       setActionLoading(true);
       const response = await BranchInventoryService.updateItem(id, data);
 
-      if (response.success) {
+      if (response.success && response.data) {
         toast.success("Inventory item updated successfully");
-        await loadItems();
+        // Optimistic update: Update item in local state
+        setItems(prevItems => prevItems.map(item =>
+          (item._id || item.id) === id ? { ...item, ...response.data } : item
+        ));
         setIsModalOpen(false);
         setEditingItem(null);
       } else {
@@ -224,7 +228,8 @@ export function useBranchInventory(branchId: string | number) {
 
       if (response.success) {
         toast.success("Inventory item deleted successfully");
-        await loadItems();
+        // Optimistic update: Remove item from local state
+        setItems(prevItems => prevItems.filter(item => (item._id || item.id) !== id));
       } else {
         throw new Error(response.message || "Failed to delete item");
       }

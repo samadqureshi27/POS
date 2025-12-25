@@ -100,9 +100,10 @@ export function useStaff(branchId?: string) {
 
       const response = await StaffService.createStaff(data);
 
-      if (response.success) {
+      if (response.success && response.data) {
         toast.success("Staff member added successfully");
-        await loadStaff();
+        // Optimistic update: Add new staff to local state
+        setItems(prevItems => [...prevItems, response.data]);
         setIsModalOpen(false);
         setEditingItem(null);
       } else {
@@ -126,9 +127,12 @@ export function useStaff(branchId?: string) {
       setActionLoading(true);
       const response = await StaffService.updateStaff(id, data);
 
-      if (response.success) {
+      if (response.success && response.data) {
         toast.success("Staff member updated successfully");
-        await loadStaff();
+        // Optimistic update: Update staff in local state
+        setItems(prevItems => prevItems.map(item =>
+          (item._id || item.id) === id ? { ...item, ...response.data } : item
+        ));
         setIsModalOpen(false);
         setEditingItem(null);
       } else {
@@ -155,7 +159,10 @@ export function useStaff(branchId?: string) {
 
       if (response.success) {
         toast.success("PIN set successfully");
-        await loadStaff();
+        // Optimistic update: Update PIN in local state
+        setItems(prevItems => prevItems.map(item =>
+          (item._id || item.id) === id ? { ...item, pin } : item
+        ));
       } else {
         throw new Error(response.message || "Failed to set PIN");
       }
@@ -180,7 +187,10 @@ export function useStaff(branchId?: string) {
 
       if (response.success) {
         toast.success("Status updated successfully");
-        await loadStaff();
+        // Optimistic update: Update status in local state
+        setItems(prevItems => prevItems.map(item =>
+          (item._id || item.id) === id ? { ...item, status } : item
+        ));
       } else {
         throw new Error(response.message || "Failed to update status");
       }

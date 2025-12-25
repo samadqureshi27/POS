@@ -27,7 +27,7 @@ const MenuModal: React.FC<MenuModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent size="3xl" fullHeight>
+      <DialogContent size="3xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
         {/* Header */}
         <div className="p-5 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-2">

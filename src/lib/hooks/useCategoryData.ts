@@ -67,6 +67,7 @@ export const useCategoryData = () => {
     categoryStats,
     createCategory: hook.create,
     updateCategory: hook.update,
+    deleteCategory: (id: string) => hook.delete([id]), // Single item delete
     deleteCategories: () => hook.delete(hook.selectedItems),
     handleSelectItem: hook.handleSelectItem,
     handleSelectAll: hook.handleSelectAll,
