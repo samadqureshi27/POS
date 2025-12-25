@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Package, Plus, Upload, Download, FileDown, Edit2, Trash2 } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Toaster, toast } from "sonner";
 import { Button } from "@/components/ui/button";

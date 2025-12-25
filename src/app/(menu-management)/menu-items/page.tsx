@@ -12,6 +12,7 @@ import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useMenuItemData } from "@/lib/hooks/useMenuItemData";
 import { MenuItemOption } from "@/lib/types/menu";
 import { formatPrice } from "@/lib/util/formatters";
+import { cn } from "@/lib/utils";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { logError } from "@/lib/util/logger";
@@ -104,7 +105,10 @@ const MenuItemsManagementPage = () => {
         setDeleteDialogOpen(false);
         setItemToDelete(null);
       } else {
-        toast.error(result.message || "Failed to delete menu item");
+        toast.error((result?.message as string) || "Failed to delete menu item", {
+          duration: 5000,
+          position: "top-right",
+        });
       }
     } catch (error: any) {
       logError("Error deleting menu item", error, {
@@ -112,7 +116,10 @@ const MenuItemsManagementPage = () => {
         action: "confirmDelete",
         itemId: itemToDelete?.ID,
       });
-      toast.error(error.message || "Failed to delete menu item");
+      toast.error((error?.message as string) || "Failed to delete menu item", {
+        duration: 5000,
+        position: "top-right",
+      });
     }
   };
 
@@ -203,17 +210,17 @@ const MenuItemsManagementPage = () => {
                   <img
                     src={item.ImageUrl}
                     alt={item.Name}
-                    className="h-10 w-10 rounded-lg object-cover border border-gray-200"
+                    className="h-10 w-10 rounded-sm object-cover border border-[#d5d5dd]"
                   />
                 ) : (
-                  <div className="h-10 w-10 rounded-lg flex items-center justify-center border bg-orange-50 border-orange-200">
-                    <UtensilsCrossed className="h-5 w-5 text-orange-600" />
+                  <div className="h-10 w-10 rounded-sm flex items-center justify-center border bg-orange-50/50 border-orange-100/50 text-orange-600">
+                    <UtensilsCrossed className="h-5 w-5" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900">{item.Name}</div>
+                  <div className="font-bold text-gray-900">{item.Name}</div>
                   {item.Description && (
-                    <div className="text-xs text-gray-500 truncate max-w-[300px]">{item.Description}</div>
+                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight truncate max-w-[300px]">{item.Description}</div>
                   )}
                 </div>
               </div>
@@ -223,8 +230,8 @@ const MenuItemsManagementPage = () => {
             key: "Category",
             header: "Category",
             render: (item) => (
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                {item.Category || "Uncategorized"}
+              <span className="px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border text-blue-600 bg-blue-50 border-blue-100">
+                {(item.Category || "UNCATEGORIZED").toUpperCase()}
               </span>
             ),
             className: "w-36",
@@ -233,11 +240,9 @@ const MenuItemsManagementPage = () => {
             key: "BasePrice",
             header: "Price",
             render: (item) => (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center h-6 w-6 rounded-full bg-green-100 text-xs font-semibold text-green-700">
-                  {item.Currency}
-                </div>
-                <span className="text-sm font-semibold text-gray-900">
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] font-bold text-gray-400">{item.Currency}</span>
+                <span className="text-sm font-bold text-gray-900">
                   {formatPrice(item.BasePrice)}
                 </span>
               </div>
@@ -248,12 +253,11 @@ const MenuItemsManagementPage = () => {
             key: "Status",
             header: "Status",
             render: (item) => (
-              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                item.Status === "Active"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}>
-                {item.Status}
+              <span className={cn(
+                "px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border",
+                item.Status === "Active" ? "text-green-600 bg-green-50 border-green-100" : "text-red-600 bg-red-50 border-red-100"
+              )}>
+                {item.Status?.toUpperCase()}
               </span>
             ),
             className: "w-28",
@@ -261,104 +265,74 @@ const MenuItemsManagementPage = () => {
         ]}
         renderGridCard={(item, actions) => {
           const isActive = item.Status === "Active";
-          const hasRecipe = !!item.Recipe;
-          const tagCount = item.Tags.length;
 
           return (
-            <div className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-200">
-              {/* Card Header with Gradient Background */}
-              <div className="relative h-28 flex items-center justify-center border-b-2 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-                {item.ImageUrl ? (
-                  <>
+            <div className="group relative bg-white border border-[#d5d5dd] rounded-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-200">
+              <div className={cn("h-0.5 w-full shrink-0", isActive ? "bg-green-500" : "bg-red-500")} />
+
+              <div className="p-4 flex flex-col flex-1">
+                {/* ID & Status */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-black text-gray-400 tracking-wider">
+                    ID: {item.ID?.slice(-6).toUpperCase()}
+                  </span>
+                  <div className={cn(
+                    "px-1.5 py-0.5 rounded-[2px] text-[9px] font-bold tracking-widest border",
+                    isActive ? "text-green-600 bg-green-50 border-green-100" : "text-red-600 bg-red-50 border-red-100"
+                  )}>
+                    {item.Status?.toUpperCase()}
+                  </div>
+                </div>
+
+                {/* Main Info */}
+                <div className="flex items-start gap-3 mb-6">
+                  {item.ImageUrl ? (
                     <img
                       src={item.ImageUrl}
                       alt={item.Name}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="h-10 w-10 rounded-sm object-cover border border-[#d5d5dd] shrink-0"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20"></div>
-                  </>
-                ) : (
-                  <UtensilsCrossed className="h-14 w-14 text-orange-400" />
-                )}
-
-                {/* Status Badge - Top Left */}
-                <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${
-                  isActive
-                    ? "bg-green-500 text-white"
-                    : "bg-red-500 text-white"
-                }`}>
-                  {item.Status}
-                </div>
-
-                {/* Category Badge - Top Right */}
-                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm bg-orange-600 text-white">
-                  {item.Category || "N/A"}
-                </div>
-
-                {/* Hover Actions Overlay */}
-                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-3">
-                  {actions}
-                </div>
-              </div>
-
-              {/* Card Content */}
-              <div className="p-4">
-                {/* Item Name */}
-                <h3 className="text-base font-bold text-gray-900 mb-2 truncate" title={item.Name}>
-                  {item.Name}
-                </h3>
-
-                {/* Description */}
-                {item.Description ? (
-                  <p className="text-xs text-gray-600 mb-3 line-clamp-2 min-h-[2.5rem]">
-                    {item.Description}
-                  </p>
-                ) : (
-                  <p className="text-xs text-gray-400 italic mb-3 min-h-[2.5rem]">
-                    No description provided
-                  </p>
-                )}
-
-                {/* Tags */}
-                {tagCount > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {item.Tags.slice(0, 3).map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-md"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                    {tagCount > 3 && (
-                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-md">
-                        +{tagCount - 3}
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {/* Stats Row */}
-                <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                  {/* Price */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-orange-100">
-                      <span className="text-xs font-bold text-orange-700">
-                        {item.Currency}
-                      </span>
+                  ) : (
+                    <div className="h-10 w-10 rounded-sm flex items-center justify-center shrink-0 border bg-orange-50/50 border-orange-100/50 text-orange-600 transition-colors">
+                      <UtensilsCrossed className="h-5 w-5 stroke-[1.5]" />
                     </div>
-                    <span className="text-sm font-bold text-gray-900">
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-1">
+                      <h3 className="text-sm font-bold text-gray-800 leading-tight truncate group-hover:text-black transition-colors" title={item.Name}>
+                        {item.Name}
+                      </h3>
+                      <div className="flex lg:hidden items-center gap-1 shrink-0">
+                        {actions}
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tight truncate">
+                      {item.Category || 'General Menu'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer Metrics */}
+                <div className="mt-auto pt-3 border-t border-gray-100/60 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Price</span>
+                    <span className="text-base font-bold text-gray-900 tracking-tight pr-2">
+                      <span className="text-[10px] font-medium text-gray-400 mr-0.5">{item.Currency}</span>
                       {formatPrice(item.BasePrice)}
                     </span>
                   </div>
 
-                  {/* Recipe Indicator */}
-                  <div className="text-xs text-gray-500">
-                    {hasRecipe ? (
-                      <span className="font-semibold text-gray-700">Has Recipe</span>
-                    ) : (
-                      <span className="italic">No Recipe</span>
-                    )}
+                  <div className="hidden lg:block opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all duration-200">
+                    <div className="flex items-center gap-1">
+                      {actions}
+                    </div>
+                  </div>
+
+                  <div className="lg:hidden flex flex-col items-end">
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Details</span>
+                    <span className="text-xs font-bold text-gray-900">
+                      {item.Recipe ? 'Recipe Linked' : 'No Recipe'}
+                    </span>
                   </div>
                 </div>
               </div>

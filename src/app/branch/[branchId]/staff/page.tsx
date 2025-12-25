@@ -12,6 +12,7 @@ import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { cn } from "@/lib/utils";
 import { useStaff } from "@/lib/hooks/useStaff";
 import StaffModal from "./_components/staff-modal";
 import type { TenantStaff } from "@/lib/services/staff-service";
@@ -62,7 +63,7 @@ const StaffManagementPage = () => {
 
   // Status update confirmation
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [itemToUpdateStatus, setItemToUpdateStatus] = useState<{item: TenantStaff; status: "active" | "inactive" | "suspended"} | null>(null);
+  const [itemToUpdateStatus, setItemToUpdateStatus] = useState<{ item: TenantStaff; status: "active" | "inactive" | "suspended" } | null>(null);
 
   // Fetch branch name
   useEffect(() => {
@@ -279,23 +280,18 @@ const StaffManagementPage = () => {
             header: "Staff Member",
             render: (item) => (
               <div className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-lg flex items-center justify-center border ${
-                  item.status === "active"
-                    ? "bg-green-50 border-green-200"
-                    : item.status === "suspended"
-                    ? "bg-orange-50 border-orange-200"
-                    : "bg-red-50 border-red-200"
-                }`}>
-                  <Users className={`h-5 w-5 ${
-                    item.status === "active" ? "text-green-600" :
-                    item.status === "suspended" ? "text-orange-600" :
-                    "text-red-600"
-                  }`} />
+                <div className={cn(
+                  "h-10 w-10 rounded-sm flex items-center justify-center border",
+                  item.status === "active" ? "bg-green-50/50 border-green-100/50 text-green-600" :
+                    item.status === "suspended" ? "bg-orange-50/50 border-orange-100/50 text-orange-600" :
+                      "bg-red-50/50 border-red-100/50 text-red-600"
+                )}>
+                  <Users className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900">{item.fullName}</div>
+                  <div className="font-bold text-gray-900">{item.fullName}</div>
                   {item.email && (
-                    <div className="text-xs text-gray-500 truncate">{item.email}</div>
+                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight truncate">{item.email}</div>
                   )}
                 </div>
               </div>
@@ -305,7 +301,7 @@ const StaffManagementPage = () => {
             key: "position",
             header: "Position",
             render: (item) => (
-              <span className="text-sm text-gray-700">{item.position || "—"}</span>
+              <span className="text-sm font-bold text-gray-700">{item.position || "—"}</span>
             ),
             className: "w-36",
           },
@@ -316,17 +312,12 @@ const StaffManagementPage = () => {
               <div className="flex flex-wrap gap-1">
                 {item.roles && item.roles.length > 0 ? (
                   item.roles.slice(0, 2).map((role, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 capitalize">
-                      {role}
+                    <span key={idx} className="px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border text-blue-600 bg-blue-50 border-blue-100">
+                      {role.toUpperCase()}
                     </span>
                   ))
                 ) : (
-                  <span className="text-xs text-gray-400">No roles</span>
-                )}
-                {item.roles && item.roles.length > 2 && (
-                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-                    +{item.roles.length - 2}
-                  </span>
+                  <span className="text-[10px] text-gray-400 font-bold">NO ROLES</span>
                 )}
               </div>
             ),
@@ -336,109 +327,88 @@ const StaffManagementPage = () => {
             key: "status",
             header: "Status",
             render: (item) => (
-              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                item.status === "active"
-                  ? "bg-green-100 text-green-700"
-                  : item.status === "suspended"
-                  ? "bg-orange-100 text-orange-700"
-                  : "bg-red-100 text-red-700"
-              }`}>
-                {item.status?.charAt(0).toUpperCase() + (item.status?.slice(1) || "")}
+              <span className={cn(
+                "px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border",
+                item.status === "active" ? "text-green-600 bg-green-50 border-green-100" :
+                  item.status === "suspended" ? "text-orange-600 bg-orange-50 border-orange-100" :
+                    "text-red-600 bg-red-50 border-red-100"
+              )}>
+                {item.status?.toUpperCase()}
               </span>
             ),
             className: "w-32",
           },
         ]}
         renderGridCard={(item, actions) => {
-          const statusColor = item.status === "active"
-            ? "green"
+          const status = item.status === "active"
+            ? { label: "ACTIVE", color: "text-green-600 bg-green-50 border-green-100", bar: "bg-green-500" }
             : item.status === "suspended"
-            ? "orange"
-            : "red";
+              ? { label: "SUSPENDED", color: "text-orange-600 bg-orange-50 border-orange-100", bar: "bg-orange-500" }
+              : { label: "INACTIVE", color: "text-red-600 bg-red-50 border-red-100", bar: "bg-red-500" };
 
           return (
-            <div className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-200">
-              {/* Card Header with Gradient Background */}
-              <div className={`relative h-28 flex items-center justify-center border-b-2 ${
-                statusColor === "green"
-                  ? "bg-gradient-to-br from-green-50 to-green-100 border-green-200"
-                  : statusColor === "orange"
-                  ? "bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200"
-                  : "bg-gradient-to-br from-red-50 to-red-100 border-red-200"
-              }`}>
-                <Users className={`h-14 w-14 ${
-                  statusColor === "green" ? "text-green-400" :
-                  statusColor === "orange" ? "text-orange-400" :
-                  "text-red-400"
-                }`} />
+            <div className="group relative bg-white border border-[#d5d5dd] rounded-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-200">
+              <div className={cn("h-0.5 w-full shrink-0", status.bar)} />
 
-                {/* Status Badge - Top Left */}
-                <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${
-                  statusColor === "green"
-                    ? "bg-green-500 text-white"
-                    : statusColor === "orange"
-                    ? "bg-orange-500 text-white"
-                    : "bg-red-500 text-white"
-                }`}>
-                  {item.status?.charAt(0).toUpperCase() + (item.status?.slice(1) || "")}
-                </div>
-
-                {/* Position Badge - Top Right */}
-                {item.position && (
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm bg-blue-600 text-white">
-                    {item.position}
+              <div className="p-4 flex flex-col flex-1">
+                {/* ID & Status */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-black text-gray-400 tracking-wider">
+                    ID: {item._id?.slice(-6).toUpperCase() || item.id?.slice(-6).toUpperCase() || 'NEW'}
+                  </span>
+                  <div className={cn(
+                    "px-1.5 py-0.5 rounded-[2px] text-[9px] font-bold tracking-widest border",
+                    status.color
+                  )}>
+                    {status.label}
                   </div>
-                )}
-
-                {/* Hover Actions Overlay */}
-                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-3">
-                  {actions}
-                </div>
-              </div>
-
-              {/* Card Content */}
-              <div className="p-4">
-                {/* Staff Name */}
-                <h3 className="text-base font-bold text-gray-900 mb-2 truncate" title={item.fullName}>
-                  {item.fullName}
-                </h3>
-
-                {/* Email */}
-                <div className="mb-3 min-h-[2.5rem]">
-                  {item.email && (
-                    <p className="text-xs text-gray-600 truncate">
-                      <span className="font-medium">Email:</span> {item.email}
-                    </p>
-                  )}
                 </div>
 
-                {/* Roles */}
-                {item.roles && item.roles.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {item.roles.slice(0, 3).map((role, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-md capitalize"
-                      >
-                        {role}
-                      </span>
-                    ))}
-                    {item.roles.length > 3 && (
-                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-md">
-                        +{item.roles.length - 3}
-                      </span>
-                    )}
+                {/* Main Info */}
+                <div className="flex items-start gap-3 mb-6">
+                  <div className={cn(
+                    "h-10 w-10 rounded-sm flex items-center justify-center shrink-0 border transition-colors",
+                    item.status === "active" ? "bg-green-50/50 border-green-100/50 text-green-600" : "bg-gray-50/50 border-gray-100/50 text-gray-400"
+                  )}>
+                    <Users className="h-5 w-5 stroke-[1.5]" />
                   </div>
-                )}
-
-                {/* PIN Indicator */}
-                {item.pin && (
-                  <div className="pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-600">
-                      <span className="font-medium">PIN:</span> ••••
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-1">
+                      <h3 className="text-sm font-bold text-gray-800 leading-tight truncate group-hover:text-black transition-colors" title={item.fullName}>
+                        {item.fullName}
+                      </h3>
+                      <div className="flex lg:hidden items-center gap-1 shrink-0">
+                        {actions}
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tight truncate">
+                      {item.position || 'No Position'}
                     </p>
                   </div>
-                )}
+                </div>
+
+                {/* Footer Metrics */}
+                <div className="mt-auto pt-3 border-t border-gray-100/60 flex items-center justify-between">
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Email</span>
+                    <span className="text-xs font-bold text-gray-900 tracking-tight pr-2 truncate">
+                      {item.email || 'NO EMAIL'}
+                    </span>
+                  </div>
+
+                  <div className="hidden lg:block opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all duration-200">
+                    <div className="flex items-center gap-1">
+                      {actions}
+                    </div>
+                  </div>
+
+                  <div className="lg:hidden flex flex-col items-end">
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">PIN</span>
+                    <span className="text-xs font-bold text-gray-900">
+                      {item.pin ? '••••' : 'NONE'}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           );
