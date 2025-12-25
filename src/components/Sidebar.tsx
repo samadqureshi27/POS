@@ -12,11 +12,10 @@ import {
   Settings,
   DollarSign,
   Package2,
-  AlignJustify,
   Package,
 } from 'lucide-react';
-import { navigationConfig, findNavigationItem, type NavigationItem } from '@/lib/navigation';
-import { group } from 'console';
+import { CustomTooltip } from './ui/custom-tooltip';
+import { findNavigationItem } from '@/lib/navigation';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -25,164 +24,112 @@ export default function Sidebar() {
     {
       icon: <Home className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Home',
-      link: '/dashboard',
+      href: '/dashboard',
       group: 'main'
     },
     {
       icon: <Package className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Items',
-      link: '/items',
+      href: '/items',
       group: 'items'
     },
     {
       icon: <Package2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Recipe Management',
-      link: '/recipes-management',
+      href: '/recipes-management',
       group: 'recipes'
     },
     {
       icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Menu Management',
-      link: '/menu-items',
-      group: 'menu' // This will match menu-related routes
+      href: '/menu-items',
+      group: 'menu'
     },
     {
       icon: <Building2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Branch Management',
-      link: '/branches-management',
+      href: '/branches-management',
       group: 'branch'
     },
     {
       icon: <DollarSign className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Financial Reports',
-      link: '/financial-reports',
+      href: '/financial-reports',
       group: 'analytics'
     },
     {
       icon: <User className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Customer Management',
-      link: '/customer-details',
+      href: '/customer-details',
       group: 'customer-management'
     },
     {
       icon: <ShoppingCart className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Order Management',
-      link: '/order-management',
+      href: '/order-management',
       group: 'order'
     },
     {
       icon: <Settings className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
       label: 'Settings',
-      link: '/general-settings',
+      href: '/general-settings',
       group: 'settings'
     },
   ];
 
   // Function to check if current path should make this menu item active
   const isItemActive = (item: any) => {
-    // Special case for dashboard/home - should be active when path is exactly /dashboard or /
-    if (item.link === '/dashboard') {
+    const activeItem = findNavigationItem(pathname);
+    if (!activeItem) return pathname === item.href;
+
+    // Special case for dashboard
+    if (item.href === '/dashboard' || item.href === '/') {
       return pathname === '/dashboard' || pathname === '/';
     }
 
-    // First check if current path matches exactly
-    if (pathname === item.link) {
-      return true;
-    }
-
-    // Find the current navigation item from your config
-    const currentNavItem = findNavigationItem(pathname);
-
-    if (!currentNavItem) {
-      return false;
-    }
-
-    // Special handling for different groups
-
-    if (item.group === 'pos') {
-      return currentNavItem.group === 'pos';
-    }
-    if (item.group === 'analytics') {
-      return currentNavItem.group === 'analytics';
-    }
-    if (item.group === 'items') {
-      return currentNavItem.group === 'items';
-    }
-    if (item.group === 'menu') {
-      return currentNavItem.group === 'menu';
-    }
-
-    if (item.group === 'recipes') {
-      return currentNavItem.group === 'recipes';
-    }
-    if (item.group === 'customer-management') {
-      return currentNavItem.group === 'customer-management';
-    }
-
-    if (item.group === 'settings') {
-      return currentNavItem.group === 'settings';
-    }
-
-    if (item.group === 'main') {
-      return currentNavItem.group === 'main';
-    }
-
-    if (item.group === 'branch') {
-      return currentNavItem.group === 'branch';
-    }
-
-    return false;
+    // Match by href or group
+    return pathname === item.href || activeItem.group === item.group;
   };
 
   return (
     <>
       {/* Desktop Sidebar - Left side, vertical */}
-      <aside className="hidden md:block fixed left-0 top-0 h-screen bg-[#D1AB35] w-16 z-30">
+      <aside className="hidden lg:block fixed left-0 top-0 h-screen bg-[#D1AB35] w-16 z-30">
         {/* Menu Items */}
         <nav className="h-full flex flex-col justify-center items-center gap-1 p-4">
           {menuItems.map((item, idx) => (
-            <Link
-              key={idx}
-              href={item.link}
-              className={`group relative flex items-center justify-center p-2.5 rounded hover:bg-[#454545] transition-all ${isItemActive(item) ? 'bg-[#454545]' : ''
-                }`}
-            >
-              <span className={`transition ${isItemActive(item)
-                ? 'text-white'
-                : 'text-black group-hover:text-white'
-                }`}>
-                {item.icon}
-              </span>
-
-              {/* Desktop Tooltip */}
-              <span className="pointer-events-none absolute left-12 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-white px-2 py-1 text-xs text-[#454545] shadow-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition z-50">
-                {item.label}
-              </span>
-
-              {/* Desktop Tooltip arrow */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute left-11 top-1/2 -translate-y-1/2 h-0 w-0 border-y-4 border-y-transparent border-r-4 border-r-white opacity-0 group-hover:opacity-100 transition z-50"
-              />
-            </Link>
+            <CustomTooltip key={idx} label={item.label} direction="right">
+              <Link
+                href={item.href}
+                className={`relative flex items-center justify-center p-2.5 rounded hover:bg-[#454545] transition-all transition-standard ${isItemActive(item) ? 'bg-[#454545]' : ''
+                  }`}
+              >
+                <span className={`transition-colors transition-standard ${isItemActive(item)
+                  ? 'text-white'
+                  : 'text-black group-hover:text-white'
+                  }`}>
+                  {item.icon}
+                </span>
+              </Link>
+            </CustomTooltip>
           ))}
         </nav>
       </aside>
 
       {/* Mobile Sidebar - Bottom of screen, horizontal */}
-      <aside className="md:hidden fixed bottom-0 left-0 right-0 bg-[#D1AB35] h-16 z-50 border-t border-black/10">
-        <div className="h-full overflow-x-auto">
+      <aside className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#D1AB35] h-16 z-50 border-t border-black/10">
+        <div className="h-full overflow-x-auto hide-scrollbar">
           <nav className="h-full flex flex-row items-center gap-2 px-2" style={{ minWidth: 'max-content' }}>
             {menuItems.map((item, idx) => (
               <Link
                 key={idx}
-                href={item.link}
-                className={`flex items-center justify-center p-2 rounded hover:bg-[#2e2e2e] transition min-w-12 h-12 flex-shrink-0 ${isItemActive(item) ? 'bg-[#2e2e2e]' : ''
+                href={item.href}
+                className={`group flex items-center justify-center p-2 rounded hover:bg-[#454545] transition-all transition-standard min-w-12 h-12 flex-shrink-0 ${isItemActive(item) ? 'bg-[#454545]' : ''
                   }`}
               >
-                <span className={`transition ${isItemActive(item)
+                <span className={`transition-colors transition-standard ${isItemActive(item)
                   ? 'text-white'
-                  : 'text-black hover:text-white'
+                  : 'text-black group-hover:text-white'
                   }`}>
                   {item.icon}
                 </span>
