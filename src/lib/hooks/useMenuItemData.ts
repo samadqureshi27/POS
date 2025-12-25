@@ -125,8 +125,8 @@ export const useMenuItemData = () => {
     menuItemStats,
     createMenuItem: hook.create,
     updateMenuItem: hook.update,
-    deleteMenuItem: (id: string) => hook.delete([id]), // Single item delete
-    deleteMenuItems: () => hook.delete(hook.selectedItems),
+    deleteMenuItem: (id: string) => hook.deleteItems([id]), // Single item delete
+    deleteMenuItems: () => hook.delete(),
     handleSelectItem: hook.handleSelectItem,
     handleSelectAll: hook.handleSelectAll,
     clearSelection: hook.clearSelection,
