@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { logError } from "@/lib/util/logger";
+import { toast as sonnerToast } from "sonner";
 
 /**
  * Generic Data Manager Hook
@@ -115,8 +116,20 @@ export function useDataManager<TRaw = any, TTransformed = any>(
   const [additionalState, setAdditionalState] = useState<Record<string, any>>({});
   const additionalStateRef = useRef<Record<string, any>>({});
 
-  // Toast utility
+  // Toast utility - use Sonner for consistent toast notifications
   const showToast = useCallback((message: string, type: "success" | "error") => {
+    if (type === "success") {
+      sonnerToast.success(message, {
+        duration: 5000,
+        position: "top-right",
+      });
+    } else {
+      sonnerToast.error(message, {
+        duration: 5000,
+        position: "top-right",
+      });
+    }
+    // Keep old state for backward compatibility (won't be used for display)
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   }, []);
@@ -133,7 +146,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
       const listFn = (service as any)[listMethod] || service.list;
 
       if (!listFn) {
-        logError(new Error(`Service does not have ${listMethod} method`), {
+        logError(`Service does not have ${listMethod} method`, undefined, {
           component: "useDataManager",
           action: "loadItems",
           entityName,
@@ -169,7 +182,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
 
         setItems(transformedData);
       } else {
-        logError(new Error(response.message || `Failed to load ${entityName}s`), {
+        logError(response.message || `Failed to load ${entityName}s`, undefined, {
           component: "useDataManager",
           action: "loadItems",
           entityName
@@ -178,7 +191,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         setItems([]);
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError(`Failed to load ${entityName}s`, error, {
         component: "useDataManager",
         action: "loadItems",
         entityName
@@ -201,8 +214,8 @@ export function useDataManager<TRaw = any, TTransformed = any>(
       try {
         const result = await loadFn();
         return { key, result };
-      } catch (error) {
-        logError(error as Error, {
+      } catch (error: any) {
+        logError(`Failed to load additional data: ${key}`, error, {
           component: "useDataManager",
           action: "loadAdditionalData",
           entityName,
@@ -285,7 +298,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         throw new Error(response.message || `Failed to create ${entityName}`);
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError(`Failed to create ${entityName}`, error, {
         component: "useDataManager",
         action: "createItem",
         entityName
@@ -329,7 +342,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         throw new Error(response.message || `Failed to update ${entityName}`);
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError(`Failed to update ${entityName}`, error, {
         component: "useDataManager",
         action: "updateItem",
         entityName,
@@ -376,7 +389,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         throw new Error(`Failed to delete ${failedCount} of ${itemIds.length} ${entityName}s`);
       }
     } catch (error: any) {
-      logError(error as Error, {
+      logError(`Failed to delete ${entityName}s`, error, {
         component: "useDataManager",
         action: "deleteItems",
         entityName,
@@ -428,21 +441,25 @@ export function useDataManager<TRaw = any, TTransformed = any>(
           setEditingItem(fullItem);
         } else {
           setEditingItem(item);
+          // Show toast if failed to fetch details, but still open modal with basic data
+          showToast(`Could not load full details for ${entityName}`, "error");
         }
       } else {
         setEditingItem(item);
       }
-    } catch (error) {
-      logError(error as Error, {
+    } catch (error: any) {
+      logError(`Failed to load ${entityName} details`, error, {
         component: "useDataManager",
         action: "openEditModal",
         entityName,
         entityId: item.ID || item.id || item._id
       });
       setEditingItem(item);
+      // Show error toast but still open modal with basic data
+      showToast(error.message || `Failed to load ${entityName} details`, "error");
     }
     setIsModalOpen(true);
-  }, [service, entityName, getMethod]);
+  }, [service, entityName, getMethod, showToast]);
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false);

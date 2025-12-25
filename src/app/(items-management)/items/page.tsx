@@ -646,6 +646,7 @@ export default function ItemsPage() {
                     </p>
                   </div>
                 </div>
+              </div>
 
                 <div className="mt-auto pt-3 border-t border-gray-100/60 flex items-center justify-between">
                   <div className="flex flex-col">
