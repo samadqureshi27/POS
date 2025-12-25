@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, Plus, UtensilsCrossed, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -513,104 +513,65 @@ export default function RecipeModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent size="4xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
-        {/* Header */}
-        <div className="p-5 border-b border-gray-200 flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <UtensilsCrossed className="h-5 w-5 text-gray-700" />
-            <DialogTitle className="text-xl font-bold text-gray-900">
-              {editingItem ? "Edit Recipe" : "Create Recipe"}
-            </DialogTitle>
-          </div>
-          <p className="text-sm text-gray-600 mt-1">
-            {editingItem ? "Update recipe details" : "Build your recipe by adding ingredients"}
-          </p>
-        </div>
+        <DialogHeader>
+          <DialogTitle>
+            {editingItem ? "Edit Recipe" : "Create Recipe"}
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Content */}
-        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-          <Tabs
-            value={formData.type}
-            onValueChange={(value) => handleFieldChange("type", value as "sub" | "final")}
-            className="flex-1 flex flex-col min-h-0"
+        <Tabs
+          value={formData.type}
+          onValueChange={(value) => handleFieldChange("type", value as "sub" | "final")}
+        >
+          <div className="px-8 pb-6 pt-2 flex-shrink-0 border-b border-gray-200">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="final">
+                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                Final Recipe
+              </TabsTrigger>
+              <TabsTrigger value="sub">
+                <UtensilsCrossed className="h-3.5 w-3.5 mr-1.5" />
+                Sub Recipe
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <DialogBody className="space-y-6">
+            <TabsContent value="final" className="mt-0 space-y-6 h-full">
+              {renderTabContent("final")}
+            </TabsContent>
+            <TabsContent value="sub" className="mt-0 space-y-6 h-full">
+              {renderTabContent("sub")}
+            </TabsContent>
+          </DialogBody>
+        </Tabs>
+
+        <DialogFooter>
+          <Button
+            onClick={handleSave}
+            disabled={!formData.name || loading || actionLoading}
+            className="bg-black hover:bg-gray-800 text-white px-8 h-11"
           >
-            {/* Tab List */}
-            <div className="px-5 pt-3 pb-3 border-b border-gray-100 flex-shrink-0">
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-center">
-                  <TabsList className="grid w-full max-w-sm grid-cols-2 h-9">
-                    <TabsTrigger value="final" className="text-sm gap-1.5">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      Final Recipe
-                    </TabsTrigger>
-                    <TabsTrigger value="sub" className="text-sm gap-1.5">
-                      <UtensilsCrossed className="h-3.5 w-3.5" />
-                      Sub Recipe
-                    </TabsTrigger>
-                  </TabsList>
-                </div>
-                <p className="text-xs text-gray-600 text-center">
-                  {formData.type === "sub"
-                    ? "Components that can be reused in other recipes"
-                    : "Complete menu items ready to serve"}
-                </p>
-              </div>
-            </div>
-              
-              
-
-            {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden p-5 min-h-0">
-              <TabsContent value="final" className="mt-0">
-                {renderTabContent("final")}
-              </TabsContent>
-              <TabsContent value="sub" className="mt-0">
-                {renderTabContent("sub")}
-              </TabsContent>
-            </div>
-          </Tabs>
-        </div>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center flex-shrink-0">
-          <div className="text-xs text-gray-600 space-x-3">
-            <span>
-              {recipeIngredients.length} ingredient{recipeIngredients.length !== 1 ? 's' : ''}
-            </span>
-            {variants.length > 0 && (
-              <span className="text-amber-700 font-semibold">
-                • {variants.length} variant{variants.length !== 1 ? 's' : ''}
-              </span>
+            {loading || actionLoading ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                {editingItem ? "Update" : "Submit"}
+              </>
             )}
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={onClose}
-              variant="outline"
-              size="sm"
-              className="h-9"
-              disabled={loading || actionLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!formData.name || loading || actionLoading}
-              size="sm"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9"
-            >
-              {loading || actionLoading ? (
-                <>
-                  <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  {editingItem ? "Update" : "Create"} Recipe
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
+          </Button>
+          <Button
+            onClick={onClose}
+            variant="outline"
+            className="px-8 h-11 border-gray-300"
+            disabled={loading || actionLoading}
+          >
+            Cancel
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
