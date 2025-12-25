@@ -145,9 +145,17 @@ export class MenuCategoryService {
         };
       }
 
+      // Handle different API response structures (same as getCategory)
+      let categoryData = data;
+      if (data.result) {
+        categoryData = data.result;
+      } else if (data.data) {
+        categoryData = data.data;
+      }
+
       return {
         success: true,
-        data: data.data || data,
+        data: categoryData,
         message: data.message || "Menu category created successfully",
       };
     } catch (error: any) {
@@ -182,9 +190,17 @@ export class MenuCategoryService {
         };
       }
 
+      // Handle different API response structures (same as getCategory)
+      let categoryData = data;
+      if (data.result) {
+        categoryData = data.result;
+      } else if (data.data) {
+        categoryData = data.data;
+      }
+
       return {
         success: true,
-        data: data.data || data,
+        data: categoryData,
         message: data.message || "Menu category updated successfully",
       };
     } catch (error: any) {

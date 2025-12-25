@@ -49,8 +49,12 @@ export const useMenuItemData = () => {
       return response.items || response.data || response.menuItems || [];
     },
     customFilter: (item, filters) => {
-      const matchesSearch = item.Name.toLowerCase().includes(filters.searchTerm?.toLowerCase() || '') ||
-                           item.Code.toLowerCase().includes(filters.searchTerm?.toLowerCase() || '');
+      const itemName = item.Name || "";
+      const itemCode = item.Code || "";
+      const searchTerm = filters.searchTerm?.toLowerCase() || "";
+
+      const matchesSearch = itemName.toLowerCase().includes(searchTerm) ||
+                           itemCode.toLowerCase().includes(searchTerm);
       const matchesStatus = !filters.statusFilter || item.Status === filters.statusFilter;
       const matchesCategory = !filters.categoryFilter || item.CategoryId === filters.categoryFilter;
       return matchesSearch && matchesStatus && matchesCategory;

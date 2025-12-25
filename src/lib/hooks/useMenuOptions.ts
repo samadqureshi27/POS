@@ -131,19 +131,33 @@ export const useMenuOptions = () => {
             }
             const response = await AddonsGroupsService.listGroups();
             if (response.success && response.data) {
-                // Map addon groups to MenuItemOptions format
-                const mapped = response.data.map((group, idx) => ({
-                    ID: idx + 1,
-                    Name: group.name || "",
-                    DisplayType: "Radio" as const, // Default to Radio
-                    Priority: group.displayOrder || idx + 1,
-                    OptionValue: [],
-                    OptionPrice: [],
-                    backendId: group._id || group.id,
-                    categoryId: group.categoryId,
-                    groupId: group._id || group.id,
-                    groupName: group.name,
-                }));
+                // Load addon items for each group to populate OptionValue and OptionPrice
+                const mappedPromises = response.data.map(async (group, idx) => {
+                    const groupId = group._id || group.id;
+
+                    // Load items for this group
+                    const itemsRes = await AddonsItemsService.listItems({ groupId });
+                    const items = itemsRes.success && itemsRes.data ? itemsRes.data : [];
+
+                    // Extract option names and prices from items
+                    const optionValues = items.map(item => item.nameSnapshot || "");
+                    const optionPrices = items.map(item => item.price || 0);
+
+                    return {
+                        ID: idx + 1,
+                        Name: group.name || "",
+                        DisplayType: "Radio" as const, // Default to Radio
+                        Priority: group.displayOrder || idx + 1,
+                        OptionValue: optionValues,
+                        OptionPrice: optionPrices,
+                        backendId: group._id || group.id,
+                        categoryId: group.categoryId,
+                        groupId: group._id || group.id,
+                        groupName: group.name,
+                    };
+                });
+
+                const mapped = await Promise.all(mappedPromises);
                 setMenuItemOptionss(mapped.sort((a, b) => a.Priority - b.Priority));
             } else {
                 throw new Error(response.message || "Failed to fetch addon groups");
@@ -269,52 +283,16 @@ export const useMenuOptions = () => {
                 }
             }
 
-            // Get existing items for this group
-            const existingItemsRes = await AddonsItemsService.listItems({ groupId: itemData.groupId });
-            const existingItems = existingItemsRes.success && existingItemsRes.data ? existingItemsRes.data : [];
-
-            // Delete all existing items
-            await Promise.all(
-                existingItems.map(async (item) => {
-                    if (item._id || item.id) {
-                        await AddonsItemsService.deleteItem(item._id || item.id || "");
-                    }
-                })
-            );
-
-            // Bulk create new items
-            const bulkPayload = {
-                groupId: itemData.groupId,
-                categoryId: itemData.categoryId,
-                items: itemData.addonItems.map((item, idx) => ({
-                    sourceType: item.sourceType,
-                    sourceId: item.sourceId,
-                    nameSnapshot: item.nameSnapshot,
-                    price: item.price,
-                    unit: item.unit || "unit",
-                    isRequired: item.isRequired || false,
-                    displayOrder: item.displayOrder || idx + 1,
-                })),
-            };
-
-            const response = await AddonsItemsService.bulkCreateItems(bulkPayload);
-            if (response.success) {
-                // Don't auto-refresh here - let the caller handle it to prevent double refresh
-                setIsModalOpen(false);
-                setEditingItem(null);
-                // showToast("Add-on items updated successfully", "success");
-                return { success: true };
-            } else {
-                showToast(response.message || "Failed to update add-on items", "error");
-                return { success: false };
-            }
+            setIsModalOpen(false);
+            setEditingItem(null);
+            return { success: true };
         } catch (error) {
-            logError("Error updating add-on items", error, {
+            logError("Error updating add-on", error, {
                 component: "useMenuOptions",
                 action: "handleUpdateItem",
                 groupId: itemData.groupId
             });
-            showToast(error instanceof Error ? error.message : "Failed to update add-on items", "error");
+            showToast(error instanceof Error ? error.message : "Failed to update add-on", "error");
             return { success: false };
         } finally {
             setActionLoading(false);

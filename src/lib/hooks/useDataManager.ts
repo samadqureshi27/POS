@@ -325,8 +325,13 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         // Optimistic update: Update item in local state
         setItems(prevItems => {
           return prevItems.map((item: any) => {
-            const itemId = item.ID || item.id || item._id;
-            if (itemId === id || item._id === id || item.id === id) {
+            const itemId = String(item.ID || item.id || item._id);
+            const targetId = String(id);
+            const matches = itemId === targetId ||
+                           String(item._id) === targetId ||
+                           String(item.id) === targetId;
+
+            if (matches) {
               // Transform the updated data and merge with existing item
               const updatedItem = transformData
                 ? transformData(response.data, 0, additionalStateRef.current)
@@ -375,10 +380,13 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         // Optimistic update: Remove deleted items from local state
         setItems(prevItems => {
           return prevItems.filter((item: any) => {
-            const itemId = item.ID || item.id || item._id;
-            return !itemIds.includes(itemId) &&
-                   !itemIds.includes(item._id) &&
-                   !itemIds.includes(item.id);
+            // Check if any of the item's ID fields match any of the IDs to delete
+            const itemIdMatches = itemIds.some(deleteId =>
+              deleteId === String(item.ID) ||
+              deleteId === String(item.id) ||
+              deleteId === String(item._id)
+            );
+            return !itemIdMatches;
           });
         });
 

@@ -121,11 +121,15 @@ export const useIngredientsData = () => {
   // Computed values
   const filteredItems = items.filter((item) => {
     const q = searchTerm.trim().toLowerCase();
+    const itemName = (item.Name || "").toLowerCase();
+    const itemID = (item.ID || "").toLowerCase();
+    const itemUnit = (item.Unit || "").toLowerCase();
+
     const matchesQuery =
       q === "" ||
-      item.Name.toLowerCase().includes(q) ||
-      item.ID.toLowerCase().includes(q) ||
-      item.Unit.toLowerCase().includes(q);
+      itemName.includes(q) ||
+      itemID.includes(q) ||
+      itemUnit.includes(q);
     const matchesStatus = statusFilter ? item.Status === statusFilter : true;
     const matchesUnit = unitFilter ? item.Unit === unitFilter : true;
     return matchesQuery && matchesStatus && matchesUnit;

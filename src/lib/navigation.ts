@@ -8,6 +8,7 @@ export interface NavigationItem {
   children?: NavigationItem[]
   group?: string
   dynamic?: boolean // ✅ mark if it's a dynamic route
+  hidden?: boolean // ✅ hide from navigation but keep in codebase
 }
 
 // -------------------------
@@ -172,6 +173,7 @@ export const navigationConfig: NavigationItem[] = [
     name: "Recipes Options",
     href: "/recipes-options",
     group: "recipes",
+    hidden: true, // ✅ Hidden but kept in codebase for future use
   },
   {
     name: "Menu Options",

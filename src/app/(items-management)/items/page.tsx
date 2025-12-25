@@ -648,6 +648,7 @@ export default function ItemsPage() {
                 </div>
               </div>
 
+              <div className="p-4 pt-0">
                 <div className="mt-auto pt-3 border-t border-gray-100/60 flex items-center justify-between">
                   <div className="flex flex-col">
                     <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Price</span>
@@ -730,5 +731,5 @@ export default function ItemsPage() {
         variant="default"
       />
     </PageContainer>
-  );
+);
 }

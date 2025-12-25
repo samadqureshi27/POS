@@ -146,9 +146,17 @@ export class MenuService {
         };
       }
 
+      // Handle different API response structures (same as getMenuItem)
+      let createdItem = data;
+      if (data.result) {
+        createdItem = data.result;
+      } else if (data.data) {
+        createdItem = data.data;
+      }
+
       return {
         success: true,
-        data: data.data || data,
+        data: createdItem,
         message: data.message || "Menu item created successfully",
       };
     } catch (error: any) {
@@ -183,9 +191,17 @@ export class MenuService {
         };
       }
 
+      // Handle different API response structures (same as getMenuItem)
+      let updatedItem = data;
+      if (data.result) {
+        updatedItem = data.result;
+      } else if (data.data) {
+        updatedItem = data.data;
+      }
+
       return {
         success: true,
-        data: data.data || data,
+        data: updatedItem,
         message: data.message || "Menu item updated successfully",
       };
     } catch (error: any) {

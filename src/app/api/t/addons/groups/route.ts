@@ -1,7 +1,7 @@
 // src/app/api/t/addons/groups/route.ts
 
 import { NextResponse } from "next/server";
-import { buildTenantHeaders, getRemoteBase } from "@/app/api/_utils/proxy-helpers";
+import { buildTenantHeaders, getRemoteBase, proxyFetch } from "@/app/api/_utils/proxy-helpers";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
   let url = `${getRemoteBase()}/t/addons/groups`;
   if (categoryId) url += `?categoryId=${encodeURIComponent(categoryId)}`;
 
-  const res = await fetch(url, {
+  const res = await proxyFetch(url, {
     method: "GET",
     headers: buildTenantHeaders(req, true)
   });
@@ -29,10 +29,11 @@ export async function POST(req: Request) {
   const payload = await req.json().catch(() => ({}));
   const url = `${getRemoteBase()}/t/addons/groups`;
 
-  const res = await fetch(url, {
+  const res = await proxyFetch(url, {
     method: "POST",
     headers: buildTenantHeaders(req, true),
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    logBody: payload
   });
 
   const contentType = res.headers.get("content-type");

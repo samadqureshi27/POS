@@ -196,7 +196,7 @@ const RecipesManagementPage = () => {
         emptyIcon={<UtensilsCrossed className="h-16 w-16 text-gray-300" />}
         emptyTitle="No recipes found"
         emptyDescription="Start by adding your first recipe"
-        getItemId={(item) => String(item.ID)}
+        getItemId={(item) => String((item as any)._id || item.ID || 'unknown')}
         onEdit={openEditModal}
         onDelete={handleDelete}
         customActions={(item) => (
