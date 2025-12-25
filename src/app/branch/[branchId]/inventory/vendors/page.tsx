@@ -14,6 +14,7 @@ import { useVendorManagement } from "@/lib/hooks/useVendors";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const VendorsPage = () => {
@@ -126,200 +127,216 @@ const VendorsPage = () => {
           subtitle="Manage vendors and suppliers for inventory"
         />
 
-      {/* Stats Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <AdvancedMetricCard
-          title="Total Vendors"
-          subtitle="All suppliers"
-          value={statistics.totalVendorsCount}
-          icon="inventory"
-          format="number"
-        />
+        {/* Stats Bar */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <AdvancedMetricCard
+            title="Total Vendors"
+            subtitle="All suppliers"
+            value={statistics.totalVendorsCount}
+            icon="inventory"
+            format="number"
+          />
 
-        <AdvancedMetricCard
-          title="Active Orders"
-          subtitle="Current orders"
-          value={statistics.totalOrders}
-          icon="target"
-          format="number"
-          status="good"
-        />
-      </div>
+          <AdvancedMetricCard
+            title="Active Orders"
+            subtitle="Current orders"
+            value={statistics.totalOrders}
+            icon="target"
+            format="number"
+            status="good"
+          />
+        </div>
 
-      {/* Action Bar */}
-      <EnhancedActionBar
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search vendors by name or contact..."
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        showViewToggle={true}
-        onPrimaryAction={handleAddWithToast}
-        primaryActionLabel="Add Vendor"
-        primaryActionIcon={<Plus className="h-5 w-5 mr-2" />}
-        onSecondaryAction={selectedItems.length > 0 ? handleDeleteWithToast : undefined}
-        secondaryActionLabel="Delete Selected"
-        secondaryActionDisabled={selectedItems.length === 0}
-      />
-
-      {/* Vendors Grid */}
-      <ResponsiveGrid<any>
-        items={paginatedItems}
-        loading={loading}
-        loadingText="Loading vendors..."
-        viewMode={viewMode}
-        emptyIcon={<Truck className="h-16 w-16 text-gray-300" />}
-        emptyTitle="No vendors found"
-        emptyDescription="Start by adding your first vendor"
-        getItemId={(item) => String(item.Vendor_ID)}
-        onEdit={openEditModal}
-        onDelete={(item) => {
-          handleSelectItem(item.Vendor_ID);
-          setDeleteDialogOpen(true);
-        }}
-        customActions={(item) => (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => openEditModal(item)}
-              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 w-8 p-0"
-            >
-              <Edit2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                handleSelectItem(item.Vendor_ID);
-                setDeleteDialogOpen(true);
-              }}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-        // Pagination props
-        showPagination={true}
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        totalItems={filteredItems.length}
-        totalPages={totalPages}
-        onPageChange={(page) => {
-          setCurrentPage(page);
-          if (typeof window !== 'undefined') {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        {/* Action Bar */}
+        <EnhancedActionBar
+          searchValue={searchTerm}
+          onSearchChange={setSearchTerm}
+          searchPlaceholder="Search vendors by name or contact..."
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          showViewToggle={true}
+          onPrimaryAction={handleAddWithToast}
+          primaryActionLabel="Add Vendor"
+          primaryActionIcon={<Plus className="h-5 w-5 mr-2" />}
+          secondaryActions={
+            selectedItems.length > 0 ? (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteWithToast}
+                className="h-[40px] px-4 rounded-sm"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Selected ({selectedItems.length})
+              </Button>
+            ) : null
           }
-        }}
-        columns={[
-          {
-            key: "name",
-            header: "Vendor Name",
-            render: (item) => (
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg flex items-center justify-center border bg-blue-50 border-blue-200">
-                  <Truck className="h-5 w-5 text-blue-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900">{item.Vendor_Name}</div>
-                  {item.Contact_Person && (
-                    <div className="text-xs text-gray-500">{item.Contact_Person}</div>
-                  )}
-                </div>
-              </div>
-            ),
-          },
-          {
-            key: "contact",
-            header: "Contact",
-            render: (item) => (
-              <div className="text-sm text-gray-700">
-                {item.Phone_Number || item.Email || "—"}
-              </div>
-            ),
-            className: "w-48",
-          },
-          {
-            key: "orders",
-            header: "Orders",
-            render: (item) => (
-              <span className="text-sm font-semibold text-gray-900">
-                {item.Total_Orders || 0}
-              </span>
-            ),
-            className: "w-24",
-          },
-        ]}
-        renderGridCard={(item, actions) => {
-          return (
-            <div className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-200">
-              {/* Card Header with Gradient Background */}
-              <div className="relative h-28 flex items-center justify-center border-b-2 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                <Truck className="h-14 w-14 text-blue-400" />
+        />
 
-                {/* Orders Badge - Top Right */}
-                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm bg-blue-600 text-white">
-                  {item.Total_Orders || 0} Orders
-                </div>
-
-                {/* Hover Actions Overlay */}
-                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-3">
-                  {actions}
-                </div>
-              </div>
-
-              {/* Card Content */}
-              <div className="p-4">
-                {/* Vendor Name */}
-                <h3 className="text-base font-bold text-gray-900 mb-2 truncate" title={item.Vendor_Name}>
-                  {item.Vendor_Name}
-                </h3>
-
-                {/* Contact Details */}
-                <div className="mb-3 min-h-[2.5rem] space-y-1">
-                  {item.Contact_Person && (
-                    <p className="text-xs text-gray-600">
-                      <span className="font-medium">Contact:</span> {item.Contact_Person}
-                    </p>
-                  )}
-                  {item.Phone_Number && (
-                    <p className="text-xs text-gray-600">
-                      <span className="font-medium">Phone:</span> {item.Phone_Number}
-                    </p>
-                  )}
-                  {item.Email && (
-                    <p className="text-xs text-gray-600 truncate">
-                      <span className="font-medium">Email:</span> {item.Email}
-                    </p>
-                  )}
-                </div>
-
-                {/* Vendor Details */}
-                {item.Address && (
-                  <div className="pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-600 line-clamp-2">
-                      <span className="font-medium">Address:</span> {item.Address}
-                    </p>
-                  </div>
-                )}
-              </div>
+        {/* Vendors Grid */}
+        <ResponsiveGrid<any>
+          items={paginatedItems}
+          loading={loading}
+          loadingText="Loading vendors..."
+          viewMode={viewMode}
+          emptyIcon={<Truck className="h-16 w-16 text-gray-300" />}
+          emptyTitle="No vendors found"
+          emptyDescription="Start by adding your first vendor"
+          getItemId={(item) => String(item.Vendor_ID)}
+          onEdit={openEditModal}
+          onDelete={(item) => {
+            handleSelectItem(item.Vendor_ID, true);
+            setDeleteDialogOpen(true);
+          }}
+          customActions={(item) => (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => openEditModal(item)}
+                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 w-8 p-0"
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  handleSelectItem(item.Vendor_ID, true);
+                  setDeleteDialogOpen(true);
+                }}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
-          );
-        }}
-      />
+          )}
+          // Pagination props
+          showPagination={true}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+          totalItems={filteredItems.length}
+          totalPages={totalPages}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            if (typeof window !== 'undefined') {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+          columns={[
+            {
+              key: "name",
+              header: "Vendor Name",
+              render: (item) => (
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-sm flex items-center justify-center border bg-blue-50/50 border-blue-100/50 text-blue-600">
+                    <Truck className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-gray-900">{item.Vendor_Name}</div>
+                    {item.Contact_Person && (
+                      <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight truncate">{item.Contact_Person}</div>
+                    )}
+                  </div>
+                </div>
+              ),
+            },
+            {
+              key: "contact",
+              header: "Contact",
+              render: (item) => (
+                <div className="text-sm font-bold text-gray-700">
+                  {item.Phone_Number || item.Email || "—"}
+                </div>
+              ),
+              className: "w-48",
+            },
+            {
+              key: "orders",
+              header: "Orders",
+              render: (item) => (
+                <span className="text-sm font-bold text-gray-900">
+                  {item.Total_Orders || 0}
+                </span>
+              ),
+              className: "w-24",
+            },
+          ]}
+          renderGridCard={(item, actions) => {
+            return (
+              <div className="group relative bg-white border border-[#d5d5dd] rounded-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-200">
+                <div className="h-0.5 w-full shrink-0 bg-blue-500" />
 
-      {/* Vendor modal */}
-      <VendorModal
-        isOpen={isModalOpen}
-        editingItem={editingItem}
-        formData={formData}
-        actionLoading={actionLoading}
-        branchId={branchId}
-        onClose={closeModal}
-        onSubmit={handleModalSubmit}
-        onFormDataChange={updateFormData}
-      />
+                <div className="p-4 flex flex-col flex-1">
+                  {/* ID & Status */}
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-black text-gray-400 tracking-wider">
+                      VENDOR: {item.Vendor_ID?.toString().padStart(3, '0') || 'NEW'}
+                    </span>
+                    <div className="px-1.5 py-0.5 rounded-[2px] text-[9px] font-bold tracking-widest border text-blue-600 bg-blue-50 border-blue-100">
+                      ACTIVE
+                    </div>
+                  </div>
+
+                  {/* Main Info */}
+                  <div className="flex items-start gap-3 mb-6">
+                    <div className="h-10 w-10 rounded-sm flex items-center justify-center shrink-0 border bg-blue-50/50 border-blue-100/50 text-blue-600 transition-colors">
+                      <Truck className="h-5 w-5 stroke-[1.5]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-1">
+                        <h3 className="text-sm font-bold text-gray-800 leading-tight truncate group-hover:text-black transition-colors" title={item.Vendor_Name}>
+                          {item.Vendor_Name}
+                        </h3>
+                        <div className="flex lg:hidden items-center gap-1 shrink-0">
+                          {actions}
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tight truncate">
+                        {item.Contact_Person || 'No Contact Person'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Footer Metrics */}
+                  <div className="mt-auto pt-3 border-t border-gray-100/60 flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Orders</span>
+                      <span className="text-sm font-bold text-gray-900 tracking-tight pr-2">
+                        {item.Total_Orders || 0}
+                      </span>
+                    </div>
+
+                    <div className="hidden lg:block opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all duration-200">
+                      <div className="flex items-center gap-1">
+                        {actions}
+                      </div>
+                    </div>
+
+                    <div className="lg:hidden flex flex-col items-end">
+                      <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Reference</span>
+                      <span className="text-xs font-bold text-gray-900">
+                        #{item.Vendor_ID}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          }}
+        />
+
+        {/* Vendor modal */}
+        <VendorModal
+          isOpen={isModalOpen}
+          editingItem={editingItem}
+          formData={formData}
+          actionLoading={actionLoading}
+          branchId={branchId}
+          onClose={closeModal}
+          onSubmit={handleModalSubmit}
+          onFormDataChange={updateFormData}
+        />
 
         {/* Delete Confirmation Dialog */}
         <ConfirmDialog

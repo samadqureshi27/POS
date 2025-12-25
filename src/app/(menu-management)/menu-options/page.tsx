@@ -13,6 +13,7 @@ import { MenuItemOptions } from "@/lib/types/menuItemOptions";
 import { formatPrice } from "@/lib/util/formatters";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
+import { cn } from "@/lib/utils";
 
 const AddOnsPage = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -171,24 +172,17 @@ const AddOnsPage = () => {
             header: "Add-on Name",
             render: (item) => (
               <div className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-lg flex items-center justify-center border ${
-                  item.DisplayType === "Radio"
-                    ? "bg-blue-50 border-blue-200"
-                    : item.DisplayType === "Select"
-                    ? "bg-purple-50 border-purple-200"
-                    : "bg-green-50 border-green-200"
-                }`}>
-                  <Settings className={`h-5 w-5 ${
-                    item.DisplayType === "Radio"
-                      ? "text-blue-600"
-                      : item.DisplayType === "Select"
-                      ? "text-purple-600"
-                      : "text-green-600"
-                  }`} />
+                <div className={cn(
+                  "h-10 w-10 rounded-sm flex items-center justify-center border",
+                  item.DisplayType === "Radio" ? "bg-blue-50/50 border-blue-100/50 text-blue-600" :
+                    item.DisplayType === "Select" ? "bg-purple-50/50 border-purple-100/50 text-purple-600" :
+                      "bg-green-50/50 border-green-100/50 text-green-600"
+                )}>
+                  <Settings className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900">{item.Name}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="font-bold text-gray-900">{item.Name}</div>
+                  <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight truncate">
                     Priority: {item.Priority}
                   </div>
                 </div>
@@ -199,14 +193,13 @@ const AddOnsPage = () => {
             key: "DisplayType",
             header: "Type",
             render: (item) => (
-              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                item.DisplayType === "Radio"
-                  ? "bg-blue-100 text-blue-700"
-                  : item.DisplayType === "Select"
-                  ? "bg-purple-100 text-purple-700"
-                  : "bg-green-100 text-green-700"
-              }`}>
-                {item.DisplayType}
+              <span className={cn(
+                "px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border",
+                item.DisplayType === "Radio" ? "text-blue-600 bg-blue-50 border-blue-100" :
+                  item.DisplayType === "Select" ? "text-purple-600 bg-purple-50 border-purple-100" :
+                    "text-green-600 bg-green-50 border-green-100"
+              )}>
+                {item.DisplayType?.toUpperCase()}
               </span>
             ),
             className: "w-28",
@@ -218,10 +211,10 @@ const AddOnsPage = () => {
               const optionCount = item.OptionValue?.length || 0;
               return (
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center h-6 w-6 rounded-full bg-gray-100 text-xs font-semibold text-gray-700">
+                  <div className="flex items-center justify-center h-6 w-6 rounded-sm bg-gray-100 text-[10px] font-bold text-gray-700">
                     {optionCount}
                   </div>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-xs font-bold text-gray-400 uppercase">
                     {optionCount === 1 ? "option" : "options"}
                   </span>
                 </div>
@@ -232,88 +225,78 @@ const AddOnsPage = () => {
         ]}
         renderGridCard={(item, actions) => {
           const optionCount = item.OptionValue?.length || 0;
+          const status = item.DisplayType === "Radio"
+            ? { label: "RADIO", color: "text-blue-600 bg-blue-50 border-blue-100", bar: "bg-blue-500" }
+            : item.DisplayType === "Select"
+              ? { label: "SELECT", color: "text-purple-600 bg-purple-50 border-purple-100", bar: "bg-purple-500" }
+              : { label: "CHECKBOX", color: "text-green-600 bg-green-50 border-green-100", bar: "bg-green-500" };
 
           return (
-            <div className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-200">
-              {/* Card Header with Gradient Background */}
-              <div className={`relative h-28 flex items-center justify-center border-b-2 ${
-                item.DisplayType === "Radio"
-                  ? "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200"
-                  : item.DisplayType === "Select"
-                  ? "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200"
-                  : "bg-gradient-to-br from-green-50 to-green-100 border-green-200"
-              }`}>
-                <Settings className={`h-14 w-14 ${
-                  item.DisplayType === "Radio"
-                    ? "text-blue-400"
-                    : item.DisplayType === "Select"
-                    ? "text-purple-400"
-                    : "text-green-400"
-                }`} />
+            <div className="group relative bg-white border border-[#d5d5dd] rounded-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-200">
+              <div className={cn("h-0.5 w-full shrink-0", status.bar)} />
 
-                {/* Type Badge - Top Right */}
-                <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${
-                  item.DisplayType === "Radio"
-                    ? "bg-blue-600 text-white"
-                    : item.DisplayType === "Select"
-                    ? "bg-purple-600 text-white"
-                    : "bg-green-600 text-white"
-                }`}>
-                  {item.DisplayType}
+              <div className="p-4 flex flex-col flex-1">
+                {/* ID & Status */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-black text-gray-400 tracking-wider">
+                    ID: {item.ID?.toString().padStart(3, '0') || 'NEW'}
+                  </span>
+                  <div className={cn(
+                    "px-1.5 py-0.5 rounded-[2px] text-[9px] font-bold tracking-widest border",
+                    status.color
+                  )}>
+                    {status.label}
+                  </div>
                 </div>
 
-                {/* Hover Actions Overlay */}
-                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-3">
-                  {actions}
-                </div>
-              </div>
-
-              {/* Card Content */}
-              <div className="p-4">
-                {/* Add-on Name */}
-                <h3 className="text-base font-bold text-gray-900 mb-2 truncate" title={item.Name}>
-                  {item.Name}
-                </h3>
-
-                {/* Priority */}
-                <div className="text-xs text-gray-500 mb-3">
-                  Priority: <span className="font-semibold text-gray-700">{item.Priority}</span>
-                </div>
-
-                {/* Stats Row */}
-                <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                  {/* Option Count */}
-                  <div className="flex items-center gap-2">
-                    <div className={`flex items-center justify-center h-7 w-7 rounded-lg ${
-                      item.DisplayType === "Radio"
-                        ? "bg-blue-100"
-                        : item.DisplayType === "Select"
-                        ? "bg-purple-100"
-                        : "bg-green-100"
-                    }`}>
-                      <span className={`text-xs font-bold ${
-                        item.DisplayType === "Radio"
-                          ? "text-blue-700"
-                          : item.DisplayType === "Select"
-                          ? "text-purple-700"
-                          : "text-green-700"
-                      }`}>
-                        {optionCount}
-                      </span>
+                {/* Main Info */}
+                <div className="flex items-start gap-3 mb-6">
+                  <div className={cn(
+                    "h-10 w-10 rounded-sm flex items-center justify-center shrink-0 border transition-colors",
+                    item.DisplayType === "Radio" ? "bg-blue-50/50 border-blue-100/50 text-blue-600" :
+                      item.DisplayType === "Select" ? "bg-purple-50/50 border-purple-100/50 text-purple-600" :
+                        "bg-green-50/50 border-green-100/50 text-green-600"
+                  )}>
+                    <Settings className="h-5 w-5 stroke-[1.5]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-1">
+                      <h3 className="text-sm font-bold text-gray-800 leading-tight truncate group-hover:text-black transition-colors" title={item.Name}>
+                        {item.Name}
+                      </h3>
+                      <div className="flex lg:hidden items-center gap-1 shrink-0">
+                        {actions}
+                      </div>
                     </div>
-                    <span className="text-xs text-gray-600 font-medium">
-                      {optionCount === 1 ? "option" : "options"}
+                    <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tight truncate">
+                      Priority: {item.Priority}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer Metrics */}
+                <div className="mt-auto pt-3 border-t border-gray-100/60 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Options</span>
+                    <span className="text-sm font-bold text-gray-900 tracking-tight pr-2">
+                      {optionCount} {optionCount === 1 ? 'OPTION' : 'OPTIONS'}
                     </span>
                   </div>
 
-                  {/* Price Range */}
-                  {item.OptionPrice && item.OptionPrice.length > 0 && (
-                    <div className="text-xs text-gray-500">
-                      <span className="font-semibold text-gray-700">
-                        ${formatPrice(Math.min(...item.OptionPrice))} - ${formatPrice(Math.max(...item.OptionPrice))}
-                      </span>
+                  <div className="hidden lg:block opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all duration-200">
+                    <div className="flex items-center gap-1">
+                      {actions}
                     </div>
-                  )}
+                  </div>
+
+                  <div className="lg:hidden flex flex-col items-end">
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Price Range</span>
+                    <span className="text-xs font-bold text-gray-900">
+                      {item.OptionPrice && item.OptionPrice.length > 0
+                        ? `$${formatPrice(Math.min(...item.OptionPrice))} - $${formatPrice(Math.max(...item.OptionPrice))}`
+                        : "NO PRICE"}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

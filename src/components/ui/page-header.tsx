@@ -39,7 +39,7 @@ const PageHeaderComponent: React.FC<PageHeaderProps> = ({
     )}>
       <div className="flex-1">
         <h1 className={cn(
-          "text-3xl font-semibold tracking-tight text-foreground",
+          "text-3xl font-semibold tracking-tight text-gray-800",
           titleClassName
         )}>
           {title}

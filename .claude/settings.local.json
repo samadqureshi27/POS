@@ -15,7 +15,6 @@
       "mcp__ide__getDiagnostics",
       "Bash(npm install:*)",
       "Bash(npm run dev:*)",
-      "Bash(dir \"I:\\POS\\admin-pos-management\\src\\app\\(menu-management)\\menu-options\\_components\")",
       "Bash(tree:*)",
       "Bash(dir:*)",
       "Bash(curl:*)",

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Loader2, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { RecipeService } from "@/lib/services/recipe-service";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -348,41 +348,22 @@ export default function MenuItemModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent size="4xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
-        {/* Header */}
-        <div className="p-5 border-b border-gray-200 flex-shrink-0">
-          <DialogTitle className="text-xl font-bold text-gray-900">
+        <DialogHeader>
+          <DialogTitle>
             {editingItem ? "Edit Menu Item" : "Add Menu Item"}
           </DialogTitle>
-          <p className="text-sm text-gray-600 mt-1">
-            {editingItem ? "Update menu item details and pricing" : "Create a new menu item"}
-          </p>
-        </div>
+        </DialogHeader>
 
-        {/* Content */}
-        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-            {/* Tab List */}
-            <div className="px-5 pt-3 pb-3 border-b border-gray-100 flex-shrink-0">
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-center">
-                  <TabsList className="grid w-full max-w-sm grid-cols-3 h-9">
-                    <TabsTrigger value="basic" className="text-sm">Basic Info</TabsTrigger>
-                    <TabsTrigger value="pricing" className="text-sm">Pricing</TabsTrigger>
-                    <TabsTrigger value="details" className="text-sm">Details</TabsTrigger>
-                  </TabsList>
-                </div>
-                <p className="text-xs text-gray-600 text-center">
-                  {activeTab === "basic"
-                    ? "Configure basic item information and category"
-                    : activeTab === "pricing"
-                    ? "Set pricing and currency details"
-                    : "Additional settings and metadata"}
-                </p>
-              </div>
-            </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <div className="px-8 pb-6 pt-2 flex-shrink-0 border-b border-gray-200">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="pricing">Pricing</TabsTrigger>
+              <TabsTrigger value="details">Details</TabsTrigger>
+            </TabsList>
+          </div>
 
-            {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-5 min-h-0">
+          <DialogBody className="space-y-6">
               <TabsContent value="basic" className="mt-0 space-y-6">
             {/* Name */}
             <div className="space-y-2">
@@ -702,31 +683,27 @@ export default function MenuItemModal({
               />
             </div>
               </TabsContent>
-            </div>
-          </Tabs>
-        </div>
+          </DialogBody>
+        </Tabs>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end items-center gap-2 flex-shrink-0">
+        <DialogFooter>
+          <Button
+            onClick={handleSave}
+            disabled={actionLoading}
+            className="bg-black hover:bg-gray-800 text-white px-8 h-11"
+          >
+            {actionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {editingItem ? "Update" : "Submit"}
+          </Button>
           <Button
             onClick={onClose}
             variant="outline"
-            size="sm"
-            className="h-9"
+            className="px-8 h-11 border-gray-300"
             disabled={actionLoading}
           >
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={actionLoading}
-            size="sm"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9"
-          >
-            {actionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {editingItem ? "Update" : "Save & Close"}
-          </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

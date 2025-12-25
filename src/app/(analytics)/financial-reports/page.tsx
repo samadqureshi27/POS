@@ -10,7 +10,7 @@ import { formatCurrency, formatDisplayDate } from "@/lib/util/formatters";
 import { MetricCard } from '@/components/ui/MetricCard';
 import { AdvancedMetricCard } from '@/components/ui/advanced-metric-card';
 import { StatCardsGrid } from '@/components/ui/stat-cards-grid';
-import { DashboardSection } from '@/components/ui/dashboard-section';
+import { DashboardSection } from '@/app/(main)/dashboard/_components/DashboardSection';
 import { CustomerGrowthChart } from './_components/CustomerGrowthChart';
 import { RevenueTrendsChart } from './_components/RevenueTrendsChart';
 import { OrderTypesChart } from './_components/OrderTypesChart';
@@ -205,12 +205,12 @@ const AnalyticsDashboard = () => {
         </div>
 
         {/* Executive Financial Overview */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+        <DashboardSection
+          title="Executive Financial Overview"
+          defaultExpanded={true}
+        >
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Executive Financial Overview</h2>
-              <p className="text-sm text-gray-600">Key financial metrics & performance indicators</p>
-            </div>
+            <p className="text-sm text-gray-600">Key financial metrics & performance indicators</p>
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => setShowExpenseModal(true)}
@@ -249,38 +249,34 @@ const AnalyticsDashboard = () => {
               format="currency"
             />
           </StatCardsGrid>
-        </div>
+        </DashboardSection>
 
         {/* Financial Charts Analysis */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Financial Performance Analysis</h2>
-              <p className="text-sm text-gray-600">P&L trends and cash flow management</p>
-            </div>
-          </div>
+        <DashboardSection
+          title="Financial Performance Analysis"
+          defaultExpanded={true}
+        >
+          <p className="text-sm text-gray-600 mb-6">P&L trends and cash flow management</p>
 
           <div className="space-y-6">
             <ProfitLossChart />
             <CashFlowChart />
           </div>
-        </div>
+        </DashboardSection>
 
         {/* Customer & Revenue Analytics */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Customer & Revenue Analytics</h2>
-              <p className="text-sm text-gray-600">Customer acquisition, retention & lifetime value</p>
-            </div>
-          </div>
+        <DashboardSection
+          title="Customer & Revenue Analytics"
+          defaultExpanded={true}
+        >
+          <p className="text-sm text-gray-600 mb-6">Customer acquisition, retention & lifetime value</p>
 
           {/* Premium Customer Analytics */}
           <PremiumCustomerAnalytics
             analyticsData={analyticsData}
             selectedPeriod={selectedPeriod}
           />
-        </div>
+        </DashboardSection>
 
 
         {/* Expense Input Modal */}

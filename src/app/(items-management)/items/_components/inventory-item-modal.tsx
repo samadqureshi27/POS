@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, Loader2, Plus, Trash2, Building2, ChevronDown, Package } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -284,49 +284,30 @@ export default function InventoryItemModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent size="3xl" fullHeight onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
-        {/* Header */}
-        <div className="p-5 border-b border-gray-200 flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <Package className="h-5 w-5 text-gray-700" />
-            <DialogTitle className="text-xl font-bold text-gray-900">
-              {editingItem ? "Edit Inventory Item" : "Add New Inventory Item"}
-            </DialogTitle>
+        <DialogHeader>
+          <DialogTitle>
+            {editingItem ? "Edit Inventory Item" : "Add New Inventory Item"}
+          </DialogTitle>
+        </DialogHeader>
+
+        <Tabs defaultValue="basic">
+          <div className="px-8 pb-6 pt-2 flex-shrink-0 border-b border-gray-200">
+            <TabsList className={`grid w-full ${isEditMode ? 'grid-cols-5' : 'grid-cols-2'}`}>
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="stock">Stock & Units</TabsTrigger>
+              {isEditMode && (
+                <>
+                  <TabsTrigger value="vendors">Vendors</TabsTrigger>
+                  <TabsTrigger value="branches">Branches</TabsTrigger>
+                  <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                </>
+              )}
+            </TabsList>
           </div>
-          <p className="text-sm text-gray-600 mt-1">
-            {editingItem ? "Update item details and manage vendors & distribution" : "Create a new inventory item with basic information"}
-          </p>
-        </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-          <Tabs defaultValue="basic" className="flex-1 flex flex-col min-h-0">
-            {/* Tab List */}
-            <div className="px-5 pt-3 pb-3 border-b border-gray-100 flex-shrink-0">
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-center">
-                  <TabsList className={`grid w-full max-w-2xl ${isEditMode ? 'grid-cols-5' : 'grid-cols-2'} h-9`}>
-                    <TabsTrigger value="basic" className="text-sm">Basic Info</TabsTrigger>
-                    <TabsTrigger value="stock" className="text-sm">Stock & Units</TabsTrigger>
-                    {isEditMode && (
-                      <>
-                        <TabsTrigger value="vendors" className="text-sm">Vendors</TabsTrigger>
-                        <TabsTrigger value="branches" className="text-sm">Branches</TabsTrigger>
-                        <TabsTrigger value="advanced" className="text-sm">Advanced</TabsTrigger>
-                      </>
-                    )}
-                  </TabsList>
-                </div>
-                <p className="text-xs text-gray-600 text-center">
-                  {!isEditMode && "💡 Add basic info first. Vendors & distribution available after saving."}
-                </p>
-              </div>
-            </div>
-
-            {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-5 min-h-0">
-
+          <DialogBody className="space-y-6">
             {/* Basic Info Tab */}
-            <TabsContent value="basic" className="mt-0 space-y-4">
+            <TabsContent value="basic" className="mt-0 space-y-6">
               {/* Name */}
               <div>
                 <Label className="text-gray-700 text-sm font-medium mb-2">
@@ -600,40 +581,36 @@ export default function InventoryItemModal({
                 </div>
               </TabsContent>
             )}
-            </div>
-          </Tabs>
-        </div>
+          </DialogBody>
+        </Tabs>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end items-center gap-2 flex-shrink-0">
-          <Button
-            onClick={onClose}
-            variant="outline"
-            size="sm"
-            className="h-9"
-            disabled={loading}
-          >
-            Cancel
-          </Button>
+        <DialogFooter>
           <Button
             type="button"
             onClick={handleSave}
             disabled={!formData.name || !formData.baseUnit || loading}
-            size="sm"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9"
+            className="bg-black hover:bg-gray-800 text-white px-8 h-11"
           >
             {loading ? (
               <>
-                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Saving...
               </>
             ) : (
               <>
-                {editingItem ? "Update Item" : "Save & Close"}
+                {editingItem ? "Update" : "Submit"}
               </>
             )}
           </Button>
-        </div>
+          <Button
+            onClick={onClose}
+            variant="outline"
+            className="px-8 h-11 border-gray-300"
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
