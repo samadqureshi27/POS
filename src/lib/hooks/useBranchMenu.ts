@@ -46,9 +46,12 @@ export function useBranchMenu(branchId: string | number) {
   };
 
   // Load effective menu items
-  const loadMenuItems = async () => {
+  const loadMenuItems = async (skipLoadingState = false) => {
     try {
-      setLoading(true);
+      // Only show loading skeleton on initial load, not during refresh
+      if (!skipLoadingState) {
+        setLoading(true);
+      }
 
       // Get branch ObjectId if we don't have it yet
       let objectId = branchObjectId;
@@ -78,7 +81,9 @@ export function useBranchMenu(branchId: string | number) {
       toast.error(`Failed to load menu for Branch #${branchId}`);
       setItems([]);
     } finally {
-      setLoading(false);
+      if (!skipLoadingState) {
+        setLoading(false);
+      }
     }
   };
 
@@ -150,7 +155,10 @@ export function useBranchMenu(branchId: string | number) {
 
       if (response.success) {
         toast.success("Menu item added to branch successfully");
-        await loadMenuItems();
+
+        // Refresh data without showing loading skeleton
+        await loadMenuItems(true);
+
         setIsModalOpen(false);
         setEditingItem(null);
       } else {
@@ -176,7 +184,10 @@ export function useBranchMenu(branchId: string | number) {
 
       if (response.success) {
         toast.success("Menu configuration updated successfully");
-        await loadMenuItems();
+
+        // Refresh data without showing loading skeleton
+        await loadMenuItems(true);
+
         setIsModalOpen(false);
         setEditingItem(null);
       } else {
@@ -203,7 +214,9 @@ export function useBranchMenu(branchId: string | number) {
 
       if (response.success) {
         toast.success("Menu item removed from branch");
-        await loadMenuItems();
+
+        // Refresh data without showing loading skeleton
+        await loadMenuItems(true);
       } else {
         throw new Error(response.message || "Failed to remove item from menu");
       }
