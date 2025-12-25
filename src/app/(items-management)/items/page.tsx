@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Package, Plus, Upload, Download, FileDown, Edit2, Trash2 } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Toaster, toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -527,17 +526,17 @@ export default function ItemsPage() {
             header: "Item",
             render: (item) => (
               <div className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-lg flex items-center justify-center border ${item.type === "stock"
-                  ? "bg-green-50 border-green-200"
-                  : "bg-purple-50 border-purple-200"
+                <div className={`h-10 w-10 rounded-sm flex items-center justify-center border ${item.type === "stock"
+                  ? "bg-green-50/50 border-green-100/50"
+                  : "bg-purple-50/50 border-purple-100/50"
                   }`}>
                   <Package className={`h-5 w-5 ${item.type === "stock" ? "text-green-600" : "text-purple-600"
                     }`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900">{item.name}</div>
+                  <div className="font-bold text-gray-900">{item.name}</div>
                   {item.categoryId && (
-                    <div className="text-xs text-gray-500">
+                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight truncate">
                       {typeof item.categoryId === 'object' && item.categoryId.name
                         ? item.categoryId.name
                         : typeof item.categoryId === 'string' ? item.categoryId : ''}
@@ -551,26 +550,28 @@ export default function ItemsPage() {
             key: "sku",
             header: "SKU",
             render: (item) => (
-              <span className="text-gray-700 font-mono text-sm">{item.sku || "—"}</span>
+              <span className="font-mono text-sm font-bold text-gray-600 uppercase">{item.sku || "—"}</span>
             ),
           },
           {
             key: "type",
             header: "Type",
             render: (item) => (
-              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${item.type === "stock"
-                ? "bg-green-100 text-green-700"
-                : "bg-purple-100 text-purple-700"
-                }`}>
-                {item.type}
+              <span className={cn(
+                "px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border",
+                item.type === "stock"
+                  ? "bg-green-50 text-green-600 border-green-100"
+                  : "bg-purple-50 text-purple-600 border-purple-100"
+              )}>
+                {item.type?.toUpperCase()}
               </span>
             ),
-            className: "w-28",
+            className: "w-24",
           },
           {
             key: "baseUnit",
             header: "Unit",
-            render: (item) => <span className="text-gray-700 font-medium">{item.baseUnit}</span>,
+            render: (item) => <span className="text-sm font-bold text-gray-900">{item.baseUnit}</span>,
             className: "w-24",
           },
           {
@@ -578,7 +579,7 @@ export default function ItemsPage() {
             header: "Stock",
             render: (item) => (
               (item.type === "stock" || item.trackStock) ? (
-                <span className="text-gray-900 font-semibold">{item.quantity || 0}</span>
+                <span className="text-sm font-bold text-gray-900">{item.quantity || 0}</span>
               ) : (
                 <span className="text-gray-400">—</span>
               )
@@ -591,11 +592,11 @@ export default function ItemsPage() {
             render: (item) => {
               const isActive = item.isActive !== false;
               return (
-                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${isActive
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-                  }`}>
-                  {isActive ? "Active" : "Inactive"}
+                <span className={cn(
+                  "px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border",
+                  isActive ? "text-green-600 bg-green-50 border-green-100" : "text-red-600 bg-red-50 border-red-100"
+                )}>
+                  {isActive ? "ACTIVE" : "INACTIVE"}
                 </span>
               );
             },
@@ -646,13 +647,15 @@ export default function ItemsPage() {
                     </p>
                   </div>
                 </div>
-              </div>
 
+                {/* Footer Metrics */}
                 <div className="mt-auto pt-3 border-t border-gray-100/60 flex items-center justify-between">
                   <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Price</span>
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">
+                      {isStock ? 'Stock' : 'Price'}
+                    </span>
                     <span className="text-sm font-bold text-gray-900 tracking-tight pr-2">
-                      PKR {Number(item.sellingPrice || 0).toLocaleString()}
+                      {isStock ? `${item.quantity || 0} ${item.baseUnit || 'pcs'}` : `PKR ${Number(item.sellingPrice || 0).toLocaleString()}`}
                     </span>
                   </div>
 
@@ -663,29 +666,12 @@ export default function ItemsPage() {
                   </div>
 
                   <div className="lg:hidden flex flex-col items-end">
-                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Inventory</span>
-                    <span className={cn(
-                      "text-xs font-bold font-mono",
-                      isStock && (item.quantity || 0) <= (item.reorderPoint || 0) ? "text-red-600" : "text-gray-900"
-                    )}>
-                      {isStock ? `${item.quantity || 0} ${item.baseUnit || 'pcs'}` : 'SERVICE'}
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Type</span>
+                    <span className="text-xs font-bold text-gray-900 uppercase">
+                      {item.type}
                     </span>
                   </div>
                 </div>
-
-                {isStock && item.reorderPoint && (
-                  <div className="mt-4">
-                    <div className="h-1 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100/50">
-                      <div
-                        className={cn(
-                          "h-full transition-all duration-500",
-                          (item.quantity || 0) <= item.reorderPoint ? "bg-red-500" : "bg-green-500"
-                        )}
-                        style={{ width: `${Math.min(((item.quantity || 0) / (item.reorderPoint * 2)) * 100, 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           );

@@ -83,7 +83,7 @@ const EnhancedActionBarComponent: React.FC<EnhancedActionBarProps> = ({
   };
 
   return (
-    <div className={`bg-white border border-[#d5d5dd] rounded-sm py-2 px-4 mb-6 hover:shadow-md transition-shadow duration-200 ${containerClassName}`}>
+    <div className={`bg-white border border-[#d5d5dd] rounded-sm py-2 px-2 mb-6 hover:shadow-md transition-shadow duration-200 ${containerClassName}`}>
       <div className={`flex flex-col xl:flex-row gap-4 items-stretch xl:items-center justify-between ${className}`}>
         {/* Search */}
         {showSearch && onSearchChange && (
