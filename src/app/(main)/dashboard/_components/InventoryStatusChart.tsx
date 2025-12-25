@@ -29,7 +29,7 @@ export const InventoryStatusChart: React.FC = () => {
   const goodItems = inventoryData.filter(item => item.status === "good").length;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+    <div className="bg-white rounded-lg border border-[#d5d5dd] p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Inventory Status</h3>
@@ -135,11 +135,10 @@ export const InventoryStatusChart: React.FC = () => {
               <span className="text-gray-600">
                 {item.current}/{item.maximum} {item.unit}
               </span>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                item.status === "critical" ? "bg-red-100 text-red-700" :
-                item.status === "low" ? "bg-amber-100 text-amber-700" :
-                "bg-green-100 text-green-700"
-              }`}>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.status === "critical" ? "bg-red-100 text-red-700" :
+                  item.status === "low" ? "bg-amber-100 text-amber-700" :
+                    "bg-green-100 text-green-700"
+                }`}>
                 {item.status}
               </span>
             </div>

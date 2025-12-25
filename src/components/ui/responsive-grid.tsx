@@ -87,8 +87,8 @@ export default function ResponsiveGrid<T>({
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">{loadingText}</p>
+          <Loader2 className="h-10 w-10 animate-spin text-gray-400 mx-auto mb-4 stroke-1" />
+          <p className="text-gray-500 font-medium text-sm">{loadingText}</p>
         </div>
       </div>
     );
@@ -100,12 +100,12 @@ export default function ResponsiveGrid<T>({
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center max-w-md">
           {emptyIcon && (
-            <div className="mx-auto mb-6 flex items-center justify-center">
+            <div className="mx-auto mb-4 flex items-center justify-center text-gray-200">
               {emptyIcon}
             </div>
           )}
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">{emptyTitle}</h3>
-          <p className="text-gray-600 text-base">{emptyDescription}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{emptyTitle}</h3>
+          <p className="text-gray-500 text-sm">{emptyDescription}</p>
         </div>
       </div>
     );
@@ -118,25 +118,31 @@ export default function ResponsiveGrid<T>({
     }
 
     return (
-      <div className="flex items-center gap-2 justify-end">
+      <div className="flex items-center gap-1 justify-end">
         {onEdit && (
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onEdit(item)}
-            className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(item);
+            }}
+            className="h-7 w-7 rounded-sm hover:bg-gray-100 text-gray-500"
           >
-            <Edit2 className="h-4 w-4" />
+            <Edit2 className="h-3.5 w-3.5" />
           </Button>
         )}
         {onDelete && (
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onDelete(item)}
-            className="h-8 w-8 hover:bg-red-50 hover:text-red-600"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(item);
+            }}
+            className="h-7 w-7 rounded-sm hover:bg-red-50 text-gray-500 hover:text-red-600"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5" />
           </Button>
         )}
       </div>
@@ -148,32 +154,32 @@ export default function ResponsiveGrid<T>({
     return (
       <div className="space-y-4">
         <div className={className}>
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div className="bg-white border border-[#d5d5dd] rounded-sm overflow-hidden shadow-none">
+            <table className="min-w-full divide-y divide-[#d5d5dd]">
+              <thead className="bg-gray-50/50">
                 <tr>
                   {columns.map((column, index) => (
                     <th
                       key={index}
-                      className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider ${column.className || ""}`}
+                      className={`px-6 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider ${column.className || ""}`}
                     >
                       {column.header}
                     </th>
                   ))}
                   {showActions && (onEdit || onDelete || customActions) && (
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider w-32">
-                      Actions
+                    <th className="px-6 py-3 text-right text-[10px] font-bold text-gray-500 uppercase tracking-wider w-24">
+                      ACTIONS
                     </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-[#d5d5dd]">
                 {items.map((item) => (
-                  <tr key={getItemId(item)} className="hover:bg-gray-50">
+                  <tr key={getItemId(item)} className="hover:bg-gray-50/50 transition-colors duration-150">
                     {columns.map((column, colIndex) => (
                       <td
                         key={colIndex}
-                        className={`px-6 py-4 ${column.className || ""}`}
+                        className={`px-6 py-3 text-sm text-gray-700 ${column.className || ""}`}
                       >
                         {column.render
                           ? column.render(item)
@@ -181,7 +187,7 @@ export default function ResponsiveGrid<T>({
                       </td>
                     ))}
                     {showActions && (onEdit || onDelete || customActions) && (
-                      <td className="px-6 py-4 text-right w-32 whitespace-nowrap">
+                      <td className="px-6 py-3 text-right w-24 whitespace-nowrap">
                         {renderActions(item)}
                       </td>
                     )}
@@ -194,7 +200,7 @@ export default function ResponsiveGrid<T>({
 
         {/* Pagination for List View */}
         {showPagination && onPageChange && totalPages > 1 && (
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <div className="bg-white border border-[#d5d5dd] rounded-sm p-4">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -211,7 +217,7 @@ export default function ResponsiveGrid<T>({
   // Grid View
   return (
     <div className="space-y-4">
-      <div className={`grid ${gridColumns} gap-5 ${className}`}>
+      <div className={`grid ${gridColumns} gap-4 ${className}`}>
         {items.map((item) => {
           const itemId = getItemId(item);
           const actions = renderActions(item);
@@ -228,16 +234,22 @@ export default function ResponsiveGrid<T>({
           return (
             <div
               key={itemId}
-              className={`group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:border-gray-300 transition-all duration-200 ${cardClassName}`}
+              className={`group bg-white border border-[#d5d5dd] rounded-sm overflow-hidden hover:shadow-md transition-all duration-200 ${cardClassName}`}
             >
               <div className="p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <pre className="text-xs text-gray-600 overflow-auto">
-                      {JSON.stringify(item, null, 2)}
-                    </pre>
+                    <span className="text-[10px] font-black text-gray-300 tracking-wider uppercase mb-2 block">
+                      ID: {itemId.slice(-6).toUpperCase()}
+                    </span>
+                    <div className="text-xs text-gray-600 line-clamp-3">
+                      {typeof item === 'object' && (item as any).name ? (item as any).name : JSON.stringify(item)}
+                    </div>
                   </div>
-                  <div className="ml-3 flex-shrink-0">{actions}</div>
+                  {/* Desktop: Hover, Mobile: Always visible */}
+                  <div className="flex-shrink-0 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                    {actions}
+                  </div>
                 </div>
               </div>
             </div>
@@ -247,7 +259,7 @@ export default function ResponsiveGrid<T>({
 
       {/* Pagination for Grid View */}
       {showPagination && onPageChange && totalPages > 1 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <div className="bg-white border border-[#d5d5dd] rounded-sm p-4 shadow-none">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Package, Plus, Upload, Download, FileDown, Edit2, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { Toaster } from "sonner";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { Toaster, toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { StatCardsGrid } from "@/components/ui/stat-cards-grid";
@@ -371,10 +372,11 @@ export default function ItemsPage() {
   }
 
   return (
-    <PageContainer>
+    <PageContainer className="pt-6">
       <Toaster position="top-center" richColors expand={true} duration={3000} />
       <PageHeader
         title="Inventory Hub"
+        titleClassName="text-2xl lg:text-3xl font-medium text-gray-800"
         subtitle="Manage your items, units, and stock levels"
         actions={
           <>
@@ -387,24 +389,24 @@ export default function ItemsPage() {
             />
             <Button
               onClick={handleDownloadTemplate}
-              variant="outline"
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              variant="filter"
+              className="px-4"
             >
               <FileDown className="h-4 w-4 mr-2" />
               Template
             </Button>
             <Button
               onClick={handleImportClick}
-              variant="outline"
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              variant="filter"
+              className="px-4"
             >
               <Upload className="h-4 w-4 mr-2" />
               Import
             </Button>
             <Button
               onClick={handleExport}
-              variant="outline"
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              variant="filter"
+              className="px-4"
               disabled={items.length === 0}
             >
               <Download className="h-4 w-4 mr-2" />
@@ -601,135 +603,86 @@ export default function ItemsPage() {
           },
         ]}
         renderGridCard={(item, actions) => {
-          const itemStatus = item.isActive !== false ? { label: "Active", color: "text-green-600 bg-green-50" } : { label: "Inactive", color: "text-red-600 bg-red-50" };
-          const stockStatus =
-            item.type !== "stock" && !item.trackStock
-              ? { label: "Not Tracked", color: "text-gray-600 bg-gray-50" }
-              : item.quantity === 0
-                ? { label: "Out of Stock", color: "text-red-600 bg-red-50" }
-                : item.reorderPoint && item.quantity && item.quantity <= item.reorderPoint
-                  ? { label: "Low Stock", color: "text-yellow-600 bg-yellow-50" }
-                  : { label: "In Stock", color: "text-green-600 bg-green-50" };
-          const isActive = item.isActive !== false;
+          const isStock = item.type === "stock" || item.trackStock;
+          const status = isStock
+            ? { label: "STOCK ITEM", color: "text-green-600 bg-green-50 border-green-100", bar: "bg-green-500" }
+            : { label: "SERVICE ITEM", color: "text-purple-600 bg-purple-50 border-purple-100", bar: "bg-purple-500" };
 
           return (
-            <div className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-200">
-              {/* Card Header with Gradient Background */}
-              <div className={`relative h-28 flex items-center justify-center border-b-2 ${item.type === "stock"
-                ? "bg-gradient-to-br from-green-50 to-green-100 border-green-200"
-                : "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200"
-                }`}>
-                <Package className={`h-14 w-14 ${item.type === "stock" ? "text-green-400" : "text-purple-400"
-                  }`} />
+            <div className="group relative bg-white border border-[#d5d5dd] rounded-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-200">
+              <div className={cn("h-0.5 w-full shrink-0 transition-colors", status.bar)} />
 
-                {/* Status Badge - Top Left */}
-                <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${isActive
-                  ? "bg-green-500 text-white"
-                  : "bg-red-500 text-white"
-                  }`}>
-                  {itemStatus.label}
+              <div className="p-4 flex flex-col flex-1">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-black text-gray-400 tracking-wider">
+                    {item.sku || 'NO SKU'}
+                  </span>
+                  <div className={cn(
+                    "px-1.5 py-0.5 rounded-[2px] text-[9px] font-bold tracking-widest border",
+                    status.color
+                  )}>
+                    {status.label}
+                  </div>
                 </div>
 
-                {/* Type Badge - Top Right */}
-                <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${item.type === "stock"
-                  ? "bg-green-600 text-white"
-                  : "bg-purple-600 text-white"
-                  }`}>
-                  {item.type}
-                </div>
-
-                {/* Hover Actions Overlay */}
-                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-3">
-                  {actions}
+                <div className="flex items-start gap-3 mb-6">
+                  <div className={cn(
+                    "h-10 w-10 rounded-sm flex items-center justify-center shrink-0 border transition-colors",
+                    isStock ? "bg-green-50/50 border-green-100/50 text-green-600" : "bg-purple-50/50 border-purple-100/50 text-purple-600"
+                  )}>
+                    <Package className="h-5 w-5 stroke-[1.5]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-1">
+                      <h3 className="text-sm font-bold text-gray-800 leading-tight truncate group-hover:text-black transition-colors" title={item.name}>
+                        {item.name}
+                      </h3>
+                      <div className="flex lg:hidden items-center gap-1 shrink-0">
+                        {actions}
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tight truncate">
+                      {typeof item.categoryId === 'object' ? item.categoryId.name : item.categoryId || 'General'}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Card Content */}
-              <div className="p-4">
-                {/* Item Name */}
-                <h3 className="text-base font-bold text-gray-900 mb-2 truncate" title={item.name}>
-                  {item.name}
-                </h3>
+                <div className="mt-auto pt-3 border-t border-gray-100/60 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Price</span>
+                    <span className="text-sm font-bold text-gray-900 tracking-tight pr-2">
+                      PKR {Number(item.sellingPrice || 0).toLocaleString()}
+                    </span>
+                  </div>
 
-                {/* SKU & Category */}
-                <div className="mb-3 min-h-[2.5rem] space-y-1">
-                  {item.sku && (
-                    <p className="text-xs text-gray-600">
-                      <span className="font-medium">SKU:</span> {item.sku}
-                    </p>
-                  )}
-                  {item.categoryId ? (
-                    <p className="text-xs text-gray-600 truncate">
-                      <span className="font-medium">Category:</span> {typeof item.categoryId === 'object' && item.categoryId.name
-                        ? item.categoryId.name
-                        : typeof item.categoryId === 'string' ? item.categoryId : 'Uncategorized'}
-                    </p>
-                  ) : !item.sku && (
-                    <p className="text-xs text-gray-400 italic">
-                      No SKU or category assigned
-                    </p>
-                  )}
-                </div>
-
-                {/* Stats Row */}
-                <div className="flex items-center justify-between pt-3 border-t border-gray-200 mb-3">
-                  {/* Unit Badge */}
-                  <div className="flex items-center gap-2">
-                    <div className={`flex items-center justify-center h-7 w-7 rounded-lg ${item.type === "stock" ? "bg-green-100" : "bg-purple-100"
-                      }`}>
-                      <span className={`text-xs font-bold ${item.type === "stock" ? "text-green-700" : "text-purple-700"
-                        }`}>
-                        {item.baseUnit?.slice(0, 3)}
-                      </span>
+                  <div className="hidden lg:block opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all duration-200">
+                    <div className="flex items-center gap-1">
+                      {actions}
                     </div>
                   </div>
 
-                  {/* Stock Quantity */}
-                  <div className="text-xs text-gray-500">
-                    {(item.type === "stock" || item.trackStock) ? (
-                      <div className="text-right">
-                        <div className={`font-semibold ${stockStatus.label === "Out of Stock" ? "text-red-600" :
-                          stockStatus.label === "Low Stock" ? "text-yellow-600" :
-                            "text-green-600"
-                          }`}>
-                          {item.quantity || 0} {item.baseUnit}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="italic">Service Item</span>
-                    )}
+                  <div className="lg:hidden flex flex-col items-end">
+                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Inventory</span>
+                    <span className={cn(
+                      "text-xs font-bold font-mono",
+                      isStock && (item.quantity || 0) <= (item.reorderPoint || 0) ? "text-red-600" : "text-gray-900"
+                    )}>
+                      {isStock ? `${item.quantity || 0} ${item.baseUnit || 'pcs'}` : 'SERVICE'}
+                    </span>
                   </div>
                 </div>
 
-                {/* Stock Threshold Progress Bar */}
-                {(item.type === "stock" || item.trackStock) && item.reorderPoint && (
-                  <div>
-                    <div className="flex items-center justify-between text-xs mb-1.5">
-                      <span className="text-gray-600 font-medium">Stock Level</span>
-                      <span className="text-gray-900 font-bold">
-                        {item.quantity || 0} / {item.reorderPoint}
-                      </span>
-                    </div>
-                    <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                {isStock && item.reorderPoint && (
+                  <div className="mt-4">
+                    <div className="h-1 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100/50">
                       <div
-                        className={`h-full transition-all ${(item.quantity || 0) <= item.reorderPoint
-                          ? "bg-red-500"
-                          : "bg-green-500"
-                          }`}
-                        style={{
-                          width: `${Math.min(((item.quantity || 0) / (item.reorderPoint * 2)) * 100, 100)}%`,
-                        }}
-                      ></div>
-                      {/* Threshold marker */}
-                      <div
-                        className="absolute top-0 bottom-0 w-0.5 bg-yellow-500"
-                        style={{ left: '50%' }}
-                      ></div>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
-                      <span>0</span>
-                      <span className="text-yellow-600 font-medium">Threshold</span>
-                      <span>{item.reorderPoint * 2}</span>
+                        className={cn(
+                          "h-full transition-all duration-500",
+                          (item.quantity || 0) <= item.reorderPoint ? "bg-red-500" : "bg-green-500"
+                        )}
+                        style={{ width: `${Math.min(((item.quantity || 0) / (item.reorderPoint * 2)) * 100, 100)}%` }}
+                      />
                     </div>
                   </div>
                 )}

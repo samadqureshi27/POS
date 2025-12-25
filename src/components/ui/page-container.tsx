@@ -46,7 +46,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
 }) => {
   return (
     <div className={cn(
-      "min-h-screen bg-background",
+      "min-h-screen bg-[#F7F7F8]",
       padding === "default" && "p-6",
       padding === "tight" && "p-4",
       maxWidth === "container" && "max-w-7xl mx-auto",

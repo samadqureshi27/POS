@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatDisplayDate } from '@/lib/util/formatters';
 
@@ -41,41 +42,32 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
 
   return (
     <div className="mb-6 relative">
-      {/* Period Buttons using shadcn ToggleGroup */}
-      <div className="flex mb-6 sm:mb-8 relative max-w-[88vw]">
-        <div className="flex overflow-x-auto pb-2 gap-2 w-full hide-scrollbar">
+      <div className="flex mb-6 sm:mb-8 relative w-full">
+        <div className="flex overflow-x-auto pb-2 gap-2 w-full justify-end hide-scrollbar p-1">
           {periods.slice(0, -1).map((period) => (
-            <button
+            <Button
               key={period}
+              variant={selectedPeriod === period ? "filterActive" : "filter"}
               onClick={() => {
                 onPeriodChange(period);
                 setShowDatePicker(false);
               }}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-sm transition-colors border flex-shrink-0 whitespace-nowrap",
-                selectedPeriod === period
-                  ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
-                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
-              )}
+              className="rounded-sm flex-shrink-0 whitespace-nowrap"
             >
               {period}
-            </button>
+            </Button>
           ))}
 
           {/* Custom date range with shadcn Popover */}
           <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
             <PopoverTrigger asChild>
-              <button
+              <Button
+                variant={selectedPeriod === "Custom" ? "filterActive" : "filter"}
                 onClick={() => {
                   onPeriodChange("Custom");
                   setShowDatePicker(!showDatePicker);
                 }}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-sm transition-colors border flex-shrink-0 whitespace-nowrap",
-                  selectedPeriod === "Custom"
-                    ? "bg-[#2C2C2C] text-white border-[#2C2C2C]"
-                    : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
-                )}
+                className="rounded-sm flex-shrink-0 whitespace-nowrap min-w-[100px]"
               >
                 <CalendarIcon size={16} />
                 <span>
@@ -85,7 +77,7 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
                     ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
                     : "Custom"}
                 </span>
-              </button>
+              </Button>
             </PopoverTrigger>
             <PopoverContent
               className="w-auto p-0"
@@ -95,7 +87,7 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
               <Calendar
                 mode="range"
                 defaultMonth={dateRange?.from}
-                selected={dateRange}
+                selected={dateRange as any}
                 onSelect={(range) => {
                   if (range) {
                     setDateRange(range);

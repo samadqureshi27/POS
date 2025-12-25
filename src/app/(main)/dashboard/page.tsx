@@ -33,6 +33,7 @@ import { ExpenseInputModal } from "@/components/ui/expense-input-modal";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import FuturisticSalesVisual from "./_components/FuturisticSalesVisual";
+import { DashboardSection } from "./_components/DashboardSection";
 
 // Main Dashboard Component
 const Dashboard = () => {
@@ -99,7 +100,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-background p-4 sm:p-6 lg:p-6">
+    <div className="w-full min-h-screen bg-[#F7F7F8] p-4 sm:p-6 lg:p-6">
       <Toaster position="top-right" />
 
       <div className="w-full">
@@ -119,13 +120,10 @@ const Dashboard = () => {
         />
 
         {/* 1. Daily Snapshot - POS System Metrics */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Daily Snapshot</h2>
-              <p className="text-sm text-gray-600">Real-time POS operations & tactical metrics</p>
-            </div>
-            <div className="text-xs text-gray-500">Last updated: {new Date().toLocaleTimeString()}</div>
+        <DashboardSection title="Daily Snapshot">
+          <div className="mb-4">
+            <p className="text-sm text-gray-600">Real-time POS operations & tactical metrics</p>
+            <div className="text-xs text-gray-500 mt-1">Last updated: {new Date().toLocaleTimeString()}</div>
           </div>
 
           {/* Key Daily Metrics */}
@@ -135,7 +133,7 @@ const Dashboard = () => {
 
           {/* Futuristic Sales Visualization */}
           <ErrorBoundary>
-            <div className="mb-6">
+            <div className="my-6">
               <FuturisticSalesVisual
                 revenueData={dashboardData.revenueData}
                 bestSellingItems={dashboardData.bestSellingItems}
@@ -166,49 +164,34 @@ const Dashboard = () => {
               <div className="mt-2 text-xs text-amber-700">Target: &lt;5 min ✓</div>
             </div>
           </div>
-        </div>
+        </DashboardSection>
 
         {/* 2. Weekly Trends - Customer Analytics */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Weekly Trends</h2>
-              <p className="text-sm text-gray-600">Customer behavior & category performance</p>
-            </div>
-          </div>
-
+        <DashboardSection title="Weekly Trends">
+          <p className="text-sm text-gray-600 mb-6">Customer behavior & category performance</p>
           <ErrorBoundary>
             <CustomerAnalytics
               visitData={dashboardData.visitData}
               getPeriodLabel={getPeriodLabelWithCustomRange}
             />
           </ErrorBoundary>
-        </div>
+        </DashboardSection>
 
         {/* 3. Product & Menu Insights */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Product & Menu Insights</h2>
-              <p className="text-sm text-gray-600">Category performance & hourly patterns</p>
-            </div>
-          </div>
-
+        <DashboardSection title="Product & Menu Insights">
+          <p className="text-sm text-gray-600 mb-6">Category performance & hourly patterns</p>
           <ErrorBoundary>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <CategorySalesChart />
               <HourlySalesChart />
             </div>
           </ErrorBoundary>
-        </div>
+        </DashboardSection>
 
         {/* 4. Monthly P&L View */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+        <DashboardSection title="Monthly P&L View">
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Monthly P&L View</h2>
-              <p className="text-sm text-gray-600">Financial performance & profitability metrics</p>
-            </div>
+            <p className="text-sm text-gray-600">Financial performance & profitability metrics</p>
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => setShowExpenseModal(true)}
@@ -301,7 +284,7 @@ const Dashboard = () => {
           </div>
 
           {/* P&L Summary */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="bg-gray-50 p-4 rounded-lg border border-[#d5d5dd]">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold text-green-600">PKR 462.8K</div>
@@ -321,21 +304,15 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-        </div>
+        </DashboardSection>
 
         {/* 5. Strategic KPIs & Inventory */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Strategic KPIs & Inventory</h2>
-              <p className="text-sm text-gray-600">Growth metrics & inventory management</p>
-            </div>
-          </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ErrorBoundary>
-                  <InventoryStatusChart />
-                </ErrorBoundary>
+        <DashboardSection title="Strategic KPIs & Inventory">
+          <p className="text-sm text-gray-600 mb-6">Growth metrics & inventory management</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ErrorBoundary>
+              <InventoryStatusChart />
+            </ErrorBoundary>
 
             {/* Strategic KPIs Panel */}
             <div className="space-y-6">
@@ -394,10 +371,10 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-        </div>
+        </DashboardSection>
       </div>
 
-      
+
 
       <ExpenseInputModal
         isOpen={showExpenseModal}

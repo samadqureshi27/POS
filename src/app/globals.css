@@ -59,9 +59,6 @@ body,
 /* Global CSS - Add this to your globals.css or styles.css */
 
 /* Desktop table view - default styling */
-.responsive-customer-table {
-  /* Ensure no background on the main container */
-}
 
 .recharts-wrapper,
 .recharts-wrapper svg,
@@ -440,7 +437,7 @@ body,
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: #F7F7F8;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -513,6 +510,6 @@ body,
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#F7F7F8] text-foreground;
   }
 }

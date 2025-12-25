@@ -14,13 +14,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   refreshing,
   onRefresh,
 }) => (
-  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
-    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900">
+  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-6">
+    <h1 className="text-2xl lg:text-3xl font-medium text-gray-800">
       Dashboard
     </h1>
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-      Welcome!
-      
+    <div className="flex flex-col sm:flex-row items-start sm:items-center">
+      {/* Header Actions can go here */}
     </div>
   </div>
 );
