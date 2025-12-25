@@ -8,28 +8,26 @@ import { useNavigation } from '@/lib/hooks/useNavigation';
 
 type DashboardWrapperProps = {
   children: React.ReactNode;
-  hasSubmenu?: boolean; // 🔴 NEW: Add this prop to indicate if page has submenu
+  hasSubmenu?: boolean;
 };
 
 export default function DashboardWrapper({ children, hasSubmenu = false }: DashboardWrapperProps) {
   const { pageTitle } = useNavigation();
 
   return (
-    // 🔴 CHANGED: Added min-h-screen and bg-background
     <div className="min-h-screen bg-background">
       <Navbar title={pageTitle} />
       <Sidebar />
-      
+
       {/* Main content area with proper spacing */}
-      {/* 🔴 CHANGED: Complete className overhaul */}
+      {/* Adjusted pt-16 (64px) and pt-[128px] (64px navbar + 64px submenu) */}
       <main className={`
-        md:ml-16 
-        ${hasSubmenu ? 'pt-28' : 'pt-16'}
-        pb-20 md:pb-4
+        lg:ml-16 
+        ${hasSubmenu ? 'pt-[128px]' : 'pt-16'}
+        pb-20 lg:pb-4
         min-h-screen
         overflow-y-auto
       `}>
-        {/* 🔴 CHANGED: Added wrapper div */}
         <div className="w-full h-full">
           {children}
         </div>

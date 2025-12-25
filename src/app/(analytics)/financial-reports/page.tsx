@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import { StarRating } from '@/components/ui/StarRating';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { formatCurrency, formatDisplayDate } from "@/lib/util/formatters";
-import  {MetricCard } from '@/components/ui/MetricCard';
+import { MetricCard } from '@/components/ui/MetricCard';
 import { AdvancedMetricCard } from '@/components/ui/advanced-metric-card';
+import { StatCardsGrid } from '@/components/ui/stat-cards-grid';
 import { DashboardSection } from '@/components/ui/dashboard-section';
 import { CustomerGrowthChart } from './_components/CustomerGrowthChart';
 import { RevenueTrendsChart } from './_components/RevenueTrendsChart';
@@ -88,7 +89,7 @@ const AnalyticsDashboard = () => {
     try {
       const startDateObj = new Date(startDate);
       const endDateObj = new Date(endDate);
-      
+
       const { startDate: start, endDate: end } = handleCustomDateRange(startDate, endDate);
       await loadCustomRangeData(startDateObj, endDateObj);
     } catch (error) {
@@ -184,126 +185,110 @@ const AnalyticsDashboard = () => {
 
       {/* Hidden Content */}
       <div className="hidden">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-3xl font-semibold">Analytics Dashboard</h1>
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl font-semibold">Analytics Dashboard</h1>
+            </div>
+          </div>
+
+          {/* Period Selector */}
+          <PeriodSelector
+            selectedPeriod={selectedPeriod}
+            onPeriodChange={handlePeriodChangeWithData}
+            showDatePicker={showDatePicker}
+            setShowDatePicker={setShowDatePicker}
+            customDateRange={customDateRange}
+            setCustomDateRange={setCustomDateRange}
+          />
+        </div>
+
+        {/* Executive Financial Overview */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Executive Financial Overview</h2>
+              <p className="text-sm text-gray-600">Key financial metrics & performance indicators</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => setShowExpenseModal(true)}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Plus size={16} className="mr-2" />
+                Add Expense
+              </Button>
+              <div className="text-xs text-gray-500">December 2024</div>
+            </div>
+          </div>
+
+          <StatCardsGrid>
+            <AdvancedMetricCard
+              title="Revenue Performance"
+              value={analyticsData.totalRevenue || 485000}
+              format="currency"
+            />
+
+            <AdvancedMetricCard
+              title="Profitability"
+              value={22.4}
+              format="percentage"
+            />
+
+            <AdvancedMetricCard
+              title="Cost Control"
+              value={34.2}
+              format="percentage"
+            />
+
+            <AdvancedMetricCard
+              title="Cash Position"
+              value={527000}
+              format="currency"
+            />
+          </StatCardsGrid>
+        </div>
+
+        {/* Financial Charts Analysis */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Financial Performance Analysis</h2>
+              <p className="text-sm text-gray-600">P&L trends and cash flow management</p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <ProfitLossChart />
+            <CashFlowChart />
           </div>
         </div>
-        
-        {/* Period Selector */}
-        <PeriodSelector
-          selectedPeriod={selectedPeriod}
-          onPeriodChange={handlePeriodChangeWithData}
-          showDatePicker={showDatePicker}
-          setShowDatePicker={setShowDatePicker}
-          customDateRange={customDateRange}
-          setCustomDateRange={setCustomDateRange}
+
+        {/* Customer & Revenue Analytics */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Customer & Revenue Analytics</h2>
+              <p className="text-sm text-gray-600">Customer acquisition, retention & lifetime value</p>
+            </div>
+          </div>
+
+          {/* Premium Customer Analytics */}
+          <PremiumCustomerAnalytics
+            analyticsData={analyticsData}
+            selectedPeriod={selectedPeriod}
+          />
+        </div>
+
+
+        {/* Expense Input Modal */}
+        <ExpenseInputModal
+          isOpen={showExpenseModal}
+          onClose={() => setShowExpenseModal(false)}
+          onSubmit={handleExpenseSubmit}
         />
-      </div>
-
-      {/* Executive Financial Overview */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Executive Financial Overview</h2>
-            <p className="text-sm text-gray-600">Key financial metrics & performance indicators</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={() => setShowExpenseModal(true)}
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Plus size={16} className="mr-2" />
-              Add Expense
-            </Button>
-            <div className="text-xs text-gray-500">December 2024</div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 rounded-lg border border-green-200">
-            <h3 className="text-sm font-medium text-green-800 mb-3">Revenue Performance</h3>
-            <div className="text-3xl font-bold text-green-900 mb-2">PKR {analyticsData.totalRevenue ? formatCurrency(analyticsData.totalRevenue) : '485,000'}</div>
-            <div className="text-sm text-green-700">Monthly Revenue</div>
-            <div className="flex items-center mt-2 text-sm text-green-600">
-              <span className="font-medium">+18.5%</span>
-              <span className="ml-2">vs last month</span>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200">
-            <h3 className="text-sm font-medium text-blue-800 mb-3">Profitability</h3>
-            <div className="text-3xl font-bold text-blue-900 mb-2">22.4%</div>
-            <div className="text-sm text-blue-700">Net Profit Margin</div>
-            <div className="flex items-center mt-2 text-sm text-blue-600">
-              <span className="font-medium">PKR 108K</span>
-              <span className="ml-2">net profit</span>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-purple-50 to-violet-100 p-6 rounded-lg border border-purple-200">
-            <h3 className="text-sm font-medium text-purple-800 mb-3">Cost Control</h3>
-            <div className="text-3xl font-bold text-purple-900 mb-2">34.2%</div>
-            <div className="text-sm text-purple-700">COGS Ratio</div>
-            <div className="flex items-center mt-2 text-sm text-purple-600">
-              <span className="font-medium">28.5%</span>
-              <span className="ml-2">labor cost</span>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-lg border border-indigo-200">
-            <h3 className="text-sm font-medium text-indigo-800 mb-3">Cash Position</h3>
-            <div className="text-3xl font-bold text-indigo-900 mb-2">PKR 527K</div>
-            <div className="text-sm text-indigo-700">Available Cash</div>
-            <div className="flex items-center mt-2 text-sm text-indigo-600">
-              <span className="font-medium">+PKR 90K</span>
-              <span className="ml-2">this month</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Financial Charts Analysis */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Financial Performance Analysis</h2>
-            <p className="text-sm text-gray-600">P&L trends and cash flow management</p>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <ProfitLossChart />
-          <CashFlowChart />
-        </div>
-      </div>
-
-      {/* Customer & Revenue Analytics */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Customer & Revenue Analytics</h2>
-            <p className="text-sm text-gray-600">Customer acquisition, retention & lifetime value</p>
-          </div>
-        </div>
-
-        {/* Premium Customer Analytics */}
-        <PremiumCustomerAnalytics
-          analyticsData={analyticsData}
-          selectedPeriod={selectedPeriod}
-        />
-      </div>
-
-
-      {/* Expense Input Modal */}
-      <ExpenseInputModal
-        isOpen={showExpenseModal}
-        onClose={() => setShowExpenseModal(false)}
-        onSubmit={handleExpenseSubmit}
-      />
       </div>
       {/* End Hidden Content */}
     </div>

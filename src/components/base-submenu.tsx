@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
+import { NewBadge } from './ui/new-badge';
 
 type SubmenuItem = {
   label: string;
@@ -11,18 +12,21 @@ type SubmenuItem = {
   isActive?: boolean;
   hasSubmenu?: boolean;
   submenuItems?: SubmenuItem[];
+  hasNewBadge?: boolean;
 };
 
 type BaseSubmenuProps = {
   items: SubmenuItem[];
   showBackArrow?: boolean;
   backPath?: string;
+  contextIcon?: React.ReactNode;
 };
 
-export default function BaseSubmenu({ 
-  items, 
-  showBackArrow = false, 
-  backPath ='/branches-management/'
+export default function BaseSubmenu({
+  items,
+  showBackArrow = false,
+  backPath = '/branches-management/',
+  contextIcon
 }: BaseSubmenuProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -34,7 +38,7 @@ export default function BaseSubmenu({
       if (item.hasSubmenu && item.submenuItems) {
         const isParentPath = pathname === item.href;
         const isInSubmenu = item.submenuItems.some(subItem => pathname === subItem.href);
-        
+
         if (isParentPath || isInSubmenu) {
           if (activeSubmenu !== item.label) {
             setActiveSubmenu(item.label);
@@ -57,80 +61,93 @@ export default function BaseSubmenu({
   };
 
   return (
-    <div className="fixed top-16 left-0 right-0 z-[50] w-full bg-[#2E2E2E] shadow-md">
-      <div className={`w-full px-2 sm:px-5 ${showBackArrow ? 'lg:px-4' : 'lg:px-22.5'}`}>
-        <div className="flex items-center">
-          {showBackArrow && (
-            <button
-              onClick={handleBack}
-              className="text-white mb-1 cursor-pointer hidden md:flex mr-7 items-center justify-center hover:text-gray-300 transition-all duration-200 ease-in-out hover:scale-110 active:scale-95 transform"
-              aria-label="Go back"
-            >
-              <ArrowLeft size={20} />
-            </button>
-          )}
-          
-          <nav className={`flex items-center py-3 px-1 ${showBackArrow ? 'md:ml-4' : ''} overflow-x-auto scrollbar-hide`}>
-            {items.map((item, idx) => {
-              let isActive = false;
-              if (item.hasSubmenu && item.submenuItems) {
-                isActive = pathname === item.href;
-              } else {
-                isActive = pathname === item.href || item.isActive;
-              }
-              
-              const isParentActive = activeSubmenu === item.label;
-              const hasActiveSubmenu = item.hasSubmenu && isParentActive;
-              
-              return (
-                <div key={idx} className="flex items-center flex-shrink-0">
-                  {/* Left separator - shows only when this item has an active submenu */}
-                  {hasActiveSubmenu && (
-                    <div className="h-8 w-px bg-[#83838a] mr-3 animate-in fade-in duration-300" />
-                  )}
-                  
-                  <div className="flex items-center">
+    <div className="fixed top-[64px] left-0 right-0 z-[40] w-full h-16 bg-[#2E2E2E] shadow-md flex items-center">
+      {/* Left Icon Section (64px wide to match sidebar) - Hidden on mobile */}
+      <div className="hidden md:flex w-16 h-full items-center justify-center">
+        {showBackArrow ? (
+          <button
+            onClick={handleBack}
+            className="text-white cursor-pointer flex items-center justify-center hover:text-gray-300 transition-all duration-400 ease-in-out hover:scale-110 active:scale-95 transform"
+            aria-label="Go back"
+          >
+            <ArrowLeft size={24} />
+          </button>
+        ) : (
+          contextIcon && (
+            <div className="text-white flex items-center justify-center">
+              {contextIcon}
+            </div>
+          )
+        )}
+      </div>
+
+      <div className="flex-1 h-full overflow-hidden">
+        <nav className="h-full flex items-center px-4 md:px-6 overflow-x-auto scrollbar-hide gap-4">
+          {items.map((item, idx) => {
+            let isActive = false;
+            if (item.hasSubmenu && item.submenuItems) {
+              isActive = pathname === item.href;
+            } else {
+              isActive = pathname === item.href || (item.isActive ?? false);
+            }
+
+            const isParentActive = activeSubmenu === item.label;
+            const hasActiveSubmenu = item.hasSubmenu && isParentActive;
+
+            return (
+              <div key={idx} className="flex items-center flex-shrink-0 h-full">
+                {/* Left separator - shows only when this item has an active submenu */}
+                {hasActiveSubmenu && (
+                  <div className="h-8 w-px bg-[#464646] mr-4 animate-in fade-in duration-400" />
+                )}
+
+                <div className="flex items-center h-full gap-4">
+                  <div className="relative h-full flex items-center">
                     <Link
                       href={item.hasSubmenu && item.submenuItems ? item.submenuItems[0].href : item.href}
                       className={`
-                        border border-[#83838a] px-4 py-2 rounded text-sm font-medium 
-                        transition-all duration-200 ease-in-out whitespace-nowrap
-                        transform hover:scale-[1.02] active:scale-[0.98]
+                        border border-[#83838a] px-6 h-12 flex items-center rounded text-base font-manrope
+                        transition-all duration-400 ease-in-out whitespace-nowrap
                         ${isActive
-                          ? 'bg-[#F6F6F6] text-gray-800 shadow-lg border-gray-300'
-                          : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#161616] hover:border-[#a0a0a0] hover:shadow-md'
+                          ? 'bg-[#F6F6F6] text-black shadow-lg border-gray-300'
+                          : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#2E2E2E] hover:border-[#83838a]'
                         }
                       `}
                     >
                       {item.label}
                     </Link>
-                    
-                    {/* Submenu items with Tailwind animations */}
-                    {item.submenuItems && (
-                      <div 
-                        className={`
-                          overflow-hidden transition-all duration-300 ease-in-out
-                          ${isParentActive 
-                            ? 'max-w-[800px] opacity-100 translate-x-0' 
-                            : 'max-w-0 opacity-0 -translate-x-5'
-                          }
-                        `}
-                      >
-                        <div className={`flex items-center px-1  ${isParentActive ? 'animate-in slide-in-from-left-3 fade-in duration-300' : ''}`}>
-                          {item.submenuItems.slice(1).map((subItem, subIndex) => {
-                            const isSubActive = pathname === subItem.href || subItem.isActive;
-                            return (
+
+                    {/* NEW Badge at bottom border */}
+                    {item.hasNewBadge && (
+                      <NewBadge className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20" />
+                    )}
+                  </div>
+
+                  {/* Submenu items */}
+                  {item.submenuItems && (
+                    <div
+                      className={`
+                        overflow-hidden transition-all duration-400 ease-in-out h-full
+                        ${isParentActive
+                          ? 'max-w-[800px] opacity-100 translate-x-0'
+                          : 'max-w-0 opacity-0 -translate-x-5'
+                        }
+                      `}
+                    >
+                      <div className={`flex items-center h-full px-1 gap-5 ${isParentActive ? 'animate-in slide-in-from-left-3 fade-in duration-400' : ''}`}>
+                        {item.submenuItems.slice(1).map((subItem, subIndex) => {
+                          const isSubActive = pathname === subItem.href || (subItem.isActive ?? false);
+                          return (
+                            <div key={subIndex} className="relative h-full flex items-center">
                               <Link
-                                key={subIndex}
                                 href={subItem.href}
                                 className={`
-                                  border border-[#83838a] px-4 py-2 rounded text-sm font-medium 
-                                  transition-all duration-200 ease-in-out whitespace-nowrap ml-3
-                                  transform hover:scale-[1.02] active:scale-[0.98]
+                                  border border-[#83838a] px-8 h-[44px] flex items-center rounded text-base font-light font-manrope
+                                  transition-all duration-400 ease-in-out whitespace-nowrap
                                   animate-in fade-in zoom-in-95 flex-shrink-0
                                   ${isSubActive
                                     ? 'bg-[#F6F6F6] text-gray-800 shadow-lg border-gray-300'
-                                    : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#161616] hover:border-[#a0a0a0] hover:shadow-md'
+                                    : 'bg-[#454545] text-[#f6f6f6] hover:bg-[#2E2E2E] hover:border-[#a0a0a0]'
                                   }
                                 `}
                                 style={{
@@ -140,29 +157,34 @@ export default function BaseSubmenu({
                               >
                                 {subItem.label}
                               </Link>
-                            );
-                          })}
-                        </div>
+
+                              {/* NEW Badge for subitem */}
+                              {subItem.hasNewBadge && (
+                                <NewBadge className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-100" />
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
-                  </div>
-                  
-                  {/* Right separator - shows only when this item has an active submenu */}
-                  {hasActiveSubmenu && (
-                    <div className="h-8 w-px bg-[#83838a] ml-3 animate-in fade-in duration-300 mr-4" />
-                  )}
-                  
-                  {/* Regular spacing between menu items when no submenu is active */}
-                  {!hasActiveSubmenu && idx < items.length - 1 && (
-                    <div className="mr-5" />
+                    </div>
                   )}
                 </div>
-              );
-            })}
-          </nav>
-        </div>
+
+                {/* Right separator - shows only when this item has an active submenu */}
+                {hasActiveSubmenu && (
+                  <div className="h-8 w-px bg-[#464646] ml-5 animate-in fade-in duration-400 mr-5" />
+                )}
+
+                {/* Regular spacing between menu items when no submenu is active */}
+                {!hasActiveSubmenu && idx < items.length - 1 && (
+                  <div className="w-4" />
+                )}
+              </div>
+            );
+          })}
+        </nav>
       </div>
-      
+
       <style jsx>{`
         @keyframes fadeIn {
           from { opacity: 0; }
