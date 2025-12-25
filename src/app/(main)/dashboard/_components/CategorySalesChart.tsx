@@ -20,7 +20,7 @@ export const CategorySalesChart: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+    <div className="bg-white rounded-lg border border-[#d5d5dd] p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Sales by Category</h3>
@@ -84,7 +84,7 @@ export const CategorySalesChart: React.FC = () => {
         ))}
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-200">
+      <div className="mt-4 pt-4 border-t border-[#d5d5dd]">
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium text-gray-700">Total Revenue</span>
           <span className="text-lg font-bold text-gray-900">PKR {formatCurrency(totalRevenue)}</span>

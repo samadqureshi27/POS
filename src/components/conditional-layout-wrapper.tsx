@@ -5,7 +5,7 @@ import DashboardWrapper from './dashboard-wrapper'
 
 export function ConditionalLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  
+
   // Define auth routes that should NOT show navbar/sidebar
   const authRoutes = [
     '/login',
@@ -16,19 +16,19 @@ export function ConditionalLayoutWrapper({ children }: { children: React.ReactNo
     '/signup',
     '/register'
   ]
-  
+
   // Check if current path is an auth route
   const isAuthRoute = authRoutes.some(route => pathname?.startsWith(route))
-  
+
   if (isAuthRoute) {
     // Auth pages - clean layout without navbar/sidebar
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#F7F7F8]">
         {children}
       </div>
     )
   }
-  
+
   // All other pages - with navbar/sidebar
   return (
     <DashboardWrapper>

@@ -165,7 +165,7 @@ const AnalyticsDashboard = () => {
   }
 
   return (
-    <div className="bg-background min-h-[calc(100vh-4rem)] p-6 mt-4 relative flex items-center justify-center overflow-hidden">
+    <div className="bg-[#F7F7F8] min-h-[calc(100vh-4rem)] p-6 mt-4 relative flex items-center justify-center overflow-hidden">
       {/* Coming Soon Overlay */}
       <div className="text-center space-y-2 sm:space-y-4 px-4 max-w-xs sm:max-w-md z-10">
         <div className="inline-flex items-center justify-center w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-100 to-purple-100">

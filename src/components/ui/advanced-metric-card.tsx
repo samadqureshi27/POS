@@ -47,7 +47,7 @@ const AdvancedMetricCardComponent: React.FC<AdvancedMetricCardProps> = ({
   };
 
   return (
-    <Card className={`bg-white border border-gray-300 rounded-sm shadow-none w-full py-0 gap-0 ${className}`}>
+    <Card className={`bg-white border border-[#d5d5dd] rounded-sm shadow-none w-full py-0 gap-0 ${className}`}>
       <CardContent className="px-6 py-5">
         {/* Main value - very large and prominent (matching RevenueCard) */}
         <div className="text-3xl md:text-5xl font-light text-gray-900 mb-3 leading-none truncate">

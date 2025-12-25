@@ -8,7 +8,7 @@ import { useCustomerId } from '@/lib/hooks/useCustomerID';
 import { useCustomerProfile } from '@/lib/hooks/useCustomerProfile';
 import { useOrderFilters } from '@/lib/hooks/cutomerOrderFilter';
 // Components
-import  {LoadingSpinner } from './_components/loading-spinner';
+import { LoadingSpinner } from './_components/loading-spinner';
 import { ErrorMessage } from './_components/error-message';
 import { CustomerProfileHeader } from './_components/customer-profile-header';
 import { CustomerMetricsSection } from './_components/customers-metric-section';
@@ -17,7 +17,7 @@ import { OrderHistorySection } from './_components/order-history-section';
 const CustomerProfilePage = () => {
   const router = useRouter();
   const customerId = useCustomerId();
-  
+
   const {
     customer,
     orders,
@@ -49,8 +49,8 @@ const CustomerProfilePage = () => {
 
   if (error || !customer) {
     return (
-      <ErrorMessage 
-        error={error || "Customer not found"} 
+      <ErrorMessage
+        error={error || "Customer not found"}
         customerId={customerId}
         onBackClick={handleBackClick}
       />
@@ -58,7 +58,7 @@ const CustomerProfilePage = () => {
   }
 
   return (
-    <div className="p-6 bg-background min-h-screen">
+    <div className="p-6 bg-[#F7F7F8] min-h-screen">
       <CustomerProfileHeader onBackClick={handleBackClick} />
 
       <CustomerMetricsSection

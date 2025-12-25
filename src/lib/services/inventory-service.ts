@@ -28,6 +28,8 @@ export interface InventoryItem {
   barcode?: string;
   taxCategory?: string;
   quantity?: number;
+  sellingPrice?: number;
+  costPerUnit?: number;
   image?: string;
   isActive?: boolean; // API uses isActive, not active
   createdAt?: string;
@@ -418,7 +420,7 @@ export const InventoryService = {
 
       const queryString = searchParams.toString();
       const url = buildUrl(`/t/inventory/items/export.csv${queryString ? `?${queryString}` : ''}`);
-      
+
       const response = await fetch(url, {
         method: "GET",
         headers: buildHeaders({
