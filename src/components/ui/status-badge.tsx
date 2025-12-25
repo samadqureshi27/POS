@@ -2,7 +2,6 @@
 // Status Badge Component using shadcn/ui Badge
 import React from "react";
 import { Badge, badgeVariants } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { VariantProps } from "class-variance-authority";
 
 export interface StatusBadgeProps extends React.ComponentProps<"span">, VariantProps<typeof badgeVariants> {
