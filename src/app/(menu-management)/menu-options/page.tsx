@@ -53,7 +53,8 @@ const AddOnsPage = () => {
   const handleModalSubmit = async () => {
     const result = await handleModalSubmitOriginal();
     if (result.success) {
-      toast.success("Add-on saved successfully", {
+      const message = editingItem ? "Add-on updated successfully" : "Add-on created successfully";
+      toast.success(message, {
         duration: 5000,
         position: "top-right",
       });
@@ -63,8 +64,8 @@ const AddOnsPage = () => {
   };
 
   const handleDelete = async (item: MenuItemOptions) => {
-    if (!item.backendId || !item.groupId) {
-      toast.error("Cannot delete: Invalid item ID", {
+    if (!item.groupId) {
+      toast.error("Cannot delete: Invalid group ID", {
         duration: 5000,
         position: "top-right",
       });
@@ -72,22 +73,7 @@ const AddOnsPage = () => {
     }
 
     try {
-      // Get all items in this group
-      const { AddonsItemsService } = await import("@/lib/services/addons-items-service");
-      const itemsRes = await AddonsItemsService.listItems({ groupId: item.groupId });
-
-      if (itemsRes.success && itemsRes.data) {
-        // Delete all items in the group
-        await Promise.all(
-          itemsRes.data.map(async (addonItem) => {
-            if (addonItem._id || addonItem.id) {
-              await AddonsItemsService.deleteItem(addonItem._id || addonItem.id || "");
-            }
-          })
-        );
-      }
-
-      // Delete the group itself
+      // Delete the group - backend should handle cascade delete of items
       const { AddonsGroupsService } = await import("@/lib/services/addons-groups-service");
       const deleteRes = await AddonsGroupsService.deleteGroup(item.groupId);
 
@@ -96,7 +82,7 @@ const AddOnsPage = () => {
           duration: 5000,
           position: "top-right",
         });
-        // Refresh to get latest data since menu-options uses different hook
+        // Refresh to get latest data
         await refreshData();
       } else {
         toast.error(deleteRes.message || "Failed to delete add-on", {

@@ -2,24 +2,44 @@
 import { buildHeaders } from "@/lib/util/service-helpers";
 import { logError } from "@/lib/util/logger";
 
+// Recipe Ingredient structure
+export interface RecipeIngredient {
+  sourceType: "inventory" | "recipe";
+  sourceId: string;
+  nameSnapshot?: string;
+  quantity: number;
+  unit: string;
+  costPerUnit?: number;
+  convertToUnit?: string;
+}
+
+// Recipe Variant matching Postman API
 export interface RecipeVariant {
   _id?: string;
   id?: string;
   recipeId: string;
   name: string;
-  price: number;
-  isActive?: boolean;
-  sku?: string;
   description?: string;
+  type: "size" | "flavor" | "crust" | "addon" | "custom";
+  sizeMultiplier?: number;
+  baseCostAdjustment?: number;
+  ingredients?: RecipeIngredient[];
+  isActive: boolean;
+  crustType?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface RecipeVariantFormData {
   recipeId: string;
   name: string;
-  price: number;
-  isActive?: boolean;
-  sku?: string;
   description?: string;
+  type: "size" | "flavor" | "crust" | "addon" | "custom";
+  sizeMultiplier?: number;
+  baseCostAdjustment?: number;
+  ingredients?: RecipeIngredient[];
+  isActive?: boolean;
+  crustType?: string;
 }
 
 export interface PaginationParams {

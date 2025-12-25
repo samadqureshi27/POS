@@ -5,6 +5,41 @@ const REMOTE_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
   "https://api.tritechtechnologyllc.com";
 
+// Enable/disable detailed API logging
+const ENABLE_API_LOGGING = true;
+
+/**
+ * Log API request details to console
+ */
+function logApiRequest(method: string, url: string, headers: Record<string, string>, body?: any) {
+  if (!ENABLE_API_LOGGING) return;
+
+  console.log('\n🌐 API REQUEST:', {
+    method,
+    url,
+    headers: {
+      'x-tenant-id': headers['x-tenant-id'],
+      'Authorization': headers['Authorization'] ? 'Bearer ***' : 'None',
+      'Content-Type': headers['Content-Type']
+    },
+    body: body ? JSON.stringify(body).substring(0, 200) : undefined
+  });
+}
+
+/**
+ * Log API response details to console
+ */
+function logApiResponse(url: string, status: number, data?: any) {
+  if (!ENABLE_API_LOGGING) return;
+
+  const statusEmoji = status >= 200 && status < 300 ? '✅' : '❌';
+  console.log(`${statusEmoji} API RESPONSE:`, {
+    url,
+    status,
+    data: data ? JSON.stringify(data).substring(0, 200) + '...' : undefined
+  });
+}
+
 /**
  * Get tenant slug from request headers or environment
  * Throws an error if tenant slug is not configured
@@ -53,4 +88,36 @@ export function buildTenantHeaders(req: Request, includeAuth: boolean = false): 
  */
 export function getRemoteBase(): string {
   return REMOTE_BASE;
+}
+
+/**
+ * Wrapper for fetch with automatic logging
+ */
+export async function proxyFetch(url: string, options: RequestInit & { logBody?: any } = {}) {
+  const { logBody, ...fetchOptions } = options;
+
+  logApiRequest(
+    fetchOptions.method || 'GET',
+    url,
+    (fetchOptions.headers as Record<string, string>) || {},
+    logBody
+  );
+
+  const response = await fetch(url, fetchOptions);
+
+  // Try to parse response for logging
+  const contentType = response.headers.get("content-type");
+  let responseData;
+  if (contentType?.includes("application/json")) {
+    const clone = response.clone();
+    try {
+      responseData = await clone.json();
+    } catch (e) {
+      // Failed to parse, ignore
+    }
+  }
+
+  logApiResponse(url, response.status, responseData);
+
+  return response;
 }

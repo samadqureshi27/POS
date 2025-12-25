@@ -716,5 +716,5 @@ export default function ItemsPage() {
         variant="default"
       />
     </PageContainer>
-  );
+);
 }

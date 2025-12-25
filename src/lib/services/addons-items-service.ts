@@ -184,4 +184,21 @@ export const AddonsItemsService = {
 
     return { success: true, data: null };
   },
+
+  // Bulk delete items by group ID
+  async bulkDeleteByGroup(groupId: string): Promise<ApiResponse<null>> {
+    const url = buildUrl(`/t/addons/items/bulk-delete?groupId=${encodeURIComponent(groupId)}`);
+    const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      // If bulk delete endpoint doesn't exist, fall back to individual deletes
+      if (res.status === 404 || res.status === 501) {
+        return { success: false, message: "Bulk delete not supported" };
+      }
+      return { success: false, message: data?.message || `Bulk delete failed (${res.status})` };
+    }
+
+    return { success: true, data: null };
+  },
 };

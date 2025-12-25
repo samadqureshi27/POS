@@ -38,13 +38,16 @@ export interface Ingredient {
 }
 
 export interface RecipeIngredient {
-  ingredientId: string;
+  sourceType: "inventory" | "recipe";
+  sourceId: string;
+  nameSnapshot?: string;
   quantity: number;
   unit: string;
+  costPerUnit?: number; // Cost per unit for this ingredient
+  convertToUnit?: string;
   notes?: string;
-  sourceType?: "inventory" | "recipe"; // Add source type
-  sourceId?: string; // Source ID for inventory or recipe
-  nameSnapshot?: string; // Snapshot of ingredient name
+  // Legacy fields for backwards compatibility
+  ingredientId?: string;
 }
 
 export interface ToastMessage {
@@ -119,20 +122,18 @@ export type RecipeStatus = typeof RECIPE_STATUS[number];
 export type RecipeDifficulty = typeof RECIPE_DIFFICULTY[number];
 export type RecipeCategory = typeof RECIPE_CATEGORIES[number];
 
-// Variant types for inline creation
+// Variant types for inline creation - matching Postman API
 export interface RecipeVariantInline {
   name: string;
   description?: string;
-  type: "size" | "flavor" | "crust" | "custom";
+  type: "size" | "flavor" | "crust" | "addon" | "custom";
   sizeMultiplier?: number;
   baseCostAdjustment?: number;
   ingredients?: RecipeIngredient[];
   isActive: boolean;
   crustType?: string;
-  metadata?: {
-    menuDisplayName?: string;
-    availability?: boolean;
-  };
+  _id?: string; // For editing existing variants
+  id?: string;
 }
 
 // Recipe creation/update payload - use the same structure as RecipeOption without ID

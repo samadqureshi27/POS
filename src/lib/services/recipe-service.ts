@@ -2,34 +2,52 @@
 import { buildHeaders } from "@/lib/util/service-helpers";
 import { logError } from "@/lib/util/logger";
 
+// Recipe Ingredient structure matching Postman API
+export interface RecipeIngredient {
+  sourceType: "inventory" | "recipe";
+  sourceId: string;
+  nameSnapshot?: string;
+  quantity: number;
+  unit: string;
+  costPerUnit?: number;
+  convertToUnit?: string;
+}
+
+// Recipe Variant structure for inline creation
+export interface RecipeVariantInline {
+  name: string;
+  description?: string;
+  type: "size" | "flavor" | "crust" | "addon" | "custom";
+  sizeMultiplier?: number;
+  baseCostAdjustment?: number;
+  ingredients?: RecipeIngredient[];
+  isActive: boolean;
+  crustType?: string;
+}
+
 export interface Recipe {
   _id?: string;
   id?: string;
   name: string;
-  slug?: string;
+  type: "sub" | "final";
   description?: string;
-  category?: string;
   isActive?: boolean;
-  type?: "sub" | "final";
-  ingredients?: any[];
-  instructions?: string;
-  prepTime?: number;
-  cookTime?: number;
-  servings?: number;
+  ingredients?: RecipeIngredient[];
+  yield?: number; // How many portions/units this recipe produces
+  totalCost?: number;
+  variations?: RecipeVariantInline[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface RecipePayload {
   name: string;
-  slug?: string;
+  type: "sub" | "final";
   description?: string;
-  category?: string;
   isActive?: boolean;
-  ingredients?: any[];
-  instructions?: string;
-  prepTime?: number;
-  cookTime?: number;
-  servings?: number;
-  variations?: any[]; // Support inline variants
+  ingredients?: RecipeIngredient[];
+  yield?: number;
+  variations?: RecipeVariantInline[]; // Support inline variants
 }
 
 export interface ApiResponse<T> {
