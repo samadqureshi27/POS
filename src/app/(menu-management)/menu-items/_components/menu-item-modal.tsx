@@ -347,7 +347,7 @@ export default function MenuItemModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent size="4xl" fullHeight>
+      <DialogContent size="4xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
         {/* Header */}
         <div className="p-5 border-b border-gray-200 flex-shrink-0">
           <DialogTitle className="text-xl font-bold text-gray-900">

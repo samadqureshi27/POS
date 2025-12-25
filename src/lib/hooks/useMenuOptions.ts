@@ -123,9 +123,12 @@ export const useMenuOptions = () => {
         loadEditingData();
     }, [editingItem, isModalOpen, MenuItemOptionss]);
 
-    const loadMenuItemOptionss = async () => {
+    const loadMenuItemOptionss = async (skipLoadingState = false) => {
         try {
-            setLoading(true);
+            // Only set loading state during initial load, not during refresh
+            if (!skipLoadingState) {
+                setLoading(true);
+            }
             const response = await AddonsGroupsService.listGroups();
             if (response.success && response.data) {
                 // Map addon groups to MenuItemOptions format
@@ -152,7 +155,9 @@ export const useMenuOptions = () => {
             });
             showToast(error instanceof Error ? error.message : "Failed to load addon groups", "error");
         } finally {
-            setLoading(false);
+            if (!skipLoadingState) {
+                setLoading(false);
+            }
         }
     };
 
@@ -166,24 +171,24 @@ export const useMenuOptions = () => {
         return matchesStatus && matchesSearch;
     });
 
-    const handleCreateItem = async (itemData: Omit<MenuItemOptions, "ID">) => {
+    const handleCreateItem = async (itemData: Omit<MenuItemOptions, "ID">): Promise<{ success: boolean }> => {
         try {
             setActionLoading(true);
 
             // Validate required fields for new add-ons structure
             if (!itemData.categoryId) {
                 showToast("Please select a menu category", "error");
-                return;
+                return { success: false };
             }
 
             if (!itemData.groupId) {
                 showToast("Please select or create an add-on group", "error");
-                return;
+                return { success: false };
             }
 
             if (!itemData.addonItems || itemData.addonItems.length === 0) {
                 showToast("Please add at least one add-on item", "error");
-                return;
+                return { success: false };
             }
 
             // Bulk create add-on items using the new API
@@ -203,14 +208,16 @@ export const useMenuOptions = () => {
 
             const response = await AddonsItemsService.bulkCreateItems(bulkPayload);
             if (response.success) {
-                await loadMenuItemOptionss(); // Reload list
+                // Don't auto-refresh here - let the caller handle it to prevent double refresh
                 setIsModalOpen(false);
                 setEditingItem(null);
                 setSearchTerm("");
                 setDisplayFilter("");
-                showToast("Add-on items created successfully", "success");
+                // showToast("Add-on items created successfully", "success");
+                return { success: true };
             } else {
                 showToast(response.message || "Failed to create add-on items", "error");
+                return { success: false };
             }
         } catch (error) {
             logError("Error creating add-on items", error, {
@@ -220,15 +227,16 @@ export const useMenuOptions = () => {
                 groupId: itemData.groupId
             });
             showToast(error instanceof Error ? error.message : "Failed to create add-on items", "error");
+            return { success: false };
         } finally {
             setActionLoading(false);
         }
     };
 
-    const handleUpdateItem = async (itemData: Omit<MenuItemOptions, "ID">) => {
+    const handleUpdateItem = async (itemData: Omit<MenuItemOptions, "ID">): Promise<{ success: boolean }> => {
         if (!editingItem || !editingItem.backendId) {
             showToast("Add-on group ID not found", "error");
-            return;
+            return { success: false };
         }
 
         try {
@@ -237,17 +245,17 @@ export const useMenuOptions = () => {
             // Validate required fields
             if (!itemData.categoryId) {
                 showToast("Please select a menu category", "error");
-                return;
+                return { success: false };
             }
 
             if (!itemData.groupId) {
                 showToast("Please select or create an add-on group", "error");
-                return;
+                return { success: false };
             }
 
             if (!itemData.addonItems || itemData.addonItems.length === 0) {
                 showToast("Please add at least one add-on item", "error");
-                return;
+                return { success: false };
             }
 
             // Update the group name if changed
@@ -257,7 +265,7 @@ export const useMenuOptions = () => {
                 });
                 if (!groupUpdateRes.success) {
                     showToast(groupUpdateRes.message || "Failed to update group name", "error");
-                    return;
+                    return { success: false };
                 }
             }
 
@@ -291,12 +299,14 @@ export const useMenuOptions = () => {
 
             const response = await AddonsItemsService.bulkCreateItems(bulkPayload);
             if (response.success) {
-                await loadMenuItemOptionss(); // Reload list
+                // Don't auto-refresh here - let the caller handle it to prevent double refresh
                 setIsModalOpen(false);
                 setEditingItem(null);
-                showToast("Add-on items updated successfully", "success");
+                // showToast("Add-on items updated successfully", "success");
+                return { success: true };
             } else {
                 showToast(response.message || "Failed to update add-on items", "error");
+                return { success: false };
             }
         } catch (error) {
             logError("Error updating add-on items", error, {
@@ -305,6 +315,7 @@ export const useMenuOptions = () => {
                 groupId: itemData.groupId
             });
             showToast(error instanceof Error ? error.message : "Failed to update add-on items", "error");
+            return { success: false };
         } finally {
             setActionLoading(false);
         }
@@ -375,16 +386,16 @@ export const useMenuOptions = () => {
         return true;
     };
 
-    const handleModalSubmit = () => {
+    const handleModalSubmit = async (): Promise<{ success: boolean }> => {
         if (!isFormValid()) {
             showToast("Please fix form errors before submitting", "error");
-            return;
+            return { success: false };
         }
 
         if (editingItem) {
-            handleUpdateItem(formData);
+            return await handleUpdateItem(formData);
         } else {
-            handleCreateItem(formData);
+            return await handleCreateItem(formData);
         }
     };
 
@@ -433,5 +444,6 @@ export const useMenuOptions = () => {
 
         // Utils
         isFormValid,
+        refreshData: () => loadMenuItemOptionss(true), // Skip loading state during refresh
     };
 };

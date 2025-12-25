@@ -93,8 +93,9 @@ export const usePosManagement = (branchId: string) => {
                 status: itemData.Status || "active",
                 metadata: itemData.metadata || {},
             });
-            if (response.success) {
-                await loadPosItems();
+            if (response.success && response.data) {
+                // Optimistic update: Add new POS to local state
+                setPosItems(prev => [...prev, convertToFrontendFormat(response.data)]);
                 closeModal();
                 setSearchTerm("");
                 showToast(response.message || "POS created successfully", "success");
@@ -145,7 +146,8 @@ export const usePosManagement = (branchId: string) => {
             setActionLoading(true);
             const response = await PosService.bulkDeleteTerminals(selectedItems as string[]);
             if (response.success) {
-                await loadPosItems();
+                // Optimistic update: Remove deleted items from local state
+                setPosItems(prev => prev.filter(item => !selectedItems.includes(item.POS_ID)));
                 clearSelection();
                 showToast(response.message || "POS items deleted successfully", "success");
             }

@@ -151,7 +151,13 @@ export default function InventoryItemModal({
     if (categoriesRes.success && categoriesRes.data) setCategories(categoriesRes.data);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e?: React.MouseEvent) => {
+    // Prevent any default behavior
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     if (!formData.name || !formData.baseUnit) return;
 
     // For stock items, ensure purchaseUnit and conversion are set
@@ -276,8 +282,8 @@ export default function InventoryItemModal({
   const isEditMode = !!editingItem;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent size="3xl" fullHeight>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent size="3xl" fullHeight onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         {/* Header */}
         <div className="p-5 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-2">
@@ -526,27 +532,6 @@ export default function InventoryItemModal({
                     </div>
                   )}
 
-                  {/* Current Stock / Initial Quantity */}
-                  <div>
-                    <Label className="text-gray-700 text-sm font-medium mb-2">
-                      Current Stock Quantity
-                    </Label>
-                    <Input
-                      type="number"
-                      value={formData.quantity === 0 ? "" : (formData.quantity !== undefined ? formData.quantity : "")}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        handleFieldChange("quantity", val === '' ? 0 : parseInt(val) || 0);
-                      }}
-                      onFocus={(e) => e.target.select()}
-                      placeholder="0"
-                      className="bg-white border-gray-300 h-9 rounded-md"
-                    />
-                    <p className="text-gray-500 text-xs mt-1">
-                      Initial or current stock quantity (in {formData.baseUnit})
-                    </p>
-                  </div>
-
                   {/* Threshold (Reorder Point) */}
                   <div>
                     <Label className="text-gray-700 text-sm font-medium mb-2">
@@ -631,6 +616,7 @@ export default function InventoryItemModal({
             Cancel
           </Button>
           <Button
+            type="button"
             onClick={handleSave}
             disabled={!formData.name || !formData.baseUnit || loading}
             size="sm"
