@@ -52,10 +52,10 @@ const BranchManagementPage = () => {
 
   // Load branches after auth is ready
   React.useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if (!authLoading) {
       loadBranchItems();
     }
-  }, [authLoading, isAuthenticated]);
+  }, [authLoading, loadBranchItems]);
 
   const handleBranchClick = (branchId: number) => {
     const item = branchItems.find((b) => b["Branch-ID"] === branchId);

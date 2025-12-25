@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { UtensilsCrossed, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
-import { useToast } from "@/lib/hooks";
+import { toast } from "sonner";
+import { Toaster } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import MenuItemModal from "./_components/menu-item-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -18,7 +18,6 @@ import { logError } from "@/lib/util/logger";
 
 const MenuItemsManagementPage = () => {
   const router = useRouter();
-  const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<MenuItemOption | null>(null);
@@ -53,6 +52,7 @@ const MenuItemsManagementPage = () => {
 
     // Utility
     refreshData,
+    deleteMenuItem,
   } = useMenuItemData();
 
   // Enhanced action handlers with consistent toast notifications
@@ -63,11 +63,12 @@ const MenuItemsManagementPage = () => {
   const handleModalSubmit = async (data: any) => {
     const result = await handleModalSubmitOriginal(data);
     if (result.success) {
-      if (editingItem) {
-        globalShowToast("Menu item updated successfully", "success");
-      } else {
-        globalShowToast("Menu item added successfully", "success");
-      }
+      const message = editingItem ? "Menu item updated successfully" : "Menu item added successfully";
+      toast.success(message, {
+        duration: 5000,
+        position: "top-right",
+      });
+      // No need to refresh - optimistic update in hook handles it
     }
     return result;
   };
@@ -80,7 +81,6 @@ const MenuItemsManagementPage = () => {
   const confirmDelete = async () => {
     if (!itemToDelete) return;
 
-
     const itemId = itemToDelete.ID;
 
     if (!itemId) {
@@ -88,21 +88,23 @@ const MenuItemsManagementPage = () => {
         component: "MenuItemsManagement",
         action: "confirmDelete",
       });
-      globalShowToast("Menu item ID is missing", "error");
+      toast.error("Menu item ID is missing");
       return;
     }
 
-
     try {
-      const MenuService = (await import("@/lib/services/menu-service")).MenuService;
-
-      const result = await MenuService.deleteMenuItem(itemId);
+      // Use hook's delete function which has optimistic update
+      const result = await deleteMenuItem(itemId);
 
       if (result.success) {
-        globalShowToast("Menu item deleted successfully", "success");
-        await refreshData();
+        toast.success("Menu item deleted successfully", {
+          duration: 5000,
+          position: "top-right",
+        });
+        setDeleteDialogOpen(false);
+        setItemToDelete(null);
       } else {
-        globalShowToast(result.message || "Failed to delete menu item", "error");
+        toast.error(result.message || "Failed to delete menu item");
       }
     } catch (error: any) {
       logError("Error deleting menu item", error, {
@@ -110,8 +112,7 @@ const MenuItemsManagementPage = () => {
         action: "confirmDelete",
         itemId: itemToDelete?.ID,
       });
-      globalShowToast(error.message || "Failed to delete menu item", "error");
-      router.refresh();
+      toast.error(error.message || "Failed to delete menu item");
     }
   };
 
@@ -122,7 +123,7 @@ const MenuItemsManagementPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" richColors expand={true} duration={5000} />
 
       <PageHeader
         title="Menu Items"

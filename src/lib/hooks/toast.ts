@@ -12,22 +12,27 @@ export const useToast = () => {
   const [toastVisible, setToastVisible] = useState(false);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
-    // Use Sonner for the actual toast display
+    // Use Sonner with consistent styling across the app
+    const toastOptions = {
+      duration: 5000,
+      position: "top-right" as const,
+    };
+
     switch (type) {
       case 'success':
-        sonnerToast.success(message);
+        sonnerToast.success(message, toastOptions);
         break;
       case 'error':
-        sonnerToast.error(message);
+        sonnerToast.error(message, toastOptions);
         break;
       case 'warning':
-        sonnerToast.warning(message);
+        sonnerToast.warning(message, toastOptions);
         break;
       case 'info':
-        sonnerToast.info(message);
+        sonnerToast.info(message, toastOptions);
         break;
       default:
-        sonnerToast(message);
+        sonnerToast(message, toastOptions);
     }
 
     // Keep the old state for backward compatibility (though it won't be used for display)

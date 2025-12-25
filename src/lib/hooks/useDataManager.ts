@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { logError } from "@/lib/util/logger";
 
 /**
@@ -48,7 +48,7 @@ export interface DataManagerConfig<TRaw, TTransformed> {
   entityName: string;
 
   /** Transform raw API data to UI format */
-  transformData?: (raw: TRaw, index?: number) => TTransformed;
+  transformData?: (raw: TRaw, index?: number, additionalData?: Record<string, any>) => TTransformed;
 
   /** Extract array from response if nested */
   extractDataArray?: (response: any) => any[];
@@ -100,6 +100,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Filter states (support common patterns)
   const [searchTerm, setSearchTerm] = useState("");
@@ -112,6 +113,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
 
   // Additional state storage
   const [additionalState, setAdditionalState] = useState<Record<string, any>>({});
+  const additionalStateRef = useRef<Record<string, any>>({});
 
   // Toast utility
   const showToast = useCallback((message: string, type: "success" | "error") => {
@@ -120,9 +122,12 @@ export function useDataManager<TRaw = any, TTransformed = any>(
   }, []);
 
   // Load items
-  const loadItems = useCallback(async () => {
+  const loadItems = useCallback(async (skipLoadingState = false) => {
     try {
-      setLoading(true);
+      // Only set loading state during initial load, not during refresh
+      if (!skipLoadingState) {
+        setLoading(true);
+      }
 
       // Get the list method (could be list, listCategories, listMenuItems, etc.)
       const listFn = (service as any)[listMethod] || service.list;
@@ -159,7 +164,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
 
         // Transform data if transformer provided
         const transformedData = transformData
-          ? dataArray.map((item: any, index: number) => transformData(item, index))
+          ? dataArray.map((item: any, index: number) => transformData(item, index, additionalStateRef.current))
           : dataArray;
 
         setItems(transformedData);
@@ -181,7 +186,10 @@ export function useDataManager<TRaw = any, TTransformed = any>(
       showToast(`Failed to load ${entityName}s`, "error");
       setItems([]);
     } finally {
-      setLoading(false);
+      if (!skipLoadingState) {
+        setLoading(false);
+      }
+      setIsInitialLoad(false);
     }
   }, [service, entityName, transformData, extractDataArray, showToast, listMethod]);
 
@@ -209,16 +217,16 @@ export function useDataManager<TRaw = any, TTransformed = any>(
     results.forEach(({ key, result }) => {
       newState[key] = result;
     });
+    additionalStateRef.current = newState;
     setAdditionalState(newState);
   }, [additionalData]);
 
   // Initialize data
   useEffect(() => {
     const loadAll = async () => {
-      await Promise.all([
-        loadItems(),
-        loadAdditionalData(),
-      ]);
+      // Load additional data first, then items (so transformData has access to it)
+      await loadAdditionalData();
+      await loadItems();
     };
     loadAll();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -265,8 +273,13 @@ export function useDataManager<TRaw = any, TTransformed = any>(
       const response = await createFn(itemData);
 
       if (response.success && response.data) {
-        await loadItems();
-        showToast(response.message || `${entityName} created successfully`, "success");
+        // Optimistic update: Add new item to local state
+        const newItem = transformData
+          ? transformData(response.data, items.length, additionalStateRef.current)
+          : response.data;
+
+        setItems(prevItems => [...prevItems, newItem]);
+
         return { success: true, data: response.data };
       } else {
         throw new Error(response.message || `Failed to create ${entityName}`);
@@ -282,7 +295,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
     } finally {
       setActionLoading(false);
     }
-  }, [service, entityName, loadItems, showToast, createMethod]);
+  }, [service, entityName, transformData, items.length, showToast, createMethod]);
 
   const updateItem = useCallback(async (id: string, itemData: any) => {
     try {
@@ -296,8 +309,21 @@ export function useDataManager<TRaw = any, TTransformed = any>(
       const response = await updateFn(id, itemData);
 
       if (response.success && response.data) {
-        await loadItems();
-        showToast(response.message || `${entityName} updated successfully`, "success");
+        // Optimistic update: Update item in local state
+        setItems(prevItems => {
+          return prevItems.map((item: any) => {
+            const itemId = item.ID || item.id || item._id;
+            if (itemId === id || item._id === id || item.id === id) {
+              // Transform the updated data and merge with existing item
+              const updatedItem = transformData
+                ? transformData(response.data, 0, additionalStateRef.current)
+                : response.data;
+              return { ...item, ...updatedItem };
+            }
+            return item;
+          });
+        });
+
         return { success: true, data: response.data };
       } else {
         throw new Error(response.message || `Failed to update ${entityName}`);
@@ -314,7 +340,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
     } finally {
       setActionLoading(false);
     }
-  }, [service, entityName, loadItems, showToast, updateMethod]);
+  }, [service, entityName, transformData, showToast, updateMethod]);
 
   const deleteItems = useCallback(async (itemIds: string[]) => {
     if (itemIds.length === 0) return { success: false };
@@ -333,9 +359,17 @@ export function useDataManager<TRaw = any, TTransformed = any>(
       const allSuccessful = results.every((result: any) => result.success);
 
       if (allSuccessful) {
-        await loadItems();
+        // Optimistic update: Remove deleted items from local state
+        setItems(prevItems => {
+          return prevItems.filter((item: any) => {
+            const itemId = item.ID || item.id || item._id;
+            return !itemIds.includes(itemId) &&
+                   !itemIds.includes(item._id) &&
+                   !itemIds.includes(item.id);
+          });
+        });
+
         setSelectedItems([]);
-        showToast(`${itemIds.length} ${entityName}(s) deleted successfully`, "success");
         return { success: true };
       } else {
         const failedCount = results.filter((r: any) => !r.success).length;
@@ -353,7 +387,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
     } finally {
       setActionLoading(false);
     }
-  }, [service, entityName, loadItems, showToast, deleteMethod]);
+  }, [service, entityName, showToast, deleteMethod]);
 
   // Selection handlers
   const handleSelectItem = useCallback((itemId: string, checked: boolean) => {
@@ -453,9 +487,9 @@ export function useDataManager<TRaw = any, TTransformed = any>(
     setFilters({});
   }, []);
 
-  // Refresh data
+  // Refresh data (skip loading state to avoid page remount)
   const refreshData = useCallback(async () => {
-    await loadItems();
+    await loadItems(true); // Skip loading state during refresh
     await loadAdditionalData();
   }, [loadItems, loadAdditionalData]);
 

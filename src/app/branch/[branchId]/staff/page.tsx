@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";

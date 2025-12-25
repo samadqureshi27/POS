@@ -51,7 +51,7 @@ export default function MenuItemModal({
     pricing: {
       basePrice: 0,
       priceIncludesTax: false,
-      currency: "SAR",
+      currency: "PKR",
     },
     isActive: true,
     displayOrder: 0,
@@ -85,7 +85,7 @@ export default function MenuItemModal({
           pricing: {
             basePrice: raw.pricing?.basePrice || 0,
             priceIncludesTax: raw.pricing?.priceIncludesTax || false,
-            currency: raw.pricing?.currency || "SAR",
+            currency: raw.pricing?.currency || "PKR",
           },
           isActive: raw.isActive !== false,
           displayOrder: raw.displayOrder || 0,
@@ -109,7 +109,7 @@ export default function MenuItemModal({
           pricing: {
             basePrice: editingItem.BasePrice || 0,
             priceIncludesTax: editingItem.PriceIncludesTax || false,
-            currency: editingItem.Currency || "SAR",
+            currency: editingItem.Currency || "PKR",
           },
           isActive: editingItem.Status === "Active",
           displayOrder: editingItem.DisplayOrder || 0,
@@ -130,7 +130,7 @@ export default function MenuItemModal({
           pricing: {
             basePrice: 0,
             priceIncludesTax: false,
-            currency: "SAR",
+            currency: "PKR",
           },
           isActive: true,
           displayOrder: 0,
@@ -221,7 +221,7 @@ export default function MenuItemModal({
                 ...prev.pricing,
                 basePrice: recipe.totalCost || 0,
                 priceIncludesTax: prev.pricing?.priceIncludesTax || false,
-                currency: prev.pricing?.currency || "SAR",
+                currency: prev.pricing?.currency || "PKR",
               };
             }
 
@@ -315,7 +315,7 @@ export default function MenuItemModal({
         pricing: {
           basePrice: formData.pricing!.basePrice!,
           priceIncludesTax: formData.pricing?.priceIncludesTax || false,
-          currency: formData.pricing?.currency || "SAR",
+          currency: formData.pricing?.currency || "PKR",
         },
         isActive: formData.isActive !== false,
         displayOrder: formData.displayOrder || 0,
@@ -347,7 +347,7 @@ export default function MenuItemModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent size="4xl" fullHeight>
+      <DialogContent size="4xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
         {/* Header */}
         <div className="p-5 border-b border-gray-200 flex-shrink-0">
           <DialogTitle className="text-xl font-bold text-gray-900">
@@ -576,17 +576,18 @@ export default function MenuItemModal({
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
               <Select
-                value={formData.pricing?.currency || "SAR"}
+                value={formData.pricing?.currency || "PKR"}
                 onValueChange={(value) => handlePricingChange("currency", value)}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="SAR">SAR</SelectItem>
-                  <SelectItem value="USD">USD</SelectItem>
-                  <SelectItem value="EUR">EUR</SelectItem>
-                  <SelectItem value="GBP">GBP</SelectItem>
+                  <SelectItem value="PKR">PKR (Pakistani Rupee)</SelectItem>
+                  <SelectItem value="SAR">SAR (Saudi Riyal)</SelectItem>
+                  <SelectItem value="USD">USD (US Dollar)</SelectItem>
+                  <SelectItem value="EUR">EUR (Euro)</SelectItem>
+                  <SelectItem value="GBP">GBP (British Pound)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

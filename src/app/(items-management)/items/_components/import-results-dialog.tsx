@@ -94,7 +94,7 @@ export default function ImportResultsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+      <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {getStatusIcon()}

@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RecipeIngredientsList } from "./recipe-ingredients-list";
 import { RecipeVariantInput } from "./recipe-variant-input";
 import { RecipeVariantInline } from "@/lib/types/recipes";
+import { toast } from "sonner";
 
 // API Recipe structure
 interface RecipeIngredient {
@@ -69,7 +70,6 @@ interface RecipeModalProps {
   onClose: () => void;
   onSubmit: (data: any) => Promise<any>;
   actionLoading: boolean;
-  showToast: (message: string, type?: "success" | "error" | "warning" | "info") => void;
 }
 
 export default function RecipeModal({
@@ -80,7 +80,6 @@ export default function RecipeModal({
   availableRecipeOptions,
   onSubmit,
   actionLoading,
-  showToast,
 }: RecipeModalProps) {
   const [loading, setLoading] = useState(false);
 
@@ -310,7 +309,10 @@ export default function RecipeModal({
 
   const handleSave = async () => {
     if (!formData.name) {
-      showToast("Please enter a recipe name", "error");
+      toast.error("Please enter a recipe name", {
+        duration: 5000,
+        position: "top-right",
+      });
       return;
     }
 
@@ -320,14 +322,20 @@ export default function RecipeModal({
     });
 
     if (invalidIngredients.length > 0) {
-      showToast(`${invalidIngredients.length} ingredient(s) have missing information`, "error");
+      toast.error(`${invalidIngredients.length} ingredient(s) have missing information`, {
+        duration: 5000,
+        position: "top-right",
+      });
       return;
     }
 
     // Validate variants if any exist
     const invalidVariants = variants.filter(v => !v.name || !v.type);
     if (invalidVariants.length > 0) {
-      showToast(`${invalidVariants.length} variant(s) are missing required fields (name or type)`, "error");
+      toast.error(`${invalidVariants.length} variant(s) are missing required fields (name or type)`, {
+        duration: 5000,
+        position: "top-right",
+      });
       return;
     }
 
@@ -504,7 +512,7 @@ export default function RecipeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent size="4xl" fullHeight>
+      <DialogContent size="4xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
         {/* Header */}
         <div className="p-5 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-2">

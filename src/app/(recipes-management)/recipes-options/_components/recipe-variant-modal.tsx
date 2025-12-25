@@ -11,6 +11,7 @@ import { MultiSelectCombobox } from "@/components/ui/multi-select-combobox";
 import { Combobox } from "@/components/ui/combobox";
 import { RecipeIngredientsList } from "../../recipes-management/_components/recipe-ingredients-list";
 import { RecipeVariant, RecipeVariantFormData, VariantIngredient } from "@/lib/types/recipe-variants";
+import { toast } from "sonner";
 
 interface RecipeVariantModalProps {
   isOpen: boolean;
@@ -20,7 +21,6 @@ interface RecipeVariantModalProps {
   onClose: () => void;
   onSubmit: (data: RecipeVariantFormData) => Promise<{ success: boolean; error?: string }>;
   actionLoading: boolean;
-  showToast: (message: string, type?: "success" | "error" | "warning" | "info") => void;
 }
 
 export default function RecipeVariantModal({
@@ -31,7 +31,6 @@ export default function RecipeVariantModal({
   ingredients,
   onSubmit,
   actionLoading,
-  showToast,
 }: RecipeVariantModalProps) {
   const [loading, setLoading] = useState(false);
 
@@ -293,13 +292,19 @@ export default function RecipeVariantModal({
 
   const handleSave = async () => {
     if (!formData.name) {
-      showToast("Please enter a variation name", "error");
+      toast.error("Please enter a variation name", {
+        duration: 5000,
+        position: "top-right",
+      });
       return;
     }
 
     const recipeIds = Array.isArray(formData.recipeId) ? formData.recipeId : [formData.recipeId];
     if (recipeIds.length === 0 || !recipeIds[0]) {
-      showToast("Please select at least one recipe", "error");
+      toast.error("Please select at least one recipe", {
+        duration: 5000,
+        position: "top-right",
+      });
       return;
     }
 
@@ -309,7 +314,10 @@ export default function RecipeVariantModal({
     });
 
     if (invalidIngredients.length > 0) {
-      showToast(`${invalidIngredients.length} ingredient(s) have missing information`, "error");
+      toast.error(`${invalidIngredients.length} ingredient(s) have missing information`, {
+        duration: 5000,
+        position: "top-right",
+      });
       return;
     }
 
@@ -350,7 +358,7 @@ export default function RecipeVariantModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent size="4xl" fullHeight>
+      <DialogContent size="4xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
         {/* Header */}
         <div className="p-5 border-b border-gray-200 flex-shrink-0 flex flex-col">
           <DialogTitle className="text-xl font-bold text-gray-900 flex  gap-2">

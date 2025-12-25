@@ -6,7 +6,7 @@ import { Monitor, Plus, Edit2, Trash2, AlertCircle } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { useToast } from "@/lib/hooks";
 import PosModal from "./_components/pos-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';

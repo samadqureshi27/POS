@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { Sparkles, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
-import { useToast } from "@/lib/hooks";
+import { toast } from "sonner";
+import { Toaster } from "sonner";
 import RecipeVariantModal from "./_components/recipe-variant-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeVariants } from "@/lib/hooks/useRecipeVariations";
@@ -15,7 +15,6 @@ import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 
 const RecipeVariationsPage = () => {
-  const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const {
@@ -62,12 +61,21 @@ const RecipeVariationsPage = () => {
     const result = await handleModalSubmitOriginal(data);
     if (result.success) {
       if (editingItem) {
-        globalShowToast("Recipe variant updated successfully", "success");
+        toast.success("Recipe variant updated successfully", {
+          duration: 5000,
+          position: "top-right",
+        });
       } else {
-        globalShowToast("Recipe variant added successfully", "success");
+        toast.success("Recipe variant added successfully", {
+          duration: 5000,
+          position: "top-right",
+        });
       }
     } else {
-      globalShowToast(result.error || "Failed to save recipe variant", "error");
+      toast.error(result.error || "Failed to save recipe variant", {
+        duration: 5000,
+        position: "top-right",
+      });
     }
     return result;
   };
@@ -77,9 +85,15 @@ const RecipeVariationsPage = () => {
 
     const result = await deleteVariant(variant._id);
     if (result.success) {
-      globalShowToast("Recipe variant deleted successfully", "success");
+      toast.success("Recipe variant deleted successfully", {
+        duration: 5000,
+        position: "top-right",
+      });
     } else {
-      globalShowToast(result.error || "Failed to delete recipe variant", "error");
+      toast.error(result.error || "Failed to delete recipe variant", {
+        duration: 5000,
+        position: "top-right",
+      });
     }
   };
 
@@ -368,7 +382,6 @@ const RecipeVariationsPage = () => {
         onClose={closeModal}
         onSubmit={handleModalSubmit}
         actionLoading={actionLoading}
-        showToast={globalShowToast}
       />
     </PageContainer>
   );

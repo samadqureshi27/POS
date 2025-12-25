@@ -222,7 +222,7 @@ const RecipeVariantModal: React.FC<RecipeVariantModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="min-w-[60vw] max-w-4xl max-h-[85vh] min-h-[85vh] flex flex-col gap-0">
+      <DialogContent className="min-w-[60vw] max-w-4xl max-h-[85vh] min-h-[85vh] flex flex-col gap-0" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">
             {editingItem ? "Edit Recipe Variant" : "Add Recipe Variant"}

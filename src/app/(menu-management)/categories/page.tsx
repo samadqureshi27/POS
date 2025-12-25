@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { FolderTree, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
-import { useToast } from "@/lib/hooks";
+import { toast } from "sonner";
+import { Toaster } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import CategoryModal from "./_components/category-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -17,7 +17,6 @@ import { logError } from "@/lib/util/logger";
 
 const CategoriesManagementPage = () => {
   const router = useRouter();
-  const { showToast: globalShowToast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<MenuCategoryOption | null>(null);
@@ -49,6 +48,7 @@ const CategoriesManagementPage = () => {
     // Utility
     parentCategories,
     refreshData,
+    deleteCategory,
   } = useCategoryData();
 
   // Enhanced action handlers with consistent toast notifications
@@ -59,11 +59,12 @@ const CategoriesManagementPage = () => {
   const handleModalSubmit = async (data: any) => {
     const result = await handleModalSubmitOriginal(data);
     if (result.success) {
-      if (editingItem) {
-        globalShowToast("Category updated successfully", "success");
-      } else {
-        globalShowToast("Category added successfully", "success");
-      }
+      const message = editingItem ? "Category updated successfully" : "Category added successfully";
+      toast.success(message, {
+        duration: 5000,
+        position: "top-right",
+      });
+      // No need to refresh - optimistic update in hook handles it
     }
     return result;
   };
@@ -76,7 +77,6 @@ const CategoriesManagementPage = () => {
   const confirmDelete = async () => {
     if (!categoryToDelete) return;
 
-
     const categoryId = categoryToDelete.ID;
 
     if (!categoryId) {
@@ -84,21 +84,23 @@ const CategoriesManagementPage = () => {
         component: "CategoriesManagement",
         action: "confirmDelete",
       });
-      globalShowToast("Category ID is missing", "error");
+      toast.error("Category ID is missing");
       return;
     }
 
-
     try {
-      const MenuCategoryService = (await import("@/lib/services/menu-category-service")).MenuCategoryService;
-
-      const result = await MenuCategoryService.deleteCategory(categoryId);
+      // Use hook's delete function which has optimistic update
+      const result = await deleteCategory(categoryId);
 
       if (result.success) {
-        globalShowToast("Category deleted successfully", "success");
-        await refreshData();
+        toast.success("Category deleted successfully", {
+          duration: 5000,
+          position: "top-right",
+        });
+        setDeleteDialogOpen(false);
+        setCategoryToDelete(null);
       } else {
-        globalShowToast(result.message || "Failed to delete category", "error");
+        toast.error(result.message || "Failed to delete category");
       }
     } catch (error: any) {
       logError("Error deleting category", error, {
@@ -106,8 +108,7 @@ const CategoriesManagementPage = () => {
         action: "confirmDelete",
         categoryId: categoryToDelete?.ID,
       });
-      globalShowToast(error.message || "Failed to delete category", "error");
-      router.refresh();
+      toast.error(error.message || "Failed to delete category");
     }
   };
 
@@ -118,7 +119,7 @@ const CategoriesManagementPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" richColors expand={true} duration={5000} />
 
       <PageHeader
         title="Menu Categories"
