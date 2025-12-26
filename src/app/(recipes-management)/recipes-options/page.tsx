@@ -155,7 +155,7 @@ const RecipeVariationsPage = () => {
         emptyIcon={<Sparkles className="h-16 w-16 text-gray-300" />}
         emptyTitle="No recipe variations found"
         emptyDescription="Start by adding your first recipe variation"
-        getItemId={(item) => String(item._id)}
+        getItemId={(item) => String(item._id || item.id || 'temp-' + Date.now())}
         onEdit={openEditModal}
         onDelete={handleDelete}
         customActions={(item) => (
@@ -199,6 +199,21 @@ const RecipeVariationsPage = () => {
                 </div>
               </div>
             ),
+          },
+          {
+            key: "recipe",
+            header: "Recipe",
+            render: (item) => {
+              const recipe = recipes.find((r: any) =>
+                r._id === item.recipeId || r.id === item.recipeId || r.ID === item.recipeId
+              );
+              return (
+                <span className="text-sm font-bold text-gray-900">
+                  {recipe?.name || recipe?.Name || "—"}
+                </span>
+              );
+            },
+            className: "w-48",
           },
           {
             key: "type",
@@ -247,6 +262,10 @@ const RecipeVariationsPage = () => {
         ]}
         renderGridCard={(item, actions) => {
           const ingredientCount = item.ingredients?.length || 0;
+          const recipe = recipes.find((r: any) =>
+            r._id === item.recipeId || r.id === item.recipeId || r.ID === item.recipeId
+          );
+          const recipeName = recipe?.name || recipe?.Name || 'No Recipe';
           const status = item.type === "size"
             ? { label: "SIZE", color: "text-blue-600 bg-blue-50 border-blue-100", bar: "bg-blue-500" }
             : item.type === "flavor"
@@ -294,7 +313,7 @@ const RecipeVariationsPage = () => {
                       </div>
                     </div>
                     <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tight truncate">
-                      {item.description || 'No Description'}
+                      Recipe: {recipeName}
                     </p>
                   </div>
                 </div>
