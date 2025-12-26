@@ -285,11 +285,19 @@ export function useDataManager<TRaw = any, TTransformed = any>(
 
       const response = await createFn(itemData);
 
+      console.log("🟢 useDataManager createItem - Full response:", response);
+      console.log("🟢 useDataManager createItem - response.data:", response.data);
+      console.log("🟢 useDataManager createItem - response.data.name:", response.data?.name);
+
       if (response.success && response.data) {
         // Optimistic update: Add new item to local state
         const newItem = transformData
           ? transformData(response.data, items.length, additionalStateRef.current)
           : response.data;
+
+        console.log("🟢 useDataManager createItem - Transformed newItem:", newItem);
+        console.log("🟢 useDataManager createItem - newItem.Name:", newItem.Name);
+        console.log("🟢 useDataManager createItem - newItem.name:", newItem.name);
 
         setItems(prevItems => [...prevItems, newItem]);
 

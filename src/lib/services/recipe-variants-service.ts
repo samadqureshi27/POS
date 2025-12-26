@@ -201,16 +201,20 @@ export class RecipeVariantsService {
       }
 
       // Handle different API response structures
-      let variant = data;
+      let createdVariant = data;
 
+      // If wrapped in a result property (backend format)
+      if (data.result) {
+        createdVariant = data.result;
+      }
       // If wrapped in a data property
-      if (data.data) {
-        variant = data.data;
+      else if (data.data) {
+        createdVariant = data.data;
       }
 
       return {
         success: true,
-        data: variant,
+        data: createdVariant,
         message: data.message || "Recipe variant created successfully",
       };
     } catch (error: any) {
@@ -246,16 +250,20 @@ export class RecipeVariantsService {
       }
 
       // Handle different API response structures
-      let variant = data;
+      let updatedVariant = data;
 
+      // If wrapped in a result property (backend format)
+      if (data.result) {
+        updatedVariant = data.result;
+      }
       // If wrapped in a data property
-      if (data.data) {
-        variant = data.data;
+      else if (data.data) {
+        updatedVariant = data.data;
       }
 
       return {
         success: true,
-        data: variant,
+        data: updatedVariant,
         message: data.message || "Recipe variant updated successfully",
       };
     } catch (error: any) {

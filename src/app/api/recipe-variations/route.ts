@@ -50,7 +50,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const url = `${REMOTE_BASE}/t/recipe-variations`;
 
-
     const response = await fetch(url, {
       method: "POST",
       headers: buildTenantHeaders(req, true),
