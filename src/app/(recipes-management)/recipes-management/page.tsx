@@ -14,6 +14,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { formatPrice, formatCurrency } from "@/lib/util/formatters";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
+import { GridActionButtons } from "@/components/ui/grid-action-buttons";
 import { cn } from "@/lib/utils";
 
 // add view only modal for recipe items with compact view
@@ -120,7 +121,7 @@ const RecipesManagementPage = () => {
         setConfirmDialogOpen(false);
         setRecipeToDelete(null);
       } else {
-        toast.error((result?.message as string) || "Failed to delete recipe", {
+        toast.error((result?.error as string) || "Failed to delete recipe", {
           duration: 5000,
           position: "top-right",
         });
@@ -146,7 +147,7 @@ const RecipesManagementPage = () => {
   }
 
   return (
-    <PageContainer hasSubmenu={true}>
+    <PageContainer>
       <Toaster position="top-right" />
 
       {/* Page Header */}
@@ -200,22 +201,6 @@ const RecipesManagementPage = () => {
         getItemId={(item) => String((item as any)._id || item.ID || 'unknown')}
         onEdit={openEditModal}
         onDelete={handleDelete}
-        customActions={(item) => (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => openEditModal(item)}
-              className="px-3 py-1 bg-gray-900 hover:bg-black text-white text-sm rounded-md transition-all"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDelete(item)}
-              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-all"
-            >
-              Delete
-            </button>
-          </div>
-        )}
         columns={[
           {
             key: "Name",

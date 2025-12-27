@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Package, Plus, Edit2, Trash2 } from "lucide-react";
+import { Package, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
@@ -123,7 +122,7 @@ const BranchInventoryPage = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer hasSubmenu={true}>
       <Toaster position="top-right" />
 
       <PageHeader
@@ -216,26 +215,6 @@ const BranchInventoryPage = () => {
         getItemId={(item) => item._id || item.id || ""}
         onEdit={handleEditItem}
         onDelete={handleDelete}
-        customActions={(item) => (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleEditItem(item)}
-              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 w-8 p-0"
-            >
-              <Edit2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDelete(item)}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
         // Pagination props
         showPagination={true}
         currentPage={currentPage}

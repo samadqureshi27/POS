@@ -144,6 +144,10 @@ export const StaffService = {
       if (payload.metadata !== undefined) apiPayload.metadata = payload.metadata;
       if (payload.branchId !== undefined) apiPayload.branchId = payload.branchId;
       if (payload.status !== undefined) apiPayload.status = payload.status;
+      // Include phone and posIds from payload (these are not in TenantStaff type but are in API)
+      if ((payload as any).phone !== undefined) apiPayload.phone = (payload as any).phone;
+      if ((payload as any).posIds !== undefined) apiPayload.posIds = (payload as any).posIds;
+      if ((payload as any).isStaff !== undefined) apiPayload.isStaff = (payload as any).isStaff;
 
       const res = await fetch(url, {
         method: "POST",
@@ -176,13 +180,21 @@ export const StaffService = {
       if (payload.fullName !== undefined) apiPayload.fullName = payload.fullName;
       if (payload.email !== undefined) apiPayload.email = payload.email;
       if (payload.password !== undefined) apiPayload.password = payload.password;
-      if (payload.branchIds !== undefined) apiPayload.branchIds = payload.branchIds;
       if (payload.roles !== undefined) apiPayload.roles = payload.roles;
       if (payload.roleGrants !== undefined) apiPayload.roleGrants = payload.roleGrants;
       if (payload.position !== undefined) apiPayload.position = payload.position;
       if (payload.metadata !== undefined) apiPayload.metadata = payload.metadata;
       if (payload.branchId !== undefined) apiPayload.branchId = payload.branchId;
       if (payload.status !== undefined) apiPayload.status = payload.status;
+      // Include phone and posIds from payload (these are not in TenantStaff type but are in API)
+      if ((payload as any).phone !== undefined) apiPayload.phone = (payload as any).phone;
+      if ((payload as any).posIds !== undefined) apiPayload.posIds = (payload as any).posIds;
+      if ((payload as any).isStaff !== undefined) apiPayload.isStaff = (payload as any).isStaff;
+      // For UPDATE: Use assignedBranchId (singular) instead of branchIds (array)
+      if ((payload as any).assignedBranchId !== undefined) {
+        apiPayload.assignedBranchId = (payload as any).assignedBranchId;
+      }
+      // Note: branchIds is only used for CREATE, not UPDATE
 
       const res = await fetch(url, {
         method: "PUT",

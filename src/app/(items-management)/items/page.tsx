@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Package, Plus, Upload, Download, FileDown, Edit2, Trash2 } from "lucide-react";
+import { Package, Plus, Upload, Download, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Toaster, toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -487,26 +487,6 @@ export default function ItemsPage() {
         getItemId={(item) => item._id || item.id || ""}
         onEdit={handleEditItem}
         onDelete={handleDeleteItem}
-        customActions={(item) => (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleEditItem(item)}
-              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 w-8 p-0"
-            >
-              <Edit2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDeleteItem(item)}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
         // Pagination props
         showPagination={true}
         currentPage={currentPage}

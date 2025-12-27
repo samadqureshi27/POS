@@ -23,7 +23,7 @@ export function ConditionalLayoutWrapper({ children }: { children: React.ReactNo
   if (isAuthRoute) {
     // Auth pages - clean layout without navbar/sidebar
     return (
-      <div className="min-h-screen bg-[#F7F7F8]">
+      <div className="min-h-screen bg-[#F7F7F8] overflow-x-hidden max-w-full">
         {children}
       </div>
     )

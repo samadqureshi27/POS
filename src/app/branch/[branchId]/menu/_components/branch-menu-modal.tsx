@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import type { EffectiveMenuItem, BranchMenuConfig } from "@/lib/services/branch-menu-service";
 import { MenuItemService, type TenantMenuItem } from "@/lib/services/menu-item-service";
 import { toast } from "sonner";
@@ -36,6 +45,7 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
   onUpdate,
   actionLoading,
 }) => {
+  const formId = "branch-menu-modal-form";
   // Determine if we're editing an existing config or creating a new one
   const isEditing = Boolean(item?.branchConfig);
 
@@ -182,71 +192,70 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
     }));
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !item) return null;
 
-  if (!item) {
-    return null;
-  }
+  const loadingShell = (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        size="3xl" 
+        fullHeight 
+        onInteractOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <DialogBody className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-10 w-10 animate-spin text-gray-400" />
+            <p className="text-sm text-muted-foreground">Loading branch information...</p>
+          </div>
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
+  );
 
-  // Show loading state if branch ObjectId is not available yet
   if (!branchObjectId) {
-    return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-12 flex flex-col items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-gray-400 mb-4" />
-          <p className="text-gray-600 font-medium">Loading branch information...</p>
-        </div>
-      </div>
-    );
+    return loadingShell;
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={(e) => e.stopPropagation()}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Menu Configuration" : "Add to Branch Menu"}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {showMenuItemDropdown ? "Select a menu item from the dropdown below" : item.name}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            disabled={actionLoading}
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        size="3xl" 
+        fullHeight 
+        onInteractOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <DialogHeader>
+          <DialogTitle className="text-xl">
+            {isEditing ? "Edit Menu Configuration" : "Add to Branch Menu"}
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
-          <div className="space-y-6">
-            {/* Menu Item Selection - Show dropdown when adding via "Browse Items" */}
+        <DialogBody className="flex-1 overflow-y-auto min-h-0 p-0">
+          <form id={formId} onSubmit={handleSubmit} className="pl-8 pr-[34px] space-y-8">
             {showMenuItemDropdown && (
               <div>
-                <Label htmlFor="menuItemId" className="text-sm font-medium text-gray-700">
-                  Menu Item <span className="text-red-500">*</span>
-                </Label>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label htmlFor="menuItemId" className="text-sm font-medium text-[#656565]">
+                    Menu Item <span className="text-red-500">*</span>
+                  </Label>
+                  <CustomTooltip label="Select the menu item to add to this branch" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
                 <Select
                   value={formData.menuItemId}
                   onValueChange={(value) => {
                     handleInputChange("menuItemId", value);
-                    // Find the selected item and set its base price
                     const selectedItem = availableMenuItems.find(
                       (mi) => (mi._id || mi.id) === value
                     );
                     if (selectedItem) {
-                      // Note: MenuItemService doesn't have pricing, so we'll leave it empty
                       handleInputChange("sellingPrice", undefined);
                     }
                   }}
                   disabled={loadingMenuItems || actionLoading}
                 >
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Select a menu item to add" />
                   </SelectTrigger>
                   <SelectContent>
@@ -270,85 +279,81 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
                     )}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-gray-500 mt-1">
-                  Select the menu item to add to this branch
-                </p>
               </div>
             )}
 
-            {/* Show item name when editing or adding from grid */}
             {!showMenuItemDropdown && item && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
-                <Label className="text-sm font-medium text-gray-700">Menu Item</Label>
-                <p className="text-lg font-semibold text-gray-900 mt-1">{item.name}</p>
+              <div className="bg-[#f8f8fa] border border-[#d4d7dd] rounded-sm p-4">
+                <Label className="text-sm font-medium text-[#656565]">Menu Item</Label>
+                <p className="text-lg font-semibold text-[#1f2937] mt-1">{item.name}</p>
                 {item.description && (
                   <p className="text-sm text-gray-600 mt-1">{item.description}</p>
                 )}
               </div>
             )}
 
-            {/* Selling Price */}
-            <div>
-              <Label htmlFor="sellingPrice" className="text-sm font-medium text-gray-700">
-                Selling Price (Optional)
-              </Label>
-              <Input
-                id="sellingPrice"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.sellingPrice || ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  handleInputChange("sellingPrice", val ? parseFloat(val) : undefined);
-                }}
-                onFocus={(e) => e.target.select()}
-                className="mt-1"
-                disabled={actionLoading}
-                placeholder="Leave empty to use base price"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Override the base menu item price for this branch
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label htmlFor="sellingPrice" className="text-sm font-medium text-[#656565]">
+                    Selling Price
+                  </Label>
+                  <CustomTooltip label="Override the base menu item price for this branch. Leave empty to use base price." direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
+                <Input
+                  id="sellingPrice"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.sellingPrice || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleInputChange("sellingPrice", val ? parseFloat(val) : undefined);
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  className="mt-1.5"
+                  disabled={actionLoading}
+                  placeholder="Leave empty to use base price"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label htmlFor="displayOrder" className="text-sm font-medium text-[#656565]">
+                    Display Order
+                  </Label>
+                  <CustomTooltip label="Lower numbers appear first in the menu" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
+                <Input
+                  id="displayOrder"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={formData.displayOrder === 0 ? "" : formData.displayOrder || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleInputChange("displayOrder", val === '' ? 0 : parseInt(val) || 0);
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  className="mt-1.5"
+                  disabled={actionLoading}
+                />
+              </div>
             </div>
 
-            {/* Display Order */}
-            <div>
-              <Label htmlFor="displayOrder" className="text-sm font-medium text-gray-700">
-                Display Order
-              </Label>
-              <Input
-                id="displayOrder"
-                type="number"
-                min="0"
-                step="1"
-                value={formData.displayOrder === 0 ? "" : formData.displayOrder || ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  handleInputChange("displayOrder", val === '' ? 0 : parseInt(val) || 0);
-                }}
-                onFocus={(e) => e.target.select()}
-                className="mt-1"
-                disabled={actionLoading}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Lower numbers appear first in the menu
-              </p>
-            </div>
-
-            {/* Availability Toggles */}
-            <div className="space-y-4 pt-4 border-t border-gray-200">
-              <h3 className="font-semibold text-gray-900">Availability Settings</h3>
-
-              {/* Is Available */}
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label htmlFor="isAvailable" className="text-sm font-medium text-gray-700">
+            <div className="space-y-4 pt-4 border-t border-[#d5d5dd]">
+              <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="isAvailable" className="text-sm font-medium text-[#1f2937]">
                     Available
                   </Label>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Item can be ordered when enabled
-                  </p>
+                  <CustomTooltip label="Item can be ordered when enabled" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
                 </div>
                 <Switch
                   id="isAvailable"
@@ -358,15 +363,14 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
                 />
               </div>
 
-              {/* Visible in POS */}
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label htmlFor="isVisibleInPOS" className="text-sm font-medium text-gray-700">
+              <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="isVisibleInPOS" className="text-sm font-medium text-[#1f2937]">
                     Visible in POS
                   </Label>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Show item in Point of Sale system
-                  </p>
+                  <CustomTooltip label="Show item in Point of Sale system" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
                 </div>
                 <Switch
                   id="isVisibleInPOS"
@@ -376,15 +380,14 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
                 />
               </div>
 
-              {/* Visible in Online */}
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label htmlFor="isVisibleInOnline" className="text-sm font-medium text-gray-700">
+              <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="isVisibleInOnline" className="text-sm font-medium text-[#1f2937]">
                     Visible in Online Ordering
                   </Label>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Show item in online/mobile ordering
-                  </p>
+                  <CustomTooltip label="Show item in online/mobile ordering" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
                 </div>
                 <Switch
                   id="isVisibleInOnline"
@@ -394,15 +397,14 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
                 />
               </div>
 
-              {/* Price Includes Tax */}
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label htmlFor="priceIncludesTax" className="text-sm font-medium text-gray-700">
+              <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="priceIncludesTax" className="text-sm font-medium text-[#1f2937]">
                     Price Includes Tax
                   </Label>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Selling price already includes tax
-                  </p>
+                  <CustomTooltip label="Selling price already includes tax" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
                 </div>
                 <Switch
                   id="priceIncludesTax"
@@ -413,19 +415,15 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
               </div>
             </div>
 
-            {/* Feature Toggles */}
-            <div className="space-y-4 pt-4 border-t border-gray-200">
-              <h3 className="font-semibold text-gray-900">Promotional Settings</h3>
-
-              {/* Is Featured */}
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label htmlFor="isFeatured" className="text-sm font-medium text-gray-700">
+            <div className="space-y-4 pt-4 border-t border-[#d5d5dd]">
+              <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="isFeatured" className="text-sm font-medium text-[#1f2937]">
                     Featured Item
                   </Label>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Highlight this item in featured section
-                  </p>
+                  <CustomTooltip label="Highlight this item in featured section" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
                 </div>
                 <Switch
                   id="isFeatured"
@@ -435,15 +433,14 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
                 />
               </div>
 
-              {/* Is Recommended */}
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label htmlFor="isRecommended" className="text-sm font-medium text-gray-700">
+              <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="isRecommended" className="text-sm font-medium text-[#1f2937]">
                     Recommended Item
                   </Label>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Show as recommended to customers
-                  </p>
+                  <CustomTooltip label="Show as recommended to customers" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
                 </div>
                 <Switch
                   id="isRecommended"
@@ -453,23 +450,13 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
                 />
               </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </DialogBody>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={actionLoading}
-            className="px-6"
-          >
-            Cancel
-          </Button>
+        <DialogFooter className="flex items-center justify-start gap-3">
           <Button
             type="submit"
-            onClick={handleSubmit}
+            form={formId}
             disabled={actionLoading}
             className="px-6 bg-gray-900 hover:bg-black text-white"
           >
@@ -482,9 +469,18 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
               <>{isEditing ? "Update Configuration" : "Add to Menu"}</>
             )}
           </Button>
-        </div>
-      </div>
-    </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={actionLoading}
+            className="px-6"
+          >
+            Cancel
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

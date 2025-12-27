@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus, UtensilsCrossed, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, Plus, UtensilsCrossed, Sparkles, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { RecipeIngredientsList } from "./recipe-ingredients-list";
 import { RecipeVariantInput } from "./recipe-variant-input";
 import { RecipeVariantInline } from "@/lib/types/recipes";
@@ -98,6 +99,7 @@ export default function RecipeModal({
   const [focusedIngredientIndex, setFocusedIngredientIndex] = useState<number | null>(null);
   const [variants, setVariants] = useState<RecipeVariantInline[]>([]);
   const [isVariantsExpanded, setIsVariantsExpanded] = useState(false);
+  const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
@@ -120,6 +122,7 @@ export default function RecipeModal({
         setRecipeIngredients(existingIngredients);
         setVariants(existingVariants);
         setIsVariantsExpanded(existingVariants.length > 0);
+        setIsIngredientsExpanded(true);
 
         const inputs: {[key: number]: string} = {};
         existingIngredients.forEach((ing, index) => {
@@ -139,6 +142,7 @@ export default function RecipeModal({
         setRecipeIngredients([]);
         setVariants([]);
         setIsVariantsExpanded(false);
+        setIsIngredientsExpanded(true);
         setIngredientInputs({});
         setShowSuggestions({});
       }
@@ -354,167 +358,209 @@ export default function RecipeModal({
   };
 
   const renderTabContent = (recipeType: "sub" | "final") => (
-    <div className="space-y-5">
+    <div className="space-y-8">
       {/* Name */}
       <div>
-        <Label className="text-sm font-semibold text-gray-700 mb-2 block">
+        <Label className="text-sm font-medium text-[#656565] mb-1.5">
           Recipe Name <span className="text-red-500">*</span>
         </Label>
         <Input
           value={formData.name}
           onChange={(e) => handleFieldChange("name", e.target.value)}
           placeholder={recipeType === "sub" ? "e.g., Burger Sauce, Grilled Patty" : "e.g., Cheeseburger, Caesar Salad"}
-          className="h-10 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="mt-1.5"
         />
       </div>
 
       {/* Description */}
       <div>
-        <Label className="text-sm font-semibold text-gray-700 mb-2 block">Description (Optional)</Label>
+        <Label className="text-sm font-medium text-[#656565] mb-1.5">Description (Optional)</Label>
         <Textarea
           value={formData.description}
           onChange={(e) => handleFieldChange("description", e.target.value)}
           placeholder="Brief description..."
-          className="min-h-[80px] resize-none rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="mt-1.5 min-h-[80px] resize-none"
           rows={3}
         />
       </div>
 
       {/* Active Status */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center justify-between">
-        <div>
-          <Label className="text-sm font-semibold text-gray-900">Active Status</Label>
-          <p className="text-xs text-gray-600 mt-0.5">
-            {formData.isActive ? "Recipe is active" : "Recipe is inactive"}
-          </p>
+      <div className="w-full">
+        <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3 w-full">
+          <span className="text-[#1f2937] text-sm font-medium">Active</span>
+          <Switch
+            checked={formData.isActive === true}
+            onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
+          />
         </div>
-        <Switch
-          checked={formData.isActive === true}
-          onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
-          className="data-[state=checked]:bg-green-600"
-        />
       </div>
 
       {/* Variants Section - Only for Final Recipes */}
       {recipeType === "final" && (
         <div className="space-y-3">
-          {/* Accordion Header */}
-          <div className="bg-gradient-to-r from-amber-50 to-white border-2 border-amber-200 rounded-lg">
-            <button
-              type="button"
-              onClick={() => setIsVariantsExpanded(!isVariantsExpanded)}
-              className="w-full p-4 flex items-center justify-between hover:bg-amber-50/50 transition-colors"
-            >
+          {/* Variants Section Header */}
+          <div className="border border-[#d5d5dd] bg-[#f8f8fa] rounded-sm p-4 relative">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-semibold text-gray-900">
-                  Recipe Variants (Optional)
+                <Label className="text-sm font-medium text-[#656565]">
+                  Recipe Variants
                 </Label>
+                <CustomTooltip label="Add size, flavor, or crust variants for this recipe" direction="right">
+                  <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                </CustomTooltip>
                 {variants.length > 0 && (
-                  <span className="text-xs font-semibold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-semibold bg-[#1f2937] text-white px-2 py-0.5 rounded-full">
                     {variants.length}
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                <p className="text-xs text-gray-600">
-                  Add size, flavor, or crust variants
-                </p>
+              <button
+                type="button"
+                onClick={() => setIsVariantsExpanded(!isVariantsExpanded)}
+                className="flex items-center gap-2 hover:opacity-70 transition-opacity cursor-pointer"
+              >
                 {isVariantsExpanded ? (
                   <ChevronUp className="h-4 w-4 text-gray-600" />
                 ) : (
                   <ChevronDown className="h-4 w-4 text-gray-600" />
                 )}
-              </div>
-            </button>
+              </button>
+            </div>
           </div>
 
-          {/* Accordion Content */}
+          {/* Variants List */}
           {isVariantsExpanded && (
             <div className="space-y-3 animate-in slide-in-from-top-2">
-              <p className="text-xs text-muted-foreground px-1">
-                Create variants for this recipe (e.g., Small/Medium/Large sizes, different flavors).
-                You can also manage variants separately from the Recipes Options page.
-              </p>
+              {variants.length > 0 ? (
+                <>
+                  {variants.map((variant, index) => (
+                    <RecipeVariantInput
+                      key={index}
+                      variant={variant}
+                      index={index}
+                      ingredients={ingredients}
+                      availableRecipeOptions={availableRecipeOptions}
+                      onUpdate={handleUpdateVariant}
+                      onRemove={handleRemoveVariant}
+                    />
+                  ))}
 
-              {variants.map((variant, index) => (
-                <RecipeVariantInput
-                  key={index}
-                  variant={variant}
-                  index={index}
-                  ingredients={ingredients}
-                  availableRecipeOptions={availableRecipeOptions}
-                  onUpdate={handleUpdateVariant}
-                  onRemove={handleRemoveVariant}
-                />
-              ))}
-
-              <Button
-                type="button"
-                onClick={handleAddVariant}
-                variant="outline"
-                className="w-full border-dashed border-2 border-amber-300 hover:border-amber-400 hover:bg-amber-50"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Variant
-              </Button>
+                  {/* Add Variant Button - Full Width Below List */}
+                  <Button
+                    type="button"
+                    onClick={handleAddVariant}
+                    variant="outline"
+                    className="w-full mt-4 px-8 h-11 border-gray-300"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Variant
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="relative overflow-hidden rounded-sm border border-dashed border-[#d5d5dd] bg-[#f8f8fa] p-12 text-center transition-all">
+                    <div className="relative z-10">
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#1f2937] shadow-lg">
+                        <Sparkles className="h-8 w-8 text-white" />
+                      </div>
+                      <h3 className="mb-2 text-lg font-bold text-[#1f2937]">No Variants Yet</h3>
+                      <p className="mx-auto max-w-sm text-sm text-[#656565]">
+                        Start building your recipe by clicking the <span className="font-semibold text-[#1f2937]">"Add Variant"</span> button below
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Add Variant Button - Below empty state */}
+                  <Button
+                    type="button"
+                    onClick={handleAddVariant}
+                    variant="outline"
+                    className="w-full mt-4 px-8 h-11 border-gray-300"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Variant
+                  </Button>
+                </>
+              )}
             </div>
           )}
         </div>
       )}
 
       {/* Ingredients Section Header */}
-      <div className={`bg-gradient-to-r ${recipeType === "sub" ? "from-purple-50 to-white border-purple-200" : "from-blue-50 to-white border-blue-200"} border-2 rounded-lg p-4`}>
+      <div className="border border-[#d5d5dd] bg-[#f8f8fa] rounded-sm p-4 relative">
         <div className="flex items-center justify-between">
-          <div>
-            <Label className="text-sm font-semibold text-gray-900">Ingredients</Label>
-            <p className="text-xs text-gray-600 mt-0.5">
-              {recipeType === "sub" ? "Add inventory items" : "Add inventory items or sub recipes"}
-            </p>
+          <div className="flex items-center gap-2">
+            <Label className="text-sm font-medium text-[#656565]">Ingredients</Label>
+            <CustomTooltip label={recipeType === "sub" ? "Add inventory items to this sub recipe" : "Add inventory items or sub recipes to this recipe"} direction="right">
+              <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+            </CustomTooltip>
+            {recipeIngredients.length > 0 && (
+              <span className="text-xs font-semibold bg-[#1f2937] text-white px-2 py-0.5 rounded-full">
+                {recipeIngredients.length}
+              </span>
+            )}
           </div>
-          <div className="text-xs font-semibold text-gray-600">
-            {recipeIngredients.length} item{recipeIngredients.length !== 1 ? 's' : ''}
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsIngredientsExpanded(!isIngredientsExpanded)}
+            className="flex items-center gap-2 hover:opacity-70 transition-opacity cursor-pointer"
+          >
+            {isIngredientsExpanded ? (
+              <ChevronUp className="h-4 w-4 text-gray-600" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-gray-600" />
+            )}
+          </button>
         </div>
       </div>
 
       {/* Ingredients List */}
-      <div className="relative">
-        <RecipeIngredientsList
-          ingredients={recipeIngredients}
-          ingredientInputs={ingredientInputs}
-          showSuggestions={showSuggestions}
-          inventoryItems={ingredients}
-          availableRecipes={availableRecipeOptions}
-          getIngredientValidation={getIngredientValidation}
-          getCompatibleUnits={getCompatibleUnits}
-          onIngredientInputChange={handleIngredientInputChange}
-          onToggleDropdown={handleToggleDropdown}
-          onSelectIngredient={selectIngredient}
-          onUpdateIngredient={handleUpdateIngredient}
-          onRemoveIngredient={handleRemoveIngredient}
-          setFocusedIngredientIndex={setFocusedIngredientIndex}
-          setShowSuggestions={setShowSuggestions}
-          recipeType={recipeType}
-        />
-
-        {/* Floating Add Button - Bottom Right */}
-        <button
-          type="button"
-          onClick={handleAddIngredient}
-          className={`fixed bottom-24 right-11 z-50 w-14 h-14 rounded-full shadow-xl ${recipeType === "sub" ? "bg-purple-600 hover:bg-purple-700" : "bg-blue-600 hover:bg-blue-700"} text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-opacity-50 ${recipeType === "sub" ? "focus:ring-purple-400" : "focus:ring-blue-400"}`}
-          title="Add Ingredient"
-        >
-          <Plus className="h-6 w-6" />
-        </button>
-      </div>
+      {isIngredientsExpanded && (
+        <div className="relative space-y-3 animate-in slide-in-from-top-2">
+          <RecipeIngredientsList
+            ingredients={recipeIngredients}
+            ingredientInputs={ingredientInputs}
+            showSuggestions={showSuggestions}
+            inventoryItems={ingredients}
+            availableRecipes={availableRecipeOptions}
+            getIngredientValidation={getIngredientValidation}
+            getCompatibleUnits={getCompatibleUnits}
+            onIngredientInputChange={handleIngredientInputChange}
+            onToggleDropdown={handleToggleDropdown}
+            onSelectIngredient={selectIngredient}
+            onUpdateIngredient={handleUpdateIngredient}
+            onRemoveIngredient={handleRemoveIngredient}
+            setFocusedIngredientIndex={setFocusedIngredientIndex}
+            setShowSuggestions={setShowSuggestions}
+            recipeType={recipeType}
+          />
+          
+          {/* Add Ingredient Button - Full Width Below List */}
+          <Button
+            type="button"
+            onClick={handleAddIngredient}
+            variant="outline"
+            className="w-full mt-4 px-8 h-11 border-gray-300"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Ingredient
+          </Button>
+        </div>
+      )}
     </div>
   );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent size="4xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent 
+        size="4xl" 
+        fullHeight 
+        onInteractOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-xl">
             {editingItem ? "Edit Recipe" : "Create Recipe"}
           </DialogTitle>
         </DialogHeader>
@@ -523,24 +569,22 @@ export default function RecipeModal({
           value={formData.type}
           onValueChange={(value) => handleFieldChange("type", value as "sub" | "final")}
         >
-          <div className="px-8 pb-6 pt-2 flex-shrink-0 border-b border-gray-200">
+          <div className="px-8 pb-6 pt-2 flex-shrink-0">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="final">
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
                 Final Recipe
               </TabsTrigger>
               <TabsTrigger value="sub">
-                <UtensilsCrossed className="h-3.5 w-3.5 mr-1.5" />
                 Sub Recipe
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <DialogBody className="space-y-6">
-            <TabsContent value="final" className="mt-0 space-y-6 h-full">
+          <DialogBody className="space-y-8">
+            <TabsContent value="final" className="mt-0 h-full">
               {renderTabContent("final")}
             </TabsContent>
-            <TabsContent value="sub" className="mt-0 space-y-6 h-full">
+            <TabsContent value="sub" className="mt-0 h-full">
               {renderTabContent("sub")}
             </TabsContent>
           </DialogBody>

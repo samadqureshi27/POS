@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import type { BranchInventoryItem } from "@/lib/services/branch-inventory-service";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
 import { toast } from "sonner";
@@ -33,6 +42,7 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
   onSave,
   actionLoading,
 }) => {
+  const formId = "branch-inventory-modal-form";
   // Available items from inventory
   const [availableItems, setAvailableItems] = useState<InventoryItem[]>([]);
   const [loadingItems, setLoadingItems] = useState(false);
@@ -133,56 +143,62 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Show loading state if branch ObjectId is not available yet
+  const loadingShell = (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        size="3xl" 
+        fullHeight 
+        onInteractOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <DialogBody className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-10 w-10 animate-spin text-gray-400" />
+            <p className="text-sm text-muted-foreground">Loading branch information...</p>
+          </div>
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (!branchObjectId && !editingItem) {
-    return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-12 flex flex-col items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-gray-400 mb-4" />
-          <p className="text-gray-600 font-medium">Loading branch information...</p>
-        </div>
-      </div>
-    );
+    return loadingShell;
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={(e) => e.stopPropagation()}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {editingItem ? "Edit Inventory Item" : "Add Inventory Item"}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {editingItem
-                ? "Update the inventory item details"
-                : "Add a new item to branch inventory"}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            disabled={actionLoading}
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        size="3xl" 
+        fullHeight 
+        onInteractOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <DialogHeader>
+          <DialogTitle className="text-xl">
+            {editingItem ? "Edit Inventory Item" : "Add Inventory Item"}
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
-          <div className="space-y-6">
-            {/* Item Selection */}
+        <DialogBody className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 p-0">
+          <form id={formId} onSubmit={handleSubmit} className="pl-8 pr-8 space-y-8 max-w-full">
             <div>
-              <Label htmlFor="itemId" className="text-sm font-medium text-gray-700">
-                Item <span className="text-red-500">*</span>
-              </Label>
+              <div className="flex items-center gap-2 mb-1.5">
+                <Label htmlFor="itemId" className="text-sm font-medium text-[#656565]">
+                  Item <span className="text-red-500">*</span>
+                </Label>
+                <CustomTooltip 
+                  label={editingItem ? "Item cannot be changed after creation" : "Select the inventory item to add to this branch"} 
+                  direction="right"
+                >
+                  <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                </CustomTooltip>
+              </div>
               {editingItem ? (
                 <Input
                   id="itemId"
                   value={formData.itemId}
                   disabled
-                  className="mt-1"
+                  className="mt-1.5"
                 />
               ) : (
                 <Select
@@ -190,7 +206,7 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                   onValueChange={(value) => handleChange("itemId", value)}
                   disabled={loadingItems || actionLoading}
                 >
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
@@ -215,44 +231,43 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                   </SelectContent>
                 </Select>
               )}
-              <p className="text-xs text-gray-500 mt-1">
-                {editingItem
-                  ? "Item cannot be changed after creation"
-                  : "Select the inventory item to add to this branch"}
-              </p>
             </div>
 
-            {/* Quantity */}
-            <div>
-              <Label htmlFor="quantity" className="text-sm font-medium text-gray-700">
-                Quantity <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="quantity"
-                type="number"
-                min="0"
-                step="1"
-                value={formData.quantity === 0 ? "" : formData.quantity || ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  handleChange("quantity", val === '' ? 0 : parseInt(val) || 0);
-                }}
-                onFocus={(e) => e.target.select()}
-                className="mt-1"
-                disabled={actionLoading}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Current stock quantity
-              </p>
-            </div>
-
-            {/* Stock Levels Row */}
-            <div className="grid grid-cols-3 gap-4">
-              {/* Reorder Point */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
               <div>
-                <Label htmlFor="reorderPoint" className="text-sm font-medium text-gray-700">
-                  Reorder Point
-                </Label>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label htmlFor="quantity" className="text-sm font-medium text-[#656565]">
+                    Quantity <span className="text-red-500">*</span>
+                  </Label>
+                  <CustomTooltip label="Current stock quantity in this branch" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
+                <Input
+                  id="quantity"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={formData.quantity === 0 ? "" : formData.quantity || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleChange("quantity", val === '' ? 0 : parseInt(val) || 0);
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  className="mt-1.5"
+                  disabled={actionLoading}
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label htmlFor="reorderPoint" className="text-sm font-medium text-[#656565]">
+                    Reorder Point
+                  </Label>
+                  <CustomTooltip label="Minimum stock level that triggers a reorder alert" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
                 <Input
                   id="reorderPoint"
                   type="number"
@@ -264,16 +279,22 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                     handleChange("reorderPoint", val === '' ? 0 : parseInt(val) || 0);
                   }}
                   onFocus={(e) => e.target.select()}
-                  className="mt-1"
+                  className="mt-1.5"
                   disabled={actionLoading}
                 />
               </div>
+            </div>
 
-              {/* Min Stock */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
               <div>
-                <Label htmlFor="minStock" className="text-sm font-medium text-gray-700">
-                  Min Stock
-                </Label>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label htmlFor="minStock" className="text-sm font-medium text-[#656565]">
+                    Min Stock
+                  </Label>
+                  <CustomTooltip label="Minimum stock level to maintain" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
                 <Input
                   id="minStock"
                   type="number"
@@ -285,16 +306,20 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                     handleChange("minStock", val === '' ? 0 : parseInt(val) || 0);
                   }}
                   onFocus={(e) => e.target.select()}
-                  className="mt-1"
+                  className="mt-1.5"
                   disabled={actionLoading}
                 />
               </div>
 
-              {/* Max Stock */}
               <div>
-                <Label htmlFor="maxStock" className="text-sm font-medium text-gray-700">
-                  Max Stock
-                </Label>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label htmlFor="maxStock" className="text-sm font-medium text-[#656565]">
+                    Max Stock
+                  </Label>
+                  <CustomTooltip label="Maximum stock level to maintain" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
                 <Input
                   id="maxStock"
                   type="number"
@@ -306,44 +331,48 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                     handleChange("maxStock", val === '' ? 0 : parseInt(val) || 0);
                   }}
                   onFocus={(e) => e.target.select()}
-                  className="mt-1"
+                  className="mt-1.5"
                   disabled={actionLoading}
                 />
               </div>
             </div>
 
-            {/* Pricing Row */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* Cost Per Unit */}
-              <div>
-                <Label htmlFor="costPerUnit" className="text-sm font-medium text-gray-700">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <Label htmlFor="costPerUnit" className="text-sm font-medium text-[#656565]">
                   Cost Per Unit
                 </Label>
-                <Input
-                  id="costPerUnit"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.costPerUnit === 0 ? "" : formData.costPerUnit || ""}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    handleChange("costPerUnit", val === '' ? 0 : parseFloat(val) || 0);
-                  }}
-                  onFocus={(e) => e.target.select()}
-                  className="mt-1"
-                  disabled={actionLoading}
-                  placeholder="0.00"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Purchase/Cost price
-                </p>
+                <CustomTooltip label="Purchase or cost price per unit" direction="right">
+                  <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                </CustomTooltip>
               </div>
+              <Input
+                id="costPerUnit"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.costPerUnit === 0 ? "" : formData.costPerUnit || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleChange("costPerUnit", val === '' ? 0 : parseFloat(val) || 0);
+                }}
+                onFocus={(e) => e.target.select()}
+                className="mt-1.5"
+                disabled={actionLoading}
+                placeholder="0.00"
+              />
+            </div>
 
-              {/* Selling Price */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <Label htmlFor="sellingPrice" className="text-sm font-medium text-gray-700">
-                  Selling Price
-                </Label>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label htmlFor="sellingPrice" className="text-sm font-medium text-[#656565]">
+                    Selling Price
+                  </Label>
+                  <CustomTooltip label="Retail or selling price per unit" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
                 <Input
                   id="sellingPrice"
                   type="number"
@@ -355,55 +384,43 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
                     handleChange("sellingPrice", val === '' ? 0 : parseFloat(val) || 0);
                   }}
                   onFocus={(e) => e.target.select()}
-                  className="mt-1"
+                  className="mt-1.5"
                   disabled={actionLoading}
                   placeholder="0.00"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Retail/Selling price
-                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label htmlFor="isActive" className="text-sm font-medium text-[#656565]">
+                    Status
+                  </Label>
+                  <CustomTooltip label="Active items are available for use in this branch" direction="right">
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
+                <Select
+                  value={formData.isActive ? "active" : "inactive"}
+                  onValueChange={(value) => handleChange("isActive", value === "active")}
+                  disabled={actionLoading}
+                >
+                  <SelectTrigger className="mt-1.5">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
+          </form>
+        </DialogBody>
 
-            {/* Status */}
-            <div>
-              <Label htmlFor="isActive" className="text-sm font-medium text-gray-700">
-                Status
-              </Label>
-              <Select
-                value={formData.isActive ? "active" : "inactive"}
-                onValueChange={(value) => handleChange("isActive", value === "active")}
-                disabled={actionLoading}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500 mt-1">
-                Active items are available for use
-              </p>
-            </div>
-          </div>
-        </form>
-
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={actionLoading}
-            className="px-6"
-          >
-            Cancel
-          </Button>
+        <DialogFooter className="flex items-center justify-start gap-3">
           <Button
             type="submit"
-            onClick={handleSubmit}
+            form={formId}
             disabled={actionLoading}
             className="px-6 bg-gray-900 hover:bg-black text-white"
           >
@@ -416,9 +433,18 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
               <>{editingItem ? "Update Item" : "Add Item"}</>
             )}
           </Button>
-        </div>
-      </div>
-    </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={actionLoading}
+            className="px-6"
+          >
+            Cancel
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

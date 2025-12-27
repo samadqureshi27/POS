@@ -11,6 +11,7 @@ import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { Toaster } from '@/components/ui/sonner';
 import { cn } from "@/lib/utils";
+import { GridActionButtons } from "@/components/ui/grid-action-buttons";
 import BranchModal from "./_components/branch-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useBranchManagement } from "@/lib/hooks/useBranchManagment";
@@ -141,26 +142,22 @@ const BranchManagementPage = () => {
         emptyTitle="No branches found"
         emptyDescription="Start by adding your first branch"
         getItemId={(item) => String(item["Branch-ID"])}
-        onEdit={openEditModal}
-        onDelete={handleDelete}
-        customActions={(item) => (
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => handleBranchClick(item["Branch-ID"])}
-              className="h-8 w-8 rounded-sm hover:bg-blue-50 text-blue-600 flex items-center justify-center transition-colors"
-              title="Open POS"
-            >
-              <Building2 className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => openEditModal(item)}
-              className="h-8 w-8 rounded-sm hover:bg-gray-100 text-gray-600 flex items-center justify-center transition-colors"
-              title="Edit Branch"
-            >
-              <Plus className="h-4 w-4 rotate-45" />
-            </button>
-          </div>
-        )}
+        customActions={(item) => {
+          const actions = [
+            {
+              label: "Edit",
+              onClick: () => openEditModal(item),
+              variant: "edit" as const,
+            },
+            {
+              label: "Open POS",
+              onClick: () => handleBranchClick(item["Branch-ID"]),
+              variant: "custom" as const,
+              className: "bg-blue-600 hover:bg-blue-700 text-white",
+            },
+          ];
+          return <GridActionButtons actions={actions} />;
+        }}
         columns={[
           {
             key: "Branch-ID",
