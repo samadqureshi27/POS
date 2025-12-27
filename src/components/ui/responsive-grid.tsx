@@ -1,9 +1,10 @@
 "use client";
 
 import React, { ReactNode } from "react";
-import { Edit2, Trash2, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
+import { GridActionButtons, GridActionButton } from "@/components/ui/grid-action-buttons";
+import { cn } from "@/lib/utils";
 
 export type ViewMode = "grid" | "list";
 
@@ -117,45 +118,35 @@ export default function ResponsiveGrid<T>({
       return customActions(item);
     }
 
-    return (
-      <div className="flex items-center gap-1 justify-end">
-        {onEdit && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(item);
-            }}
-            className="h-7 w-7 rounded-sm hover:bg-gray-100 text-gray-500"
-          >
-            <Edit2 className="h-3.5 w-3.5" />
-          </Button>
-        )}
-        {onDelete && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(item);
-            }}
-            className="h-7 w-7 rounded-sm hover:bg-red-50 text-gray-500 hover:text-red-600"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        )}
-      </div>
-    );
+    const actions: GridActionButton[] = [];
+    
+    if (onEdit) {
+      actions.push({
+        label: "Edit",
+        onClick: () => onEdit(item),
+        variant: "edit",
+      });
+    }
+    
+    if (onDelete) {
+      actions.push({
+        label: "Delete",
+        onClick: () => onDelete(item),
+        variant: "delete",
+      });
+    }
+
+    return <GridActionButtons actions={actions} />;
   };
 
   // List View
   if (viewMode === "list") {
     return (
-      <div className="space-y-4">
-        <div className={className}>
-          <div className="bg-white border border-[#d5d5dd] rounded-sm overflow-hidden shadow-none">
-            <table className="min-w-full divide-y divide-[#d5d5dd]">
+      <div className="space-y-4 min-w-0 max-w-full overflow-x-hidden">
+        <div className={cn("min-w-0 max-w-full", className)}>
+          <div className="bg-white border border-[#d5d5dd] rounded-sm overflow-hidden shadow-none min-w-0 max-w-full">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-[#d5d5dd]">
               <thead className="bg-gray-50/50">
                 <tr>
                   {columns.map((column, index) => (
@@ -194,7 +185,8 @@ export default function ResponsiveGrid<T>({
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -216,8 +208,8 @@ export default function ResponsiveGrid<T>({
 
   // Grid View
   return (
-    <div className="space-y-4">
-      <div className={`grid ${gridColumns} gap-4 ${className}`}>
+    <div className="space-y-4 min-w-0 max-w-full overflow-x-hidden">
+      <div className={cn(`grid ${gridColumns} gap-4 min-w-0 max-w-full`, className)}>
         {items.map((item) => {
           const itemId = getItemId(item);
           const actions = renderActions(item);

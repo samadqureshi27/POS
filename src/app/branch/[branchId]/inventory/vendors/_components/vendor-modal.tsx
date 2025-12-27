@@ -1,7 +1,14 @@
 "use client";
 import React, { useEffect } from "react";
 import { X, Save } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogBody,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -36,120 +43,112 @@ const VendorModal: React.FC<VendorModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col gap-0" onInteractOutside={(e) => e.preventDefault()}>
-                <DialogHeader>
-                    <DialogTitle className="text-2xl font-semibold mb-2">
+            <DialogContent size="3xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
+                <DialogHeader className="space-y-1.5 pb-3">
+                    <DialogTitle className="text-xl">
                         {editingItem ? "Edit Vendor" : `Add New Vendor - Branch #${branchId}`}
                     </DialogTitle>
+                    <p className="text-sm text-muted-foreground">
+                        Manage vendor details and contact information
+                    </p>
                 </DialogHeader>
 
-                {/* Scrollable Content */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-1 pl-1">
-                    {/* Company Name */}
-                    <div className="md:col-span-2">
-                        <Label htmlFor="companyName" className="text-sm font-medium">
-                            Company Name <span className="text-destructive">*</span>
-                        </Label>
-                        <Input
-                            id="companyName"
-                            type="text"
-                            value={formData.Company_Name}
-                            onChange={(e) =>
-                                onFormDataChange({ Company_Name: e.target.value })
-                            }
-                            placeholder="Enter company name"
-                            required
-                        />
-                    </div>
+                <DialogBody className="flex-1 overflow-y-auto pr-1">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                            <Label htmlFor="companyName" className="text-sm font-medium">
+                                Company Name <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                id="companyName"
+                                type="text"
+                                value={formData.Company_Name}
+                                onChange={(e) =>
+                                    onFormDataChange({ Company_Name: e.target.value })
+                                }
+                                placeholder="Enter company name"
+                                className="mt-1.5"
+                                required
+                            />
+                        </div>
 
-                    {/* Contact Person Name */}
-                    <div className="md:col-span-2">
-                        <Label htmlFor="contactName" className="text-sm font-medium">
-                            Contact Person Name <span className="text-destructive">*</span>
-                        </Label>
-                        <Input
-                            id="contactName"
-                            type="text"
-                            value={formData.Name}
-                            onChange={(e) =>
-                                onFormDataChange({ Name: e.target.value })
-                            }
-                            placeholder="Enter contact person name"
-                            required
-                        />
-                    </div>
+                        <div className="md:col-span-2">
+                            <Label htmlFor="contactName" className="text-sm font-medium">
+                                Contact Person Name <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                id="contactName"
+                                type="text"
+                                value={formData.Name}
+                                onChange={(e) =>
+                                    onFormDataChange({ Name: e.target.value })
+                                }
+                                placeholder="Enter contact person name"
+                                className="mt-1.5"
+                                required
+                            />
+                        </div>
 
-                    {/* Contact Number */}
-                    <div className="md:col-span-2">
-                        <Label htmlFor="contactNumber" className="text-sm font-medium">
-                            Contact Number
-                            <span className="text-xs text-muted-foreground ml-1">
-                                (Phone/Mobile)
-                            </span>
-                        </Label>
-                        <Input
-                            id="contactNumber"
-                            type="text"
-                            value={formData.Contact}
-                            onChange={(e) =>
-                                onFormDataChange({ Contact: e.target.value })
-                            }
-                            placeholder="Enter contact number"
-                        />
-                    </div>
+                        <div className="md:col-span-2">
+                            <Label htmlFor="contactNumber" className="text-sm font-medium">
+                                Contact Number
+                                <span className="text-xs text-muted-foreground ml-1">
+                                    (Phone/Mobile)
+                                </span>
+                            </Label>
+                            <Input
+                                id="contactNumber"
+                                type="text"
+                                value={formData.Contact}
+                                onChange={(e) =>
+                                    onFormDataChange({ Contact: e.target.value })
+                                }
+                                placeholder="Enter contact number"
+                                className="mt-1.5"
+                            />
+                        </div>
 
-                    {/* Email */}
-                    <div className="md:col-span-2">
-                        <Label htmlFor="email" className="text-sm font-medium">
-                            Email Address
-                            <span className="text-xs text-muted-foreground ml-1">
-                                (Business email)
-                            </span>
-                        </Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            value={formData.Email}
-                            onChange={(e) =>
-                                onFormDataChange({ Email: e.target.value })
-                            }
-                            placeholder="Enter email address"
-                        />
-                    </div>
+                        <div className="md:col-span-2">
+                            <Label htmlFor="email" className="text-sm font-medium">
+                                Email Address
+                                <span className="text-xs text-muted-foreground ml-1">
+                                    (Business email)
+                                </span>
+                            </Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={formData.Email}
+                                onChange={(e) =>
+                                    onFormDataChange({ Email: e.target.value })
+                                }
+                                placeholder="Enter email address"
+                                className="mt-1.5"
+                            />
+                        </div>
 
-                    {/* Address */}
-                    <div className="md:col-span-2">
-                        <Label htmlFor="address" className="text-sm font-medium">
-                            Business Address
-                            <span className="text-xs text-muted-foreground ml-1">
-                                (Complete address)
-                            </span>
-                        </Label>
-                        <Textarea
-                            id="address"
-                            value={formData.Address}
-                            onChange={(e) =>
-                                onFormDataChange({ Address: e.target.value })
-                            }
-                            className="h-24 resize-none"
-                            placeholder="Enter complete business address..."
-                            rows={3}
-                        />
+                        <div className="md:col-span-2">
+                            <Label htmlFor="address" className="text-sm font-medium">
+                                Business Address
+                                <span className="text-xs text-muted-foreground ml-1">
+                                    (Complete address)
+                                </span>
+                            </Label>
+                            <Textarea
+                                id="address"
+                                value={formData.Address}
+                                onChange={(e) =>
+                                    onFormDataChange({ Address: e.target.value })
+                                }
+                                className="h-24 resize-none mt-1.5"
+                                placeholder="Enter complete business address..."
+                                rows={3}
+                            />
+                        </div>
                     </div>
-                </div>
+                </DialogBody>
 
-                {/* Fixed Action Buttons */}
-                <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onClose}
-                        disabled={actionLoading}
-                        className="w-full sm:w-auto"
-                    >
-                        <X size={16} />
-                        Cancel
-                    </Button>
+                <DialogFooter className="flex justify-start gap-2">
                     <Button
                         type="button"
                         onClick={handleSubmit}
@@ -172,7 +171,17 @@ const VendorModal: React.FC<VendorModalProps> = ({
                             </>
                         )}
                     </Button>
-                </div>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onClose}
+                        disabled={actionLoading}
+                        className="w-full sm:w-auto"
+                    >
+                        <X size={16} />
+                        Cancel
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

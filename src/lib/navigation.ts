@@ -86,6 +86,12 @@ export const navigationConfig: NavigationItem[] = [
           },
         ],
       },
+      {
+        name: "Menu",
+        href: "/branch/[branchId]/menu",
+        group: "branch",
+        dynamic: true,
+      },
     ],
   },
 

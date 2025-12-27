@@ -27,22 +27,27 @@ const MenuModal: React.FC<MenuModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent size="3xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent 
+        size="3xl" 
+        fullHeight 
+        onInteractOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-xl">
             {editingItem ? "Edit Add-on" : "Add Add-on"}
           </DialogTitle>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <div className="px-8 pb-6 pt-2 flex-shrink-0 border-b border-gray-200">
+          <div className="px-8 pb-6 pt-2 flex-shrink-0">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="option-values">Option Values</TabsTrigger>
             </TabsList>
           </div>
 
-          <DialogBody className="space-y-6">
+          <DialogBody className="space-y-8">
               <TabsContent value="details" className="mt-0">
                 <DetailsForm
                   formData={formData}

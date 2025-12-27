@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CustomTooltip } from '@/components/ui/custom-tooltip';
 import { MenuItemOptions, DetailsFormProps } from '@/lib/types/menuItemOptions';
 import { MenuCategoryService } from '@/lib/services/menu-category-service';
 import { AddonsGroupsService, AddonGroup } from '@/lib/services/addons-groups-service';
-import { Plus, Loader2, ChevronDown } from 'lucide-react';
+import { Plus, Loader2, ChevronDown, Info } from 'lucide-react';
 
 interface MenuCategory {
   _id?: string;
@@ -114,204 +115,194 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange })
   );
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      {/* Fixed Header Section - Non-scrollable */}
-      <div className="flex-shrink-0 space-y-4 p-6 bg-white">
-        <div>
-          <h3 className="text-sm font-semibold text-gray-800">
-            Option Details
-          </h3>
-          <p className="text-xs text-gray-500 mt-1">
-            Configure the basic settings for this menu item option
-          </p>
+    <div className="space-y-8">
+      {/* Menu Category */}
+      <div>
+        <div className="flex items-center gap-2 mb-1.5">
+          <Label htmlFor="categoryId" className="text-sm font-medium text-[#656565]">
+            Menu Category <span className="text-red-500">*</span>
+          </Label>
+          <CustomTooltip label="Select the menu category for this add-on group" direction="right">
+            <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+          </CustomTooltip>
         </div>
+        <Select
+          value={formData.categoryId}
+          onValueChange={handleCategoryChange}
+        >
+          <SelectTrigger className="mt-1.5">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent className="z-[100]">
+            {categories.map((cat) => (
+              <SelectItem key={cat._id || cat.id} value={cat._id || cat.id || ''}>
+                {cat.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Scrollable Content Area */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6">
-        <div className="space-y-6">
-          {/* Menu Category */}
-          <div className="space-y-2">
-            <Label htmlFor="categoryId" className="text-sm font-medium text-gray-700">
-              Menu Category <span className="text-red-500">*</span>
+      {/* Add-on Group with Runtime Creation */}
+      {formData.categoryId && (
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <Label htmlFor="groupId" className="text-sm font-medium text-[#656565]">
+              Add-on Group <span className="text-red-500">*</span>
             </Label>
-            <p className="text-xs text-gray-500">
-              Select the menu category for this add-on group
-            </p>
-            <Select
-              value={formData.categoryId}
-              onValueChange={handleCategoryChange}
-            >
-              <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 w-full min-w-0">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent className="z-[100]">
-                {categories.map((cat) => (
-                  <SelectItem key={cat._id || cat.id} value={cat._id || cat.id || ''}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CustomTooltip label="Select or create a new add-on group" direction="right">
+              <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+            </CustomTooltip>
           </div>
+          <div className="relative flex gap-2 mt-1.5">
+            <div className="relative flex-1 min-w-0">
+              <Input
+                id="groupId"
+                type="text"
+                value={groupInput}
+                onChange={(e) => handleGroupInputChange(e.target.value)}
+                onFocus={() => setShowGroupSuggestions(groupInput.length > 0)}
+                placeholder="Type to search or create group"
+                className="pr-8"
+              />
+              <ChevronDown
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 cursor-pointer"
+                onClick={() => setShowGroupSuggestions(!showGroupSuggestions)}
+              />
 
-          {/* Add-on Group with Runtime Creation */}
-          {formData.categoryId && (
-            <div className="space-y-2">
-              <Label htmlFor="groupId" className="text-sm font-medium text-gray-700">
-                Add-on Group <span className="text-red-500">*</span>
-              </Label>
-              <p className="text-xs text-gray-500">
-                Select or create a new add-on group
-              </p>
-              <div className="relative flex gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    id="groupId"
-                    type="text"
-                    value={groupInput}
-                    onChange={(e) => handleGroupInputChange(e.target.value)}
-                    onFocus={() => setShowGroupSuggestions(groupInput.length > 0)}
-                    placeholder="Type to search or create group"
-                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 w-full min-w-0 pr-8"
-                  />
-                  <ChevronDown
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 cursor-pointer"
-                    onClick={() => setShowGroupSuggestions(!showGroupSuggestions)}
-                  />
-
-                  {/* Suggestions Dropdown */}
-                  {showGroupSuggestions && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-50">
-                      {filteredGroups.length > 0 ? (
-                        filteredGroups.map((group) => (
-                          <div
-                            key={group._id || group.id}
-                            onClick={() => selectGroup(group)}
-                            className="px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm"
-                          >
-                            {group.name}
-                          </div>
-                        ))
-                      ) : (
-                        <div className="px-3 py-2 text-sm text-gray-500">
-                          No groups found. Click + to create one.
-                        </div>
-                      )}
+              {/* Suggestions Dropdown */}
+              {showGroupSuggestions && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#dcdfe3] rounded-sm shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] max-h-48 overflow-y-auto z-50 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  {filteredGroups.length > 0 ? (
+                    filteredGroups.map((group) => (
+                      <div
+                        key={group._id || group.id}
+                        onClick={() => selectGroup(group)}
+                        className="px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm text-[#111827] transition-colors"
+                      >
+                        {group.name}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-sm text-gray-500">
+                      No groups found. Click + to create one.
                     </div>
                   )}
                 </div>
-                <Button
-                  type="button"
-                  onClick={handleAddGroup}
-                  disabled={!groupInput.trim() || addingGroup}
-                  className="bg-gray-900 hover:bg-black text-white"
-                >
-                  {addingGroup ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
+              )}
             </div>
-          )}
+            <Button
+              type="button"
+              onClick={handleAddGroup}
+              disabled={!groupInput.trim() || addingGroup}
+              className="bg-gray-900 hover:bg-black text-white h-14 flex-shrink-0"
+            >
+              {addingGroup ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
 
-          {/* Name */}
-          <div className="space-y-2">
-            <Label htmlFor="optionName" className="text-sm font-medium text-gray-700">
-              Option Name <span className="text-red-500">*</span>
+      {/* Name */}
+      <div>
+        <div className="flex items-center gap-2 mb-1.5">
+          <Label htmlFor="optionName" className="text-sm font-medium text-[#656565]">
+            Option Name <span className="text-red-500">*</span>
+          </Label>
+          <CustomTooltip label="Name of the option that will appear in the POS system" direction="right">
+            <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+          </CustomTooltip>
+        </div>
+        <Input
+          id="optionName"
+          type="text"
+          value={formData.Name}
+          onChange={(e) =>
+            onFormDataChange({ ...formData, Name: e.target.value })
+          }
+          placeholder="Enter option name (e.g., Size, Toppings)"
+          className="mt-1.5"
+        />
+      </div>
+
+      {/* Display Type and Priority Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {/* Display Type */}
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-1.5">
+            <Label htmlFor="displayType" className="text-sm font-medium text-[#656565]">
+              Display Type <span className="text-red-500">*</span>
             </Label>
-            <p className="text-xs text-gray-500">
-              Name of the option that will appear in the POS system
-            </p>
-            <Input
-              id="optionName"
-              type="text"
-              value={formData.Name}
-              onChange={(e) =>
-                onFormDataChange({ ...formData, Name: e.target.value })
+            <CustomTooltip label="How options will be displayed to customers" direction="right">
+              <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+            </CustomTooltip>
+          </div>
+          <Select
+            value={formData.DisplayType}
+            onValueChange={(value) => onFormDataChange({ ...formData, DisplayType: value as "Radio" | "Select" | "Checkbox" })}
+          >
+            <SelectTrigger className="mt-1.5">
+              <SelectValue placeholder="Select display type" />
+            </SelectTrigger>
+            <SelectContent className="z-[100]">
+              <SelectItem value="Radio">Radio - Select only one option</SelectItem>
+              <SelectItem value="Select">Select - Select one or none</SelectItem>
+              <SelectItem value="Checkbox">Checkbox - Select one or more</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Priority */}
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-1.5">
+            <Label htmlFor="priority" className="text-sm font-medium text-[#656565]">
+              Priority
+            </Label>
+            <CustomTooltip label="Display order in the POS (lower numbers appear first)" direction="right">
+              <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+            </CustomTooltip>
+          </div>
+          <Input
+            id="priority"
+            type="number"
+            value={formData.Priority === 0 ? "" : formData.Priority}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow empty string or valid numbers
+              if (value === '') {
+                onFormDataChange({
+                  ...formData,
+                  Priority: 0
+                });
+              } else if (/^\d+$/.test(value)) {
+                onFormDataChange({
+                  ...formData,
+                  Priority: Number(value)
+                });
               }
-              placeholder="Enter option name (e.g., Size, Toppings)"
-              className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 w-full min-w-0"
-            />
+            }}
+            onFocus={(e) => e.target.select()}
+            placeholder="1"
+            min={0}
+            className="mt-1.5"
+          />
+        </div>
+      </div>
+
+      {/* Information Card */}
+      <div className="p-4 rounded-sm bg-blue-50 border border-blue-200">
+        <div className="flex items-start gap-3">
+          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-sm font-medium text-blue-800 mb-1">Next Step</h4>
+            <p className="text-xs text-blue-700 leading-relaxed">
+              After saving the option details, switch to the "Option Values" tab to add add-on items from inventory or recipes.
+            </p>
           </div>
-
-          {/* Display Type and Priority Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {/* Display Type */}
-            <div className="space-y-2 min-w-0">
-              <Label htmlFor="displayType" className="text-sm font-medium text-gray-700">
-                Display Type <span className="text-red-500">*</span>
-              </Label>
-              <p className="text-xs text-gray-500">
-                How options will be displayed to customers
-              </p>
-              <Select
-                value={formData.DisplayType}
-                onValueChange={(value) => onFormDataChange({ ...formData, DisplayType: value as "Radio" | "Select" | "Checkbox" })}
-              >
-                <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 w-full min-w-0">
-                  <SelectValue placeholder="Select display type" />
-                </SelectTrigger>
-                <SelectContent className="z-[100]">
-                  <SelectItem value="Radio">Radio - Select only one option</SelectItem>
-                  <SelectItem value="Select">Select - Select one or none</SelectItem>
-                  <SelectItem value="Checkbox">Checkbox - Select one or more</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Priority */}
-            <div className="space-y-2 min-w-0">
-              <Label htmlFor="priority" className="text-sm font-medium text-gray-700">
-                Priority
-              </Label>
-              <p className="text-xs text-gray-500">
-                Display order in the POS (lower numbers appear first)
-              </p>
-              <Input
-                id="priority"
-                type="number"
-                value={formData.Priority === 0 ? "" : formData.Priority}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  // Allow empty string or valid numbers
-                  if (value === '') {
-                    onFormDataChange({
-                      ...formData,
-                      Priority: 0
-                    });
-                  } else if (/^\d+$/.test(value)) {
-                    onFormDataChange({
-                      ...formData,
-                      Priority: Number(value)
-                    });
-                  }
-                }}
-                onFocus={(e) => e.target.select()}
-                placeholder="1"
-                min={0}
-                className="transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 w-full min-w-0"
-              />
-            </div>
-          </div>
-
-          {/* Information Card */}
-          <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
-            <div className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-medium text-blue-800 mb-1">Next Step</h4>
-                <p className="text-xs text-blue-700 leading-relaxed">
-                  After saving the option details, switch to the "Option Values" tab to add add-on items from inventory or recipes.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional spacing for better scroll experience */}
-          <div className="h-4"></div>
         </div>
       </div>
     </div>

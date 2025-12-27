@@ -46,11 +46,11 @@ export const PageContainer: React.FC<PageContainerProps> = ({
 }) => {
   return (
     <div className={cn(
-      "min-h-screen bg-[#F7F7F8]",
+      "min-h-screen bg-[#F7F7F8] overflow-x-hidden",
       padding === "default" && "p-6",
       padding === "tight" && "p-4",
       maxWidth === "container" && "max-w-7xl mx-auto",
-      maxWidth === "full" && "w-full",
+      maxWidth === "full" && "w-full max-w-full",
       hasSubmenu && "!pt-20", // Extra top padding for submenu: base pt-6 + 14 units (56px submenu height)
       className
     )}>

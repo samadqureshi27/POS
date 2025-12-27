@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { BranchModalProps } from "@/lib/types/branch";
 
 const BranchModal: React.FC<BranchModalProps> = ({
@@ -36,27 +37,34 @@ const BranchModal: React.FC<BranchModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent size="3xl" fullHeight>
+            <DialogContent
+                size="3xl"
+                fullHeight
+                onInteractOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+            >
                 <DialogHeader>
-                    <DialogTitle>
+                    <DialogTitle className="text-xl">
                         {editingItem ? "Edit Branch" : "Add New Branch"}
                     </DialogTitle>
                 </DialogHeader>
 
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <div className="px-8 pb-6 pt-2 flex-shrink-0 border-b border-gray-200">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+                    <div className="px-8 pb-6 pt-2 flex-shrink-0 min-w-0 max-w-full">
                         <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="basic-info">Basic Info</TabsTrigger>
                             <TabsTrigger value="contact">Contact & Status</TabsTrigger>
                         </TabsList>
                     </div>
 
-                    <DialogBody className="space-y-6">
-                            <TabsContent value="basic-info" className="mt-0 space-y-4">
+                    <DialogBody className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 p-0">
+                        <div className="pl-8 pr-8 space-y-8 min-w-0 max-w-full">
+                            <TabsContent value="basic-info" className="mt-0 space-y-8">
                                 {/* Branch Name */}
                                 <div>
-                                    <Label htmlFor="branchName" className="text-sm font-medium">
-                                        Branch Name <span className="text-destructive">*</span>
+                                    <Label htmlFor="branchName" className="text-sm font-medium text-[#656565] mb-1.5">
+                                        Branch Name <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         id="branchName"
@@ -73,8 +81,8 @@ const BranchModal: React.FC<BranchModalProps> = ({
 
                                 {/* Address */}
                                 <div>
-                                    <Label htmlFor="address" className="text-sm font-medium">
-                                        Address <span className="text-destructive">*</span>
+                                    <Label htmlFor="address" className="text-sm font-medium text-[#656565] mb-1.5">
+                                        Address <span className="text-red-500">*</span>
                                     </Label>
                                     <Textarea
                                         id="address"
@@ -90,9 +98,8 @@ const BranchModal: React.FC<BranchModalProps> = ({
 
                                 {/* Postal Code */}
                                 <div>
-                                    <Label htmlFor="postalCode" className="text-sm font-medium">
+                                    <Label htmlFor="postalCode" className="text-sm font-medium text-[#656565] mb-1.5">
                                         Postal Code
-                                        <span className="text-xs text-muted-foreground ml-1">(Optional)</span>
                                     </Label>
                                     <Input
                                         id="postalCode"
@@ -107,12 +114,11 @@ const BranchModal: React.FC<BranchModalProps> = ({
                                 </div>
                             </TabsContent>
 
-                            <TabsContent value="contact" className="mt-0 space-y-4">
+                            <TabsContent value="contact" className="mt-0 space-y-8">
                                 {/* Email */}
                                 <div>
-                                    <Label htmlFor="email" className="text-sm font-medium">
+                                    <Label htmlFor="email" className="text-sm font-medium text-[#656565] mb-1.5">
                                         Email
-                                        <span className="text-xs text-muted-foreground ml-1">(Optional)</span>
                                     </Label>
                                     <Input
                                         id="email"
@@ -127,27 +133,21 @@ const BranchModal: React.FC<BranchModalProps> = ({
                                 </div>
 
                                 {/* Status Toggle */}
-                                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                    <div className="space-y-0.5">
-                                        <Label className="text-sm font-medium">
-                                            Branch Status
-                                        </Label>
-                                        <p className="text-xs text-muted-foreground">
-                                            {formData.Status === "Active"
-                                                ? "This branch is currently active and operational"
-                                                : "This branch is currently inactive"}
-                                        </p>
+                                <div className="w-full">
+                                    <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3 w-full">
+                                        <span className="text-[#1f2937] text-sm font-medium">Active</span>
+                                        <Switch
+                                            checked={formData.Status === "Active"}
+                                            onCheckedChange={onStatusChange}
+                                        />
                                     </div>
-                                    <Switch
-                                        checked={formData.Status === "Active"}
-                                        onCheckedChange={onStatusChange}
-                                    />
                                 </div>
                             </TabsContent>
+                        </div>
                     </DialogBody>
                 </Tabs>
 
-                <DialogFooter>
+                <DialogFooter className="flex justify-start gap-2">
                     <Button
                         onClick={onSubmit}
                         disabled={!isFormValid() || actionLoading}

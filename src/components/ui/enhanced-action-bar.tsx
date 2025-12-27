@@ -4,6 +4,7 @@ import React from 'react';
 import { Plus, Trash2, Search, Grid3x3, List, Upload, Download, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SearchBar from './search-bar';
+import { cn } from '@/lib/utils';
 
 export type FilterPill = {
   label: string;
@@ -83,8 +84,8 @@ const EnhancedActionBarComponent: React.FC<EnhancedActionBarProps> = ({
   };
 
   return (
-    <div className={`bg-white border border-[#d5d5dd] rounded-sm py-2 px-2 mb-6 hover:shadow-md transition-shadow duration-200 ${containerClassName}`}>
-      <div className={`flex flex-col xl:flex-row gap-4 items-stretch xl:items-center justify-between ${className}`}>
+    <div className={cn(`bg-white border border-[#d5d5dd] rounded-sm py-2 px-2 mb-6 hover:shadow-md transition-shadow duration-200 min-w-0 max-w-full overflow-x-hidden`, containerClassName)}>
+      <div className={cn(`flex flex-col xl:flex-row gap-4 items-stretch xl:items-center justify-between min-w-0 max-w-full`, className)}>
         {/* Search */}
         {showSearch && onSearchChange && (
           <div className="flex-1 w-full xl:max-w-md">

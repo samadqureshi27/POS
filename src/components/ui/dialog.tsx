@@ -21,7 +21,7 @@ const DialogOverlay = React.forwardRef<
       "data-[state=open]:animate-in data-[state=closed]:animate-out",
       "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       "transition-all duration-200",
-      "overflow-y-scroll",
+      "overflow-y-scroll overflow-x-hidden",
       "min-h-screen",
       className
     )}
@@ -65,7 +65,7 @@ const DialogContent = React.forwardRef<
 
     return (
       <DialogPortal>
-        <DialogOverlay className="flex items-start justify-center pt-[5vh] pb-[5vh]">
+        <DialogOverlay className="flex items-start justify-center pt-[4vh] pb-[4vh]">
           <DialogPrimitive.Content
             ref={ref}
             style={{
@@ -77,15 +77,15 @@ const DialogContent = React.forwardRef<
               "z-[1001]",
 
               // Size
-              "w-[calc(100%-2rem)]",
+      "w-[calc(100%-1.5rem)] max-w-full",
               sizeClasses[size],
               "h-auto",
 
               // Appearance
-              "bg-white rounded-sm shadow-2xl",
+      "bg-white rounded-sm shadow-[0_14px_44px_rgba(15,23,42,0.16)] border border-[#E7E7E9]",
 
               // Layout
-              "flex flex-col",
+              "flex flex-col overflow-x-hidden",
 
               // Animations
               "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -107,7 +107,8 @@ const DialogContent = React.forwardRef<
                   "text-gray-400 hover:text-gray-600",
                   "transition-colors duration-150",
                   "focus:outline-none",
-                  "disabled:pointer-events-none"
+                  "cursor-pointer",
+                  "disabled:pointer-events-none disabled:cursor-not-allowed"
                 )}
               >
                 <X className="h-8 w-8" strokeWidth={1} />
@@ -129,7 +130,7 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "px-8 py-6 flex-shrink-0",
+      "px-8 py-7 flex-shrink-0 min-w-0 max-w-full",
       className
     )}
     {...props}
@@ -146,7 +147,8 @@ const DialogBody = ({
   <div
     data-slot="dialog-body"
     className={cn(
-      "px-8 py-6",
+      "px-8 py-6 overflow-x-hidden overflow-y-auto",
+      "min-w-0 max-w-full",
       className
     )}
     {...props}
@@ -160,9 +162,10 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "px-8 py-6",
-      "flex items-center justify-start gap-3",
-      "flex-shrink-0",
+      "px-8 py-7",
+      "flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-3",
+      "flex-shrink-0 w-full min-w-0 max-w-full",
+      "[&>*]:w-full sm:[&>*]:w-auto",
       className
     )}
     {...props}
@@ -177,7 +180,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-lg font-medium text-black",
+      "text-[20px] font-semibold text-[#111827]",
       className
     )}
     {...props}
