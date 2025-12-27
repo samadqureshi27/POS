@@ -15,6 +15,7 @@ import {
   Package,
 } from 'lucide-react';
 import { CustomTooltip } from './ui/custom-tooltip';
+import { NewBadge } from './ui/new-badge';
 import { findNavigationItem } from '@/lib/navigation';
 
 export default function Sidebar() {
@@ -22,58 +23,67 @@ export default function Sidebar() {
 
   const menuItems = [
     {
-      icon: <Home className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      icon: <Home className="h-5 w-5 md:h-6 md:w-6 stroke-[1]" />,
       label: 'Home',
       href: '/dashboard',
-      group: 'main'
+      group: 'main',
+      hasNewBadge: false // Set to true to show badge
     },
     {
-      icon: <Package className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      icon: <Package className="h-5 w-5 md:h-6 md:w-6 stroke-[1]" />,
       label: 'Items',
       href: '/items',
-      group: 'items'
+      group: 'items',
+      hasNewBadge: false
     },
     {
-      icon: <Package2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      icon: <Package2 className="h-5 w-5 md:h-6 md:w-6 stroke-[1]" />,
       label: 'Recipe Management',
       href: '/recipes-management',
-      group: 'recipes'
+      group: 'recipes',
+      hasNewBadge: false,
     },
     {
-      icon: <ChefHat className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      icon: <ChefHat className="h-5 w-5 md:h-6 md:w-6 stroke-[1]" />,
       label: 'Menu Management',
       href: '/menu-items',
-      group: 'menu'
+      group: 'menu',
+      hasNewBadge: false
     },
     {
-      icon: <Building2 className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      icon: <Building2 className="h-5 w-5 md:h-6 md:w-6 stroke-[1]" />,
       label: 'Branch Management',
       href: '/branches-management',
-      group: 'branch'
+      group: 'branch',
+      hasNewBadge: false
     },
     {
-      icon: <DollarSign className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      icon: <DollarSign className="h-5 w-5 md:h-6 md:w-6 stroke-[1]" />,
       label: 'Financial Reports',
       href: '/financial-reports',
-      group: 'analytics'
+      group: 'analytics',
+      hasNewBadge: true
     },
     {
-      icon: <User className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      icon: <User className="h-5 w-5 md:h-6 md:w-6 stroke-[1]" />,
       label: 'Customer Management',
       href: '/customer-details',
-      group: 'customer-management'
+      group: 'customer-management',
+      hasNewBadge: false
     },
     {
-      icon: <ShoppingCart className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      icon: <ShoppingCart className="h-5 w-5 md:h-6 md:w-6 stroke-[1]" />,
       label: 'Order Management',
       href: '/order-management',
-      group: 'order'
+      group: 'order',
+      hasNewBadge: false
     },
     {
-      icon: <Settings className="h-6 w-6 md:h-7 md:w-7 stroke-[1]" />,
+      icon: <Settings className="h-5 w-5 md:h-6 md:w-6 stroke-[1]" />,
       label: 'Settings',
       href: '/general-settings',
-      group: 'settings'
+      group: 'settings',
+      hasNewBadge: false // Set to true to show badge
     },
   ];
 
@@ -96,12 +106,12 @@ export default function Sidebar() {
       {/* Desktop Sidebar - Left side, vertical */}
       <aside className="hidden lg:block fixed left-0 top-0 h-screen bg-[#D1AB35] w-16 z-30">
         {/* Menu Items */}
-        <nav className="h-full flex flex-col justify-center items-center gap-1 p-4">
+        <nav className="h-full flex flex-col justify-center items-center gap-2 p-4">
           {menuItems.map((item, idx) => (
             <CustomTooltip key={idx} label={item.label} direction="right">
               <Link
                 href={item.href}
-                className={`relative flex items-center justify-center p-2.5 rounded hover:bg-[#454545] transition-all transition-standard ${isItemActive(item) ? 'bg-[#454545]' : ''
+                className={`group relative flex items-center justify-center p-2.5 rounded hover:bg-[#454545] transition-all transition-standard ${isItemActive(item) ? 'bg-[#454545]' : ''
                   }`}
               >
                 <span className={`transition-colors transition-standard ${isItemActive(item)
@@ -110,6 +120,11 @@ export default function Sidebar() {
                   }`}>
                   {item.icon}
                 </span>
+
+                {/* NEW Badge at bottom border */}
+                {item.hasNewBadge && (
+                  <NewBadge className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20" />
+                )}
               </Link>
             </CustomTooltip>
           ))}
@@ -133,6 +148,11 @@ export default function Sidebar() {
                   }`}>
                   {item.icon}
                 </span>
+
+                {/* NEW Badge at bottom border */}
+                {item.hasNewBadge && (
+                  <NewBadge className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20" />
+                )}
               </Link>
             ))}
           </nav>

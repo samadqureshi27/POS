@@ -1,12 +1,9 @@
 // components/ui/period-selector.tsx
 import React, { useRef, useEffect, useState } from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { formatDisplayDate } from '@/lib/util/formatters';
 
 interface PeriodSelectorProps {
@@ -41,9 +38,9 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
   }, [customDateRange]);
 
   return (
-    <div className="mb-6 relative">
-      <div className="flex mb-6 sm:mb-8 relative w-full">
-        <div className="flex overflow-x-auto pb-2 gap-2 w-full justify-end hide-scrollbar p-1">
+    <div className="mb-1 relative">
+      <div className="flex mb-1 sm:mb-1 relative w-full">
+        <div className="flex overflow-x-auto overflow-y-hidden pb-1 gap-2 w-full justify-end scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent sm:hide-scrollbar [-webkit-overflow-scrolling:touch]">
           {periods.slice(0, -1).map((period) => (
             <Button
               key={period}
@@ -52,7 +49,7 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
                 onPeriodChange(period);
                 setShowDatePicker(false);
               }}
-              className="rounded-sm flex-shrink-0 whitespace-nowrap"
+              className="h-8 rounded-sm flex-shrink-0 whitespace-nowrap"
             >
               {period}
             </Button>
@@ -67,9 +64,9 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
                   onPeriodChange("Custom");
                   setShowDatePicker(!showDatePicker);
                 }}
-                className="rounded-sm flex-shrink-0 whitespace-nowrap min-w-[100px]"
+                className="h-8 rounded-sm flex-shrink-0 whitespace-nowrap min-w-[100px]"
               >
-                <CalendarIcon size={16} />
+                <CalendarIcon size={14} />
                 <span>
                   {selectedPeriod === "Custom" &&
                     customDateRange?.[0]?.startDate &&
@@ -107,23 +104,12 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
                   }
                 }}
                 numberOfMonths={1}
-                className="rounded-md border"
+                className="rounded-sm border"
               />
             </PopoverContent>
           </Popover>
         </div>
       </div>
-
-      <style jsx global>{`
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 };

@@ -133,7 +133,7 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange })
           <SelectTrigger className="mt-1.5">
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
-          <SelectContent className="z-[100]">
+          <SelectContent>
             {categories.map((cat) => (
               <SelectItem key={cat._id || cat.id} value={cat._id || cat.id || ''}>
                 {cat.name}
@@ -248,7 +248,7 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange })
             <SelectTrigger className="mt-1.5">
               <SelectValue placeholder="Select display type" />
             </SelectTrigger>
-            <SelectContent className="z-[100]">
+            <SelectContent>
               <SelectItem value="Radio">Radio - Select only one option</SelectItem>
               <SelectItem value="Select">Select - Select one or none</SelectItem>
               <SelectItem value="Checkbox">Checkbox - Select one or more</SelectItem>

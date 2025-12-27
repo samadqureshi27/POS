@@ -39,7 +39,7 @@ const PageHeaderComponent: React.FC<PageHeaderProps> = ({
     )}>
       <div className="flex-1">
         <h1 className={cn(
-          "text-3xl font-semibold tracking-tight text-gray-800",
+          "text-2xl font-semibold tracking-tight text-[#333333]",
           titleClassName
         )}>
           {title}
@@ -52,7 +52,7 @@ const PageHeaderComponent: React.FC<PageHeaderProps> = ({
       </div>
 
       {actions && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent sm:pb-0 sm:overflow-x-visible [-webkit-overflow-scrolling:touch] w-full sm:w-auto">
           {actions}
         </div>
       )}

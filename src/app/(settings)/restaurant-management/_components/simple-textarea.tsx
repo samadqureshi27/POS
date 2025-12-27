@@ -20,7 +20,7 @@ export const SimpleTextarea: React.FC<SimpleTextareaProps> = ({
         </Label>
         <Textarea
             {...props}
-            className="px-4 py-3 rounded-lg transition-all duration-200 resize-none"
+            className="px-4 py-3 rounded-sm transition-all duration-200 resize-none"
         />
     </div>
 );

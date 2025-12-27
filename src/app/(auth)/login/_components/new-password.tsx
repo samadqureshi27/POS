@@ -162,7 +162,7 @@ const NewPasswordOverlay: React.FC = () => {
             }}
             placeholder="Enter your new password"
             disabled={isLoading}
-            className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-xl py-3 sm:py-4"
+            className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-sm py-3 sm:py-4"
           />
           {validationErrors.newPassword && (
             <p className="text-red-500 text-xs mt-1">{validationErrors.newPassword}</p>
@@ -186,7 +186,7 @@ const NewPasswordOverlay: React.FC = () => {
             }}
             placeholder="Re-enter password"
             disabled={isLoading}
-            className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-xl py-3 sm:py-4"
+            className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-sm py-3 sm:py-4"
           />
           {validationErrors.confirmPassword && (
             <p className="text-red-500 text-xs mt-1">{validationErrors.confirmPassword}</p>
@@ -198,7 +198,7 @@ const NewPasswordOverlay: React.FC = () => {
             type="button"
             variant="default"
             size="lg"
-            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
+            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-sm text-xs sm:text-sm"
             disabled={isLoading || !newPassword || !confirmPassword}
             onClick={handleUpdatePassword}
           >

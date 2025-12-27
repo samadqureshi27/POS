@@ -35,8 +35,8 @@ export default function InventoryItemModal({
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [categoryInput, setCategoryInput] = useState("");
-  const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
   const [addingCategory, setAddingCategory] = useState(false);
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
 
   const [formData, setFormData] = useState<Partial<InventoryItem>>({
     name: "",
@@ -94,11 +94,8 @@ export default function InventoryItemModal({
           isActive: editingItem.isActive ?? true,
         });
 
-        // Set category name for display
-        const categoryName = typeof editingItem.categoryId === 'object' && editingItem.categoryId?.name
-          ? editingItem.categoryId.name
-          : categories.find(c => (c._id || c.id) === categoryIdValue)?.name || '';
-        setCategoryInput(categoryName);
+        // Set category input for new category creation (if needed)
+        setCategoryInput("");
         // Load vendors and branches from mock API (not yet in backend)
         setSelectedVendors([]);
         setBranchDistribution([]);
@@ -120,6 +117,7 @@ export default function InventoryItemModal({
           isActive: true,
         });
         setCategoryInput("");
+        setShowNewCategoryInput(false);
         setSelectedVendors([]);
         setBranchDistribution([]);
       }
@@ -196,35 +194,34 @@ export default function InventoryItemModal({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleCategoryInputChange = (value: string) => {
-    setCategoryInput(value);
-    // Don't set categoryId until user selects or creates a category
-    setShowCategorySuggestions(value.length > 0);
-  };
-
-  const selectCategory = (category: Category) => {
-    setCategoryInput(category.name);
-    handleFieldChange("categoryId", category._id || category.id || "");
-    setShowCategorySuggestions(false);
+  const handleCategorySelect = (categoryId: string) => {
+    handleFieldChange("categoryId", categoryId);
+    setCategoryInput(""); // Clear input when selecting existing category
+    setShowNewCategoryInput(false); // Hide input when selecting existing category
   };
 
   const handleAddCategory = async () => {
-    if (!categoryInput.trim()) return;
+    const categoryName = categoryInput.trim();
+    if (!categoryName) {
+      // Show input field if not already shown
+      setShowNewCategoryInput(true);
+      return;
+    }
 
     setAddingCategory(true);
     try {
       const response = await CategoriesService.createCategory({
-        name: categoryInput,
+        name: categoryName,
         isActive: true,
       });
 
       if (response.success && response.data) {
         setCategories([...categories, response.data]);
         const newCategoryId = response.data._id || response.data.id || "";
-        // Keep showing the category name in the input, but store the ID
-        setCategoryInput(response.data.name);
         handleFieldChange("categoryId", newCategoryId);
-        setShowCategorySuggestions(false);
+        setCategoryInput(""); // Clear input after successful creation
+        setShowNewCategoryInput(false); // Hide input after successful creation
+        toast.success("Category created successfully");
       } else {
         toast.error(response.message || "Failed to create category");
       }
@@ -234,10 +231,6 @@ export default function InventoryItemModal({
     }
     setAddingCategory(false);
   };
-
-  const filteredCategories = categories.filter((cat) =>
-    cat.name.toLowerCase().includes(categoryInput.toLowerCase())
-  );
 
   const toggleVendor = (vendorId: number) => {
     if (selectedVendors.includes(vendorId)) {
@@ -298,7 +291,7 @@ export default function InventoryItemModal({
         </DialogHeader>
 
         <Tabs defaultValue="basic">
-          <div className="px-8 pb-6 pt-2 flex-shrink-0">
+          <div className="px-8 pb-4 pt-2 flex-shrink-0">
             <TabsList className={`grid w-full ${isEditMode ? 'grid-cols-5' : 'grid-cols-2'}`}>
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="stock">Stock & Units</TabsTrigger>
@@ -369,62 +362,70 @@ export default function InventoryItemModal({
                 </div>
               </div>
 
-              {/* Category with Autocomplete */}
+              {/* Category */}
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
                   <Label className="text-sm font-medium text-[#656565]">Category</Label>
-                  <CustomTooltip label="Type to search or add new category. Click + to save custom category" direction="right">
+                  <CustomTooltip label="Select a category or create a new one using the + button" direction="right">
                     <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
                   </CustomTooltip>
                 </div>
-                <div className="grid grid-cols-[1fr_auto] gap-2 relative mt-1.5">
-                  <div className="relative">
-                    <Input
-                      value={categoryInput}
-                      onChange={(e) => handleCategoryInputChange(e.target.value)}
-                      onFocus={() => setShowCategorySuggestions(categoryInput.length > 0)}
-                      onBlur={() => setTimeout(() => setShowCategorySuggestions(false), 200)}
-                      placeholder="Type or select category"
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowCategorySuggestions(!showCategorySuggestions)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </button>
-
-                    {/* Category Suggestions Dropdown */}
-                    {showCategorySuggestions && filteredCategories.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#dcdfe3] rounded-sm shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] z-[100] max-h-48 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                        {filteredCategories.map((cat) => (
-                          <button
-                            key={cat._id || cat.id}
-                            type="button"
-                            onClick={() => selectCategory(cat)}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-[#111827] capitalize transition-colors cursor-pointer"
-                          >
+                <div className="grid grid-cols-[1fr_auto] gap-2 mt-1.5">
+                  <Select
+                    value={formData.categoryId || ""}
+                    onValueChange={handleCategorySelect}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.length > 0 ? (
+                        categories.map((cat) => (
+                          <SelectItem key={cat._id || cat.id} value={cat._id || cat.id || ""}>
                             {cat.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="px-2 py-4 text-center text-sm text-gray-500">
+                          No categories available. Create one using the + button.
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
 
                   <Button
                     type="button"
                     onClick={handleAddCategory}
-                    disabled={!categoryInput.trim() || addingCategory}
-                    className="bg-gray-900 hover:bg-black text-white h-14"
+                    disabled={addingCategory}
+                    variant="outline"
+                    className="h-14 border-gray-300"
+                    title="Add new category"
                   >
                     {addingCategory ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-5 w-5 stroke-[1.5]" />
                     )}
                   </Button>
                 </div>
+                {/* Input for creating new category - shown when + button is clicked */}
+                {showNewCategoryInput && (
+                  <Input
+                    value={categoryInput}
+                    onChange={(e) => setCategoryInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && categoryInput.trim()) {
+                        handleAddCategory();
+                      } else if (e.key === 'Escape') {
+                        setShowNewCategoryInput(false);
+                        setCategoryInput("");
+                      }
+                    }}
+                    placeholder="Enter new category name and press Enter or click +"
+                    className="mt-2"
+                    autoFocus
+                  />
+                )}
               </div>
 
               {/* Active Status */}
@@ -441,114 +442,31 @@ export default function InventoryItemModal({
 
             {/* Stock & Units Tab */}
             <TabsContent value="stock" className="mt-0 space-y-8">
-
-              {/* Quantity */}
-              <div>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Label className="text-sm font-medium text-[#656565]">
-                    Quantity
-                  </Label>
-                  <CustomTooltip label="Current stock quantity in base unit" direction="right">
-                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
-                  </CustomTooltip>
-                </div>
-                <Input
-                  type="number"
-                  value={formData.quantity === 0 ? "" : formData.quantity || ""}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    handleFieldChange("quantity", val === '' ? 0 : parseFloat(val) || 0);
-                  }}
-                  onFocus={(e) => e.target.select()}
-                  placeholder="0"
-                  className="mt-1.5"
-                />
-              </div>
-
-              {/* Base Unit */}
-              <div>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Label className="text-sm font-medium text-[#656565]">
-                    Base Unit of Measurement <span className="text-red-500">*</span>
-                  </Label>
-                  <CustomTooltip label="Standard unit for recipes, stock tracking, and reporting" direction="right">
-                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
-                  </CustomTooltip>
-                </div>
-                <Select
-                  value={formData.baseUnit}
-                  onValueChange={(value) => handleFieldChange("baseUnit", value)}
-                >
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {units.length > 0 ? (
-                      units.map((unit) => (
-                        <SelectItem key={unit._id || unit.id || unit.symbol} value={unit.symbol}>
-                          {unit.name} ({unit.symbol}) - {unit.type}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <div className="px-2 py-4 text-center text-sm text-gray-500">
-                        No units available. Add units from Units button first.
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Purchase Unit & Conversion - Show for stock items by default */}
+              {/* Row 1: Quantity and Low Stock Threshold - Show for stock items */}
               {(formData.type === "stock" || formData.trackStock) && (
-                <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Quantity */}
                   <div>
                     <div className="flex items-center gap-2 mb-1.5">
-                      <Label className="text-sm font-medium text-[#656565]">Purchase Unit (Optional)</Label>
-                      <CustomTooltip label="Unit used when ordering from suppliers (e.g., buy in kg, use in g)" direction="right">
+                      <Label className="text-sm font-medium text-[#656565]">
+                        Quantity
+                      </Label>
+                      <CustomTooltip label="Current stock quantity in base unit" direction="right">
                         <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
                       </CustomTooltip>
                     </div>
-                    <Select
-                      value={formData.purchaseUnit}
-                      onValueChange={(value) => handleFieldChange("purchaseUnit", value)}
-                    >
-                      <SelectTrigger className="mt-1.5">
-                        <SelectValue placeholder="Same as base unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {units.map((unit) => (
-                          <SelectItem key={unit._id || unit.id || unit.symbol} value={unit.symbol}>
-                            {unit.name} ({unit.symbol})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      type="number"
+                      value={formData.quantity === 0 ? "" : formData.quantity || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        handleFieldChange("quantity", val === '' ? 0 : parseFloat(val) || 0);
+                      }}
+                      onFocus={(e) => e.target.select()}
+                      placeholder="0"
+                      className="mt-1.5"
+                    />
                   </div>
-
-                  {formData.purchaseUnit && formData.purchaseUnit !== formData.baseUnit && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <Label className="text-sm font-medium text-[#656565]">
-                          Conversion Factor <span className="text-red-500">*</span>
-                        </Label>
-                        <CustomTooltip label={`Conversion: 1 ${formData.purchaseUnit} = ${formData.conversion || "?"} ${formData.baseUnit}. Example: If buying in kg but using in g, factor is 1000`} direction="right">
-                          <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
-                        </CustomTooltip>
-                      </div>
-                      <Input
-                        type="number"
-                        step="any"
-                        value={formData.conversion === 0 ? "" : formData.conversion || ""}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleFieldChange("conversion", val === '' ? 0 : parseFloat(val) || 0);
-                        }}
-                        onFocus={(e) => e.target.select()}
-                        placeholder="e.g., 1000"
-                        className="mt-1.5"
-                      />
-                    </div>
-                  )}
 
                   {/* Threshold (Reorder Point) */}
                   <div>
@@ -572,14 +490,103 @@ export default function InventoryItemModal({
                       className="mt-1.5"
                     />
                   </div>
-                </>
+                </div>
+              )}
+
+              {/* Row 2: Base Unit and Purchase Unit */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Base Unit - Always visible */}
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Label className="text-sm font-medium text-[#656565]">
+                      Base Unit of Measurement <span className="text-red-500">*</span>
+                    </Label>
+                    <CustomTooltip label="Standard unit for recipes, stock tracking, and reporting" direction="right">
+                      <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                    </CustomTooltip>
+                  </div>
+                  <Select
+                    value={formData.baseUnit}
+                    onValueChange={(value) => handleFieldChange("baseUnit", value)}
+                  >
+                    <SelectTrigger className="mt-1.5">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {units.length > 0 ? (
+                        units.map((unit) => (
+                          <SelectItem key={unit._id || unit.id || unit.symbol} value={unit.symbol}>
+                            {unit.name} ({unit.symbol}) - {unit.type}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="px-2 py-4 text-center text-sm text-gray-500">
+                          No units available. Add units from Units button first.
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Purchase Unit - Show for stock items */}
+                {(formData.type === "stock" || formData.trackStock) && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Label className="text-sm font-medium text-[#656565]">Purchase Unit (Optional)</Label>
+                      <CustomTooltip label="Unit used when ordering from suppliers (e.g., buy in kg, use in g)" direction="right">
+                        <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                      </CustomTooltip>
+                    </div>
+                    <Select
+                      value={formData.purchaseUnit}
+                      onValueChange={(value) => handleFieldChange("purchaseUnit", value)}
+                    >
+                      <SelectTrigger className="mt-1.5">
+                        <SelectValue placeholder="Same as base unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {units.map((unit) => (
+                          <SelectItem key={unit._id || unit.id || unit.symbol} value={unit.symbol}>
+                            {unit.name} ({unit.symbol})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+
+              {/* Conversion Factor - Show when purchase unit differs from base unit */}
+              {(formData.type === "stock" || formData.trackStock) && formData.purchaseUnit && formData.purchaseUnit !== formData.baseUnit && (
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Label className="text-sm font-medium text-[#656565]">
+                      Conversion Factor <span className="text-red-500">*</span>
+                    </Label>
+                    <CustomTooltip label={`Conversion: 1 ${formData.purchaseUnit} = ${formData.conversion || "?"} ${formData.baseUnit}. Example: If buying in kg but using in g, factor is 1000`} direction="right">
+                      <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                    </CustomTooltip>
+                  </div>
+                  <Input
+                    type="number"
+                    step="any"
+                    value={formData.conversion === 0 ? "" : formData.conversion || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      handleFieldChange("conversion", val === '' ? 0 : parseFloat(val) || 0);
+                    }}
+                    onFocus={(e) => e.target.select()}
+                    placeholder="e.g., 1000"
+                    className="mt-1.5"
+                  />
+                </div>
               )}
             </TabsContent>
 
             {/* Vendors Tab (Edit Mode Only) */}
             {isEditMode && (
               <TabsContent value="vendors" className="mt-0 space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                <div className="bg-blue-50 border border-blue-200 rounded-sm p-6 text-center">
                   <p className="text-blue-800 text-lg font-semibold mb-2">
                     🚀 Coming in Version 2
                   </p>
@@ -593,7 +600,7 @@ export default function InventoryItemModal({
             {/* Branches Tab (Edit Mode Only) */}
             {isEditMode && (
               <TabsContent value="branches" className="mt-0 space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                <div className="bg-blue-50 border border-blue-200 rounded-sm p-6 text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <Building2 className="h-6 w-6 text-blue-700" />
                     <p className="text-blue-800 text-lg font-semibold">
@@ -610,7 +617,7 @@ export default function InventoryItemModal({
             {/* Advanced Tab (Edit Mode Only) */}
             {isEditMode && (
               <TabsContent value="advanced" className="mt-0 space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                <div className="bg-blue-50 border border-blue-200 rounded-sm p-6 text-center">
                   <p className="text-blue-800 text-lg font-semibold mb-2">
                     🚀 Coming in Version 2
                   </p>

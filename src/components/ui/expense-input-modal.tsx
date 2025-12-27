@@ -105,7 +105,7 @@ export const ExpenseInputModal: React.FC<ExpenseInputModalProps> = ({
       >
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-blue-100">
+            <div className="p-2 rounded-sm bg-blue-100">
               <Receipt size={18} className="text-blue-600" />
             </div>
             Add New Expense

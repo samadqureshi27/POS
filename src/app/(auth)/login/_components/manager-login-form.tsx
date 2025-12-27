@@ -114,7 +114,7 @@ const ManagerLoginForm: React.FC = () => {
               maxLength={1}
               value={digit}
               onChange={(e) => handlePinChange(index, e.target.value)}
-              className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl md:text-2xl font-bold border-0 bg-gray-100 rounded-lg focus:bg-gray-800 focus:text-white focus:ring-2 focus:ring-gray-600 focus:outline-none transition-colors"
+              className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl md:text-2xl font-bold border-0 bg-gray-100 rounded-sm focus:bg-gray-800 focus:text-white focus:ring-2 focus:ring-gray-600 focus:outline-none transition-colors"
               style={{
                 backgroundColor: digit ? "#374151" : "#f3f4f6",
                 color: digit ? "white" : "#374151",
@@ -141,7 +141,7 @@ const ManagerLoginForm: React.FC = () => {
               type="button"
               variant="secondary"
 
-              className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
               onClick={() => handleKeypadInput(num.toString())}
               disabled={
                 isLoading || pinCode.every((digit) => digit !== "")
@@ -155,7 +155,7 @@ const ManagerLoginForm: React.FC = () => {
             type="button"
             variant="secondary"
 
-            className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
+            className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
             onClick={() => handleKeypadInput("0")}
             disabled={isLoading || pinCode.every((digit) => digit !== "")}
           >
@@ -164,7 +164,7 @@ const ManagerLoginForm: React.FC = () => {
           <Button
             type="button"
             variant="secondary"
-            className="h-12 sm:h-14 text-base sm:text-lg font-medium text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
+            className="h-12 sm:h-14 text-base sm:text-lg font-medium text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
             onClick={handleBackspace}
             disabled={isLoading || pinCode.every((digit) => digit === "")}
           >

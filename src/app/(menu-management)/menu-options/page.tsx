@@ -154,13 +154,13 @@ const AddOnsPage = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleEditItem(item)}
-              className="px-3 py-1 bg-gray-900 hover:bg-black text-white text-sm rounded-md transition-all"
+              className="px-3 py-1 bg-gray-900 hover:bg-black text-white text-sm rounded-sm transition-all"
             >
               Edit
             </button>
             <button
               onClick={() => handleDelete(item)}
-              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-all"
+              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-sm transition-all"
             >
               Delete
             </button>

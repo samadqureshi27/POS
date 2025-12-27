@@ -85,7 +85,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       // Default fallback UI
       return (
-        <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg border border-red-200">
+        <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-sm border border-red-200">
           <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
             <AlertTriangle className="w-6 h-6 text-red-600" />
           </div>

@@ -46,7 +46,7 @@ export const NotificationFilters: React.FC<NotificationFiltersProps> = ({
           placeholder="Search notifications..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 pr-4 py-2 bg-white border border-gray-300 text-black placeholder-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black w-full sm:w-64"
+          className="pl-10 pr-4 py-2 bg-white border border-gray-300 text-black placeholder-gray-600 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black w-full sm:w-64"
         />
       </div>
     </div>

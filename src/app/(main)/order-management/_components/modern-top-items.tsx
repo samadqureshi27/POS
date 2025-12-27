@@ -49,7 +49,7 @@ const ModernTopItems: React.FC<ModernTopItemsProps> = ({
     <Card className="relative overflow-hidden">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <div className={`p-2 rounded-lg ${type === 'most' ? 'bg-yellow-100' : 'bg-orange-100'}`}>
+          <div className={`p-2 rounded-sm ${type === 'most' ? 'bg-yellow-100' : 'bg-orange-100'}`}>
             <IconComponent size={16} className={type === 'most' ? 'text-yellow-600' : 'text-orange-600'} />
           </div>
           {title}
@@ -83,7 +83,7 @@ const ModernTopItems: React.FC<ModernTopItemsProps> = ({
               return (
                 <div
                   key={item.Order}
-                  className="group flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-all duration-200"
+                  className="group flex items-center gap-3 p-3 rounded-sm hover:bg-muted/50 transition-all duration-200"
                 >
                   {/* Rank Badge */}
                   <div className={`

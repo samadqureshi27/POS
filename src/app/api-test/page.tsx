@@ -55,7 +55,7 @@ export default function ApiTestPage() {
   return (
     <div className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-sm shadow p-6">
           <h1 className="text-2xl font-bold mb-4">🧪 API Test Page</h1>
           <p className="text-gray-600 mb-6">
             Direct API test without going through the login UI
@@ -93,7 +93,7 @@ export default function ApiTestPage() {
         </div>
 
         {response && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-sm shadow p-6">
             <h2 className="text-xl font-bold mb-4">Response</h2>
 
             <div className="space-y-4">
@@ -141,7 +141,7 @@ export default function ApiTestPage() {
           </div>
         )}
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-sm p-4">
           <h3 className="font-semibold text-blue-900 mb-2">📝 Quick Info</h3>
           <ul className="text-sm text-blue-800 space-y-1">
             <li>• Endpoint: <code className="bg-blue-100 px-1 rounded">POST /t/auth/login</code></li>

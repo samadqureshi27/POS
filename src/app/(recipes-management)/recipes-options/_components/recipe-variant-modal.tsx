@@ -373,7 +373,7 @@ export default function RecipeVariantModal({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-5 space-y-6 min-h-0">
           {/* Recipe Selection - Multi-Select */}
-          <div className="space-y-3 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+          <div className="space-y-3 bg-blue-50 border-2 border-blue-200 rounded-sm p-4">
             <div className="flex items-start gap-2">
               <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -420,7 +420,7 @@ export default function RecipeVariantModal({
                 value={formData.name}
                 onChange={(e) => handleFieldChange("name", e.target.value)}
                 placeholder="e.g., Large, Extra Spicy, Gluten-Free"
-                className="h-10 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="h-10 rounded-sm focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -432,7 +432,7 @@ export default function RecipeVariantModal({
                 value={formData.description}
                 onChange={(e) => handleFieldChange("description", e.target.value)}
                 placeholder="Customer-facing description of this variation..."
-                className="min-h-[80px] resize-none rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="min-h-[80px] resize-none rounded-sm focus:ring-2 focus:ring-blue-500"
                 rows={3}
               />
             </div>
@@ -478,7 +478,7 @@ export default function RecipeVariantModal({
                     }}
                     onFocus={(e) => e.target.select()}
                     placeholder="1.0"
-                    className="h-10 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="h-10 rounded-sm focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
@@ -497,7 +497,7 @@ export default function RecipeVariantModal({
                     value={formData.crustType ?? ''}
                     onChange={(e) => handleFieldChange("crustType", e.target.value)}
                     placeholder="e.g., Stuffed, Thin, Pan"
-                    className="h-10 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="h-10 rounded-sm focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
@@ -522,7 +522,7 @@ export default function RecipeVariantModal({
                   }}
                   onFocus={(e) => e.target.select()}
                   placeholder="0.00"
-                  className="h-10 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="h-10 rounded-sm focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>

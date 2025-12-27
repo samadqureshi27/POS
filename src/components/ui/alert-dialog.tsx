@@ -37,7 +37,7 @@ const AlertDialogContent = React.forwardRef<
       className={cn(
         "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50",
         "w-full max-w-lg",
-        "bg-white rounded-2xl shadow-2xl border border-gray-200",
+        "bg-white rounded-sm shadow-2xl border border-gray-200",
         "p-6",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -110,7 +110,7 @@ const AlertDialogAction = React.forwardRef<
   <AlertDialogPrimitive.Action
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md px-4 py-2",
+      "inline-flex h-10 items-center justify-center rounded-sm px-4 py-2",
       "bg-gray-900 text-white font-medium text-sm",
       "hover:bg-black transition-colors",
       "focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2",
@@ -129,7 +129,7 @@ const AlertDialogCancel = React.forwardRef<
   <AlertDialogPrimitive.Cancel
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md px-4 py-2 mt-2 sm:mt-0",
+      "inline-flex h-10 items-center justify-center rounded-sm px-4 py-2 mt-2 sm:mt-0",
       "bg-gray-100 text-gray-900 font-medium text-sm",
       "hover:bg-gray-200 transition-colors",
       "focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2",

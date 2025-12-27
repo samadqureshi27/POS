@@ -141,7 +141,7 @@ const UnitManagementCard: React.FC<UnitManagementCardProps> = ({ onUnitChange })
       </CardHeader>
       <CardContent className="space-y-6 overflow-y-auto" style={{ maxHeight: 'calc(450px - 80px)' }}>
         {/* Add New Unit Section */}
-        <div className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-8">
+        <div className="bg-white border-2 border-dashed border-gray-300 rounded-sm p-8">
           <div className="text-center mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Add New Unit</h3>
             <p className="text-sm text-gray-500">Create a custom unit for your ingredients</p>

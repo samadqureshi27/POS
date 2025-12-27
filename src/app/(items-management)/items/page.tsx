@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Package, Plus, Upload, Download, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { StatCardsGrid } from "@/components/ui/stat-cards-grid";
@@ -372,10 +372,8 @@ export default function ItemsPage() {
 
   return (
     <PageContainer className="pt-6">
-      <Toaster position="top-center" richColors expand={true} duration={3000} />
       <PageHeader
         title="Inventory Hub"
-        titleClassName="text-2xl lg:text-3xl font-medium text-gray-800"
         subtitle="Manage your items, units, and stock levels"
         actions={
           <>
@@ -389,26 +387,26 @@ export default function ItemsPage() {
             <Button
               onClick={handleDownloadTemplate}
               variant="filter"
-              className="px-4"
+              className="h-8 px-3 flex-shrink-0"
             >
-              <FileDown className="h-4 w-4 mr-2" />
+              <FileDown className="h-3.5 w-3.5 mr-1.5" />
               Template
             </Button>
             <Button
               onClick={handleImportClick}
               variant="filter"
-              className="px-4"
+              className="h-8 px-3 flex-shrink-0"
             >
-              <Upload className="h-4 w-4 mr-2" />
+              <Upload className="h-3.5 w-3.5 mr-1.5" />
               Import
             </Button>
             <Button
               onClick={handleExport}
               variant="filter"
-              className="px-4"
+              className="h-8 px-3 flex-shrink-0"
               disabled={items.length === 0}
             >
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-3.5 w-3.5 mr-1.5" />
               Export
             </Button>
           </>

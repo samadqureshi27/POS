@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Toaster } from "@/components/ui/sonner";
 import { useToast } from '@/lib/hooks';
 import { useNotificationSettings } from "@/lib/hooks/useNotificationSettings";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -32,8 +31,6 @@ const NotificationSettingsPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
-
       <PageHeader
         title="Notification Settings"
         actions={

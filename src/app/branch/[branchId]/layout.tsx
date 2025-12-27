@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, usePathname } from "next/navigation";
+import { Building2 } from "lucide-react";
 import BaseSubmenu from "@/components/base-submenu";
 
 export default function BranchLayout({ children }: { children: React.ReactNode }) {
@@ -34,6 +35,7 @@ export default function BranchLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="flex min-w-0 max-w-full overflow-x-hidden">
+      {/* When showBackArrow is true, it shows back arrow instead of contextIcon */}
       <BaseSubmenu items={mainItems} showBackArrow={true} />
       <div className="flex-1 min-w-0 max-w-full overflow-x-hidden">{children}</div>
     </div>

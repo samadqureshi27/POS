@@ -138,7 +138,7 @@ const AnalyticsDashboard = () => {
   if (error) {
     return (
       <div className="bg-background min-h-screen p-6 mt-4 flex items-center justify-center">
-        <div className="bg-card p-8 rounded-lg shadow-sm border">
+        <div className="bg-card p-8 rounded-sm shadow-sm border">
           <h2 className="text-xl font-semibold text-destructive mb-4">Error Loading Dashboard</h2>
           <p className="text-muted-foreground mb-4">{error}</p>
           <button

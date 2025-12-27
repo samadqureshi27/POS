@@ -20,7 +20,7 @@ export const CashFlowChart: React.FC = () => {
   const currentCash = cashFlowData[cashFlowData.length - 1].cumulativeCash;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+    <div className="bg-white rounded-sm border border-gray-200 p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-semibold text-gray-900">Cash Flow Analysis</h3>
@@ -31,7 +31,7 @@ export const CashFlowChart: React.FC = () => {
 
       {/* Cash Flow Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gradient-to-r from-green-50 to-emerald-100 p-4 rounded-lg border border-green-200">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-100 p-4 rounded-sm border border-green-200">
           <div className="flex items-center gap-3">
             <DollarSign size={24} className="text-green-600" />
             <div>
@@ -42,7 +42,7 @@ export const CashFlowChart: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-sm border border-blue-200">
           <div className="flex items-center gap-3">
             <TrendingUp size={24} className="text-blue-600" />
             <div>
@@ -53,7 +53,7 @@ export const CashFlowChart: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-purple-50 to-violet-100 p-4 rounded-lg border border-purple-200">
+        <div className="bg-gradient-to-r from-purple-50 to-violet-100 p-4 rounded-sm border border-purple-200">
           <div className="flex items-center gap-3">
             <TrendingUp size={24} className="text-purple-600" />
             <div>
@@ -162,7 +162,7 @@ export const CashFlowChart: React.FC = () => {
       </div>
 
       {/* Insights */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+      <div className="mt-6 p-4 bg-gray-50 rounded-sm">
         <h4 className="text-sm font-medium text-gray-700 mb-2">Key Insights</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div className="flex items-center gap-2">

@@ -128,10 +128,10 @@ const EnhancedActionBarComponent: React.FC<EnhancedActionBarProps> = ({
           <div className="flex items-center gap-4 w-full sm:w-auto justify-end sm:justify-start mt-2 sm:mt-0 ml-auto">
             {/* View Mode Toggle */}
             {showViewToggle && onViewModeChange && (
-              <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+              <div className="flex gap-1 bg-gray-100 p-1 rounded-sm">
                 <button
                   onClick={() => onViewModeChange('grid')}
-                  className={`p-2 rounded-md transition-all ${viewMode === 'grid'
+                  className={`p-2 rounded-sm transition-all ${viewMode === 'grid'
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                     }`}
@@ -141,7 +141,7 @@ const EnhancedActionBarComponent: React.FC<EnhancedActionBarProps> = ({
                 </button>
                 <button
                   onClick={() => onViewModeChange('list')}
-                  className={`p-2 rounded-md transition-all ${viewMode === 'list'
+                  className={`p-2 rounded-sm transition-all ${viewMode === 'list'
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                     }`}

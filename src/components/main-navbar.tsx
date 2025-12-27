@@ -86,7 +86,7 @@ export default function Navbar({ title }: NavbarProps) {
   const navItemClass = "h-full flex items-center px-4 hover:bg-[#2E2E2E] transition-all transition-standard focus:outline-none text-[#D4AF37]";
 
   return (
-    <header className="fixed top-0 z-[500] w-full h-[64px]">
+    <header className="fixed top-0 left-0 right-0 z-[500] h-[64px]">
       <nav className="bg-[#1F1E1F] text-white w-full h-full shadow-md">
         <div className="w-full h-full flex items-center justify-between pl-0 pr-0">
 

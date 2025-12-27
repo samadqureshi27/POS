@@ -15,7 +15,7 @@ const profitLossData = [
 
 export const ProfitLossChart: React.FC = () => {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+    <div className="bg-white rounded-sm border border-gray-200 p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-semibold text-gray-900">Profit & Loss Trend</h3>
@@ -99,21 +99,21 @@ export const ProfitLossChart: React.FC = () => {
 
       {/* Key Metrics Summary */}
       <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="text-center p-3 bg-green-50 rounded-lg">
+        <div className="text-center p-3 bg-green-50 rounded-sm">
           <div className="text-lg font-bold text-green-700">
             PKR {formatTickValue(profitLossData[profitLossData.length - 1].revenue)}
           </div>
           <div className="text-xs text-green-600">Current Revenue</div>
         </div>
-        <div className="text-center p-3 bg-blue-50 rounded-lg">
+        <div className="text-center p-3 bg-blue-50 rounded-sm">
           <div className="text-lg font-bold text-blue-700">34.2%</div>
           <div className="text-xs text-blue-600">COGS Ratio</div>
         </div>
-        <div className="text-center p-3 bg-amber-50 rounded-lg">
+        <div className="text-center p-3 bg-amber-50 rounded-sm">
           <div className="text-lg font-bold text-amber-700">28.5%</div>
           <div className="text-xs text-amber-600">Labor Ratio</div>
         </div>
-        <div className="text-center p-3 bg-purple-50 rounded-lg">
+        <div className="text-center p-3 bg-purple-50 rounded-sm">
           <div className="text-lg font-bold text-purple-700">17.5%</div>
           <div className="text-xs text-purple-600">Net Margin</div>
         </div>

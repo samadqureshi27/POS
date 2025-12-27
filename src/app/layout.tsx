@@ -5,6 +5,7 @@ import DashboardWrapper from "@/components/dashboard-wrapper";
 import { ConditionalLayoutWrapper } from '@/components/conditional-layout-wrapper';
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/lib/hooks/useAuth";
+import { Toaster } from "@/components/ui/sonner";
 
 
 const manrope = Manrope({
@@ -40,6 +41,7 @@ export default function RootLayout({
             <ConditionalLayoutWrapper>
               {children}
             </ConditionalLayoutWrapper>
+            <Toaster position="top-right" richColors />
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -39,7 +39,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg">
+      <div className="bg-background/95 backdrop-blur-sm border border-border rounded-sm p-3 shadow-lg">
         <div className="flex items-center gap-2 mb-1">
           <div
             className="w-3 h-3 rounded-full"
@@ -72,7 +72,7 @@ const ModernOrderChart: React.FC<ModernOrderChartProps> = ({ data, loading }) =>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2 rounded-sm bg-primary/10">
               <TrendingUp size={16} className="text-primary" />
             </div>
             Order Distribution
@@ -126,7 +126,7 @@ const ModernOrderChart: React.FC<ModernOrderChartProps> = ({ data, loading }) =>
               {dataWithPercentages.slice(0, 4).map((item, index) => {
                 const IconComponent = getIcon(item.name);
                 return (
-                  <div key={item.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div key={item.name} className="flex items-center justify-between p-2 rounded-sm hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         <div

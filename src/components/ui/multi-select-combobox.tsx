@@ -121,7 +121,7 @@ export function MultiSelectCombobox({
                     <div
                       key={option.value}
                       className={cn(
-                        "flex items-center px-2 py-2 cursor-pointer rounded-md hover:bg-accent",
+                        "flex items-center px-2 py-2 cursor-pointer rounded-sm hover:bg-accent",
                         isSelected && "bg-accent"
                       )}
                       onClick={() => handleSelect(option.value)}

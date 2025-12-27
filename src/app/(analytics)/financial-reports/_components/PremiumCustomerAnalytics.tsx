@@ -76,7 +76,7 @@ const PremiumCustomerAnalytics: React.FC<PremiumCustomerAnalyticsProps> = ({ ana
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
-                    <div className={`w-12 h-12 rounded-xl bg-${metric.color}-100 flex items-center justify-center`}>
+                    <div className={`w-12 h-12 rounded-sm bg-${metric.color}-100 flex items-center justify-center`}>
                       <IconComponent size={24} className={`text-${metric.color}-600`} />
                     </div>
                     <div>
@@ -113,7 +113,7 @@ const PremiumCustomerAnalytics: React.FC<PremiumCustomerAnalyticsProps> = ({ ana
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-blue-100">
+                  <div className="p-2 rounded-sm bg-blue-100">
                     <TrendingUp size={18} className="text-blue-600" />
                   </div>
                   Customer Growth Trend

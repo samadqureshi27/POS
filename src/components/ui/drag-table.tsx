@@ -45,7 +45,7 @@ export const DragTable: React.FC<DragTableProps> = ({
   }
 
   return (
-    <div className={`border border-gray-200 rounded-lg bg-white overflow-hidden ${className}`}>
+    <div className={`border border-gray-200 rounded-sm bg-white overflow-hidden ${className}`}>
       {/* Header */}
       <div className="bg-gray-50/50 border-b border-gray-200">
         <div className="grid gap-4 p-3" style={{ gridTemplateColumns: `40px ${columns.map(col => col.width || 'minmax(0, 1fr)').join(' ')} ${showDelete ? '40px' : ''}` }}>

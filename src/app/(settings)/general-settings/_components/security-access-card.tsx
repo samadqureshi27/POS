@@ -58,7 +58,7 @@ const SecurityAccessCard: React.FC<SecurityAccessCardProps> = ({ settings, onSet
                     </div>
 
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-sm border">
                             <div className="flex-1">
                                 <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                                     <AlertTriangle size={14} className="text-orange-500" />
@@ -74,7 +74,7 @@ const SecurityAccessCard: React.FC<SecurityAccessCardProps> = ({ settings, onSet
                             />
                         </div>
 
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-sm border">
                             <div className="flex-1">
                                 <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                                     <AlertTriangle size={14} className="text-orange-500" />
@@ -129,7 +129,7 @@ const SecurityAccessCard: React.FC<SecurityAccessCardProps> = ({ settings, onSet
                 </div>
 
                 {/* Security Recommendations */}
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="p-4 bg-blue-50 rounded-sm border border-blue-200">
                     <h4 className="text-sm font-medium text-blue-900 mb-2">Security Recommendations</h4>
                     <ul className="text-xs text-blue-800 space-y-1">
                         <li className="flex items-start gap-2">

@@ -19,7 +19,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
 }) => {
   return (
     <div
-      className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-xl ${
+      className={`p-4 rounded-sm border transition-all duration-200 hover:shadow-xl ${
         notification.read
           ? 'bg-white border-gray-300 hover:border-gray-400'
           : 'bg-white border-gray-400 hover:border-black shadow-lg'
@@ -78,7 +78,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
               {!notification.read && (
                 <button
                   onClick={() => onMarkAsRead(notification.id)}
-                  className="p-1.5 text-gray-600 hover:text-black hover:bg-gray-300 rounded-md transition-colors border border-transparent hover:border-gray-400"
+                  className="p-1.5 text-gray-600 hover:text-black hover:bg-gray-300 rounded-sm transition-colors border border-transparent hover:border-gray-400"
                   title="Mark as read"
                 >
                   <Check className="h-4 w-4" />
@@ -86,7 +86,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
               )}
               <button
                 onClick={() => onDelete(notification.id)}
-                className="p-1.5 text-gray-600 hover:text-black hover:bg-gray-300 rounded-md transition-colors border border-transparent hover:border-gray-400"
+                className="p-1.5 text-gray-600 hover:text-black hover:bg-gray-300 rounded-sm transition-colors border border-transparent hover:border-gray-400"
                 title="Delete"
               >
                 <Trash2 className="h-4 w-4" />

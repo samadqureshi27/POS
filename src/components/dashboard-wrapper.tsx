@@ -15,7 +15,7 @@ export default function DashboardWrapper({ children, hasSubmenu = false }: Dashb
   const { pageTitle } = useNavigation();
 
   return (
-    <div className="min-h-screen bg-[#F7F7F8] overflow-x-hidden max-w-full">
+    <div className="bg-[#F7F7F8] overflow-x-hidden max-w-full">
       <Navbar title={pageTitle} />
       <Sidebar />
 
@@ -25,11 +25,10 @@ export default function DashboardWrapper({ children, hasSubmenu = false }: Dashb
         lg:ml-16 
         ${hasSubmenu ? 'pt-[128px]' : 'pt-16'}
         pb-20 lg:pb-4
-        min-h-screen
-        overflow-y-auto overflow-x-hidden
+        overflow-x-hidden
         min-w-0 max-w-full
       `}>
-        <div className="w-full h-full min-w-0 max-w-full overflow-x-hidden">
+        <div className="w-full min-w-0 max-w-full overflow-x-hidden">
           {children}
         </div>
       </main>

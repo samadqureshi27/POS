@@ -87,7 +87,7 @@ export const DateFilter: React.FC<DateFilterProps> = ({ dateFilter }) => {
                                             }
                                         }}
                                         moveRangeOnFirstSelection={false}
-                                        className="rounded-lg calendar-mobile-responsive"
+                                        className="rounded-sm calendar-mobile-responsive"
                                     />
                                 </div>
                             )}

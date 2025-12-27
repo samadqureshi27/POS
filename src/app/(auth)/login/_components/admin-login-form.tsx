@@ -78,7 +78,7 @@ const AdminLoginForm: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="EMAIL-OR-NUMBER"
             disabled={isLoading}
-            className="placeholder-gray-400 text-sm tracking-wide rounded-xl py-3 sm:py-4 pl-12"
+            className="placeholder-gray-400 text-sm tracking-wide rounded-sm py-3 sm:py-4 pl-12"
           />
           <User size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
           {validationErrors.email && (
@@ -93,7 +93,7 @@ const AdminLoginForm: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="PASSWORD"
             disabled={isLoading}
-            className="placeholder-gray-400 text-sm tracking-wide rounded-xl py-3 sm:py-4 pl-12"
+            className="placeholder-gray-400 text-sm tracking-wide rounded-sm py-3 sm:py-4 pl-12"
           />
           <Lock size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
           {validationErrors.password && (
@@ -106,7 +106,7 @@ const AdminLoginForm: React.FC = () => {
           <Button
             type="submit"
             size="lg"
-            className="h-11 w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
+            className="h-11 w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-sm text-xs sm:text-sm"
             disabled={isLoading}
             onClick={handleLogin}
           >

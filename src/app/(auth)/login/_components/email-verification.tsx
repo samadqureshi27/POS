@@ -113,7 +113,7 @@ const EmailVerificationOverlay: React.FC = () => {
               maxLength={1}
               value={digit}
               onChange={(e) => handleOtpChange(index, e.target.value)}
-              className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold rounded-lg"
+              className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold rounded-sm"
               style={{
                 backgroundColor: digit ? "#fff5f0" : "white",
                 borderColor: digit ? "#fb923c" : "#d1d5db",
@@ -128,7 +128,7 @@ const EmailVerificationOverlay: React.FC = () => {
             type="button"
             variant="ghost"
             size="lg"
-            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
+            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-sm text-xs sm:text-sm"
             disabled={isLoading || otpCode.join("").length !== 5}
             onClick={handleVerifyOtp}
           >

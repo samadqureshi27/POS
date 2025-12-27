@@ -69,7 +69,7 @@ export const DashboardSection: React.FC<DashboardSectionProps> = ({
 
   if (!isVisible) {
     return (
-      <div className="flex items-center justify-between p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50">
+      <div className="flex items-center justify-between p-4 border border-dashed border-gray-300 rounded-sm bg-gray-50">
         <div className="flex items-center gap-3">
           <EyeOff size={16} className="text-gray-400" />
           <span className="text-sm text-gray-500">{title} (Hidden)</span>
