@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { UtensilsCrossed, Settings, Plus, Trash2 } from "lucide-react";
+import { UtensilsCrossed, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
+import { GridActionButtons } from "@/components/ui/grid-action-buttons";
 import { Toaster } from "@/components/ui/sonner";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { PageContainer } from "@/components/ui/page-container";
@@ -220,48 +220,32 @@ const BranchMenuPage = () => {
         getItemId={(item) => item._id || item.id || ""}
         customActions={(item) => {
           const isAssigned = !!item.branchConfig;
-          return (
-            <div className="flex items-center gap-2">
-              {isAssigned ? (
-                <>
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditModal(item);
-                    }}
-                    disabled={actionLoading}
-                    className="px-4 py-2 text-sm rounded-md bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <Settings className="h-4 w-4 mr-1" />
-                    Configure
-                  </Button>
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemove(item);
-                    }}
-                    disabled={actionLoading}
-                    className="px-4 py-2 text-sm rounded-md bg-red-600 hover:bg-red-700 text-white"
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Remove
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openAddModal(item);
-                  }}
-                  disabled={actionLoading}
-                  className="px-4 py-2 text-sm rounded-md bg-green-600 hover:bg-green-700 text-white"
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add to Menu
-                </Button>
-              )}
-            </div>
-          );
+          const actions = [];
+
+          if (isAssigned) {
+            actions.push(
+              {
+                label: "Configure",
+                onClick: () => openEditModal(item),
+                variant: "custom" as const,
+                className: "bg-blue-600 hover:bg-blue-700 text-white",
+              },
+              {
+                label: "Remove",
+                onClick: () => handleRemove(item),
+                variant: "delete" as const,
+              }
+            );
+          } else {
+            actions.push({
+              label: "Add to Menu",
+              onClick: () => openAddModal(item),
+              variant: "custom" as const,
+              className: "bg-green-600 hover:bg-green-700 text-white",
+            });
+          }
+
+          return <GridActionButtons actions={actions} />;
         }}
         // Pagination props
         showPagination={true}

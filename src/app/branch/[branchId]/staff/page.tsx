@@ -12,6 +12,7 @@ import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { GridActionButtons } from "@/components/ui/grid-action-buttons";
 import { cn } from "@/lib/utils";
 import { useStaff } from "@/lib/hooks/useStaff";
 import StaffModal from "./_components/staff-modal";
@@ -221,47 +222,33 @@ const StaffManagementPage = () => {
         emptyTitle="No staff members found"
         emptyDescription="Start by adding your first staff member"
         getItemId={(item) => item._id || item.id || ""}
-        customActions={(item) => (
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                openEditModal(item);
-              }}
-              disabled={actionLoading}
-              className="px-4 py-2 text-sm rounded-md bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Edit2 className="h-4 w-4 mr-1" />
-              Edit
-            </Button>
-            {item.status === "active" && (
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStatusChange(item, "suspended");
-                }}
-                disabled={actionLoading}
-                className="px-4 py-2 text-sm rounded-md bg-orange-600 hover:bg-orange-700 text-white"
-              >
-                <Settings className="h-4 w-4 mr-1" />
-                Suspend
-              </Button>
-            )}
-            {item.status === "suspended" && (
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStatusChange(item, "active");
-                }}
-                disabled={actionLoading}
-                className="px-4 py-2 text-sm rounded-md bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Settings className="h-4 w-4 mr-1" />
-                Activate
-              </Button>
-            )}
-          </div>
-        )}
+        customActions={(item) => {
+          const actions = [
+            {
+              label: "Edit",
+              onClick: () => openEditModal(item),
+              variant: "edit" as const,
+            },
+          ];
+
+          if (item.status === "active") {
+            actions.push({
+              label: "Suspend",
+              onClick: () => handleStatusChange(item, "suspended"),
+              variant: "custom" as const,
+              className: "bg-orange-600 hover:bg-orange-700 text-white",
+            });
+          } else if (item.status === "suspended") {
+            actions.push({
+              label: "Activate",
+              onClick: () => handleStatusChange(item, "active"),
+              variant: "custom" as const,
+              className: "bg-green-600 hover:bg-green-700 text-white",
+            });
+          }
+
+          return <GridActionButtons actions={actions} />;
+        }}
         // Pagination props
         showPagination={true}
         currentPage={currentPage}

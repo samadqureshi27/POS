@@ -1,20 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { X, Loader2, Check } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Loader2, Info } from "lucide-react";
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ChipMultiSelect, type ChipOption } from "@/components/ui/chip-multiselect";
+import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import type { TenantStaff } from "@/lib/services/staff-service";
+import { StaffService } from "@/lib/services/staff-service";
 import { BranchService, type TenantBranch } from "@/lib/services/branch-service";
+import { PosService, type PosTerminal } from "@/lib/services/pos-service";
 import { toast } from "sonner";
 
 interface StaffModalProps {
@@ -36,16 +41,17 @@ const StaffModal: React.FC<StaffModalProps> = ({
   onUpdate,
   actionLoading,
 }) => {
+  const formId = "staff-modal-form";
   // Determine if we're editing
   const isEditing = Boolean(item?._id || item?.id);
 
   // Branches state
   const [branches, setBranches] = useState<TenantBranch[]>([]);
   const [loadingBranches, setLoadingBranches] = useState(false);
-  const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
 
-  // Roles dropdown state
-  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+  // POS Terminals state
+  const [posTerminals, setPosTerminals] = useState<PosTerminal[]>([]);
+  const [loadingTerminals, setLoadingTerminals] = useState(false);
 
   // Available roles
   const availableRoles = ["staff", "cashier", "supervisor", "manager", "waiter", "chef", "cleaner"];
@@ -59,33 +65,109 @@ const StaffModal: React.FC<StaffModalProps> = ({
     roles: [],
     roleGrants: [],
     pin: "",
-    position: "",
     status: "active",
     metadata: {},
   });
+
+  // Phone number state (separate from TenantStaff type)
+  const [phone, setPhone] = useState<string>("");
+
+  // POS IDs state (separate from TenantStaff type)
+  const [posIds, setPosIds] = useState<string[]>([]);
+
+  // Check roles for conditional fields
+  const isCashier = formData.roles?.includes("cashier");
+  const isManager = formData.roles?.includes("manager");
+  const showPosTerminals = isCashier || isManager;
+  const hasOtherRoles = !formData.roles || formData.roles.length === 0 || formData.roles.some(role => role !== "cashier" && role !== "manager");
+
+  // Convert branches to ChipOption format
+  const branchOptions = useMemo<ChipOption[]>(() => {
+    return branches.map((branch) => ({
+      id: branch._id || branch.id || "",
+      label: branch.code ? `${branch.name} (${branch.code})` : branch.name,
+    }));
+  }, [branches]);
+
+  // Convert roles to ChipOption format
+  const roleOptions = useMemo<ChipOption[]>(() => {
+    return availableRoles.map((role) => ({
+      id: role,
+      label: role.charAt(0).toUpperCase() + role.slice(1),
+    }));
+  }, []);
+
+  // Convert POS terminals to ChipOption format
+  const posTerminalOptions = useMemo<ChipOption[]>(() => {
+    return posTerminals.map((terminal) => ({
+      id: terminal._id || terminal.id || "",
+      label: terminal.name,
+    }));
+  }, [posTerminals]);
 
   // Load branches when modal opens
   useEffect(() => {
     if (isOpen) {
       loadBranches();
+      // If editing, fetch full staff details to get phone, pin, posIds, etc.
+      if (item && (item._id || item.id)) {
+        loadFullStaffDetails(item._id || item.id!);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, item?._id, item?.id]);
 
-  // Close dropdowns when clicking outside
+  const loadFullStaffDetails = async (staffId: string) => {
+    try {
+      const response = await StaffService.getStaff(staffId);
+      if (response.success && response.data) {
+        const fullStaff = response.data;
+        // Update form data with full staff details
+        setFormData({
+          fullName: fullStaff.fullName || "",
+          email: fullStaff.email || "",
+          password: "", // Never populate password
+          branchIds: fullStaff.branchIds || (branchId ? [branchId] : []),
+          roles: fullStaff.roles || [],
+          roleGrants: fullStaff.roleGrants || [],
+          pin: fullStaff.pin || "",
+          status: fullStaff.status || "active",
+          metadata: fullStaff.metadata || {},
+        });
+        // Set phone from full staff data
+        setPhone((fullStaff as any).phone || (fullStaff.metadata as any)?.phone || "");
+        // Set POS IDs from full staff data
+        setPosIds((fullStaff as any).posIds || []);
+      }
+    } catch (error) {
+      console.error("Error loading full staff details:", error);
+      // Don't show error toast as the item prop might still have basic data
+    }
+  };
+
+  // Load POS terminals when branches or roles change (for cashier/manager)
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (branchDropdownOpen && !target.closest('.branch-dropdown-container')) {
-        setBranchDropdownOpen(false);
+    if (isOpen && showPosTerminals && formData.branchIds && formData.branchIds.length > 0) {
+      loadPosTerminals();
+    } else {
+      // Clear terminals if conditions not met
+      setPosTerminals([]);
+      // Also clear selected POS IDs if roles don't require terminals
+      if (!showPosTerminals) {
+        setPosIds([]);
       }
-      if (roleDropdownOpen && !target.closest('.role-dropdown-container')) {
-        setRoleDropdownOpen(false);
-      }
-    };
+    }
+  }, [isOpen, showPosTerminals, formData.branchIds]);
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [branchDropdownOpen, roleDropdownOpen]);
+  // Filter out invalid POS IDs when terminals list changes
+  useEffect(() => {
+    if (posTerminals.length > 0 && posIds.length > 0) {
+      const validTerminalIds = posTerminals.map((t) => t._id || t.id || "").filter(Boolean);
+      const validPosIds = posIds.filter((id) => validTerminalIds.includes(id));
+      if (validPosIds.length !== posIds.length) {
+        setPosIds(validPosIds);
+      }
+    }
+  }, [posTerminals]);
 
   const loadBranches = async () => {
     try {
@@ -102,9 +184,50 @@ const StaffModal: React.FC<StaffModalProps> = ({
     }
   };
 
-  // Update form data when item changes
+  const loadPosTerminals = async () => {
+    if (!formData.branchIds || formData.branchIds.length === 0) {
+      setPosTerminals([]);
+      return;
+    }
+
+    try {
+      setLoadingTerminals(true);
+      // Fetch terminals for all selected branches and combine them
+      const terminalPromises = formData.branchIds.map((branchId) =>
+        PosService.getTerminalsByBranch(branchId)
+      );
+      
+      const results = await Promise.all(terminalPromises);
+      const allTerminals: PosTerminal[] = [];
+      
+      results.forEach((result) => {
+        if (result.success && result.data) {
+          allTerminals.push(...result.data);
+        }
+      });
+
+      // Remove duplicates based on terminal ID
+      const uniqueTerminals = allTerminals.filter(
+        (terminal, index, self) =>
+          index === self.findIndex((t) => (t._id || t.id) === (terminal._id || terminal.id))
+      );
+
+      setPosTerminals(uniqueTerminals);
+    } catch (error) {
+      console.error("Error loading POS terminals:", error);
+      toast.error("Failed to load POS terminals");
+      setPosTerminals([]);
+    } finally {
+      setLoadingTerminals(false);
+    }
+  };
+
+  // Update form data when item changes (for initial load from list)
+  // Note: If editing, loadFullStaffDetails will override this with complete data
   useEffect(() => {
     if (item) {
+      // Set basic data from item prop (might be partial from list view)
+      // This provides initial values while full details are being fetched
       setFormData({
         fullName: item.fullName || "",
         email: item.email || "",
@@ -113,10 +236,13 @@ const StaffModal: React.FC<StaffModalProps> = ({
         roles: item.roles || [],
         roleGrants: item.roleGrants || [],
         pin: item.pin || "",
-        position: item.position || "",
         status: item.status || "active",
         metadata: item.metadata || {},
       });
+      // Set phone from item if available (check both top-level and metadata)
+      setPhone((item as any).phone || (item.metadata as any)?.phone || "");
+      // Set POS IDs from item if available
+      setPosIds((item as any).posIds || []);
     } else {
       // Reset for new staff
       setFormData({
@@ -127,10 +253,11 @@ const StaffModal: React.FC<StaffModalProps> = ({
         roles: [],
         roleGrants: [],
         pin: "",
-        position: "",
         status: "active",
         metadata: {},
       });
+      setPhone("");
+      setPosIds([]);
     }
   }, [item, branchId]);
 
@@ -143,9 +270,22 @@ const StaffModal: React.FC<StaffModalProps> = ({
       return;
     }
 
+    if (hasOtherRoles) {
     if (!formData.email?.trim()) {
       toast.error("Please enter email address");
       return;
+      }
+      if (!isEditing && !formData.password?.trim()) {
+        toast.error("Please enter password for new staff member");
+        return;
+      }
+    }
+
+    if (isCashier && !isEditing) {
+      if (!formData.pin || formData.pin.length !== 6) {
+        toast.error("Please enter a 6-digit PIN for the cashier");
+        return;
+      }
     }
 
     if (!formData.branchIds || formData.branchIds.length === 0) {
@@ -153,31 +293,58 @@ const StaffModal: React.FC<StaffModalProps> = ({
       return;
     }
 
-    if (!isEditing && !formData.password?.trim()) {
-      toast.error("Please enter password for new staff member");
-      return;
-    }
-
     // Build payload matching API structure
-    const payload: Partial<TenantStaff> = {
+    // For CREATE: use branchIds (array)
+    // For UPDATE: use assignedBranchId (singular, first branch from array)
+    const payload: any = {
       fullName: formData.fullName,
       email: formData.email,
-      branchIds: formData.branchIds || [],
       roles: formData.roles || [],
-      roleGrants: formData.roleGrants || [],
+      isStaff: true,
       status: formData.status || "active",
     };
 
-    // Only include password if provided
+    // Branch assignment: array for create, singular for update
+    if (isEditing) {
+      // UPDATE: Use assignedBranchId (singular) - staff can only be assigned to one branch
+      const firstBranchId = formData.branchIds && formData.branchIds.length > 0 
+        ? formData.branchIds[0] 
+        : (branchId || null);
+      if (firstBranchId) {
+        payload.assignedBranchId = firstBranchId;
+      }
+    } else {
+      // CREATE: Use branchIds (array)
+      payload.branchIds = formData.branchIds || [];
+    }
+
+    // Include phone if provided - always check current state value
+    const phoneValue = phone?.trim() || "";
+    if (phoneValue) {
+      payload.phone = phoneValue;
+    }
+
+    // Always include posIds when cashier/manager role is selected or when editing
+    // Check roles directly from formData to ensure we catch the current state
+    const hasCashierOrManager = formData.roles?.some(role => role === "cashier" || role === "manager");
+    if (hasCashierOrManager || isEditing) {
+      payload.posIds = Array.isArray(posIds) ? posIds : [];
+    }
+
+    // Only include password if provided (for non-cashier roles)
     if (formData.password) {
       payload.password = formData.password;
     }
 
     // Optional fields
     if (formData.pin) payload.pin = formData.pin;
-    if (formData.position) payload.position = formData.position;
-    if (formData.metadata) payload.metadata = formData.metadata;
-    if (branchId) payload.branchId = branchId;
+    if (formData.roleGrants && formData.roleGrants.length > 0) {
+      payload.roleGrants = formData.roleGrants;
+    }
+    // Include other metadata fields if any
+    if (formData.metadata && Object.keys(formData.metadata).length > 0) {
+      payload.metadata = formData.metadata;
+    }
 
     if (isEditing && (item?._id || item?.id)) {
       await onUpdate(item._id || item.id!, payload);
@@ -193,323 +360,217 @@ const StaffModal: React.FC<StaffModalProps> = ({
     }));
   };
 
-  const handleToggleRole = (role: string) => {
-    const currentRoles = formData.roles || [];
-    const newRoles = currentRoles.includes(role)
-      ? currentRoles.filter(r => r !== role)
-      : [...currentRoles, role];
-    handleInputChange("roles", newRoles);
+  const handleBranchChange = (selectedIds: string[]) => {
+    handleInputChange("branchIds", selectedIds);
   };
 
-  const handleToggleBranch = (branchObjId: string) => {
-    const currentBranchIds = formData.branchIds || [];
-    const newBranchIds = currentBranchIds.includes(branchObjId)
-      ? currentBranchIds.filter(id => id !== branchObjId)
-      : [...currentBranchIds, branchObjId];
-    handleInputChange("branchIds", newBranchIds);
+  const handleRoleChange = (selectedIds: string[]) => {
+    handleInputChange("roles", selectedIds);
   };
 
-  if (!isOpen) return null;
+  const handlePosTerminalChange = (selectedIds: string[]) => {
+    setPosIds(selectedIds);
+  };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={(e) => e.stopPropagation()}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Staff Member" : "Add New Staff Member"}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {isEditing ? "Update staff member details" : "Fill in the details to add a new staff member"}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            disabled={actionLoading}
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        size="3xl" 
+        fullHeight 
+        onInteractOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <DialogHeader className="space-y-1">
+          <DialogTitle className="text-xl">
+            {isEditing ? "Edit Staff Member" : "Add New Staff Member"}
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
-          <div className="space-y-6">
-            {/* Full Name */}
-            <div>
-              <Label htmlFor="fullName" className="text-sm font-medium text-gray-700">
-                Full Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="fullName"
-                type="text"
-                value={formData.fullName || ""}
-                onChange={(e) => handleInputChange("fullName", e.target.value)}
-                className="mt-1"
-                disabled={actionLoading}
-                placeholder="Enter full name"
-                required
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Email Address <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email || ""}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className="mt-1"
-                disabled={actionLoading}
-                placeholder="staff@example.com"
-                required
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                Password {!isEditing && <span className="text-red-500">*</span>}
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password || ""}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                className="mt-1"
-                disabled={actionLoading}
-                placeholder={isEditing ? "Leave empty to keep current password" : "Enter password"}
-                required={!isEditing}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {isEditing ? "Leave empty to keep current password" : "Minimum 8 characters recommended"}
-              </p>
-            </div>
-
-            {/* Branches - Multi-select */}
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Assigned Branches <span className="text-red-500">*</span>
-              </Label>
-              <div className="mt-1 relative branch-dropdown-container">
-                <div
-                  className="min-h-[40px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm cursor-pointer hover:border-gray-400 transition-colors"
-                  onClick={() => !actionLoading && !loadingBranches && setBranchDropdownOpen(!branchDropdownOpen)}
-                >
-                  {loadingBranches ? (
-                    <div className="flex items-center gap-2 text-gray-500">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Loading branches...</span>
-                    </div>
-                  ) : formData.branchIds && formData.branchIds.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {formData.branchIds.map((branchObjId) => {
-                        const branch = branches.find(b => (b._id || b.id) === branchObjId);
-                        return branch ? (
-                          <span
-                            key={branchObjId}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium"
-                          >
-                            {branch.name}
-                            <X
-                              className="h-3 w-3 cursor-pointer hover:text-blue-900"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleBranch(branchObjId);
-                              }}
-                            />
-                          </span>
-                        ) : null;
-                      })}
-                    </div>
-                  ) : (
-                    <span className="text-gray-400">Select branches...</span>
-                  )}
-                </div>
-
-                {/* Dropdown */}
-                {branchDropdownOpen && (
-                  <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                    {branches.length === 0 ? (
-                      <div className="px-3 py-2 text-sm text-gray-500">No branches available</div>
-                    ) : (
-                      branches.map((branch) => {
-                        const branchObjId = branch._id || branch.id || "";
-                        const isSelected = formData.branchIds?.includes(branchObjId);
-                        return (
-                          <div
-                            key={branchObjId}
-                            className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                            onClick={() => handleToggleBranch(branchObjId)}
-                          >
-                            <div className={`h-4 w-4 rounded border flex items-center justify-center ${
-                              isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
-                            }`}>
-                              {isSelected && <Check className="h-3 w-3 text-white" />}
-                            </div>
-                            <span className="text-sm text-gray-700">{branch.name}</span>
-                            {branch.code && (
-                              <span className="text-xs text-gray-400">({branch.code})</span>
-                            )}
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Select one or more branches to assign this staff member to
-              </p>
-            </div>
-
-            {/* Position */}
-            <div>
-              <Label htmlFor="position" className="text-sm font-medium text-gray-700">
-                Position
-              </Label>
-              <Input
-                id="position"
-                type="text"
-                value={formData.position || ""}
-                onChange={(e) => handleInputChange("position", e.target.value)}
-                className="mt-1"
-                disabled={actionLoading}
-                placeholder="e.g., Cashier, Manager, Waiter"
-              />
-            </div>
-
-            {/* PIN */}
-            <div>
-              <Label htmlFor="pin" className="text-sm font-medium text-gray-700">
-                PIN (4 digits)
-              </Label>
-              <Input
-                id="pin"
-                type="text"
-                value={formData.pin || ""}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "").slice(0, 4);
-                  handleInputChange("pin", value);
-                }}
-                className="mt-1"
-                disabled={actionLoading}
-                placeholder="1234"
-                maxLength={4}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                4-digit PIN for quick access
-              </p>
-            </div>
-
-            {/* Roles - Multi-select */}
-            <div className="pt-4 border-t border-gray-200">
-              <Label className="text-sm font-medium text-gray-700">
-                Roles <span className="text-red-500">*</span>
-              </Label>
-              <div className="mt-1 relative role-dropdown-container">
-                <div
-                  className="min-h-[40px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm cursor-pointer hover:border-gray-400 transition-colors"
-                  onClick={() => !actionLoading && setRoleDropdownOpen(!roleDropdownOpen)}
-                >
-                  {formData.roles && formData.roles.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {formData.roles.map((role) => (
-                        <span
-                          key={role}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium capitalize"
-                        >
-                          {role}
-                          <X
-                            className="h-3 w-3 cursor-pointer hover:text-purple-900"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleRole(role);
-                            }}
-                          />
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-gray-400">Select roles...</span>
-                  )}
-                </div>
-
-                {/* Dropdown */}
-                {roleDropdownOpen && (
-                  <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                    {availableRoles.map((role) => {
-                      const isSelected = formData.roles?.includes(role);
-                      return (
-                        <div
-                          key={role}
-                          className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                          onClick={() => handleToggleRole(role)}
-                        >
-                          <div className={`h-4 w-4 rounded border flex items-center justify-center ${
-                            isSelected ? 'bg-purple-600 border-purple-600' : 'border-gray-300'
-                          }`}>
-                            {isSelected && <Check className="h-3 w-3 text-white" />}
-                          </div>
-                          <span className="text-sm text-gray-700 capitalize">{role}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Select one or more roles for this staff member
-              </p>
-            </div>
-
-            {/* Status */}
-            <div className="space-y-4 pt-4 border-t border-gray-200">
-              <h3 className="font-semibold text-gray-900">Status</h3>
-
-              <div>
-                <Label htmlFor="status" className="text-sm font-medium text-gray-700">
-                  Status
+        <DialogBody className="space-y-8">
+          <form id={formId} onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Full Name */}
+              <div className="md:col-span-1">
+                <Label htmlFor="fullName" className="text-sm font-medium text-[#656565]">
+                  Full Name <span className="text-red-500">*</span>
                 </Label>
-                <Select
-                  value={formData.status || "active"}
-                  onValueChange={(value: "active" | "inactive" | "suspended") =>
-                    handleInputChange("status", value)
+                <Input
+                  id="fullName"
+                  type="text"
+                  value={formData.fullName || ""}
+                  onChange={(e) => handleInputChange("fullName", e.target.value)}
+                  className="mt-1.5"
+                  disabled={actionLoading}
+                  placeholder="Enter full name"
+                  required
+                />
+              </div>
+
+              {/* Email - Conditional */}
+              {hasOtherRoles && (
+              <div className="md:col-span-1">
+                <Label htmlFor="email" className="text-sm font-medium text-[#656565]">
+                  Email Address <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email || ""}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  className="mt-1.5"
+                  disabled={actionLoading}
+                  placeholder="staff@example.com"
+                  required
+                />
+              </div>
+              )}
+
+              {/* Password - Conditional */}
+              {hasOtherRoles && (
+              <div className="md:col-span-1">
+                <Label htmlFor="password" className="text-sm font-medium text-[#656565]">
+                  Password {!isEditing && <span className="text-red-500">*</span>}
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password || ""}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  className="mt-1.5"
+                  disabled={actionLoading}
+                  placeholder={isEditing ? "Leave empty to keep current password" : "Enter password"}
+                  required={!isEditing}
+                />
+              </div>
+              )}
+
+              {/* Phone Number */}
+              <div className="md:col-span-1">
+                <Label htmlFor="phone" className="text-sm font-medium text-[#656565]">
+                  Phone Number
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="mt-1.5"
+                  disabled={actionLoading}
+                  placeholder="+966501234569"
+                />
+              </div>
+
+              {/* PIN - Only for cashier role, and only when creating (not editing) */}
+              {isCashier && !isEditing && (
+              <div className="md:col-span-1">
+                <Label htmlFor="pin" className="text-sm font-medium text-[#656565]">
+                    PIN (6 digits) <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="pin"
+                  type="text"
+                  value={formData.pin || ""}
+                  onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+                    handleInputChange("pin", value);
+                  }}
+                  className="mt-1.5"
+                  disabled={actionLoading}
+                    placeholder="123456"
+                    maxLength={6}
+                    required
+                />
+              </div>
+              )}
+
+            </div>
+
+            {/* Branches - Multi-select - Full width */}
+            <div className="w-full">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Label className="text-sm font-medium text-[#656565]">
+                  Assigned Branches <span className="text-red-500">*</span>
+                </Label>
+                <CustomTooltip label="Select one or more branches to assign this staff member to" direction="right">
+                  <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                </CustomTooltip>
+              </div>
+              <ChipMultiSelect
+                value={formData.branchIds || []}
+                options={branchOptions}
+                placeholder="Nothing selected"
+                loading={loadingBranches}
+                disabled={actionLoading}
+                onChange={handleBranchChange}
+              />
+            </div>
+
+            {/* Roles - Multi-select - Full width */}
+            <div className="w-full">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Label className="text-sm font-medium text-[#656565]">
+                  Roles <span className="text-red-500">*</span>
+                </Label>
+                <CustomTooltip label="Select one or more roles for this staff member" direction="right">
+                  <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                </CustomTooltip>
+              </div>
+              <ChipMultiSelect
+                value={formData.roles || []}
+                options={roleOptions}
+                placeholder="Nothing selected"
+                disabled={actionLoading}
+                onChange={handleRoleChange}
+              />
+            </div>
+
+            {/* POS Terminals - Conditional on cashier/manager role - Full width */}
+            {showPosTerminals && (
+              <div className="w-full">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Label className="text-sm font-medium text-[#656565]">
+                    POS Terminals
+                  </Label>
+                  <CustomTooltip 
+                    label={!formData.branchIds || formData.branchIds.length === 0
+                      ? "Select branches first to see available POS terminals"
+                      : "Select POS terminals for this staff member (optional)"} 
+                    direction="right"
+                  >
+                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                  </CustomTooltip>
+                </div>
+                <ChipMultiSelect
+                  value={posIds}
+                  options={posTerminalOptions}
+                  placeholder="Nothing selected"
+                  loading={loadingTerminals}
+                  disabled={actionLoading || loadingBranches || !formData.branchIds || formData.branchIds.length === 0}
+                  onChange={handlePosTerminalChange}
+                />
+              </div>
+            )}
+
+            {/* Status at end, full width */}
+            <div className="w-full">
+              <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3 w-full">
+                <span className="text-[#1f2937] text-sm font-medium">Active</span>
+                <Switch
+                  checked={(formData.status || "active") === "active"}
+                  onCheckedChange={(checked) =>
+                    handleInputChange("status", checked ? "active" : "inactive")
                   }
                   disabled={actionLoading}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="suspended">Suspended</SelectItem>
-                  </SelectContent>
-                </Select>
+                />
               </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </DialogBody>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={actionLoading}
-            className="px-6"
-          >
-            Cancel
-          </Button>
+        <DialogFooter className="flex items-center justify-start gap-2">
           <Button
             type="submit"
-            onClick={handleSubmit}
+            form={formId}
             disabled={actionLoading}
             className="px-6 bg-gray-900 hover:bg-black text-white"
           >
@@ -522,9 +583,18 @@ const StaffModal: React.FC<StaffModalProps> = ({
               <>{isEditing ? "Update Staff Member" : "Add Staff Member"}</>
             )}
           </Button>
-        </div>
-      </div>
-    </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={actionLoading}
+            className="px-6"
+          >
+            Cancel
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

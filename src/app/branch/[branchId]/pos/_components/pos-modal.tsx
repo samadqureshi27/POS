@@ -1,13 +1,22 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MonitorCheck, Loader2 } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Loader2, Info } from "lucide-react";
+import {
+    Dialog,
+    DialogBody,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { CustomTooltip } from "@/components/ui/custom-tooltip";
+import { BranchService } from "@/lib/services/branch-service";
 import { PosItem, PosModalFormData } from "@/lib/types/pos";
 
 interface PosModalProps {
@@ -34,12 +43,25 @@ const PosModal: React.FC<PosModalProps> = ({
     onStatusChange,
 }) => {
     const [activeTab, setActiveTab] = useState("basic-info");
+    const [branchName, setBranchName] = useState<string>("");
 
     useEffect(() => {
         if (isOpen) {
             setActiveTab("basic-info");
+            // Fetch branch name
+            if (branchId) {
+                BranchService.getBranch(branchId)
+                    .then((response) => {
+                        if (response.success && response.data) {
+                            setBranchName(response.data.name || "");
+                        }
+                    })
+                    .catch(() => {
+                        // Silently fail, will just show branchId
+                    });
+            }
         }
-    }, [isOpen]);
+    }, [isOpen, branchId]);
 
     const isFormValid = () => {
         return formData.POS_Name.trim() && formData.machineId?.trim();
@@ -47,52 +69,42 @@ const PosModal: React.FC<PosModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent size="3xl" fullHeight onInteractOutside={(e) => e.preventDefault()}>
-                {/* Header */}
-                <div className="p-5 border-b border-gray-200 flex-shrink-0">
-                    <div className="flex items-center gap-2">
-                        <MonitorCheck className="h-5 w-5 text-gray-700" />
-                        <DialogTitle className="text-xl font-bold text-gray-900">
-                            {editingItem ? "Edit POS Terminal" : `Add POS Terminal - Branch #${branchId}`}
-                        </DialogTitle>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                        {editingItem ? "Update POS terminal configuration and status" : "Create a new POS terminal for this branch"}
-                    </p>
-                </div>
+            <DialogContent 
+                size="3xl" 
+                fullHeight 
+                onInteractOutside={(e) => e.preventDefault()}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+            >
+                <DialogHeader>
+                    <DialogTitle className="text-xl">
+                        {editingItem ? "Edit POS Terminal" : `Add POS Terminal${branchName ? ` - ${branchName}` : branchId ? ` - Branch #${branchId}` : ""}`}
+                    </DialogTitle>
+                </DialogHeader>
 
-                {/* Content */}
-                <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+                <DialogBody className="flex-1 flex flex-col min-h-0 p-0">
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-                        {/* Tab List */}
-                        <div className="px-5 pt-3 pb-3 border-b border-gray-100 flex-shrink-0">
-                            <div className="flex flex-col gap-2">
-                                <div className="flex justify-center">
-                                    <TabsList className="grid w-full max-w-sm grid-cols-2 h-9">
-                                        <TabsTrigger value="basic-info" className="text-sm">
-                                            Basic Info
-                                        </TabsTrigger>
-                                        <TabsTrigger value="settings" className="text-sm">
-                                            Settings
-                                        </TabsTrigger>
-                                    </TabsList>
-                                </div>
-                                <p className="text-xs text-gray-600 text-center">
-                                    {activeTab === "basic-info"
-                                        ? "Enter POS terminal name and identifier"
-                                        : "Configure terminal status and availability"}
-                                </p>
-                            </div>
+                        <div className="px-8 pb-6 pt-2 flex-shrink-0 min-w-0 max-w-full">
+                            <TabsList className="w-full grid grid-cols-2">
+                                <TabsTrigger value="basic-info">
+                                    Basic Info
+                                </TabsTrigger>
+                                <TabsTrigger value="settings">
+                                    Settings
+                                </TabsTrigger>
+                            </TabsList>
                         </div>
 
-                        {/* Tab Content */}
-                        <div className="flex-1 overflow-y-auto p-5 min-h-0">
-                            <TabsContent value="basic-info" className="mt-0 space-y-4">
-                                {/* POS Name */}
+                        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 pl-8 pr-8 space-y-8 pt-4 min-w-0 max-w-full">
+                            <TabsContent value="basic-info" className="mt-0 space-y-8">
                                 <div>
-                                    <Label htmlFor="posName" className="text-sm font-medium">
-                                        POS Name <span className="text-destructive">*</span>
-                                    </Label>
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <Label htmlFor="posName" className="text-sm font-medium text-[#656565]">
+                                            POS Name <span className="text-red-500">*</span>
+                                        </Label>
+                                        <CustomTooltip label="Give this POS terminal a descriptive name to easily identify it" direction="right">
+                                            <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                                        </CustomTooltip>
+                                    </div>
                                     <Input
                                         id="posName"
                                         type="text"
@@ -104,16 +116,17 @@ const PosModal: React.FC<PosModalProps> = ({
                                         className="mt-1.5"
                                         required
                                     />
-                                    <p className="text-xs text-gray-500 mt-1.5">
-                                        Give this POS terminal a descriptive name to easily identify it
-                                    </p>
                                 </div>
 
-                                {/* Machine ID */}
                                 <div>
-                                    <Label htmlFor="machineId" className="text-sm font-medium">
-                                        Machine ID <span className="text-destructive">*</span>
-                                    </Label>
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <Label htmlFor="machineId" className="text-sm font-medium text-[#656565]">
+                                            Machine ID <span className="text-red-500">*</span>
+                                        </Label>
+                                        <CustomTooltip label="Unique identifier for this POS terminal device" direction="right">
+                                            <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                                        </CustomTooltip>
+                                    </div>
                                     <Input
                                         id="machineId"
                                         type="text"
@@ -125,16 +138,17 @@ const PosModal: React.FC<PosModalProps> = ({
                                         className="mt-1.5"
                                         required
                                     />
-                                    <p className="text-xs text-gray-500 mt-1.5">
-                                        Unique identifier for this POS terminal device
-                                    </p>
                                 </div>
 
-                                {/* Metadata - IP Address */}
                                 <div>
-                                    <Label htmlFor="ipAddress" className="text-sm font-medium">
-                                        IP Address (Optional)
-                                    </Label>
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <Label htmlFor="ipAddress" className="text-sm font-medium text-[#656565]">
+                                            IP Address
+                                        </Label>
+                                        <CustomTooltip label="Network IP address for this terminal (optional)" direction="right">
+                                            <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                                        </CustomTooltip>
+                                    </div>
                                     <Input
                                         id="ipAddress"
                                         type="text"
@@ -150,51 +164,28 @@ const PosModal: React.FC<PosModalProps> = ({
                                         placeholder="e.g., 10.0.0.5"
                                         className="mt-1.5"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1.5">
-                                        Network IP address for this terminal (optional)
-                                    </p>
                                 </div>
                             </TabsContent>
 
-                            <TabsContent value="settings" className="mt-0 space-y-4">
-                                {/* Status Toggle */}
-                                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                    <div className="space-y-0.5">
-                                        <Label className="text-sm font-medium">
-                                            Terminal Status
-                                        </Label>
-                                        <p className="text-xs text-muted-foreground">
-                                            {formData.Status === "active"
-                                                ? "This terminal is active and ready to accept orders"
-                                                : "This terminal is currently inactive"}
-                                        </p>
+                            <TabsContent value="settings" className="mt-0 space-y-8">
+                                <div className="w-full">
+                                    <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3 w-full">
+                                        <span className="text-[#1f2937] text-sm font-medium">Active</span>
+                                        <Switch
+                                            checked={formData.Status === "active"}
+                                            onCheckedChange={onStatusChange}
+                                        />
                                     </div>
-                                    <Switch
-                                        checked={formData.Status === "active"}
-                                        onCheckedChange={onStatusChange}
-                                    />
                                 </div>
                             </TabsContent>
                         </div>
                     </Tabs>
-                </div>
+                </DialogBody>
 
-                {/* Footer */}
-                <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end items-center gap-2 flex-shrink-0">
-                    <Button
-                        onClick={onClose}
-                        variant="outline"
-                        size="sm"
-                        className="h-9"
-                        disabled={actionLoading}
-                    >
-                        Cancel
-                    </Button>
+                <DialogFooter>
                     <Button
                         onClick={onSubmit}
                         disabled={!isFormValid() || actionLoading}
-                        size="sm"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9"
                     >
                         {actionLoading ? (
                             <>
@@ -207,7 +198,14 @@ const PosModal: React.FC<PosModalProps> = ({
                             </>
                         )}
                     </Button>
-                </div>
+                    <Button
+                        onClick={onClose}
+                        variant="outline"
+                        disabled={actionLoading}
+                    >
+                        Cancel
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

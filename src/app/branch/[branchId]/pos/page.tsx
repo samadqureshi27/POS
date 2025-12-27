@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { Monitor, Plus, Edit2, Trash2, AlertCircle } from "lucide-react";
+import { Monitor, Plus, AlertCircle } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
@@ -210,29 +210,6 @@ const PosListPage = () => {
                     handleSelectItem(item.POS_ID, true);
                     setDeleteDialogOpen(true);
                 }}
-                customActions={(item) => (
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditPos(item)}
-                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 w-8 p-0"
-                        >
-                            <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                                handleSelectItem(item.POS_ID, true);
-                                setDeleteDialogOpen(true);
-                            }}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
-                    </div>
-                )}
                 // Pagination props
                 showPagination={true}
                 currentPage={currentPage}

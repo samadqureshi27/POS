@@ -1,12 +1,13 @@
 "use client";
 import React from "react";
-import { X, Save } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2, Info } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { PaymentMethod, ModalFormData } from "@/lib/types/payment";
 
 interface PaymentModalProps {
@@ -32,37 +33,52 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="min-w-[35vw] max-w-2xl max-h-[70vh] min-h-[70vh] flex flex-col">
+      <DialogContent 
+        size="lg"
+        onInteractOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl font-semibold">
+          <DialogTitle className="text-xl">
             {editingItem ? "Edit Payment Method" : "Add New Payment Method"}
           </DialogTitle>
         </DialogHeader>
 
-        {/* Scrollable Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 flex-1 overflow-y-auto pr-1 pl-1">
+        <DialogBody className="flex-1 overflow-y-auto min-h-0 p-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pl-8 pr-[34px]">
           {/* Payment Method Name */}
           <div className="md:col-span-2">
-            <Label htmlFor="paymentName" className="text-sm font-medium mb-1">
-              Payment Method Name <span className="text-destructive">*</span>
-            </Label>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Label htmlFor="paymentName" className="text-sm font-medium text-[#656565]">
+                Payment Method Name <span className="text-red-500">*</span>
+              </Label>
+              <CustomTooltip label="Enter a descriptive name for this payment method" direction="right">
+                <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+              </CustomTooltip>
+            </div>
             <Input
               id="paymentName"
               type="text"
               value={formData.Name}
               onChange={(e) => onFormDataChange({ Name: e.target.value })}
               placeholder="Enter payment method name"
+              className="mt-1.5"
               required
             />
           </div>
 
           {/* Payment Type */}
           <div className="sm:col-span-1 md:col-span-1">
-            <Label htmlFor="paymentType" className="text-sm font-medium mb-1">
-              Payment Type
-            </Label>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Label htmlFor="paymentType" className="text-sm font-medium text-[#656565]">
+                Payment Type
+              </Label>
+              <CustomTooltip label="Select the type of payment method (Cash, Card, or Online)" direction="right">
+                <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+              </CustomTooltip>
+            </div>
             <Select value={formData.PaymentType} onValueChange={(value) => onFormDataChange({ PaymentType: value as "Cash" | "Card" | "Online" })}>
-              <SelectTrigger>
+              <SelectTrigger className="mt-1.5">
                 <SelectValue placeholder="Select Payment Type" />
               </SelectTrigger>
               <SelectContent>
@@ -75,27 +91,35 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
           {/* Tax Type */}
           <div className="sm:col-span-1 md:col-span-1">
-            <Label htmlFor="taxType" className="text-sm font-medium mb-1">
-              Tax Type <span className="text-destructive">*</span>
-            </Label>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Label htmlFor="taxType" className="text-sm font-medium text-[#656565]">
+                Tax Type <span className="text-red-500">*</span>
+              </Label>
+              <CustomTooltip label="Enter the tax type name (e.g., GST, VAT, Service Tax)" direction="right">
+                <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+              </CustomTooltip>
+            </div>
             <Input
               id="taxType"
               type="text"
               value={formData.TaxType}
               onChange={(e) => onFormDataChange({ TaxType: e.target.value })}
               placeholder="e.g., GST, VAT, Service Tax"
+              className="mt-1.5"
               required
             />
           </div>
 
           {/* Tax Percentage */}
-          <div className="sm:col-span-2 md:col-span-2 ">
-            <Label htmlFor="taxPercentage" className="text-sm font-medium mb-1">
-              Tax Percentage (%)
-              <span className="text-xs text-muted-foreground ml-1">
-                (Enter rate between 0-100)
-              </span>
-            </Label>
+          <div className="sm:col-span-2 md:col-span-2">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Label htmlFor="taxPercentage" className="text-sm font-medium text-[#656565]">
+                Tax Percentage (%)
+              </Label>
+              <CustomTooltip label="Enter the tax rate as a percentage between 0-100" direction="right">
+                <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+              </CustomTooltip>
+            </div>
             <Input
               id="taxPercentage"
               type="text"
@@ -114,6 +138,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 // If invalid input, just ignore it (don't update state)
               }}
               placeholder="0"
+              className="mt-1.5"
               min="0"
               max="100"
             />
@@ -121,49 +146,50 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
           {/* Status - Replaced with Toggle */}
           <div className="md:col-span-2">
-            <div className="flex items-center justify-between gap-4">
-              <Label className="text-sm font-medium">
-                Status
-              </Label>
+            <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium text-[#1f2937]">
+                  Status
+                </Label>
+                <CustomTooltip label="Enable or disable this payment method" direction="right">
+                  <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
+                </CustomTooltip>
+              </div>
               <Switch
                 checked={formData.Status === "Active"}
                 onCheckedChange={onStatusChange}
               />
             </div>
           </div>
-        </div>
+          </div>
+        </DialogBody>
 
-        {/* Fixed Action Buttons */}
-        <div className="flex-shrink-0 pt-4 border-t border-gray-100 bg-white flex justify-end gap-2">
+        <DialogFooter>
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
             disabled={actionLoading}
-            className="w-full sm:w-auto"
           >
-            <X size={16} />
             Cancel
           </Button>
           <Button
             type="button"
             onClick={onSubmit}
             disabled={!formData.Name.trim() || actionLoading}
-            className="w-full sm:w-auto"
           >
             {actionLoading ? (
               <>
-                <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"></div>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 {editingItem ? "Updating..." : "Saving..."}
               </>
             ) : (
               <>
-                <Save size={16} />
-                {editingItem ? "Update Item" : "Add Item"}
+                {editingItem ? "Update Payment Method" : "Add Payment Method"}
               </>
             )}
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

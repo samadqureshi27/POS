@@ -184,22 +184,6 @@ const MenuItemsManagementPage = () => {
         getItemId={(item) => item.ID}
         onEdit={openEditModal}
         onDelete={handleDelete}
-        customActions={(item) => (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => openEditModal(item)}
-              className="px-3 py-1 bg-gray-900 hover:bg-black text-white text-sm rounded-md transition-all"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDelete(item)}
-              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-all"
-            >
-              Delete
-            </button>
-          </div>
-        )}
         columns={[
           {
             key: "Name",
