@@ -72,9 +72,10 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
         isActive: editingItem.isActive !== false,
       });
     } else {
+      // Reset form completely when creating new item
       setFormData({
         branchId: branchObjectId || "",
-        itemId: "",
+        itemId: "", // MUST be empty for new items
         quantity: 0,
         reorderPoint: 0,
         minStock: 0,
@@ -84,7 +85,7 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
         isActive: true,
       });
     }
-  }, [editingItem, branchObjectId]);
+  }, [editingItem, branchObjectId, isOpen]); // Add isOpen to dependencies
 
   const loadAvailableItems = async () => {
     try {

@@ -266,7 +266,9 @@ const BranchInventoryPage = () => {
                     }`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900">{item.itemName || `Item ${item.itemId}`}</div>
+                  <div className="font-medium text-gray-900">
+                    {item.itemName || `Item ${typeof item.itemId === 'object' ? item.itemId._id : item.itemId}`}
+                  </div>
                 </div>
               </div>
             ),

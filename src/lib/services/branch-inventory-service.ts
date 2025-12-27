@@ -9,7 +9,13 @@ export interface BranchInventoryItem {
   _id?: string;
   id?: string;
   branchId: string;
-  itemId: string;
+  itemId: string | {  // Can be populated as an object
+    _id: string;
+    name: string;
+    sku: string;
+    type: string;
+    [key: string]: any;
+  };
   itemName?: string;
   itemNameSnapshot?: string;
   skuSnapshot?: string;
@@ -30,7 +36,7 @@ export interface BranchInventoryItem {
     status: string;
     [key: string]: any;
   };
-  item?: {
+  item?: {  // Alternative nested field name
     _id: string;
     name: string;
     sku: string;
@@ -230,6 +236,19 @@ export const BranchInventoryService = {
       console.log("✅ Successfully created branch inventory item:", data);
 
       const item: BranchInventoryItem = data?.result ?? data?.data ?? data;
+
+      console.log("📋 Extracted item:", item);
+      console.log("🏷️ ItemId type:", typeof item.itemId);
+      console.log("🏷️ ItemId is populated object?", typeof item.itemId === 'object' && item.itemId !== null);
+      if (typeof item.itemId === 'object') {
+        console.log("🏷️ Populated itemId:", item.itemId);
+        console.log("🏷️ Name from populated itemId:", (item.itemId as any)?.name);
+      }
+      console.log("🏷️ Item has nested 'item' object?", !!item.item);
+      console.log("🏷️ Item name from nested 'item':", item.item?.name);
+      console.log("🏷️ Item name snapshot:", item.itemNameSnapshot);
+      console.log("🏷️ Item name direct:", item.itemName);
+
       item.stockStatus = calculateStockStatus(item);
 
       return { success: true, data: item };
