@@ -78,28 +78,28 @@ const RoleLabels: React.FC = () => {
       <div className="absolute inset-0 z-40 sm:hidden flex flex-col">
         {/* Manager label - top half (black section) */}
         <div
-          className="flex-1 flex items-center justify-center"
+          className="flex-1 flex flex-col items-center justify-center"
           style={{
             opacity: phase === "adminLogin" || phase === "toGold" ? 0 : 1,
             transform: phase === "idle"
               ? "translateY(0) scale(1)"
               : phase === "managerLogin" || phase === "toBlack"
-              ? "translateY(-17.5vh) scale(0.85)" // Move from center of top half (25vh) to center of top space (7.5vh)
+              ? "translateY(-17.5vh) scale(0.7)"
               : "translateY(-30px) scale(0.9)",
             transition: "all 700ms cubic-bezier(0.22, 1, 0.36, 1)",
             pointerEvents: phase === "adminLogin" || phase === "toGold" ? "none" : "auto",
           }}
+          onClick={
+            phase === "managerLogin"
+              ? handleBackToRoleSelection
+              : phase === "idle"
+              ? handleManagerClick
+              : undefined
+          }
         >
           <span
-            className="pointer-events-auto cursor-pointer select-none text-[#d1ab35] font-semibold tracking-wider text-xl"
-            style={{ fontFamily: "Manrope, system-ui, sans-serif" }}
-            onClick={
-              phase === "managerLogin"
-                ? handleBackToRoleSelection
-                : phase === "idle"
-                ? handleManagerClick
-                : undefined
-            }
+            className="pointer-events-auto cursor-pointer select-none text-[#d1ab35] font-bold tracking-[0.2em] text-3xl"
+            style={{ fontFamily: "Allerta Stencil, system-ui, sans-serif" }}
           >
             MANAGER
           </span>
@@ -107,28 +107,28 @@ const RoleLabels: React.FC = () => {
 
         {/* Admin label - bottom half (gold section) */}
         <div
-          className="flex-1 flex items-center justify-center"
+          className="flex-1 flex flex-col items-center justify-center"
           style={{
             opacity: phase === "managerLogin" || phase === "toBlack" ? 0 : 1,
             transform: phase === "idle"
               ? "translateY(0) scale(1)"
               : phase === "adminLogin" || phase === "toGold"
-              ? "translateY(-67.5vh) scale(0.85)" // Move from center of bottom half (75vh) to center of top space (7.5vh)
+              ? "translateY(-67.5vh) scale(0.7)"
               : "translateY(30px) scale(0.9)",
             transition: "all 700ms cubic-bezier(0.22, 1, 0.36, 1)",
             pointerEvents: phase === "managerLogin" || phase === "toBlack" ? "none" : "auto",
           }}
+          onClick={
+            phase === "adminLogin"
+              ? handleBackToRoleSelection
+              : phase === "idle"
+              ? handleAdminClick
+              : undefined
+          }
         >
           <span
-            className="pointer-events-auto cursor-pointer select-none text-black font-semibold tracking-wider text-xl"
-            style={{ fontFamily: "Manrope, system-ui, sans-serif" }}
-            onClick={
-              phase === "adminLogin"
-                ? handleBackToRoleSelection
-                : phase === "idle"
-                ? handleAdminClick
-                : undefined
-            }
+            className="pointer-events-auto cursor-pointer select-none text-black font-bold tracking-[0.2em] text-3xl"
+            style={{ fontFamily: "Allerta Stencil, system-ui, sans-serif" }}
           >
             ADMIN
           </span>
