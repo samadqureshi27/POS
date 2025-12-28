@@ -22,7 +22,7 @@ const hourlySalesData = [
 
 export const HourlySalesChart: React.FC = () => {
   return (
-    <div className="bg-white rounded-lg border border-[#d5d5dd] p-6 shadow-sm">
+    <div className="bg-white rounded-sm border border-[#d5d5dd] p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Hourly Sales Pattern</h3>

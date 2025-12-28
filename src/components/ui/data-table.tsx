@@ -77,7 +77,7 @@ function DataTableComponent<T extends Record<string, any>>({
   if (loading) {
     return (
       <div className="w-full">
-        <div className="rounded-md border">
+        <div className="rounded-sm border">
           <div className="relative overflow-auto" style={{ maxHeight, overflowY: 'scroll' }}>
             <table className="w-full caption-bottom text-sm">
               <thead className="[&_tr]:border-b">

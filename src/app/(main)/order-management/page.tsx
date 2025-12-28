@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 // Import all our new components
-import { Toast } from "@/components/ui/toast";
+import { toast } from "sonner";
 import { PeriodSelector } from "@/components/ui/period-selector";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { DashboardSection } from "@/app/(main)/dashboard/_components/DashboardSection";
@@ -35,11 +35,6 @@ const OrderManagementPage = () => {
     orderTypeStats: [],
   });
 
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-
   // Use our custom hook for filtering logic
   const {
     filteredItems,
@@ -56,11 +51,6 @@ const OrderManagementPage = () => {
     customDateRange,
     setCustomDateRange,
   } = useOrderFilters(items);
-
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
 
   // Load orders on mount
   useEffect(() => {
@@ -82,7 +72,7 @@ const OrderManagementPage = () => {
         component: "OrderManagement",
         action: "loadOrders",
       });
-      showToast("Failed to load orders", "error");
+      toast.error("Failed to load orders");
     } finally {
       setLoading(false);
     }
@@ -102,7 +92,7 @@ const OrderManagementPage = () => {
         component: "OrderManagement",
         action: "loadOrderStats",
       });
-      showToast("Failed to load order statistics", "error");
+      toast.error("Failed to load order statistics");
     } finally {
       setStatsLoading(false);
     }
@@ -124,14 +114,6 @@ const OrderManagementPage = () => {
 
   return (
     <PageContainer>
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-
       <PageHeader title="Order Management" />
 
       {/* Time Period Selector */}

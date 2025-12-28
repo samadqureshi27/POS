@@ -51,7 +51,7 @@ const FuturisticSalesVisual: React.FC<FuturisticSalesVisualProps> = ({
 
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-blue-500/10 backdrop-blur-sm">
+            <div className="p-2 rounded-sm bg-blue-500/10 backdrop-blur-sm">
               <Activity size={16} className="text-blue-600" />
             </div>
             Revenue Pulse
@@ -142,7 +142,7 @@ const FuturisticSalesVisual: React.FC<FuturisticSalesVisualProps> = ({
 
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-amber-500/10 backdrop-blur-sm">
+            <div className="p-2 rounded-sm bg-amber-500/10 backdrop-blur-sm">
               <Crown size={16} className="text-amber-600" />
             </div>
             Bestsellers Spotlight
@@ -154,7 +154,7 @@ const FuturisticSalesVisual: React.FC<FuturisticSalesVisualProps> = ({
             {topItems.map((item, index) => (
               <div
                 key={item.name || index}
-                className="group flex items-center gap-4 p-3 rounded-xl hover:bg-white/50 transition-all duration-300 backdrop-blur-sm"
+                className="group flex items-center gap-4 p-3 rounded-sm hover:bg-white/50 transition-all duration-300 backdrop-blur-sm"
               >
                 {/* Rank Circle */}
                 <div className={`

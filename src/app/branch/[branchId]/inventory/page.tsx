@@ -233,7 +233,7 @@ const BranchInventoryPage = () => {
             header: "Item",
             render: (item) => (
               <div className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-lg flex items-center justify-center border ${item.stockStatus === "High"
+                <div className={`h-10 w-10 rounded-sm flex items-center justify-center border ${item.stockStatus === "High"
                     ? "bg-green-50 border-green-200"
                     : item.stockStatus === "Medium"
                       ? "bg-yellow-50 border-yellow-200"

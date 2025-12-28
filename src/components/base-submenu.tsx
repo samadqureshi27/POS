@@ -73,10 +73,12 @@ export default function BaseSubmenu({
             <ArrowLeft size={24} />
           </button>
         ) : (
-          contextIcon && (
+          contextIcon ? (
             <div className="text-white flex items-center justify-center">
               {contextIcon}
             </div>
+          ) : (
+            <div className="w-16 h-full" /> // Empty spacer to maintain layout
           )
         )}
       </div>

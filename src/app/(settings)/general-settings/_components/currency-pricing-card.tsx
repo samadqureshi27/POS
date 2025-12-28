@@ -64,7 +64,7 @@ const CurrencyPricingCard: React.FC<CurrencyPricingCardProps> = ({ settings, onS
                             onValueChange={(value) => onSettingChange("currencyPosition", value)}
                             className="space-y-3"
                         >
-                            <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                            <div className="flex items-center justify-between p-3 border rounded-sm hover:bg-gray-50">
                                 <div className="flex items-center space-x-3">
                                     <RadioGroupItem value="before" id="before" />
                                     <div>
@@ -76,7 +76,7 @@ const CurrencyPricingCard: React.FC<CurrencyPricingCardProps> = ({ settings, onS
                                     {formatPreview(100)}
                                 </Badge>
                             </div>
-                            <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                            <div className="flex items-center justify-between p-3 border rounded-sm hover:bg-gray-50">
                                 <div className="flex items-center space-x-3">
                                     <RadioGroupItem value="after" id="after" />
                                     <div>
@@ -155,7 +155,7 @@ const CurrencyPricingCard: React.FC<CurrencyPricingCardProps> = ({ settings, onS
                 </div>
 
                 {/* Preview Section */}
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="p-4 bg-blue-50 rounded-sm border border-blue-200">
                     <h4 className="text-sm font-medium text-blue-900 mb-2">Format Preview</h4>
                     <div className="space-y-1 text-sm">
                         <div className="flex justify-between">

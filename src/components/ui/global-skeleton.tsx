@@ -54,9 +54,9 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
           {/* Dashboard Header Skeleton */}
           {showHeader && (
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
-              <Skeleton className="h-8 w-48 rounded-lg" />
+              <Skeleton className="h-8 w-48 rounded-sm" />
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <Skeleton className="h-6 w-32 rounded-lg" />
+                <Skeleton className="h-6 w-32 rounded-sm" />
               </div>
             </div>
           )}
@@ -94,13 +94,13 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
             </div>
 
             {/* Content Area */}
-            <div className="bg-white rounded-lg border border-[#d5d5dd] p-6 shadow-none">
+            <div className="bg-white rounded-sm border border-[#d5d5dd] p-6 shadow-none">
               <Skeleton className="h-4 w-64 mb-4" />
 
               {/* Key Daily Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg border border-gray-200">
+                  <div key={i} className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-sm border border-gray-200">
                     <Skeleton className="h-4 w-24 mb-2" />
                     <Skeleton className="h-8 w-20 mb-1" />
                     <Skeleton className="h-3 w-16" />
@@ -109,13 +109,13 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
               </div>
 
               {/* Futuristic Visual Area */}
-              <Skeleton className="w-full h-64 rounded-lg mb-6" />
+              <Skeleton className="w-full h-64 rounded-sm mb-6" />
 
               {/* Customer Insights Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className={cn(
-                    "p-4 rounded-lg border",
+                    "p-4 rounded-sm border",
                     i === 0 && "bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200",
                     i === 1 && "bg-gradient-to-r from-green-50 to-green-100 border-green-200",
                     i === 2 && "bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200"
@@ -144,18 +144,18 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
               </div>
 
               {/* Content Area */}
-              <div className="bg-white rounded-lg border border-[#d5d5dd] p-6 shadow-none">
+              <div className="bg-white rounded-sm border border-[#d5d5dd] p-6 shadow-none">
                 <Skeleton className="h-4 w-56 mb-6" />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Chart 1 */}
                   <div>
-                    <Skeleton className="h-64 w-full rounded-lg" />
+                    <Skeleton className="h-64 w-full rounded-sm" />
                   </div>
 
                   {/* Chart 2 */}
                   <div>
-                    <Skeleton className="h-64 w-full rounded-lg" />
+                    <Skeleton className="h-64 w-full rounded-sm" />
                   </div>
                 </div>
               </div>
@@ -176,10 +176,10 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
           'max-w-[100vw] mb-8',
           hasSubmenu ? 'mt-20' : 'mt-2'
         )}>
-          <Skeleton className="h-9 w-64 rounded-lg" />
+          <Skeleton className="h-9 w-64 rounded-sm" />
           {showImportExport && (
             <div className="flex justify-end">
-              <Skeleton className="h-10 w-32 rounded-lg" />
+              <Skeleton className="h-10 w-32 rounded-sm" />
             </div>
           )}
         </div>
@@ -215,12 +215,12 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
                 </div>
 
                 {/* Content Area */}
-                <div className="bg-white rounded-lg border border-[#d5d5dd] p-6 shadow-none">
+                <div className="bg-white rounded-sm border border-[#d5d5dd] p-6 shadow-none">
                   {/* Summary Cards in Section */}
                   {sectionIndex === 0 && showSummaryCards && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                       {[...Array(summaryCardCount)].map((_, i) => (
-                        <div key={i} className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg border border-gray-200">
+                        <div key={i} className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-sm border border-gray-200">
                           <Skeleton className="h-4 w-24 mb-2" />
                           <Skeleton className="h-8 w-20 mb-1" />
                           <Skeleton className="h-3 w-16" />
@@ -233,7 +233,7 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
                   {sectionIndex === 1 && showCharts && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                       {[...Array(3)].map((_, i) => (
-                        <Skeleton key={i} className="h-64 w-full rounded-lg" />
+                        <Skeleton key={i} className="h-64 w-full rounded-sm" />
                       ))}
                     </div>
                   )}
@@ -245,17 +245,17 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
                       {showActionBar && (
                         <div className="mb-6">
                           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                            <Skeleton className="h-10 w-64 rounded-md" />
+                            <Skeleton className="h-10 w-64 rounded-sm" />
                             <div className="flex gap-2 ml-auto">
-                              <Skeleton className="h-10 w-20 rounded-md" />
-                              <Skeleton className="h-10 w-20 rounded-md" />
+                              <Skeleton className="h-10 w-20 rounded-sm" />
+                              <Skeleton className="h-10 w-20 rounded-sm" />
                             </div>
                           </div>
                         </div>
                       )}
 
                       {/* Table */}
-                      <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <div className="border border-gray-200 rounded-sm overflow-hidden">
                         {/* Table Header */}
                         <div className="border-b border-gray-200 p-4 bg-gray-50">
                           <div className="grid grid-cols-4 gap-4">
@@ -274,8 +274,8 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
                               <Skeleton className="h-6 w-full" />
                               <Skeleton className="h-6 w-full" />
                               <div className="flex gap-2">
-                                <Skeleton className="h-8 w-16 rounded-md" />
-                                <Skeleton className="h-8 w-16 rounded-md" />
+                                <Skeleton className="h-8 w-16 rounded-sm" />
+                                <Skeleton className="h-8 w-16 rounded-sm" />
                               </div>
                             </div>
                           </div>
@@ -293,7 +293,7 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
             {showSummaryCards && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {[...Array(summaryCardCount)].map((_, i) => (
-                  <div key={i} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200 p-6 shadow-sm">
+                  <div key={i} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-sm border border-gray-200 p-6 shadow-sm">
                     <Skeleton className="h-4 w-24 mb-2" />
                     <Skeleton className="h-8 w-16" />
                   </div>
@@ -303,19 +303,19 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
 
             {/* Action Bar */}
             {showActionBar && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm mb-6">
+              <div className="bg-white rounded-sm border border-gray-200 p-4 shadow-sm mb-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                  <Skeleton className="h-10 w-64 rounded-md" />
+                  <Skeleton className="h-10 w-64 rounded-sm" />
                   <div className="flex gap-2 ml-auto">
-                    <Skeleton className="h-10 w-20 rounded-md" />
-                    <Skeleton className="h-10 w-20 rounded-md" />
+                    <Skeleton className="h-10 w-20 rounded-sm" />
+                    <Skeleton className="h-10 w-20 rounded-sm" />
                   </div>
                 </div>
               </div>
             )}
 
             {/* Table */}
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+            <div className="bg-white rounded-sm border border-gray-200 shadow-sm">
               {/* Table Header */}
               <div className="border-b border-gray-200 p-4 bg-gray-50">
                 <div className="grid grid-cols-4 gap-4">
@@ -334,8 +334,8 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
                     <Skeleton className="h-6 w-full" />
                     <Skeleton className="h-6 w-full" />
                     <div className="flex gap-2">
-                      <Skeleton className="h-8 w-16 rounded-md" />
-                      <Skeleton className="h-8 w-16 rounded-md" />
+                      <Skeleton className="h-8 w-16 rounded-sm" />
+                      <Skeleton className="h-8 w-16 rounded-sm" />
                     </div>
                   </div>
                 </div>
@@ -354,17 +354,17 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
         {/* Header */}
         {showHeader && (
           <div className={cn("mb-8", hasSubmenu ? 'mt-28' : 'mt-2')}>
-            <Skeleton className="h-9 w-64 rounded-lg" />
+            <Skeleton className="h-9 w-64 rounded-sm" />
           </div>
         )}
 
         {/* Content */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <div className="bg-white rounded-sm border border-gray-200 p-6 shadow-sm">
           <div className="space-y-6">
             {[...Array(contentRows)].map((_, i) => (
               <div key={i} className="space-y-2">
                 <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-10 w-full rounded-md" />
+                <Skeleton className="h-10 w-full rounded-sm" />
               </div>
             ))}
           </div>
@@ -381,17 +381,17 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
           <div className="mt-20">
             {/* Header */}
             <div className="grid grid-cols-1 md:grid-cols-2 items-center mb-8">
-              <Skeleton className="h-9 w-64 rounded-lg" />
+              <Skeleton className="h-9 w-64 rounded-sm" />
               <div className="flex justify-end">
-                <Skeleton className="h-10 w-32 rounded-lg" />
+                <Skeleton className="h-10 w-32 rounded-sm" />
               </div>
             </div>
 
             {/* Settings Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-shadow duration-200">
-                  <Skeleton className="h-6 w-32 mb-4 rounded-lg" />
+                <div key={i} className="bg-white rounded-sm border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-shadow duration-200">
+                  <Skeleton className="h-6 w-32 mb-4 rounded-sm" />
                   <div className="space-y-4">
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-3/4" />

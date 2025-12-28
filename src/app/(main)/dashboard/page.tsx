@@ -20,7 +20,7 @@ import { useDashboardData } from "@/lib/hooks/useDashboardData";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { DashboardHeader } from "./_components/DashboardHeader";
+import { PageHeader } from "@/components/ui/page-header";
 import { PeriodSelector } from "@/components/ui/period-selector";
 import { MetricsCards } from "./_components/MetricsCards";
 import { CustomerAnalytics } from "./_components/CustomerAnalytics";
@@ -100,15 +100,11 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#F7F7F8] p-4 sm:p-6 lg:p-6">
+    <div className="w-full bg-[#F7F7F8] p-4 sm:p-6 lg:p-6">
       <Toaster position="top-right" />
 
       <div className="w-full">
-        <DashboardHeader
-          lastUpdated={lastUpdated}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-        />
+        <PageHeader title="Dashboard" />
 
         <PeriodSelector
           selectedPeriod={selectedPeriod}
@@ -144,20 +140,20 @@ const Dashboard = () => {
 
           {/* Customer & Payment Insights */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-sm border border-blue-200">
               <h3 className="text-sm font-medium text-blue-800 mb-2">Customer Flow</h3>
               <div className="text-2xl font-bold text-blue-900">142</div>
               <div className="text-xs text-blue-600">Transactions today</div>
               <div className="mt-2 text-xs text-blue-700">Peak: 11AM-12PM (23 orders)</div>
             </div>
-            <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+            <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-sm border border-green-200">
               <h3 className="text-sm font-medium text-green-800 mb-2">Payment Split</h3>
               <div className="text-sm text-green-900">
                 <div>Card: 68% • Cash: 32%</div>
                 <div className="mt-1">Digital: 12% • UPI: 8%</div>
               </div>
             </div>
-            <div className="bg-gradient-to-r from-amber-50 to-amber-100 p-4 rounded-lg border border-amber-200">
+            <div className="bg-gradient-to-r from-amber-50 to-amber-100 p-4 rounded-sm border border-amber-200">
               <h3 className="text-sm font-medium text-amber-800 mb-2">Staff Performance</h3>
               <div className="text-2xl font-bold text-amber-900">3.2</div>
               <div className="text-xs text-amber-600">Avg order time (min)</div>
@@ -207,7 +203,7 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Revenue Section */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 rounded-lg border border-green-200">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 rounded-sm border border-green-200">
               <h3 className="text-sm font-medium text-green-800 mb-4">Revenue</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -226,7 +222,7 @@ const Dashboard = () => {
             </div>
 
             {/* COGS Section */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-sm border border-blue-200">
               <h3 className="text-sm font-medium text-blue-800 mb-4">COGS</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -245,7 +241,7 @@ const Dashboard = () => {
             </div>
 
             {/* Labor Costs */}
-            <div className="bg-gradient-to-br from-amber-50 to-yellow-100 p-6 rounded-lg border border-amber-200">
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-100 p-6 rounded-sm border border-amber-200">
               <h3 className="text-sm font-medium text-amber-800 mb-4">Labor</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -264,7 +260,7 @@ const Dashboard = () => {
             </div>
 
             {/* Net Profit */}
-            <div className="bg-gradient-to-br from-purple-50 to-violet-100 p-6 rounded-lg border border-purple-200">
+            <div className="bg-gradient-to-br from-purple-50 to-violet-100 p-6 rounded-sm border border-purple-200">
               <h3 className="text-sm font-medium text-purple-800 mb-4">Profit</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -284,7 +280,7 @@ const Dashboard = () => {
           </div>
 
           {/* P&L Summary */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-[#d5d5dd]">
+          <div className="bg-gray-50 p-4 rounded-sm border border-[#d5d5dd]">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold text-green-600">PKR 462.8K</div>
@@ -317,7 +313,7 @@ const Dashboard = () => {
             {/* Strategic KPIs Panel */}
             <div className="space-y-6">
               {/* Growth Metrics */}
-              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-lg border border-indigo-200">
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-sm border border-indigo-200">
                 <h3 className="text-lg font-semibold text-indigo-900 mb-4">Growth & Expansion</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -344,7 +340,7 @@ const Dashboard = () => {
               </div>
 
               {/* Customer Metrics */}
-              <div className="bg-gradient-to-r from-rose-50 to-pink-50 p-6 rounded-lg border border-rose-200">
+              <div className="bg-gradient-to-r from-rose-50 to-pink-50 p-6 rounded-sm border border-rose-200">
                 <h3 className="text-lg font-semibold text-rose-900 mb-4">Customer Intelligence</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>

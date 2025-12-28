@@ -114,7 +114,7 @@ export default function ImportResultsDialog({
                 {/* Row Information */}
                 {results.summary.totalRows !== undefined && (
                   <div className="flex justify-center mb-4">
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-center p-3 bg-gray-50 rounded-sm">
                       <div className="text-2xl font-bold text-gray-600">
                         {results.summary.totalRows}
                       </div>
@@ -126,7 +126,7 @@ export default function ImportResultsDialog({
                 {/* Action Results */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {results.summary.created !== undefined && (
-                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                    <div className="text-center p-3 bg-green-50 rounded-sm">
                       <div className="text-2xl font-bold text-green-600">
                         {results.summary.created}
                       </div>
@@ -134,7 +134,7 @@ export default function ImportResultsDialog({
                     </div>
                   )}
                   {results.summary.updated !== undefined && (
-                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                    <div className="text-center p-3 bg-blue-50 rounded-sm">
                       <div className="text-2xl font-bold text-blue-600">
                         {results.summary.updated}
                       </div>
@@ -142,7 +142,7 @@ export default function ImportResultsDialog({
                     </div>
                   )}
                   {results.summary.skipped !== undefined && (
-                    <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                    <div className="text-center p-3 bg-yellow-50 rounded-sm">
                       <div className="text-2xl font-bold text-yellow-600">
                         {results.summary.skipped}
                       </div>
@@ -150,7 +150,7 @@ export default function ImportResultsDialog({
                     </div>
                   )}
                   {results.summary.failed !== undefined && (
-                    <div className="text-center p-3 bg-red-50 rounded-lg">
+                    <div className="text-center p-3 bg-red-50 rounded-sm">
                       <div className="text-2xl font-bold text-red-600">
                         {results.summary.failed}
                       </div>
@@ -164,7 +164,7 @@ export default function ImportResultsDialog({
             {/* General Message */}
             {results.message && (
               <div className="space-y-3">
-                <div className={`p-4 rounded-lg border ${
+                <div className={`p-4 rounded-sm border ${
                   results.success 
                     ? 'bg-green-50 border-green-200 text-green-800' 
                     : 'bg-red-50 border-red-200 text-red-800'
@@ -194,7 +194,7 @@ export default function ImportResultsDialog({
                   {results.validations!.map((validation, index) => (
                     <div
                       key={index}
-                      className={`flex items-start gap-2 p-3 rounded-lg ${
+                      className={`flex items-start gap-2 p-3 rounded-sm ${
                         validation.severity === 'error'
                           ? 'bg-red-50 border border-red-200'
                           : validation.severity === 'warning'
@@ -224,7 +224,7 @@ export default function ImportResultsDialog({
                 <h3 className="font-semibold text-lg text-red-600">Errors</h3>
                 <div className="space-y-2">
                   {results.errors!.map((error, index) => (
-                    <div key={index} className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div key={index} className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-sm">
                       <XCircle className="h-4 w-4 text-red-500 mt-0.5" />
                       <div className="flex-1">
                         {error.row && (
@@ -250,7 +250,7 @@ export default function ImportResultsDialog({
                 <h3 className="font-semibold text-lg text-red-600">Import Errors</h3>
                 <div className="space-y-3">
                   {results.failedRows!.map((failedRow, index) => (
-                    <div key={index} className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div key={index} className="p-4 bg-red-50 border border-red-200 rounded-sm">
                       <div className="font-medium text-red-700 mb-3">Row {failedRow.row}</div>
                       <div className="space-y-2">
                         {failedRow.errors.map((error, errorIndex) => (
@@ -272,7 +272,7 @@ export default function ImportResultsDialog({
                 <h3 className="font-semibold text-lg">Duplicate Items</h3>
                 <div className="space-y-2">
                   {results.duplicates!.map((duplicate, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-sm">
                       <div>
                         <div className="font-medium">Row {duplicate.row}: {duplicate.name}</div>
                         {duplicate.sku && (
@@ -294,7 +294,7 @@ export default function ImportResultsDialog({
                 <h3 className="font-semibold text-lg text-yellow-600">Warnings</h3>
                 <div className="space-y-2">
                   {results.warnings!.map((warning, index) => (
-                    <div key={index} className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div key={index} className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-sm">
                       <AlertCircle className="h-4 w-4 text-yellow-500 mt-0.5" />
                       <div className="text-sm text-yellow-800">{warning}</div>
                     </div>

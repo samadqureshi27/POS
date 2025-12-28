@@ -428,7 +428,7 @@ const RecipeVariantModal: React.FC<RecipeVariantModalProps> = ({
                 const showDropdown = showSuggestions[index] && focusedIngredientIndex === index;
 
                 return (
-                  <div key={index} className="p-4 border border-gray-200 rounded-lg space-y-3">
+                  <div key={index} className="p-4 border border-gray-200 rounded-sm space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-medium text-gray-700">Ingredient {index + 1}</h4>
                       <Button
@@ -505,7 +505,7 @@ const RecipeVariantModal: React.FC<RecipeVariantModalProps> = ({
 
                           {/* Dropdown */}
                           {showDropdown && (
-                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-sm shadow-lg z-50 max-h-60 overflow-y-auto">
                               {suggestions.inventory.length > 0 && (
                                 <div>
                                   <div className="sticky top-0 z-10 border-b bg-green-50 px-3 py-1.5">
@@ -669,7 +669,7 @@ const RecipeVariantModal: React.FC<RecipeVariantModalProps> = ({
             </div>
 
             {/* Information Card */}
-            <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+            <div className="p-4 rounded-sm bg-blue-50 border border-blue-200">
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                 <div>

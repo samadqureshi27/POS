@@ -65,7 +65,7 @@ export const BackupModal: React.FC<BackupModalProps> = ({
 
             {/* Modal */}
             <div
-                className={`relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-200 ${isVisible ? 'scale-100' : 'scale-95'
+                className={`relative bg-white rounded-sm shadow-2xl max-w-md w-full mx-4 transform transition-all duration-200 ${isVisible ? 'scale-100' : 'scale-95'
                     }`}
             >
                 <div className="p-6">
@@ -91,13 +91,13 @@ export const BackupModal: React.FC<BackupModalProps> = ({
                     <div className="flex gap-3 mt-6 justify-end">
                         <button
                             onClick={handleClose}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-sm hover:bg-gray-200 transition-colors"
                         >
                             {cancelText}
                         </button>
                         <button
                             onClick={handleConfirm}
-                            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDestructive
+                            className={`px-4 py-2 text-sm font-medium rounded-sm transition-colors ${isDestructive
                                 ? 'bg-red-600 text-white hover:bg-red-700'
                                 : 'bg-blue-600 text-white hover:bg-blue-700'
                                 }`}

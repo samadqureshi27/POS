@@ -130,7 +130,7 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "px-8 py-7 flex-shrink-0 min-w-0 max-w-full",
+      "px-8 py-6 flex-shrink-0 min-w-0 max-w-full",
       className
     )}
     {...props}
@@ -147,7 +147,7 @@ const DialogBody = ({
   <div
     data-slot="dialog-body"
     className={cn(
-      "px-8 py-6 overflow-x-hidden overflow-y-auto",
+      "px-8 py-6 overflow-x-hidden overflow-y-auto pt-0 pb-0",
       "min-w-0 max-w-full",
       className
     )}
@@ -162,7 +162,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "px-8 py-7",
+      "px-8 py-8",
       "flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-3",
       "flex-shrink-0 w-full min-w-0 max-w-full",
       "[&>*]:w-full sm:[&>*]:w-auto",

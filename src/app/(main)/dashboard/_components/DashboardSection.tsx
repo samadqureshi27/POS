@@ -56,9 +56,7 @@ export const DashboardSection: React.FC<DashboardSectionProps> = ({
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                         className="overflow-hidden"
                     >
-                        <div className="bg-white rounded-lg border border-[#d5d5dd] p-6 shadow-none">
-                            {children}
-                        </div>
+                        {children}
                     </motion.div>
                 )}
             </AnimatePresence>

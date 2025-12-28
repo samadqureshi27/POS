@@ -29,7 +29,7 @@ export const InventoryStatusChart: React.FC = () => {
   const goodItems = inventoryData.filter(item => item.status === "good").length;
 
   return (
-    <div className="bg-white rounded-lg border border-[#d5d5dd] p-6 shadow-sm">
+    <div className="bg-white rounded-sm border border-[#d5d5dd] p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Inventory Status</h3>
@@ -42,7 +42,7 @@ export const InventoryStatusChart: React.FC = () => {
 
       {/* Status Summary */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+        <div className="bg-red-50 p-3 rounded-sm border border-red-200">
           <div className="flex items-center gap-2">
             <AlertTriangle size={16} className="text-red-500" />
             <div>
@@ -51,7 +51,7 @@ export const InventoryStatusChart: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-amber-50 p-3 rounded-lg border border-amber-200">
+        <div className="bg-amber-50 p-3 rounded-sm border border-amber-200">
           <div className="flex items-center gap-2">
             <Clock size={16} className="text-amber-500" />
             <div>
@@ -60,7 +60,7 @@ export const InventoryStatusChart: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+        <div className="bg-green-50 p-3 rounded-sm border border-green-200">
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-green-500" />
             <div>
@@ -126,7 +126,7 @@ export const InventoryStatusChart: React.FC = () => {
       <div className="mt-6 space-y-2">
         <h4 className="text-sm font-medium text-gray-700 mb-3">Stock Details</h4>
         {inventoryData.map((item, index) => (
-          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-sm">
             <div className="flex items-center gap-3">
               {getStatusIcon(item.status)}
               <span className="text-sm font-medium text-gray-700">{item.item}</span>

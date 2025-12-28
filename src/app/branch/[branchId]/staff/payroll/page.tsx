@@ -5,17 +5,15 @@ import { useParams } from "next/navigation";
 import { AlertCircle, DollarSign } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { DateFilter } from "@/components/ui/date-filter";
-import { Toast } from "@/components/ui/toast";
+import { toast } from "sonner";
 import { StaffTable } from "./components/payroll-staff-table";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
-import { Toaster } from "@/components/ui/sonner";
 import { useDateFilter } from "@/lib/hooks/useDateFilter";
 import { useStaffData } from "@/lib/hooks/usePayrollStaffData";
 import { useFilters } from "@/lib/hooks/payrollFilter";
-import { useToast as useToastHook } from "@/lib/hooks/toast";
 import { formatCurrency } from "@/lib/util/formatters";
 
 const StaffManagementPage = () => {
@@ -24,7 +22,6 @@ const StaffManagementPage = () => {
 
   // Custom hooks
   const dateFilter = useDateFilter("Week");
-  const { toast, showToast, hideToast } = useToastHook();
 
   // Staff data hook with error handling
   const { staffItems, loading, summaryData } = useStaffData(branchId);
@@ -35,9 +32,9 @@ const StaffManagementPage = () => {
   // Handle staff data loading errors
   React.useEffect(() => {
     if (!loading && !branchId) {
-      showToast("Branch ID not found", "error");
+      toast.error("Branch ID not found");
     }
-  }, [loading, branchId, showToast]);
+  }, [loading, branchId]);
 
   if (loading) {
     return <GlobalSkeleton type="management" showSummaryCards={true} summaryCardCount={4} showActionBar={true} hasSubmenu={true} />;
@@ -56,15 +53,6 @@ const StaffManagementPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
-
       {/* Coming Soon Content */}
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
         <div className="text-center px-6 py-12 max-w-md">

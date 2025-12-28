@@ -40,7 +40,7 @@ export default function NotificationsPage() {
             <button
               onClick={markAllAsRead}
               disabled={unreadCount === 0}
-              className="px-4 py-2 bg-black text-white hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed rounded-md text-sm font-medium transition-colors"
+              className="px-4 py-2 bg-black text-white hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed rounded-sm text-sm font-medium transition-colors"
             >
               Mark all as read
             </button>
@@ -74,7 +74,7 @@ export default function NotificationsPage() {
         {/* Load More */}
         {filteredNotifications.length > 0 && (
           <div className="mt-6 text-center">
-            <button className="px-6 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 hover:border-black text-black rounded-md text-sm font-medium transition-colors">
+            <button className="px-6 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 hover:border-black text-black rounded-sm text-sm font-medium transition-colors">
               Load More Notifications
             </button>
           </div>

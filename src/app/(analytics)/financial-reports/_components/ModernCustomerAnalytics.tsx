@@ -107,7 +107,7 @@ const ModernCustomerAnalytics: React.FC<CustomerAnalyticsProps> = ({ analyticsDa
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-blue-100">
+            <div className="p-2 rounded-sm bg-blue-100">
               <TrendingUp size={16} className="text-blue-600" />
             </div>
             Growth Trend

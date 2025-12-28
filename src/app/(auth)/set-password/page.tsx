@@ -118,7 +118,7 @@ const SetPasswordContent: React.FC = () => {
         className="relative h-screen w-full overflow-hidden flex items-center justify-center"
         style={{ background: "#d1ab35" }}
       >
-        <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-12 md:p-16 max-w-md w-full mx-4">
+        <div className="bg-white rounded-sm shadow-2xl p-8 sm:p-12 md:p-16 max-w-md w-full mx-4">
           <div className="text-center">
             <div className="mb-6 flex justify-center">
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
@@ -149,7 +149,7 @@ const SetPasswordContent: React.FC = () => {
       className="relative h-screen w-full overflow-hidden flex items-center justify-center"
       style={{ background: "#d1ab35" }}
     >
-      <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-12 md:p-16 max-w-md w-full mx-4">
+      <div className="bg-white rounded-sm shadow-2xl p-8 sm:p-12 md:p-16 max-w-md w-full mx-4">
         {/* Header */}
         <div className="mb-8 sm:mb-10 text-center">
           <p className="text-gray-500 text-xs sm:text-sm mb-2 sm:mb-3 tracking-widest font-medium">
@@ -239,7 +239,7 @@ const SetPasswordContent: React.FC = () => {
                 }}
                 placeholder="Enter your password"
                 disabled={isLoading}
-                className="placeholder-gray-400 text-sm tracking-wide rounded-xl py-3 sm:py-4 pl-12 pr-12"
+                className="placeholder-gray-400 text-sm tracking-wide rounded-sm py-3 sm:py-4 pl-12 pr-12"
               />
               <Lock
                 size={18}
@@ -282,7 +282,7 @@ const SetPasswordContent: React.FC = () => {
                 }}
                 placeholder="Re-enter your password"
                 disabled={isLoading}
-                className="placeholder-gray-400 text-sm tracking-wide rounded-xl py-3 sm:py-4 pl-12 pr-12"
+                className="placeholder-gray-400 text-sm tracking-wide rounded-sm py-3 sm:py-4 pl-12 pr-12"
               />
               <Lock
                 size={18}
@@ -308,7 +308,7 @@ const SetPasswordContent: React.FC = () => {
             <Button
               type="button"
               size="lg"
-              className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-xl text-xs sm:text-sm"
+              className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-sm text-xs sm:text-sm"
               disabled={isLoading || !newPassword || !confirmPassword}
               onClick={handleSetPassword}
             >
@@ -349,7 +349,7 @@ const SetPasswordPage: React.FC = () => {
         className="relative h-screen w-full overflow-hidden flex items-center justify-center"
         style={{ background: "#d1ab35" }}
       >
-        <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-12 md:p-16 max-w-md w-full mx-4">
+        <div className="bg-white rounded-sm shadow-2xl p-8 sm:p-12 md:p-16 max-w-md w-full mx-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
             <p className="text-gray-600 mt-4">Loading...</p>

@@ -36,7 +36,7 @@ export const RestaurantDropdown: React.FC<RestaurantDropdownProps> = ({
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent bg-white text-left flex items-center justify-between transition-all duration-200"
+                className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#d9d9e1] focus:border-transparent bg-white text-left flex items-center justify-between transition-all duration-200"
             >
                 <span className={value ? "text-gray-900" : "text-gray-500"}>
                     {options.find((opt) => opt.value === value)?.label || placeholder}
@@ -49,7 +49,7 @@ export const RestaurantDropdown: React.FC<RestaurantDropdownProps> = ({
             </button>
 
             {isOpen && (
-                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto backdrop-blur-sm">
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-sm shadow-xl max-h-60 overflow-y-auto backdrop-blur-sm">
                     {options.map((option) => (
                         <button
                             key={option.value}

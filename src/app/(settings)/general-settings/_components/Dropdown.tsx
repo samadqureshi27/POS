@@ -50,7 +50,7 @@ const SettingsDropdown = React.memo<DropdownProps>(
         </button>
 
         {isOpen && (
-          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-sm shadow-lg max-h-60 overflow-y-auto">
             {options.map((option) => (
               <button
                 key={option.value}

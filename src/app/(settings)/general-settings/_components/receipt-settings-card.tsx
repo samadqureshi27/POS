@@ -43,7 +43,7 @@ const ReceiptSettingsCard: React.FC<ReceiptSettingsCardProps> = ({ settings, onS
                         <h3 className="text-sm font-semibold text-gray-900">Print Settings</h3>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-sm">
                         <div className="flex-1">
                             <Label className="text-sm font-medium text-gray-700">
                                 Auto Print Receipts
