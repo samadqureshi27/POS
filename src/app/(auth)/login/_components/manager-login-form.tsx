@@ -1,11 +1,11 @@
 // components/login/ManagerLoginForm.tsx
 "use client";
-import React from "react";
-import { ArrowLeft } from "lucide-react";
+import React, { useEffect, useCallback, useState } from "react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Keypad } from "@/components/ui/Keypad";
 import ErrorMessage from "@/components/ui/error-message";
 import { useLoginContext } from "./login-context";
-import { validateManagerPinForm } from "@/lib/validations";
 
 const ManagerLoginForm: React.FC = () => {
   const {
@@ -22,33 +22,76 @@ const ManagerLoginForm: React.FC = () => {
     handleBackToRoleSelection,
   } = useLoginContext();
 
-  const handlePinChange = (index: number, value: string) => {
-    if (value.length <= 1 && /^\d*$/.test(value)) {
+  const [pinError, setPinError] = useState(false);
+  const pin = pinCode.filter(d => d !== "").join("");
+
+  const handlePinInput = useCallback((value: string) => {
+    if (pin.length < 6 && /^\d$/.test(value)) {
       const newPin = [...pinCode];
-      newPin[index] = value;
-      setPinCode(newPin);
+      const emptyIndex = newPin.findIndex(d => d === "");
+      if (emptyIndex !== -1) {
+        newPin[emptyIndex] = value;
+        setPinCode(newPin);
 
-      if (value && index < 3) {
-        const nextInput = document.getElementById(`pin-${index + 1}`);
-        nextInput?.focus();
-      }
+        if (validationErrors.pin) {
+          setValidationErrors((prev: any) => ({ ...prev, pin: undefined }));
+        }
 
-      if (validationErrors.pin) {
-        setValidationErrors((prev) => ({ ...prev, pin: undefined }));
-      }
-
-      const completedPin = [...newPin];
-      if (completedPin.every((digit) => digit !== "")) {
-        const { isValid, errors } = validateManagerPinForm(completedPin);
-        setValidationErrors(errors);
-
-        if (isValid) {
-          const pin = completedPin.join("");
-          handleManagerLogin(pin);
+        // Check if PIN is complete (6 digits)
+        if (newPin.every(digit => digit !== "")) {
+          const pinString = newPin.join("");
+          handleManagerLogin(pinString);
         }
       }
     }
-  };
+  }, [pin.length, pinCode, setPinCode, validationErrors.pin, setValidationErrors, handleManagerLogin]);
+
+  const handleBackspace = useCallback(() => {
+    const lastFilledIndex = pinCode
+      .map((digit, index) => (digit !== "" ? index : -1))
+      .filter((index) => index !== -1)
+      .pop();
+    if (lastFilledIndex !== undefined) {
+      const newPin = [...pinCode];
+      newPin[lastFilledIndex] = "";
+      setPinCode(newPin);
+      setPinError(false);
+    }
+  }, [pinCode, setPinCode]);
+
+  // Show error animation when there's an error
+  useEffect(() => {
+    if (error) {
+      setPinError(true);
+      // Clear PIN after error
+      setTimeout(() => {
+        setPinCode(["", "", "", "", "", ""]);
+        setPinError(false);
+      }, 600);
+    }
+  }, [error, setPinCode]);
+
+  // Global keyboard listener for PIN input
+  useEffect(() => {
+    if (!showManagerContainer || isLoading) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Handle number keys (0-9)
+      if (/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        handlePinInput(e.key);
+      }
+
+      // Handle backspace
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        handleBackspace();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showManagerContainer, isLoading, handlePinInput, handleBackspace]);
 
   const handleManagerForgotPin = () => {
     setShowManagerForgotPin(true);
@@ -57,69 +100,45 @@ const ManagerLoginForm: React.FC = () => {
     }, 100);
   };
 
-  const handleKeypadInput = (num: string) => {
-    const emptyIndex = pinCode.findIndex((digit) => digit === "");
-    if (emptyIndex !== -1) {
-      handlePinChange(emptyIndex, num);
-    }
-  };
-
-  const handleBackspace = () => {
-    const lastFilledIndex = pinCode
-      .map((digit, index) => (digit !== "" ? index : -1))
-      .filter((index) => index !== -1)
-      .pop();
-    if (lastFilledIndex !== undefined) {
-      handlePinChange(lastFilledIndex, "");
-    }
-  };
-
   return (
-    <div
-      className={`transition-all duration-500 ease-out ${
-        showManagerContainer
-          ? "opacity-100 transform translate-y-0"
-          : "opacity-0 transform translate-y-4"
-      }`}
-    >
-      {/* Mobile Back Button */}
+    <>
+      {/* Mobile Close Button */}
       <Button
         variant="ghost"
         size="icon"
         onClick={handleBackToRoleSelection}
-        className="absolute top-4 left-4 sm:hidden w-8 h-8 text-gray-400 hover:text-gray-600 z-10"
+        className="absolute top-4 right-4 sm:hidden w-9 h-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100 z-10 rounded-full"
       >
-        <ArrowLeft size={20} />
+        <X size={20} />
       </Button>
 
-      <div className="mb-8 sm:mb-12 text-center -mt-6 sm:-mt-8">
-        <p className="text-gray-500 text-xs sm:text-sm mb-2 sm:mb-3 tracking-widest font-medium">
+      <div className="mb-6 sm:mb-6 text-center mt-2 sm:mt-0" style={{ fontFamily: "Manrope, system-ui, sans-serif" }}>
+        <p className="text-gray-400 text-[10px] sm:text-xs mb-1.5 tracking-widest font-medium">
           WELCOME BACK
         </p>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
-          Log In to your Account
+        <h2 className="text-xl sm:text-xl font-semibold text-gray-900">
+          Enter Your PIN
         </h2>
       </div>
 
-      {error && <ErrorMessage message={error} className="mb-4 sm:mb-6" />}
+      {error && <ErrorMessage message={error} className="mb-3 sm:mb-4" />}
 
-      <div className="space-y-6 sm:space-y-8">
-        {/* PIN Input */}
-        <div className="flex justify-center gap-2 sm:gap-3 md:gap-4">
-          {pinCode.map((digit, index) => (
-            <input
+      <div className="space-y-5" style={{ fontFamily: "Manrope, system-ui, sans-serif" }}>
+        {/* PIN Dots - also serves as loading indicator */}
+        <div className={`flex justify-center gap-2.5 sm:gap-3 mb-4 transition-all duration-200 ${pinError ? 'animate-shake' : ''}`}>
+          {[0, 1, 2, 3, 4, 5].map((index) => (
+            <div
               key={index}
-              id={`pin-${index}`}
-              type="password"
-              maxLength={1}
-              value={digit}
-              onChange={(e) => handlePinChange(index, e.target.value)}
-              className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl md:text-2xl font-bold border-0 bg-gray-100 rounded-sm focus:bg-gray-800 focus:text-white focus:ring-2 focus:ring-gray-600 focus:outline-none transition-colors"
-              style={{
-                backgroundColor: digit ? "#374151" : "#f3f4f6",
-                color: digit ? "white" : "#374151",
-              }}
-              disabled={isLoading}
+              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full transition-all duration-200 ${
+                pinError
+                  ? 'bg-red-500 scale-110 shadow-lg shadow-red-500/50'
+                  : isLoading
+                  ? 'bg-gray-800 animate-bounce'
+                  : index < pin.length
+                  ? 'bg-gray-800 scale-110 shadow-lg shadow-gray-800/30'
+                  : 'bg-gray-200'
+              }`}
+              style={isLoading ? { animationDelay: `${index * 100}ms` } : undefined}
             />
           ))}
         </div>
@@ -127,64 +146,45 @@ const ManagerLoginForm: React.FC = () => {
         {/* Error message for PIN */}
         {validationErrors.pin && (
           <div className="text-center">
-            <span className="text-red-500 text-sm">
+            <span className="text-red-500 text-xs">
               {validationErrors.pin}
             </span>
           </div>
         )}
 
         {/* Number Keypad */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 max-w-xs mx-auto px-4 sm:px-0">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-            <Button
-              key={num}
-              type="button"
-              variant="secondary"
+        <Keypad
+          onInput={handlePinInput}
+          onClear={() => setPinCode(["", "", "", "", "", ""])}
+          onBackspace={handleBackspace}
+          showDecimal={false}
+          className="max-w-[220px] sm:max-w-[240px] mx-auto"
+        />
 
-              className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
-              onClick={() => handleKeypadInput(num.toString())}
-              disabled={
-                isLoading || pinCode.every((digit) => digit !== "")
-              }
-            >
-              {num}
-            </Button>
-          ))}
-          <div></div> {/* Empty space */}
-          <Button
+        <div className="text-right pt-2">
+          <button
             type="button"
-            variant="secondary"
-
-            className="h-12 sm:h-14 text-lg sm:text-xl font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
-            onClick={() => handleKeypadInput("0")}
-            disabled={isLoading || pinCode.every((digit) => digit !== "")}
-          >
-            0
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-12 sm:h-14 text-base sm:text-lg font-medium text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
-            onClick={handleBackspace}
-            disabled={isLoading || pinCode.every((digit) => digit === "")}
-          >
-            ⌫
-          </Button>
-        </div>
-
-        <div className="text-center pt-3">
-          <Button
-            type="button"
-            variant="link"
             onClick={handleManagerForgotPin}
-            className="text-gray-500 text-sm hover:text-gray-700 transition-colors duration-200 p-0 h-auto"
+            className="text-[#333333] text-sm hover:text-black transition-colors"
+            style={{ fontFamily: "Manrope, system-ui, sans-serif" }}
             disabled={isLoading}
           >
-            Forgot Your PIN Code?
-          </Button>
+            Forgot Your PIN?
+          </button>
         </div>
       </div>
-    </div>
+
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+          20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
+    </>
   );
 };
 

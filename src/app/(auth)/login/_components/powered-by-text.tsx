@@ -8,50 +8,62 @@ const PoweredByText: React.FC = () => {
 
   return (
     <>
-      {/* Admin powered by text - comes from left */}
-      {phase === "adminLogin" && (
+      {/* Mobile: Idle phase - show at bottom center */}
+      {phase === "idle" && (
         <div
-          className="absolute bottom-6 sm:bottom-12 left-2 sm:left-4 z-45 flex items-center transition-all duration-1000 ease-out"
-          style={{
-            transform: showLine ? "translateX(0)" : "translateX(-100%)",
-            opacity: showLine ? 1 : 0,
-            willChange: "transform, opacity",
-          }}
+          className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[35] flex items-center"
+          style={{ fontFamily: "Manrope, system-ui, sans-serif" }}
         >
-          <div className="w-4 h-4 sm:w-6 sm:h-6 mr-1 sm:mr-2 flex items-center justify-center">
-            <img
-              src="/logos/Black.svg"
-              alt="logo"
-              className="w-4 h-4 sm:w-6 sm:h-6 object-contain"
-            />
-          </div>
-
-          <span className="text-xs sm:text-sm md:text-base font-medium" style={{ color: "#2e2e2e" }}>
+          <img
+            src="/Logos/Black.svg"
+            alt="logo"
+            className="w-3 h-3 object-contain mr-1.5"
+          />
+          <span className="text-[10px] font-medium text-black/60">
             Powered by Tri Tech Technology
           </span>
         </div>
       )}
 
-      {/* Manager powered by text - comes from right */}
-      {phase === "managerLogin" && (
+      {/* Desktop: Admin powered by text - fixed to bottom left */}
+      {phase === "adminLogin" && (
         <div
-          className="absolute bottom-6 sm:bottom-12 right-2 sm:right-4 z-45 flex items-center transition-all duration-1000 ease-out"
+          className="hidden sm:flex fixed bottom-3 left-3 z-[60] items-center transition-all duration-700 ease-out"
           style={{
-            transform: showManagerLine ? "translateX(0)" : "translateX(100%)",
-            opacity: showManagerLine ? 1 : 0,
-            willChange: "transform, opacity",
+            transform: showLine ? "translateY(0)" : "translateY(20px)",
+            opacity: showLine ? 1 : 0,
+            fontFamily: "Manrope, system-ui, sans-serif",
           }}
         >
-          <span className="text-xs sm:text-sm md:text-base font-medium text-gray-500 mr-1 sm:mr-2">
+          <img
+            src="/Logos/Black.svg"
+            alt="logo"
+            className="w-4 h-4 object-contain mr-1.5"
+          />
+          <span className="text-xs font-medium text-gray-400">
             Powered by Tri Tech Technology
           </span>
-          <div className="w-4 h-4 sm:w-6 sm:h-6 mr-1 sm:mr-2 flex items-center justify-center">
-            <img
-              src="/logos/d1ab35.svg"
-              alt="logo"
-              className="w-4 h-4 sm:w-6 sm:h-6 object-contain"
-            />
-          </div>
+        </div>
+      )}
+
+      {/* Desktop: Manager powered by text - fixed to bottom right */}
+      {phase === "managerLogin" && (
+        <div
+          className="hidden sm:flex fixed bottom-3 right-3 z-[60] items-center transition-all duration-700 ease-out"
+          style={{
+            transform: showManagerLine ? "translateY(0)" : "translateY(20px)",
+            opacity: showManagerLine ? 1 : 0,
+            fontFamily: "Manrope, system-ui, sans-serif",
+          }}
+        >
+          <span className="text-xs font-medium text-gray-400 mr-1.5">
+            Powered by Tri Tech Technology
+          </span>
+          <img
+            src="/Logos/d1ab35.svg"
+            alt="logo"
+            className="w-4 h-4 object-contain"
+          />
         </div>
       )}
     </>

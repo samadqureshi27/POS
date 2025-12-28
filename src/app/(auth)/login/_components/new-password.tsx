@@ -125,17 +125,23 @@ const NewPasswordOverlay: React.FC = () => {
 
   return (
     <div
-      className={`absolute inset-0 bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-6 sm:px-12 md:px-16 py-12 sm:py-16 md:py-20 z-30 transition-transform duration-1000 ease-out ${
+      className={`absolute inset-0 bg-white rounded-t-2xl sm:rounded-tl-3xl sm:rounded-tr-3xl flex flex-col justify-center px-6 sm:px-12 md:px-16 py-8 sm:py-16 md:py-20 z-30 transition-transform duration-700 sm:duration-1000 ease-out ${
         showNewPasswordContainer
           ? "transform translate-y-0"
           : "transform translate-y-full"
       }`}
       style={{
         willChange: "transform",
+        fontFamily: "Manrope, system-ui, sans-serif",
       }}
     >
-      <div className="mb-8 sm:mb-12 text-center -mt-6 sm:-mt-8">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">
+      {/* Mobile: Drag handle indicator - positioned at top edge */}
+      <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 z-20">
+        <div className="w-10 h-1 bg-gray-300 rounded-full" />
+      </div>
+
+      <div className="mb-6 sm:mb-12 text-center mt-4 sm:-mt-8">
+        <h2 className="text-xl sm:text-xl md:text-2xl font-semibold text-gray-900 mb-2 sm:mb-4">
           Set a new password
         </h2>
         <p className="text-gray-500 text-sm">
@@ -162,7 +168,7 @@ const NewPasswordOverlay: React.FC = () => {
             }}
             placeholder="Enter your new password"
             disabled={isLoading}
-            className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-sm py-3 sm:py-4"
+            className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-sm h-12 sm:h-14"
           />
           {validationErrors.newPassword && (
             <p className="text-red-500 text-xs mt-1">{validationErrors.newPassword}</p>
@@ -186,19 +192,19 @@ const NewPasswordOverlay: React.FC = () => {
             }}
             placeholder="Re-enter password"
             disabled={isLoading}
-            className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-sm py-3 sm:py-4"
+            className="placeholder-gray-400 text-sm tracking-wide border-gray-300 rounded-sm h-12 sm:h-14"
           />
           {validationErrors.confirmPassword && (
             <p className="text-red-500 text-xs mt-1">{validationErrors.confirmPassword}</p>
           )}
         </div>
 
-        <div className="pt-3 sm:pt-4">
+        <div className="pt-2 sm:pt-4">
           <Button
             type="button"
             variant="default"
             size="lg"
-            className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-sm text-xs sm:text-sm"
+            className="w-full h-12 sm:h-14 bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest rounded-sm text-xs sm:text-sm"
             disabled={isLoading || !newPassword || !confirmPassword}
             onClick={handleUpdatePassword}
           >

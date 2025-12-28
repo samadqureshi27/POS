@@ -372,8 +372,8 @@ export default function InventoryItemModal({
                 </div>
                 <div className="grid grid-cols-[1fr_auto] gap-2 mt-1.5">
                   <Select
-                    value={formData.categoryId || ""}
-                    onValueChange={handleCategorySelect}
+                    value={typeof formData.categoryId === 'string' ? formData.categoryId : formData.categoryId?._id || formData.categoryId?.id || ""}
+                    onValueChange={(value) => handleCategorySelect(value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />

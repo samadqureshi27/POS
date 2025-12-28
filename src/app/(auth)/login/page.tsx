@@ -21,7 +21,10 @@ const LoginPageContent: React.FC = () => {
     <div
       ref={containerRef}
       className="relative h-screen w-full overflow-hidden"
-      style={{ background: "#d1ab35" }}
+      style={{ 
+        background: "#d1ab35",
+        overflowX: "hidden",
+      }}
       onMouseLeave={() => setHoverSide("none")}
       onMouseMove={(e) => {
         if (!containerRef.current || phase !== "idle") return;
@@ -44,11 +47,30 @@ const LoginPageContent: React.FC = () => {
       {/* Admin login container with all overlays */}
       {phase === "adminLogin" && (
         <div className="absolute right-0 top-0 h-full z-50 w-full sm:w-auto">
+          {/* Mobile: Full screen with rounded top corners, slides from bottom */}
           <div
-            className={`h-full bg-white rounded-tl-3xl rounded-tr-3xl flex flex-col justify-center px-6 sm:px-12 md:px-16 py-12 sm:py-16 md:py-20 shadow-lg mr-0 sm:mr-8 md:mr-16 mt-0 sm:mt-8 md:mt-16 transition-transform duration-1000 ease-out relative w-full sm:w-96 md:w-[450px] sm:-ml-6 md:-ml-12 ${
+            className={`
+              sm:hidden
+              fixed inset-x-0 bottom-0 bg-white rounded-t-2xl flex flex-col px-6 pt-12 pb-8 shadow-2xl
+              transition-transform duration-700 ease-out
+              ${showLoginContainer ? "transform translate-y-0" : "transform translate-y-full"}
+            `}
+            style={{
+              willChange: "transform",
+              height: "85vh",
+              maxHeight: "85vh",
+            }}
+          >
+            <AdminLoginForm />
+            <ForgotPasswordOverlay />
+            <EmailVerificationOverlay />
+            <NewPasswordOverlay />
+          </div>
 
+          {/* Desktop: Side panel with original styling */}
+          <div
+            className={`hidden sm:flex min-h-[120%] bg-white rounded-sm flex-col px-10 md:px-12 pt-20 pb-40 shadow-lg mr-6 md:mr-12 mt-[20%] transition-transform duration-1000 ease-out relative w-[340px] md:w-[400px] ${
               showLoginContainer ? "transform translate-y-0" : "transform translate-y-full"
-
             }`}
             style={{
               willChange: "transform",
@@ -65,11 +87,28 @@ const LoginPageContent: React.FC = () => {
       {/* Manager PIN login container with overlays */}
       {phase === "managerLogin" && (
         <div className="absolute left-0 top-0 h-full z-50 w-full sm:w-auto">
+          {/* Mobile: Full screen with rounded top corners, slides from bottom */}
           <div
-            className={`h-full bg-white rounded-tr-3xl rounded-tl-3xl flex flex-col justify-center px-6 sm:px-12 md:px-16 py-12 sm:py-16 md:py-20 shadow-lg ml-0 sm:ml-8 md:ml-16 mt-0 sm:mt-8 md:mt-16 transition-transform duration-1000 ease-out relative w-full sm:w-96 md:w-[450px] sm:-mr-6 md:-mr-12 ${
+            className={`
+              sm:hidden
+              fixed inset-x-0 bottom-0 bg-white rounded-t-2xl flex flex-col px-6 pt-12 pb-8 shadow-2xl
+              transition-transform duration-700 ease-out
+              ${showManagerContainer ? "transform translate-y-0" : "transform translate-y-full"}
+            `}
+            style={{
+              willChange: "transform",
+              height: "85vh",
+              maxHeight: "85vh",
+            }}
+          >
+            <ManagerLoginForm />
+            <ManagerForgotPinOverlay />
+          </div>
 
+          {/* Desktop: Side panel with original styling */}
+          <div
+            className={`hidden sm:flex min-h-[120%] bg-white rounded-sm flex-col px-10 md:px-12 pt-20 pb-40 shadow-lg ml-6 md:ml-12 mt-[20%] transition-transform duration-1000 ease-out relative w-[340px] md:w-[400px] ${
               showManagerContainer ? "transform translate-y-0" : "transform translate-y-full"
-
             }`}
             style={{
               willChange: "transform",

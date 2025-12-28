@@ -67,7 +67,7 @@ export function MobileDrawer({
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto flex flex-col bg-[#2E2E2E]">
+                <div className="flex-1 overflow-y-auto hide-scrollbar flex flex-col bg-[#2E2E2E]">
                     {/* Navigation Links */}
                     <div>
                         {menuItems.map((item, index) => (

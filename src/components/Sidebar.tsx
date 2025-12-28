@@ -139,7 +139,7 @@ export default function Sidebar() {
               <Link
                 key={idx}
                 href={item.href}
-                className={`group flex items-center justify-center p-2 rounded hover:bg-[#454545] transition-all transition-standard min-w-12 h-12 flex-shrink-0 ${isItemActive(item) ? 'bg-[#454545]' : ''
+                className={`group relative flex items-center justify-center p-2 rounded hover:bg-[#454545] transition-all transition-standard min-w-12 h-12 flex-shrink-0 ${isItemActive(item) ? 'bg-[#454545]' : ''
                   }`}
               >
                 <span className={`transition-colors transition-standard ${isItemActive(item)
@@ -151,7 +151,7 @@ export default function Sidebar() {
 
                 {/* NEW Badge at bottom border */}
                 {item.hasNewBadge && (
-                  <NewBadge className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20" />
+                  <NewBadge className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20" />
                 )}
               </Link>
             ))}

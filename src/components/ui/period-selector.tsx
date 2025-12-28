@@ -38,77 +38,75 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
   }, [customDateRange]);
 
   return (
-    <div className="mb-1 relative">
-      <div className="flex mb-1 sm:mb-1 relative w-full">
-        <div className="flex overflow-x-auto overflow-y-hidden pb-1 gap-2 w-full justify-end scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent sm:hide-scrollbar [-webkit-overflow-scrolling:touch]">
-          {periods.slice(0, -1).map((period) => (
+    <div className="mb-8 relative w-full overflow-hidden">
+      <div className="flex items-center overflow-x-auto hide-scrollbar gap-2 flex-row-reverse [-webkit-overflow-scrolling:touch]">
+        {/* Custom date range with shadcn Popover */}
+        <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
+          <PopoverTrigger asChild>
             <Button
-              key={period}
-              variant={selectedPeriod === period ? "filterActive" : "filter"}
+              variant={selectedPeriod === "Custom" ? "filterActive" : "filter"}
               onClick={() => {
-                onPeriodChange(period);
-                setShowDatePicker(false);
+                onPeriodChange("Custom");
+                setShowDatePicker(!showDatePicker);
               }}
-              className="h-8 rounded-sm flex-shrink-0 whitespace-nowrap"
+              className="h-8 rounded-sm flex-shrink-0 whitespace-nowrap min-w-[100px]"
             >
-              {period}
+              <CalendarIcon size={14} />
+              <span>
+                {selectedPeriod === "Custom" &&
+                  customDateRange?.[0]?.startDate &&
+                  customDateRange?.[0]?.endDate
+                  ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
+                  : "Custom"}
+              </span>
             </Button>
-          ))}
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-auto p-0"
+            align="center"
+            side="bottom"
+          >
+            <Calendar
+              mode="range"
+              defaultMonth={dateRange?.from}
+              selected={dateRange as any}
+              onSelect={(range) => {
+                if (range) {
+                  setDateRange(range);
+                  if (range.from && range.to) {
+                    // Update the original format for compatibility
+                    const newCustomDateRange = [{
+                      startDate: range.from,
+                      endDate: range.to,
+                      key: "selection",
+                    }];
+                    setCustomDateRange(newCustomDateRange);
+                    setShowDatePicker(false);
 
-          {/* Custom date range with shadcn Popover */}
-          <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
-            <PopoverTrigger asChild>
-              <Button
-                variant={selectedPeriod === "Custom" ? "filterActive" : "filter"}
-                onClick={() => {
-                  onPeriodChange("Custom");
-                  setShowDatePicker(!showDatePicker);
-                }}
-                className="h-8 rounded-sm flex-shrink-0 whitespace-nowrap min-w-[100px]"
-              >
-                <CalendarIcon size={14} />
-                <span>
-                  {selectedPeriod === "Custom" &&
-                    customDateRange?.[0]?.startDate &&
-                    customDateRange?.[0]?.endDate
-                    ? `${formatDisplayDate(customDateRange[0].startDate)} - ${formatDisplayDate(customDateRange[0].endDate)}`
-                    : "Custom"}
-                </span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto p-0"
-              align="center"
-              side="bottom"
-            >
-              <Calendar
-                mode="range"
-                defaultMonth={dateRange?.from}
-                selected={dateRange as any}
-                onSelect={(range) => {
-                  if (range) {
-                    setDateRange(range);
-                    if (range.from && range.to) {
-                      // Update the original format for compatibility
-                      const newCustomDateRange = [{
-                        startDate: range.from,
-                        endDate: range.to,
-                        key: "selection",
-                      }];
-                      setCustomDateRange(newCustomDateRange);
-                      setShowDatePicker(false);
-
-                      // Trigger data loading with the new date range
-                      onPeriodChange("Custom");
-                    }
+                    // Trigger data loading with the new date range
+                    onPeriodChange("Custom");
                   }
-                }}
-                numberOfMonths={1}
-                className="rounded-sm border"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+                }
+              }}
+              numberOfMonths={1}
+              className="rounded-sm border"
+            />
+          </PopoverContent>
+        </Popover>
+
+        {[...periods.slice(0, -1)].reverse().map((period) => (
+          <Button
+            key={period}
+            variant={selectedPeriod === period ? "filterActive" : "filter"}
+            onClick={() => {
+              onPeriodChange(period);
+              setShowDatePicker(false);
+            }}
+            className="h-8 rounded-sm flex-shrink-0 whitespace-nowrap"
+          >
+            {period}
+          </Button>
+        ))}
       </div>
     </div>
   );

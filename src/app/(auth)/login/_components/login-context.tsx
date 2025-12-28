@@ -137,7 +137,7 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
   // Manager states
   const [showManagerContainer, setShowManagerContainer] = useState(false);
   const [showManagerLine, setShowManagerLine] = useState(false);
-  const [pinCode, setPinCode] = useState(["", "", "", ""]);
+  const [pinCode, setPinCode] = useState(["", "", "", "", "", ""]);
   const [showManagerForgotPin, setShowManagerForgotPin] = useState(false);
   const [showManagerForgotContainer, setShowManagerForgotContainer] = useState(false);
 
@@ -296,7 +296,7 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
     setOtpCode(["", "", "", "", ""]);
     setNewPassword("");
     setConfirmPassword("");
-    setPinCode(["", "", "", ""]);
+    setPinCode(["", "", "", "", "", ""]);
     setValidationErrors({});
     setResetEmailError("");
     setError(null);

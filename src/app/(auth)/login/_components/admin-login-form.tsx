@@ -1,7 +1,7 @@
 // components/login/AdminLoginForm.tsx
 "use client";
-import React from "react";
-import { User, Lock, ArrowLeft } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { X, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ErrorMessage from "@/components/ui/error-message";
@@ -20,11 +20,23 @@ const AdminLoginForm: React.FC = () => {
     validationErrors,
     setValidationErrors,
     handleAdminLogin,
-    showForgotPassword,
     setShowForgotPassword,
     setShowForgotContainer,
     handleBackToRoleSelection,
+    showLoginContainer,
   } = useLoginContext();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus email input when form appears
+  useEffect(() => {
+    if (showLoginContainer && emailInputRef.current) {
+      setTimeout(() => {
+        emailInputRef.current?.focus();
+      }, 500);
+    }
+  }, [showLoginContainer]);
 
   const validateForm = () => {
     const { isValid, errors } = validateAdminLoginForm(email, password);
@@ -32,7 +44,8 @@ const AdminLoginForm: React.FC = () => {
     return isValid;
   };
 
-  const handleLogin = () => {
+  const handleLogin = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (validateForm()) {
       handleAdminLogin(email, password);
     }
@@ -49,83 +62,92 @@ const AdminLoginForm: React.FC = () => {
 
   return (
     <>
-      {/* Mobile Back Button */}
+      {/* Mobile Close Button */}
       <Button
         variant="ghost"
         size="icon"
         onClick={handleBackToRoleSelection}
-        className="absolute top-4 left-4 sm:hidden w-8 h-8 text-gray-400 hover:text-gray-600 z-10"
+        className="absolute top-4 right-4 sm:hidden w-9 h-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100 z-10 rounded-full"
       >
-        <ArrowLeft size={20} />
+        <X size={20} />
       </Button>
 
-      <div className="mb-8 sm:mb-12 text-center -mt-8 sm:-mt-16">
-        <p className="text-gray-500 text-xs sm:text-sm mb-2 sm:mb-3 tracking-widest font-medium">
+      <div className="mb-6 sm:mb-6 text-center mt-2 sm:mt-0" style={{ fontFamily: "Manrope, system-ui, sans-serif" }}>
+        <p className="text-gray-400 text-[10px] sm:text-xs mb-1.5 tracking-widest font-medium">
           WELCOME BACK
         </p>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
+        <h2 className="text-xl sm:text-xl font-semibold text-gray-900">
           Log In to your Account
         </h2>
       </div>
 
-      {error && <ErrorMessage message={error} className="mb-4 sm:mb-6" />}
+      {error && <ErrorMessage message={error} className="mb-3 sm:mb-4" />}
 
-      <div className="space-y-4 sm:space-y-5">
-        <div className="relative">
+      <form onSubmit={handleLogin} className="space-y-4" style={{ fontFamily: "Manrope, system-ui, sans-serif" }}>
+        <div>
           <Input
+            ref={emailInputRef}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="EMAIL-OR-NUMBER"
+            placeholder="Email or Phone"
             disabled={isLoading}
-            className="placeholder-gray-400 text-sm tracking-wide rounded-sm py-3 sm:py-4 pl-12"
+            required
+            className="placeholder-gray-400 text-sm h-12 sm:h-14"
           />
-          <User size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
           {validationErrors.email && (
-            <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+            <p className="text-red-500 text-xs mt-1">{validationErrors.email}</p>
           )}
         </div>
 
         <div className="relative">
           <Input
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="PASSWORD"
+            placeholder="Password"
             disabled={isLoading}
-            className="placeholder-gray-400 text-sm tracking-wide rounded-sm py-3 sm:py-4 pl-12"
+            required
+            className="placeholder-gray-400 text-sm pr-10 h-12 sm:h-14"
           />
-          <Lock size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-500 transition-colors"
+            tabIndex={-1}
+          >
+            {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+          </button>
           {validationErrors.password && (
-            <p className="text-red-500 text-sm mt-1">{validationErrors.password}</p>
+            <p className="text-red-500 text-xs mt-1">{validationErrors.password}</p>
           )}
         </div>
 
-
         <div className="pt-3 sm:pt-4">
-          <Button
+          <button
             type="submit"
-            size="lg"
-            className="h-11 w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-sm text-xs sm:text-sm"
             disabled={isLoading}
-            onClick={handleLogin}
+            className="h-12 sm:h-14 w-full bg-black hover:bg-gray-900 font-medium rounded-sm text-base transition-colors disabled:opacity-50"
+            style={{ fontFamily: "Manrope, system-ui, sans-serif" }}
           >
-            {isLoading ? "LOGGING IN..." : "LOGIN"}
-          </Button>
+            <span className="bg-gradient-to-r from-[#d1ab35] to-[#e8c84a] bg-clip-text text-transparent">
+              {isLoading ? "Logging in..." : "Log in"}
+            </span>
+          </button>
         </div>
 
-        <div className="text-center pt-2 sm:pt-3">
-          <Button
+        <div className="text-right pt-1">
+          <button
             type="button"
-            variant="ghost"
             onClick={handleForgotPassword}
-            className="text-gray-500 text-sm hover:text-gray-700"
+            className="text-[#333333] text-sm hover:text-black transition-colors"
             disabled={isLoading}
+            style={{ fontFamily: "Manrope, system-ui, sans-serif" }}
           >
             Forgot password?
-          </Button>
+          </button>
         </div>
-      </div>
+      </form>
     </>
   );
 };

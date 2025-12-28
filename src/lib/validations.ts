@@ -15,7 +15,7 @@ export const validatePassword = (password: string): string | null => {
 
 export const validatePin = (pin: string[]): string | null => {
   const pinString = pin.join('');
-  if (pinString.length !== 4) return 'Please enter a 4-digit PIN';
+  if (pinString.length !== 6) return 'Please enter a 6-digit PIN';
   if (!/^\d+$/.test(pinString)) return 'PIN must contain only numbers';
   return null;
 };
