@@ -1,5 +1,6 @@
 // lib/types/recipe-options.ts
 // All recipe-related types in one file
+import { ApiResponse } from "./common";
 
 // Recipe Variant Ingredient interface based on API structure
 export interface RecipeVariantIngredient {
@@ -216,12 +217,7 @@ export interface RecipeVariantModalProps {
   loading?: boolean;
 }
 
-// API Response interfaces
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-}
+// API Response interfaces - imported from common.ts
 
 export interface PaginatedResponse<T> {
   success: boolean;

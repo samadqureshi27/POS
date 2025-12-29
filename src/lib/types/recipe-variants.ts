@@ -1,5 +1,6 @@
 // lib/types/recipe-variants.ts
 // Recipe Variant types based on API structure
+import { ApiResponse } from "./common";
 
 // Ingredient structure for variants
 export interface VariantIngredient {
@@ -59,12 +60,7 @@ export interface RecipeVariantFormData {
   };
 }
 
-// API Response types
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-}
+// API Response types - imported from common.ts
 
 export interface PaginatedResponse<T> {
   success: boolean;

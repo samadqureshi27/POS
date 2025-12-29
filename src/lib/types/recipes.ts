@@ -1,4 +1,5 @@
 // types/recipes.ts
+import { ApiResponse } from "./common";
 
 export interface RecipeOption {
   ID: number;
@@ -76,12 +77,7 @@ export interface LoadingState {
   actionLoading: boolean;
 }
 
-// API Response types
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-}
+// API Response types - imported from common.ts
 
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   pagination: {

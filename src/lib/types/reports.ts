@@ -1,3 +1,5 @@
+import { ApiResponse, ToastState } from "./common";
+
 export interface ReportItem {
     ID: number;
     Branch_ID_fk: string;
@@ -12,15 +14,7 @@ export interface ReportItem {
     Total_Value: number;
 }
 
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    success: boolean;
-}
-
-export interface ToastProps {
-    message: string;
-    type: "success" | "error";
+export interface ToastProps extends ToastState {
     onClose: () => void;
 }
 

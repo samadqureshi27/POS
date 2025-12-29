@@ -1,4 +1,6 @@
 // Types for category management
+import { ApiResponse, ToastState } from "./common";
+
 export interface CategoryItem {
   ID: number;
   Name: string;
@@ -10,15 +12,7 @@ export interface CategoryItem {
   backendId?: string; // Actual backend ID (_id or id)
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  success: boolean;
-}
-
-export interface ToastProps {
-  message: string;
-  type: "success" | "error";
+export interface ToastProps extends ToastState {
   onClose: () => void;
 }
 

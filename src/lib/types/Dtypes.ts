@@ -1,4 +1,5 @@
 // types.ts - All TypeScript interfaces and types
+import { ApiResponse } from "./common";
 
 export interface DashboardMetrics {
   grossRevenue: number;
@@ -53,10 +54,8 @@ export interface DashboardData {
   period: string;
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  success: boolean;
+// Extended ApiResponse for this file that includes lastUpdated
+export interface DashboardApiResponse<T> extends ApiResponse<T> {
   lastUpdated?: string;
 }
 
