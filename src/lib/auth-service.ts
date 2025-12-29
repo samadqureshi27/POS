@@ -1,5 +1,7 @@
 // src/lib/authService.ts
 import { getAccessToken, getRefreshToken, setTokens, updateAccessToken, clearTokens as clearAuthTokens, migrateLegacyTokens } from './util/token-manager';
+import { setTenantInfo, clearTenantInfo, getTenantSlug as getStoredTenantSlug, migrateLegacyTenantData } from './util/tenant-manager';
+import { extractTenantFromToken } from './util/jwt-helper';
 
 export interface User {
   _id?: string;
@@ -68,43 +70,55 @@ function buildUrl(path: string) {
 }
 
 /**
- * Get tenant slug from environment or localStorage
- * Throws an error if tenant slug is not configured
+ * Get tenant slug from cookies/localStorage or fallback to environment
+ * @param required - Whether to throw error if not found (default: true)
+ * @returns Tenant slug or empty string if not required and not found
  */
-function getTenantSlug(): string {
-  // Priority: env var > localStorage
-  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || '';
-  if (envSlug) return envSlug;
+function getTenantSlug(required: boolean = true): string {
+  // Priority: cookies/localStorage > env var
+  const stored = getStoredTenantSlug();
+  if (stored) return stored;
 
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem('tenant_slug');
-    if (stored) return stored;
+  // Fallback to env var (for initial setup or development)
+  const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || '';
+  if (envSlug) {
+    console.warn('⚠️ Using tenant slug from environment. Please login to store it properly.');
+    return envSlug;
+  }
+
+  // If not required (like during login), return empty string
+  if (!required) {
+    return '';
   }
 
   // No default - tenant slug MUST be explicitly configured
   throw new Error(
-    'Tenant slug not configured. Please set NEXT_PUBLIC_TENANT_SLUG environment variable.'
+    'Tenant slug not configured. Please login to set tenant information.'
   );
 }
 
 function getTenantId(): string | null {
+  // Priority: cookies/localStorage > env var
+  const stored = getStoredTenantSlug();
+  if (stored) return stored;
+
   const envId = process.env.NEXT_PUBLIC_TENANT_ID || '';
   if (envId) return envId;
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('tenant_id') || null;
-  }
+
   return null;
 }
 
-function buildHeaders(token?: string, extra?: Record<string, string>) {
+function buildHeaders(token?: string, extra?: Record<string, string>, requireTenant: boolean = true) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
 
-  // Always add tenant identifier - required for ALL tenant API calls
-  const slug = getTenantSlug();
-  headers['x-tenant-id'] = slug; // API expects x-tenant-id header
+  // Add tenant identifier if required (skip for login endpoints)
+  const slug = getTenantSlug(requireTenant);
+  if (slug) {
+    headers['x-tenant-id'] = slug; // API expects x-tenant-id header
+  }
 
   if (token) headers['Authorization'] = `Bearer ${token}`;
   return { ...headers, ...(extra || {}) };
@@ -119,6 +133,9 @@ class AuthService {
       // Migrate any legacy tokens on initialization
       migrateLegacyTokens();
 
+      // Migrate any legacy tenant data on initialization
+      migrateLegacyTenantData();
+
       this.token = getAccessToken();
       this.refreshToken = getRefreshToken();
     }
@@ -132,7 +149,7 @@ class AuthService {
   ): Promise<LoginResponse> {
     try {
       const url = buildUrl(AUTH_LOGIN_PATH);
-      const headers = buildHeaders();
+      const headers = buildHeaders(undefined, undefined, false); // Don't require tenant for login
 
       const response = await fetch(url, {
         method: 'POST',
@@ -159,13 +176,19 @@ class AuthService {
         const token = data.result.token;
         const user = data.result.user || data.result;
 
+        // Extract tenant information from JWT token
+        const tenantInfo = extractTenantFromToken(token);
+
         // Store authentication data
         this.setTokens(token, token);
         this.setUser(user);
 
-        // Store tenant slug in localStorage for future requests
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('tenant_slug', getTenantSlug());
+        // Store tenant information from JWT in cookies
+        if (tenantInfo.slug) {
+          setTenantInfo(tenantInfo.slug, tenantInfo.name || undefined, tenantInfo.id || undefined);
+          console.log('✅ Tenant information stored from login:', tenantInfo.slug);
+        } else {
+          console.warn('⚠️ No tenant slug found in JWT token');
         }
 
         return { success: true, user };
@@ -227,9 +250,18 @@ class AuthService {
       const token = data.result.token;
       const user = data.result.user || data.result;
 
+      // Extract tenant information from JWT token
+      const tenantInfo = extractTenantFromToken(token);
+
       // Store token
       this.setTokens(token, token);
       this.setUser(user);
+
+      // Store tenant information from JWT in cookies
+      if (tenantInfo.slug) {
+        setTenantInfo(tenantInfo.slug, tenantInfo.name || undefined, tenantInfo.id || undefined);
+        console.log('✅ Tenant information stored from PIN login:', tenantInfo.slug);
+      }
 
       return { success: true, user: user };
     } else {
@@ -473,6 +505,8 @@ class AuthService {
     this.refreshToken = null;
     // Use centralized token manager which also cleans up legacy tokens
     clearAuthTokens();
+    // Also clear tenant information on logout
+    clearTenantInfo();
   }
 
   isAuthenticated(): boolean {

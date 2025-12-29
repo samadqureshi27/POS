@@ -41,20 +41,39 @@ function logApiResponse(url: string, status: number, data?: any) {
 }
 
 /**
- * Get tenant slug from request headers or environment
+ * Get tenant slug from request (cookies, headers, or environment fallback)
  * Throws an error if tenant slug is not configured
  */
 export function getTenantSlug(req: Request): string {
-  // Priority: header > env var
+  // Priority: header > cookies > env var
   const fromHeader = req.headers.get("x-tenant-id");
   if (fromHeader) return fromHeader;
 
+  // Try to get from cookies
+  const cookieHeader = req.headers.get("cookie");
+  if (cookieHeader) {
+    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split('=');
+      acc[key] = decodeURIComponent(value);
+      return acc;
+    }, {} as Record<string, string>);
+
+    const tenantSlugFromCookie = cookies['tenant_slug'];
+    if (tenantSlugFromCookie) {
+      return tenantSlugFromCookie;
+    }
+  }
+
+  // Fallback to env var (for development or initial setup)
   const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG;
-  if (envSlug) return envSlug;
+  if (envSlug) {
+    console.warn('⚠️ Using tenant slug from environment. Login to store it in cookies.');
+    return envSlug;
+  }
 
   // No default - tenant slug MUST be explicitly configured
   throw new Error(
-    'Tenant slug not configured. Please set NEXT_PUBLIC_TENANT_SLUG environment variable.'
+    'Tenant slug not configured. Please login to set tenant information.'
   );
 }
 
@@ -62,15 +81,24 @@ export function getTenantSlug(req: Request): string {
  * Build headers for proxying to tenant API
  * Automatically includes x-tenant-id header with tenant slug
  */
-export function buildTenantHeaders(req: Request, includeAuth: boolean = false): Record<string, string> {
+export function buildTenantHeaders(req: Request, includeAuth: boolean = false, requireTenant: boolean = true): Record<string, string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "Accept": "application/json",
   };
 
-  // Always include tenant identifier
-  const tenantSlug = getTenantSlug(req);
-  headers["x-tenant-id"] = tenantSlug;
+  // Include tenant identifier if required (skip for login endpoints)
+  if (requireTenant) {
+    try {
+      const tenantSlug = getTenantSlug(req);
+      headers["x-tenant-id"] = tenantSlug;
+    } catch (error) {
+      // If tenant slug is required but not found, throw error
+      if (requireTenant) {
+        throw error;
+      }
+    }
+  }
 
   // Include auth token if provided
   if (includeAuth) {

@@ -13,6 +13,7 @@
  */
 
 import { getAccessToken } from './token-manager';
+import { getTenantSlug, getTenantId } from './tenant-manager';
 import { API_CONFIG } from '@/lib/constants';
 import { ApiResponse as BaseApiResponse } from "@/lib/types/common";
 
@@ -21,7 +22,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PU
 const USE_API_PROXY = (process.env.NEXT_PUBLIC_USE_API_PROXY || 'true').toLowerCase() === 'true';
 
 /**
- * Get tenant information from localStorage or environment
+ * Get tenant information from cookies or environment
  */
 function getTenantInfo(): { id: string | null; slug: string | null } {
   if (typeof window === 'undefined') {
@@ -31,9 +32,10 @@ function getTenantInfo(): { id: string | null; slug: string | null } {
     };
   }
 
+  // Get from cookies using tenant-manager
   return {
-    id: localStorage.getItem('tenant_id') || process.env.NEXT_PUBLIC_TENANT_ID || null,
-    slug: localStorage.getItem('tenant_slug') || process.env.NEXT_PUBLIC_TENANT_SLUG || null,
+    id: getTenantId() || process.env.NEXT_PUBLIC_TENANT_ID || null,
+    slug: getTenantSlug() || process.env.NEXT_PUBLIC_TENANT_SLUG || null,
   };
 }
 
