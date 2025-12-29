@@ -2,7 +2,7 @@
 import React from "react";
 import { Save, RotateCcw } from "lucide-react";
 import { Button } from "./button";
-import LoadingSpinner from "./loading-spinner";
+import LoadingSpinner from "@/components/optional-ui-components/loading-spinner";
 
 interface ActionButtonsProps {
   hasChanges: boolean;

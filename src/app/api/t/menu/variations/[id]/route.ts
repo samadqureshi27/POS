@@ -12,10 +12,11 @@ const REMOTE_BASE = getRemoteBase();
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const url = `${REMOTE_BASE}/t/menu/variations/${params.id}`;
+    const { id } = await params;
+    const url = `${REMOTE_BASE}/t/menu/variations/${id}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -47,11 +48,12 @@ export async function GET(
  */
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await req.json();
-    const url = `${REMOTE_BASE}/t/menu/variations/${params.id}`;
+    const url = `${REMOTE_BASE}/t/menu/variations/${id}`;
 
     const response = await fetch(url, {
       method: "PUT",
@@ -84,10 +86,11 @@ export async function PUT(
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const url = `${REMOTE_BASE}/t/menu/variations/${params.id}`;
+    const { id } = await params;
+    const url = `${REMOTE_BASE}/t/menu/variations/${id}`;
 
     const response = await fetch(url, {
       method: "DELETE",

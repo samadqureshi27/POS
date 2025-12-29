@@ -19,7 +19,9 @@
       "Bash(dir:*)",
       "Bash(curl:*)",
       "Bash(git diff:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(done)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []
