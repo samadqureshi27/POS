@@ -14,6 +14,7 @@
 
 import { getAccessToken } from './token-manager';
 import { API_CONFIG } from '@/lib/constants';
+import { ApiResponse as BaseApiResponse } from "@/lib/types/common";
 
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || '';
@@ -225,13 +226,10 @@ export const api = {
 };
 
 /**
- * Type-safe API response wrapper
- * Use this for consistent API response handling
+ * Extended API response wrapper for api-client
+ * Extends the common ApiResponse with additional fields used by the backend
  */
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  message?: string;
+export interface ApiResponse<T = any> extends BaseApiResponse<T> {
   error?: string;
   errors?: any;
   result?: any; // Backend sometimes uses 'result' instead of 'data'

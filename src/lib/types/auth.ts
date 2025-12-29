@@ -1,4 +1,5 @@
 // src/types/auth.ts
+import { ApiResponse } from "./common";
 
 export type UserRole = 'superadmin' | 'admin' | 'manager' | 'cashier' | 'waiter';
 
@@ -28,10 +29,8 @@ export interface LoginResponse {
   error?: string;
 }
 
-export interface ApiResponse<T = any> {
-  success: boolean;
-  message?: string;
-  data?: T;
+// ApiResponse imported from common.ts with extended error fields
+export interface AuthApiResponse<T = any> extends ApiResponse<T> {
   errors?: Record<string, any>;
   error?: string;
 }

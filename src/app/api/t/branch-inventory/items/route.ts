@@ -14,6 +14,9 @@ export async function GET(req: Request) {
   if (searchParams.get("q")) queryParams.append("q", searchParams.get("q")!);
   if (searchParams.get("status")) queryParams.append("status", searchParams.get("status")!);
 
+  // Always request populated data with item details (itemId is the reference field)
+  queryParams.append("populate", "itemId");
+
   const queryString = queryParams.toString();
   const url = `${getRemoteBase()}/t/branch-inventory/items${queryString ? `?${queryString}` : ''}`;
 
@@ -34,7 +37,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const payload = await req.json().catch(() => ({}));
-  const url = `${getRemoteBase()}/t/branch-inventory/items`;
+  // Request populated data with item details when creating
+  const url = `${getRemoteBase()}/t/branch-inventory/items?populate=itemId`;
+
+  console.log("🔵 POST to backend:", url);
+  console.log("🔵 Payload:", payload);
 
   const res = await fetch(url, {
     method: "POST",
@@ -45,6 +52,7 @@ export async function POST(req: Request) {
   const contentType = res.headers.get("content-type");
   if (contentType?.includes("application/json")) {
     const data = await res.json();
+    console.log("🔵 Backend response:", JSON.stringify(data).substring(0, 500));
     return NextResponse.json(data, { status: res.status });
   }
 

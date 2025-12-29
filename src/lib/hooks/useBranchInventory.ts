@@ -87,16 +87,25 @@ export function useBranchInventory(branchId: string | number) {
 
       if (response.success && response.data) {
         // Populate item names from nested objects (preferred) or fallback to snapshots
-        const itemsWithNames = response.data.map(item => ({
-          ...item,
-          itemName: item.item?.name || item.itemNameSnapshot || item.itemName || item.itemId
-        }));
+        // The populated field could be 'item', 'itemId' (populated), or itemNameSnapshot
+        const itemsWithNames = response.data.map(item => {
+          // Check if itemId is populated (becomes an object with name)
+          const populatedItemId = typeof item.itemId === 'object' && item.itemId !== null ? item.itemId : null;
+          const itemName = populatedItemId?.name || item.item?.name || item.itemNameSnapshot || item.itemName || String(item.itemId);
+
+          return {
+            ...item,
+            itemName,
+          };
+        });
 
         console.log("📦 Loaded", itemsWithNames.length, "items with names:",
           itemsWithNames.slice(0, 2).map(i => ({
-            id: i.itemId,
+            id: typeof i.itemId === 'object' ? i.itemId._id : i.itemId,
             name: i.itemName,
-            fromNestedObject: !!i.item?.name
+            fromPopulatedItemId: !!(typeof i.itemId === 'object' && i.itemId.name),
+            fromNestedItem: !!i.item?.name,
+            fromSnapshot: !!i.itemNameSnapshot
           })));
 
         setItems(itemsWithNames);
@@ -171,8 +180,29 @@ export function useBranchInventory(branchId: string | number) {
 
       if (response.success && response.data) {
         toast.success("Inventory item created successfully");
-        // Optimistic update: Add new item to local state
-        setItems(prevItems => [...prevItems, response.data]);
+
+        // Extract item name from the populated response
+        const createdItem = response.data;
+
+        // Check if itemId is populated (becomes an object with name)
+        const populatedItemId = typeof createdItem.itemId === 'object' && createdItem.itemId !== null ? createdItem.itemId : null;
+        const itemName = populatedItemId?.name || createdItem.item?.name || createdItem.itemNameSnapshot || createdItem.itemName || String(createdItem.itemId);
+
+        console.log("✅ Created item with name:", itemName, "from:", {
+          populatedItemId: populatedItemId?.name,
+          nestedItem: createdItem.item?.name,
+          snapshot: createdItem.itemNameSnapshot,
+          direct: createdItem.itemName,
+          rawItemId: createdItem.itemId
+        });
+
+        // Optimistic update: Add new item to local state with populated name
+        const newItemWithName = {
+          ...createdItem,
+          itemName,
+        };
+
+        setItems(prevItems => [...prevItems, newItemWithName]);
         setIsModalOpen(false);
         setEditingItem(null);
       } else {
@@ -198,9 +228,24 @@ export function useBranchInventory(branchId: string | number) {
 
       if (response.success && response.data) {
         toast.success("Inventory item updated successfully");
-        // Optimistic update: Update item in local state
+
+        // Extract item name from the populated response
+        const updatedItem = response.data;
+
+        // Check if itemId is populated (becomes an object with name)
+        const populatedItemId = typeof updatedItem.itemId === 'object' && updatedItem.itemId !== null ? updatedItem.itemId : null;
+        const itemName = populatedItemId?.name || updatedItem.item?.name || updatedItem.itemNameSnapshot || updatedItem.itemName || String(updatedItem.itemId);
+
+        console.log("✅ Updated item with name:", itemName);
+
+        // Optimistic update: Update item in local state with populated name
+        const updatedItemWithName = {
+          ...updatedItem,
+          itemName,
+        };
+
         setItems(prevItems => prevItems.map(item =>
-          (item._id || item.id) === id ? { ...item, ...response.data } : item
+          (item._id || item.id) === id ? updatedItemWithName : item
         ));
         setIsModalOpen(false);
         setEditingItem(null);

@@ -8,7 +8,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const url = `${getRemoteBase()}/t/branch-inventory/items/${id}`;
+  // Request populated data with item details (itemId is the reference field)
+  const url = `${getRemoteBase()}/t/branch-inventory/items/${id}?populate=itemId`;
 
   const res = await fetch(url, {
     method: "GET",
@@ -31,7 +32,8 @@ export async function PUT(
 ) {
   const { id } = await params;
   const payload = await req.json().catch(() => ({}));
-  const url = `${getRemoteBase()}/t/branch-inventory/items/${id}`;
+  // Request populated data with item details when updating (itemId is the reference field)
+  const url = `${getRemoteBase()}/t/branch-inventory/items/${id}?populate=itemId`;
 
   const res = await fetch(url, {
     method: "PUT",

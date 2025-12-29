@@ -1,4 +1,6 @@
 // types/branch.ts
+import { ApiResponse, ToastState } from "./common";
+
 export interface BranchItem {
   "Branch-ID": number; // Local sequential ID for UI
   Branch_Name: string;
@@ -11,15 +13,7 @@ export interface BranchItem {
   backendId?: string;
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  success: boolean;
-}
-
-export interface ToastProps {
-  message: string;
-  type: "success" | "error";
+export interface ToastProps extends ToastState {
   onClose: () => void;
 }
 

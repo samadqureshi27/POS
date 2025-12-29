@@ -1,4 +1,6 @@
 // Staff Management Types
+import { ApiResponse } from "./common";
+
 export interface StaffItem {
     Staff_ID: string;
     Name: string;
@@ -20,12 +22,6 @@ export interface BranchInfo {
     Status: "Active" | "Inactive";
     "Contact-Info": string;
     Address: string;
-}
-
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    success: boolean;
 }
 
 export interface Toast {

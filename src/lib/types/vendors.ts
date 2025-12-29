@@ -1,3 +1,5 @@
+import { ApiResponse, ToastState } from "./common";
+
 export interface VendorItem {
     ID: number;
     Company_Name: string;
@@ -13,15 +15,7 @@ export interface VendorItemWithUsage extends VendorItem {
     usageCount: number;
 }
 
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    success: boolean;
-}
-
-export interface ToastProps {
-    message: string;
-    type: "success" | "error";
+export interface ToastProps extends ToastState {
     onClose: () => void;
 }
 

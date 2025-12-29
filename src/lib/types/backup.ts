@@ -1,4 +1,6 @@
 // Types for Backup & Recovery
+import { ApiResponse, ToastState } from "./common";
+
 export interface BackupSettings {
     // Automated Backup Settings
     autoBackupEnabled: boolean;
@@ -30,20 +32,12 @@ export interface BackupHistoryItem {
     includes: string[];
 }
 
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    success: boolean;
-}
-
 export interface DropdownOption {
     value: string;
     label: string;
 }
 
-export interface ToastState {
-    message: string;
-    type: "success" | "error";
+export interface BackupToastState extends ToastState {
     id: number;
 }
 
