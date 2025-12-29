@@ -8,7 +8,7 @@ export default function MenuSubmenu() {
   const items = [
     { label: 'Menu Management', href: '/menu-items' },
     { label: 'Category', href: '/categories' },
-    { label: 'Options', href: '/menu-options', hasNewBadge: true }, // Example: badge on Options
+    { label: 'Addons', href: '/menu-addons', hasNewBadge: true }, // Example: badge on Options
   ];
 
   // Pass contextIcon to show icon in left section (64px wide)
