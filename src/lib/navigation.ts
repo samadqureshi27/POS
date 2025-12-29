@@ -176,8 +176,8 @@ export const navigationConfig: NavigationItem[] = [
 
   // --- RECIPES & MENU ---
   {
-    name: "Menu Options",
-    href: "/menu-options",
+    name: "Menu Addons",
+    href: "/menu-addons",
     group: "menu",
   },
 ]
