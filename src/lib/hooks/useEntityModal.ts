@@ -58,7 +58,8 @@ export function useEntityModal<TItem, TFormData extends Record<string, any>>({
     } else if (!isOpen) {
       setFormData(defaultFormData);
     }
-  }, [editingItem, isOpen, defaultFormData, mapItemToForm]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingItem, isOpen]);
 
   // Handle body overflow when modal is open (prevent background scroll)
   useEffect(() => {
@@ -78,17 +79,20 @@ export function useEntityModal<TItem, TFormData extends Record<string, any>>({
   const openCreateModal = useCallback(() => {
     setFormData(defaultFormData);
     openCreate();
-  }, [defaultFormData, openCreate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openCreate]);
 
   const openEditModal = useCallback((item: TItem) => {
     setFormData(mapItemToForm(item));
     openEdit(item);
-  }, [mapItemToForm, openEdit]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openEdit]);
 
   const closeModal = useCallback(() => {
     setFormData(defaultFormData);
     close();
-  }, [defaultFormData, close]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [close]);
 
   const updateFormData = useCallback((updates: Partial<TFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
