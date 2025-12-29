@@ -1,13 +1,9 @@
+import { ApiResponse } from "@/lib/types/common";
+
 interface RecipeOption {
   ID: number;
   Name: string;
   price: number;
-}
-
-interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  success: boolean;
 }
 
 class MenuAPI {

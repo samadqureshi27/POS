@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { ApiResponse } from "./common";
 
 // API and Data Types
 export interface PayrollStaffItem {
@@ -14,12 +15,6 @@ export interface PayrollStaffItem {
 
 // Legacy alias for backward compatibility
 export type StaffItem = PayrollStaffItem;
-
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    success: boolean;
-}
 
 // Date Filter Types
 export interface DateRange {

@@ -1,4 +1,6 @@
 // types/customer.ts
+import { ApiResponse } from "./common";
+
 export interface CustomerItem {
     Customer_ID: number;
     Name: string;
@@ -21,10 +23,4 @@ export interface OrderItem {
     Date: string;
     Total: number;
     Status: "Completed" | "Pending" | "Cancelled";
-}
-
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    success: boolean;
 }

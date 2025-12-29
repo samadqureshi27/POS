@@ -1,3 +1,5 @@
+import { ApiResponse, ToastState } from "./common";
+
 export interface PosItem {
     Branch_ID_fk: string;
     POS_ID: string;
@@ -42,15 +44,7 @@ export interface CloseTillRequest {
     notes?: string;
 }
 
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    success: boolean;
-}
-
-export interface ToastProps {
-    message: string;
-    type: "success" | "error";
+export interface ToastProps extends ToastState {
     onClose: () => void;
 }
 

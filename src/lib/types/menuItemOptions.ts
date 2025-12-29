@@ -1,4 +1,6 @@
 // types/interfaces.ts
+import { ApiResponse } from "./common";
+
 export interface AddonItemValue {
   sourceType: "inventory" | "recipe";
   sourceId: string;
@@ -28,11 +30,7 @@ export interface MenuItemOptions {
   addonItems?: AddonItemValue[]; // New structure for add-on items
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  success: boolean;
-}
+// ApiResponse imported from common.ts
 
 export interface ToastProps {
   message: string;

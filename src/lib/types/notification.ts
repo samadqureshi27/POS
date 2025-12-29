@@ -1,3 +1,5 @@
+import { ApiResponse } from "./common";
+
 export interface NotificationSettings {
   // Order Management
   newOrderAlerts: boolean;
@@ -29,11 +31,5 @@ export interface NotificationSettings {
   quietHoursEnabled: boolean;
   quietHoursStart: string;
   quietHoursEnd: string;
-}
-
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  success: boolean;
 }
 

@@ -1,4 +1,6 @@
 // Types
+import { ApiResponse, ToastState } from "./common";
+
 export interface LicenseInfo {
     licensedTo: string;
     plan: "Basic" | "Standard" | "Pro" | "Ultimate" | "Trial";
@@ -8,12 +10,6 @@ export interface LicenseInfo {
     totalPOS: number;
     totalKDS: number;
     totalBranches: number;
-}
-
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    success: boolean;
 }
 
 export interface ToastState {

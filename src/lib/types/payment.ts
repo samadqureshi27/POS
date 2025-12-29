@@ -1,3 +1,5 @@
+import { ApiResponse, ToastState } from "./common";
+
 export interface PaymentMethod {
     ID: number;
     Name: string;
@@ -9,15 +11,7 @@ export interface PaymentMethod {
     LastUsed: string;
 }
 
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    success: boolean;
-}
-
-export interface ToastProps {
-    message: string;
-    type: "success" | "error";
+export interface ToastProps extends ToastState {
     onClose: () => void;
 }
 

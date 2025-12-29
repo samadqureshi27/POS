@@ -1,4 +1,5 @@
 // types/menu.ts
+import { ApiResponse } from "./common";
 
 // ===== MENU CATEGORY TYPES =====
 
@@ -120,13 +121,7 @@ export interface MenuVariationPayload {
 }
 
 // ===== API RESPONSE TYPES =====
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
-}
+// ApiResponse imported from common.ts
 
 export interface PaginatedResponse<T> {
   success: boolean;

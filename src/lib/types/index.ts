@@ -1,4 +1,6 @@
 // _components/types.ts
+import { ApiResponse } from "./common";
+
 export interface OrderItem {
   Order: string;
   Name: string;
@@ -8,12 +10,6 @@ export interface OrderItem {
   Payment: string;
   Total: string;
   Time_Date: string;
-}
-
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  success: boolean;
 }
 
 export interface OrderStats {
