@@ -12,13 +12,14 @@
 
 import AuthService from "@/lib/auth-service";
 import { getAccessToken } from './token-manager';
+import { getTenantSlug as getStoredTenantSlug, getTenantId as getStoredTenantId } from './tenant-manager';
 
 /**
- * Get authentication token from AuthService or localStorage
+ * Get authentication token from token-manager (cookies)
  * @returns Authentication token or null
  */
 export function getToken(): string | null {
-  // Try to get from AuthService first (centralized token manager)
+  // Get from token-manager (cookies only)
   const token = getAccessToken();
   if (token) return token;
 
@@ -26,41 +27,21 @@ export function getToken(): string | null {
   const authToken = AuthService.getToken();
   if (authToken) return authToken;
 
-  // Last resort: check localStorage/sessionStorage (legacy support)
-  if (typeof window !== "undefined") {
-    return (
-      localStorage.getItem("access_token") ||
-      sessionStorage.getItem("access_token") ||
-      null
-    );
-  }
-
   return null;
 }
 
 /**
- * Get tenant information from storage or environment variables
+ * Get tenant information from cookies or environment variables
  * @returns Object with tenant id and slug
  */
 export function getTenantInfo(): { id: string | null; slug: string | null } {
-  if (typeof window === "undefined") {
-    return {
-      id: process.env.NEXT_PUBLIC_TENANT_ID || null,
-      slug: process.env.NEXT_PUBLIC_TENANT_SLUG || null,
-    };
-  }
+  // Use tenant-manager for unified tenant data access (works both client and server)
+  const slug = getStoredTenantSlug();
+  const id = getStoredTenantId();
 
   return {
-    id:
-      localStorage.getItem("tenant_id") ||
-      sessionStorage.getItem("tenant_id") ||
-      process.env.NEXT_PUBLIC_TENANT_ID ||
-      null,
-    slug:
-      localStorage.getItem("tenant_slug") ||
-      sessionStorage.getItem("tenant_slug") ||
-      process.env.NEXT_PUBLIC_TENANT_SLUG ||
-      null,
+    id: id || process.env.NEXT_PUBLIC_TENANT_ID || null,
+    slug: slug || process.env.NEXT_PUBLIC_TENANT_SLUG || null,
   };
 }
 

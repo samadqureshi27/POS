@@ -176,12 +176,6 @@ export const navigationConfig: NavigationItem[] = [
 
   // --- RECIPES & MENU ---
   {
-    name: "Recipes Options",
-    href: "/recipes-options",
-    group: "recipes",
-    hidden: true, // ✅ Hidden but kept in codebase for future use
-  },
-  {
     name: "Menu Options",
     href: "/menu-options",
     group: "menu",

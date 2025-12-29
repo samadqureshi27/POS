@@ -5,7 +5,7 @@
  * and prevents duplicate token storage issues.
  *
  * IMPORTANT: All services should import and use these functions instead of
- * directly accessing localStorage.
+ * directly accessing localStorage or cookies.
  */
 
 // Single source of truth for token storage keys
@@ -15,35 +15,76 @@ const TOKEN_KEYS = {
 } as const;
 
 /**
- * Get the current access token from localStorage
+ * Helper to set a cookie
+ */
+const setCookie = (name: string, value: string, days: number = 30): void => {
+  if (typeof window === 'undefined') return;
+
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+
+  const secure = process.env.NODE_ENV === 'production' ? 'Secure;' : '';
+  const encoded = encodeURIComponent(value);
+  document.cookie = `${name}=${encoded};expires=${expires.toUTCString()};path=/;SameSite=Lax;${secure}`;
+};
+
+/**
+ * Helper to get a cookie value
+ */
+const getCookie = (name: string): string | null => {
+  if (typeof window === 'undefined') return null;
+
+  const nameEQ = name + '=';
+  const ca = document.cookie.split(';');
+
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) {
+      return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+  }
+  return null;
+};
+
+/**
+ * Helper to delete a cookie
+ */
+const deleteCookie = (name: string): void => {
+  if (typeof window === 'undefined') return;
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+};
+
+/**
+ * Get the current access token from cookies
  * @returns The access token or null if not found
  */
 export const getAccessToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(TOKEN_KEYS.ACCESS_TOKEN);
+  return getCookie(TOKEN_KEYS.ACCESS_TOKEN);
 };
 
 /**
- * Get the current refresh token from localStorage
+ * Get the current refresh token from cookies
  * @returns The refresh token or null if not found
  */
 export const getRefreshToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(TOKEN_KEYS.REFRESH_TOKEN);
+  return getCookie(TOKEN_KEYS.REFRESH_TOKEN);
 };
 
 /**
- * Store access and refresh tokens
+ * Store access and refresh tokens in cookies
  * @param accessToken - The access token to store
  * @param refreshToken - The refresh token to store (optional)
  */
 export const setTokens = (accessToken: string, refreshToken?: string): void => {
   if (typeof window === 'undefined') return;
 
-  localStorage.setItem(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
+  setCookie(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
 
   if (refreshToken) {
-    localStorage.setItem(TOKEN_KEYS.REFRESH_TOKEN, refreshToken);
+    setCookie(TOKEN_KEYS.REFRESH_TOKEN, refreshToken);
   }
 };
 
@@ -53,24 +94,17 @@ export const setTokens = (accessToken: string, refreshToken?: string): void => {
  */
 export const updateAccessToken = (accessToken: string): void => {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
+  setCookie(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
 };
 
 /**
- * Clear all authentication tokens from storage
+ * Clear all authentication tokens from cookies
  */
 export const clearTokens = (): void => {
   if (typeof window === 'undefined') return;
 
-  localStorage.removeItem(TOKEN_KEYS.ACCESS_TOKEN);
-  localStorage.removeItem(TOKEN_KEYS.REFRESH_TOKEN);
-  localStorage.removeItem('user');
-
-  // Clean up any legacy token keys that might exist
-  localStorage.removeItem('auth_token');
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('token');
-  sessionStorage.removeItem('access_token');
+  deleteCookie(TOKEN_KEYS.ACCESS_TOKEN);
+  deleteCookie(TOKEN_KEYS.REFRESH_TOKEN);
 };
 
 /**
@@ -82,29 +116,44 @@ export const isAuthenticated = (): boolean => {
 };
 
 /**
- * Migrate any legacy tokens to the new standard key
+ * Migrate any legacy tokens from localStorage/sessionStorage to cookies (one-time migration)
  * Call this on app initialization to clean up old token storage
  */
 export const migrateLegacyTokens = (): void => {
   if (typeof window === 'undefined') return;
 
-  // Check for tokens stored under old keys
-  const legacyKeys = ['auth_token', 'access_token', 'token'];
+  // Check if we already have token in cookies
+  const existingToken = getCookie(TOKEN_KEYS.ACCESS_TOKEN);
+  if (existingToken) return; // Already migrated
 
-  for (const key of legacyKeys) {
-    const token = localStorage.getItem(key);
-    if (token && !getAccessToken()) {
-      // Migrate to new key
-      setTokens(token);
+  try {
+    // Check for tokens stored under old keys in localStorage
+    const legacyKeys = ['auth_token', 'access_token', 'accessToken', 'token'];
+
+    for (const key of legacyKeys) {
+      const token = localStorage.getItem(key);
+      if (token && !getAccessToken()) {
+        // Migrate to cookies
+        setTokens(token);
+        console.log(`✅ Migrated token from localStorage key: ${key}`);
+      }
+      // Clean up localStorage
       localStorage.removeItem(key);
-      console.warn(`Migrated token from legacy key: ${key}`);
     }
-  }
 
-  // Clean up sessionStorage
-  const sessionToken = sessionStorage.getItem('access_token');
-  if (sessionToken && !getAccessToken()) {
-    setTokens(sessionToken);
+    // Clean up sessionStorage
+    const sessionToken = sessionStorage.getItem('access_token');
+    if (sessionToken && !getAccessToken()) {
+      setTokens(sessionToken);
+      console.log('✅ Migrated token from sessionStorage');
+    }
     sessionStorage.removeItem('access_token');
+
+    // Clean up other common localStorage keys
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+  } catch (error) {
+    console.warn('Failed to migrate tokens:', error);
   }
 };

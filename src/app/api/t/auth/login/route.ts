@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     const res = await fetch(url, {
       method: "POST",
-      headers: buildTenantHeaders(req),
+      headers: buildTenantHeaders(req, false, false),
       body: JSON.stringify(payload)
     });
 
