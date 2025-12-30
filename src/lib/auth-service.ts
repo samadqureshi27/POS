@@ -480,10 +480,18 @@ class AuthService {
   }
 
   private setTokens(accessToken: string, refreshToken: string): void {
+    console.log('🔐 AuthService.setTokens called', {
+      tokenLength: accessToken?.length,
+      refreshTokenLength: refreshToken?.length
+    });
+
     this.token = accessToken;
     this.refreshToken = refreshToken;
+
     // Use centralized token manager
     setTokens(accessToken, refreshToken);
+
+    console.log('🔐 Tokens set in centralized manager');
   }
 
   private setUser(user: User): void {

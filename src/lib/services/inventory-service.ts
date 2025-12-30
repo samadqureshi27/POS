@@ -2,6 +2,7 @@
 
 import { buildHeaders } from "@/lib/util/service-helpers";
 import { logError } from "@/lib/util/logger";
+import { validateInventoryItems, validateInventoryItem } from "@/lib/util/data-validator";
 
 // ==================== Types ====================
 
@@ -18,7 +19,7 @@ export interface InventoryItem {
   id?: string;
   name: string;
   sku?: string;
-  type: "stock" | "service";
+  type: "stock" | "nonstock" | "service"; // Backend types: stock, nonstock, service
   categoryId?: string | Category; // Can be either string ID or populated Category object
   baseUnit: string;
   purchaseUnit?: string;
@@ -173,36 +174,78 @@ export const InventoryService = {
     q?: string;
     page?: number;
     limit?: number;
-    type?: "stock" | "service";
+    type?: "stock" | "nonstock" | "service";
     categoryId?: string;
     sort?: string;
     order?: "asc" | "desc";
   }): Promise<ApiResponse<InventoryItem[]>> {
-    // Build query params only when they have values
-    const queryParams = new URLSearchParams();
+    try {
+      // Build query params only when they have values
+      const queryParams = new URLSearchParams();
 
-    if (params?.q) queryParams.append('q', params.q);
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.type) queryParams.append('type', params.type);
-    if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
-    if (params?.sort) queryParams.append('sort', params.sort);
-    if (params?.order) queryParams.append('order', params.order);
+      if (params?.q) queryParams.append('q', params.q);
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+      if (params?.type) queryParams.append('type', params.type);
+      if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
+      if (params?.sort) queryParams.append('sort', params.sort);
+      if (params?.order) queryParams.append('order', params.order);
 
-    const queryString = queryParams.toString();
-    const url = buildUrl(`/t/inventory/items${queryString ? `?${queryString}` : ''}`);
+      const queryString = queryParams.toString();
+      const url = buildUrl(`/t/inventory/items${queryString ? `?${queryString}` : ''}`);
 
-    const res = await fetch(url, { headers: buildHeaders() });
-    const data = await res.json().catch(() => ({}));
+      const headers = buildHeaders();
 
-    if (!res.ok) {
-      return { success: false, message: data?.message || `List items failed (${res.status})` };
+      // Check if authorization header exists (token is available)
+      if (!headers['Authorization']) {
+        console.warn('⚠️ No authentication token available for API call');
+        // Don't return error here - let the API call happen
+        // The backend will return 401 if token is missing
+        // This prevents false positives where token exists but header wasn't built yet
+      }
+
+      const res = await fetch(url, { headers });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        // Handle 401 Unauthorized specifically
+        if (res.status === 401) {
+          console.error('❌ Unauthorized: Token may be expired or invalid');
+          return {
+            success: false,
+            message: 'You are not allowed and need to login first'
+          };
+        }
+
+        return { success: false, message: data?.message || `List items failed (${res.status})` };
+      }
+
+      const rawItems: any[] = data?.items ?? data?.result ?? data?.data ?? [];
+
+      // Validate and sanitize items from backend
+      const { validItems, invalidCount, warnings } = validateInventoryItems(rawItems);
+
+      // Log validation results
+      if (invalidCount > 0) {
+        console.error(`❌ Removed ${invalidCount} invalid items from response`);
+      }
+
+      if (warnings.length > 0) {
+        console.warn('⚠️ Data validation warnings:', warnings);
+      }
+
+      // Note: Stats are now fetched from dedicated /t/inventory/stats endpoint
+      return { success: true, data: validItems };
+    } catch (error: any) {
+      logError("Error listing inventory items", error, {
+        component: "InventoryService",
+        action: "listItems",
+      });
+      return {
+        success: false,
+        message: error.message || 'Failed to list inventory items'
+      };
     }
-
-    const items: InventoryItem[] = data?.items ?? data?.result ?? data?.data ?? [];
-
-    // Note: Stats are now fetched from dedicated /t/inventory/stats endpoint
-    return { success: true, data: items };
   },
 
   // Get single inventory item

@@ -189,11 +189,48 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
       if (response.success && response.user) {
         toast.success("Login successful! Redirecting...");
 
-        // Small delay to show toast before redirect
-        setTimeout(() => {
+        // Wait for cookies to be set before redirecting
+        // This ensures middleware can read the token
+        const waitForCookies = async () => {
+          const { getAccessToken } = await import('@/lib/util/token-manager');
+          const { PersistentLogger } = await import('@/lib/util/persistent-logger');
+
+          PersistentLogger.log('Login successful, waiting for cookies...');
+
+          // Try up to 10 times (1 second total) to verify cookie is set
+          for (let i = 0; i < 10; i++) {
+            const token = getAccessToken();
+            if (token) {
+              console.log('✅ Cookie verified before redirect');
+              PersistentLogger.log('Cookie verified, redirecting...', {
+                tokenLength: token.length,
+                attempt: i + 1
+              });
+
+              // Cookie is set, safe to redirect
+              const next = searchParams.get('next');
+              const redirectUrl = next || "/dashboard";
+              PersistentLogger.log('Redirecting to: ' + redirectUrl);
+
+              window.location.href = redirectUrl;
+              return;
+            }
+            // Wait 100ms before trying again
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+
+          // If we get here, cookie wasn't set - something went wrong
+          console.error('❌ Cookie not set after login - trying redirect anyway');
+          PersistentLogger.error('Cookie not set after 10 attempts!', {
+            allCookies: document.cookie,
+            localStorage: localStorage.getItem('user') ? 'HAS USER' : 'NO USER'
+          });
+
           const next = searchParams.get('next');
-          router.push(next || "/dashboard");
-        }, 500);
+          window.location.href = next || "/dashboard";
+        };
+
+        waitForCookies();
       } else {
         // Extract error message
         const errorMessage =
@@ -226,27 +263,52 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
       if (response.success && response.user) {
         toast.success("Login successful! Redirecting...");
 
-        // Small delay to show toast before redirect
-        setTimeout(() => {
+        // Wait for cookies to be set before redirecting
+        const waitForCookies = async () => {
+          const { getAccessToken } = await import('@/lib/util/token-manager');
+
+          // Try up to 10 times (1 second total) to verify cookie is set
+          for (let i = 0; i < 10; i++) {
+            const token = getAccessToken();
+            if (token) {
+              console.log('✅ Cookie verified before redirect (PIN login)');
+              // Cookie is set, safe to redirect
+              const next = searchParams.get('next');
+              if (next) {
+                window.location.href = next;
+                return;
+              }
+
+              switch (response.user.role) {
+                case "manager":
+                  window.location.href = "/dashboard";
+                  break;
+                case "cashier":
+                  window.location.href = "/pos";
+                  break;
+                case "waiter":
+                  window.location.href = "/orders";
+                  break;
+                default:
+                  window.location.href = "/dashboard";
+              }
+              return;
+            }
+            // Wait 100ms before trying again
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+
+          // If we get here, cookie wasn't set - something went wrong
+          console.error('❌ Cookie not set after PIN login - trying redirect anyway');
           const next = searchParams.get('next');
           if (next) {
-            router.push(next);
-            return;
+            window.location.href = next;
+          } else {
+            window.location.href = "/dashboard";
           }
-          switch (response.user.role) {
-            case "manager":
-              router.push("/dashboard");
-              break;
-            case "cashier":
-              router.push("/pos");
-              break;
-            case "waiter":
-              router.push("/orders");
-              break;
-            default:
-              router.push("/dashboard");
-          }
-        }, 500);
+        };
+
+        waitForCookies();
       } else {
 
         // Handle error message safely

@@ -19,11 +19,11 @@ import { getTenantSlug as getStoredTenantSlug, getTenantId as getStoredTenantId 
  * @returns Authentication token or null
  */
 export function getToken(): string | null {
-  // Get from token-manager (cookies only)
+  // Always try token-manager first (cookies are the source of truth)
   const token = getAccessToken();
   if (token) return token;
 
-  // Fallback to AuthService instance method
+  // Fallback to AuthService instance method (backwards compatibility)
   const authToken = AuthService.getToken();
   if (authToken) return authToken;
 
