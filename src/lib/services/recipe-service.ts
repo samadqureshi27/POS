@@ -94,6 +94,14 @@ export class RecipeService {
         recipes = data.items;
       }
 
+      console.log("📋 RecipeService.listRecipes - Raw API response:", data);
+      console.log("📋 RecipeService.listRecipes - Extracted recipes:", recipes);
+      console.log("📋 RecipeService.listRecipes - Recipe count:", Array.isArray(recipes) ? recipes.length : 0);
+      if (Array.isArray(recipes) && recipes.length > 0) {
+        console.log("📋 RecipeService.listRecipes - First recipe:", recipes[0]);
+        console.log("📋 RecipeService.listRecipes - Sub recipes:", recipes.filter((r: any) => r.type === "sub").length);
+      }
+
       return {
         success: true,
         data: recipes,

@@ -26,32 +26,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
 
+      // Check if we have a valid token
       if (authService.isAuthenticated()) {
         const currentUser = authService.getCurrentUser();
 
         if (currentUser) {
-          const profileResponse = await authService.getProfile();
+          // Set user from localStorage immediately (fast, no API call needed)
+          setUser(currentUser);
+          setIsAuthenticated(true);
 
-          if (profileResponse.success && profileResponse.data) {
-            setUser(profileResponse.data);
-            setIsAuthenticated(true);
-          } else {
-            const refreshed = await authService.refreshAccessToken();
-
-            if (refreshed) {
-              const retryProfile = await authService.getProfile();
-              if (retryProfile.success && retryProfile.data) {
-                setUser(retryProfile.data);
-                setIsAuthenticated(true);
-              } else {
-                await handleLogout();
-              }
+          // Optionally verify with backend in background (don't block UI)
+          // If this fails, don't logout - the token might still be valid
+          authService.getProfile().then(profileResponse => {
+            if (profileResponse.success && profileResponse.data) {
+              // Update with fresh data from server
+              setUser(profileResponse.data);
+            }
+            // If profile fetch fails, we keep the cached user
+            // The user will only be logged out if they make a request that gets 401
+          }).catch(err => {
+            console.debug('Background profile fetch failed (user remains logged in):', err);
+          });
+        } else {
+          // Token exists but no user in localStorage
+          // Try to fetch user profile
+          try {
+            const profileResponse = await authService.getProfile();
+            if (profileResponse.success && profileResponse.data) {
+              setUser(profileResponse.data);
+              setIsAuthenticated(true);
             } else {
+              // Profile fetch failed, clear auth state
               await handleLogout();
             }
+          } catch (error) {
+            console.error('Failed to fetch user profile:', error);
+            await handleLogout();
           }
-        } else {
-          await handleLogout();
         }
       }
     } catch (error) {
@@ -59,7 +70,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         component: "useAuth",
         action: "initializeAuth"
       });
-      await handleLogout();
+      // Don't logout on initialization errors - just log them
+      console.error('Auth initialization failed, but keeping existing session');
     } finally {
       setIsLoading(false);
     }
