@@ -103,6 +103,14 @@ export const useRecipeData = () => {
     return transformed;
   }, [(hook as any).inventoryItems]);
 
+  // Debug log for available recipe options
+  const availableRecipeOptions = useMemo(() => {
+    const recipes = (hook as any).availableRecipeOptions || [];
+    console.log("🔄 useRecipeData - Available recipe options:", recipes.length, recipes);
+    console.log("🔍 useRecipeData - Sub recipes only:", recipes.filter((r: any) => r.type === "sub").length);
+    return recipes;
+  }, [(hook as any).availableRecipeOptions]);
+
   // Computed values
   const availableCategories = useMemo(() =>
     [...new Set(
@@ -195,7 +203,7 @@ export const useRecipeData = () => {
   return {
     recipeOptions: hook.items,
     ingredients,
-    availableRecipeOptions: (hook as any).availableRecipeOptions || [],
+    availableRecipeOptions, // Use computed value with debug logging
     filteredItems: hook.filteredItems,
     selectedItems: hook.selectedItems,
     loading: hook.loading,
