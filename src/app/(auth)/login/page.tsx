@@ -1,7 +1,12 @@
 // pages/LoginPage.tsx (Main Component)
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { LoginProvider, useLoginContext } from "./_components/login-context";
+
+// Import debug utilities (only loads in development)
+if (process.env.NODE_ENV !== 'production') {
+  import('@/lib/util/clear-all-auth');
+}
 import BackgroundLayer from "./_components/background-layer";
 import RoleLabels from "./_components/role-labels";
 import PoweredByText from "./_components/powered-by-text";

@@ -85,7 +85,7 @@ export function middleware(req: NextRequest) {
 
   // Protected API routes require authentication
   if (pathname.startsWith('/api')) {
-    const token = cookies.get('accessToken')?.value;
+    const token = cookies.get('auth_session')?.value;
 
     if (!token) {
       return addSecurityHeaders(
@@ -102,9 +102,21 @@ export function middleware(req: NextRequest) {
   }
 
   // Check for a valid session token for page routes
-  const token = cookies.get('accessToken')?.value;
+  const token = cookies.get('auth_session')?.value;
+
+  // Debug logging in development
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('🔍 Middleware Auth Check:', {
+      pathname,
+      hasToken: !!token,
+      tokenLength: token?.length,
+      allCookies: Array.from(cookies.getAll()).map(c => ({ name: c.name, hasValue: !!c.value }))
+    });
+  }
 
   if (!token) {
+    console.warn(`⚠️ No auth_session cookie found for: ${pathname}`);
+
     // Preserve originally requested URL via next parameter
     const loginUrl = new URL('/login', nextUrl.origin);
     const nextParam = `${pathname}${nextUrl.search}`;

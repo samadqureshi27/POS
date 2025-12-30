@@ -356,6 +356,7 @@ export default function InventoryItemModal({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="stock">Stock (Inventory tracked)</SelectItem>
+                      <SelectItem value="nonstock">Non-Stock (Tracked but not for sale)</SelectItem>
                       <SelectItem value="service">Service (No inventory)</SelectItem>
                     </SelectContent>
                   </Select>

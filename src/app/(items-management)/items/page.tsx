@@ -12,18 +12,23 @@ import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import InventoryItemModal from "./_components/inventory-item-modal";
 import ImportResultsDialog from "./_components/import-results-dialog";
+import ValidationErrorsDialog from "./_components/validation-errors-dialog";
+import { validateInventoryCSV } from "@/lib/util/csv-validator";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import { logError } from "@/lib/util/logger";
+import { getCategoryName } from "@/lib/util/data-validator";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { debugAuthState } from "@/lib/util/debug-auth";
 
-export default function ItemsPage() {
+function ItemsPageContent() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState<"all" | "stock" | "service">("all");
+  const [filterType, setFilterType] = useState<"all" | "stock" | "nonstock" | "service">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "Active" | "Inactive">("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   // Pagination state
@@ -38,6 +43,10 @@ export default function ItemsPage() {
   // Import Results Dialog
   const [importResults, setImportResults] = useState<any>(null);
   const [isImportResultsOpen, setIsImportResultsOpen] = useState(false);
+
+  // Validation Errors Dialog
+  const [validationErrors, setValidationErrors] = useState<any>(null);
+  const [isValidationErrorsOpen, setIsValidationErrorsOpen] = useState(false);
 
   // Confirmation Dialogs
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -74,6 +83,7 @@ export default function ItemsPage() {
       let filteredItems = response.data;
 
       // Client-side type filtering (backend not filtering correctly)
+      // Now supports: stock, service, and consumable
       if (filterType !== "all") {
         filteredItems = filteredItems.filter(item => item.type === filterType);
       }
@@ -102,10 +112,36 @@ export default function ItemsPage() {
         calculateStats(filteredItems);
       }
     } else {
+      // Handle authentication errors - but be more conservative
+      // Only redirect to login on clear authentication failures
+      if (response.message?.includes('not allowed') || response.message?.includes('login')) {
+        console.error('❌ Authentication error loading items:', response.message);
+
+        // Check if we actually have a token - if yes, this might be a backend issue
+        const { getAccessToken } = await import('@/lib/util/token-manager');
+        const token = getAccessToken();
+
+        if (token) {
+          // We have a token but backend rejected it - it might be expired
+          console.warn('Token exists but was rejected by backend. Token might be expired.');
+          toast.error('Your session has expired. Please login again.');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 1000);
+        } else {
+          // No token at all - definitely need to login
+          toast.error('Please login to continue.');
+          window.location.href = '/login';
+        }
+        return;
+      }
+
+      // Other errors - just log them, don't logout
       logError("Failed to load items", new Error(response.message), {
         component: "ItemsManagement",
         action: "loadItems",
       });
+      toast.error(response.message || 'Failed to load items');
     }
     setLoading(false);
   };
@@ -120,6 +156,11 @@ export default function ItemsPage() {
   };
 
   useEffect(() => {
+    // Debug auth state on component mount
+    if (process.env.NODE_ENV !== 'production') {
+      debugAuthState();
+    }
+
     // Show loading skeleton only on initial load
     loadItems(isInitialLoad);
     if (isInitialLoad) {
@@ -309,7 +350,7 @@ export default function ItemsPage() {
     fileInputRef.current?.click();
   };
 
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -319,6 +360,32 @@ export default function ItemsPage() {
     if (!allowedTypes.includes(fileExtension)) {
       toast.error('Please select a CSV or XLSX file.');
       return;
+    }
+
+    // Validate CSV content before uploading (only for CSV files)
+    if (fileExtension === '.csv') {
+      toast.loading('Validating CSV file...', { id: 'csv-validation' });
+
+      const validationResult = await validateInventoryCSV(file);
+
+      toast.dismiss('csv-validation');
+
+      if (!validationResult.isValid) {
+        // Show validation errors dialog
+        setValidationErrors(validationResult);
+        setIsValidationErrorsOpen(true);
+
+        // Reset file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+
+        toast.error(`Found ${validationResult.invalidRows} validation error(s). Please fix and try again.`);
+        return;
+      }
+
+      // Show success message
+      toast.success(`✅ Validation passed! All ${validationResult.totalRows} rows are valid.`);
     }
 
     // Store file and show duplicate policy dialog
@@ -450,10 +517,11 @@ export default function ItemsPage() {
             options: [
               { label: "All", value: "all" },
               { label: "Stock", value: "stock" },
+              { label: "Non-Stock", value: "nonstock" },
               { label: "Service", value: "service" },
             ],
             activeValue: filterType,
-            onChange: (value) => setFilterType(value as "all" | "stock" | "service"),
+            onChange: (value) => setFilterType(value as "all" | "stock" | "nonstock" | "service"),
           },
           {
             options: [
@@ -502,27 +570,28 @@ export default function ItemsPage() {
           {
             key: "name",
             header: "Item",
-            render: (item) => (
-              <div className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-sm flex items-center justify-center border ${item.type === "stock"
-                  ? "bg-green-50/50 border-green-100/50"
-                  : "bg-purple-50/50 border-purple-100/50"
-                  }`}>
-                  <Package className={`h-5 w-5 ${item.type === "stock" ? "text-green-600" : "text-purple-600"
-                    }`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-gray-900">{item.name}</div>
-                  {item.categoryId && (
+            render: (item) => {
+              const typeColors = {
+                stock: { bg: "bg-green-50/50", border: "border-green-100/50", text: "text-green-600" },
+                nonstock: { bg: "bg-orange-50/50", border: "border-orange-100/50", text: "text-orange-600" },
+                service: { bg: "bg-purple-50/50", border: "border-purple-100/50", text: "text-purple-600" }
+              };
+              const colors = typeColors[item.type] || typeColors.stock;
+
+              return (
+                <div className="flex items-center gap-3">
+                  <div className={`h-10 w-10 rounded-sm flex items-center justify-center border ${colors.bg} ${colors.border}`}>
+                    <Package className={`h-5 w-5 ${colors.text}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-gray-900">{item.name}</div>
                     <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight truncate">
-                      {typeof item.categoryId === 'object' && item.categoryId.name
-                        ? item.categoryId.name
-                        : typeof item.categoryId === 'string' ? item.categoryId : ''}
+                      {getCategoryName(item.categoryId)}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            ),
+              );
+            },
           },
           {
             key: "sku",
@@ -534,16 +603,23 @@ export default function ItemsPage() {
           {
             key: "type",
             header: "Type",
-            render: (item) => (
-              <span className={cn(
-                "px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border",
-                item.type === "stock"
-                  ? "bg-green-50 text-green-600 border-green-100"
-                  : "bg-purple-50 text-purple-600 border-purple-100"
-              )}>
-                {item.type?.toUpperCase()}
-              </span>
-            ),
+            render: (item) => {
+              const badgeColors = {
+                stock: "bg-green-50 text-green-600 border-green-100",
+                nonstock: "bg-orange-50 text-orange-600 border-orange-100",
+                service: "bg-purple-50 text-purple-600 border-purple-100"
+              };
+              const colorClass = badgeColors[item.type] || badgeColors.stock;
+
+              return (
+                <span className={cn(
+                  "px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border",
+                  colorClass
+                )}>
+                  {item.type?.toUpperCase()}
+                </span>
+              );
+            },
             className: "w-24",
           },
           {
@@ -583,9 +659,14 @@ export default function ItemsPage() {
         ]}
         renderGridCard={(item, actions) => {
           const isStock = item.type === "stock" || item.trackStock;
-          const status = isStock
-            ? { label: "STOCK ITEM", color: "text-green-600 bg-green-50 border-green-100", bar: "bg-green-500" }
-            : { label: "SERVICE ITEM", color: "text-purple-600 bg-purple-50 border-purple-100", bar: "bg-purple-500" };
+
+          // Define status and colors based on item type
+          const typeConfig = {
+            stock: { label: "STOCK ITEM", color: "text-green-600 bg-green-50 border-green-100", bar: "bg-green-500", iconBg: "bg-green-50/50 border-green-100/50 text-green-600" },
+            nonstock: { label: "NON-STOCK", color: "text-orange-600 bg-orange-50 border-orange-100", bar: "bg-orange-500", iconBg: "bg-orange-50/50 border-orange-100/50 text-orange-600" },
+            service: { label: "SERVICE ITEM", color: "text-purple-600 bg-purple-50 border-purple-100", bar: "bg-purple-500", iconBg: "bg-purple-50/50 border-purple-100/50 text-purple-600" }
+          };
+          const status = typeConfig[item.type] || typeConfig.stock;
 
           return (
             <div className="group relative bg-white border border-[#d5d5dd] rounded-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-200">
@@ -607,7 +688,7 @@ export default function ItemsPage() {
                 <div className="flex items-start gap-3 mb-6">
                   <div className={cn(
                     "h-10 w-10 rounded-sm flex items-center justify-center shrink-0 border transition-colors",
-                    isStock ? "bg-green-50/50 border-green-100/50 text-green-600" : "bg-purple-50/50 border-purple-100/50 text-purple-600"
+                    status.iconBg
                   )}>
                     <Package className="h-5 w-5 stroke-[1.5]" />
                   </div>
@@ -621,7 +702,7 @@ export default function ItemsPage() {
                       </div>
                     </div>
                     <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tight truncate">
-                      {typeof item.categoryId === 'object' ? item.categoryId.name : item.categoryId || 'General'}
+                      {getCategoryName(item.categoryId)}
                     </p>
                   </div>
                 </div>
@@ -669,6 +750,15 @@ export default function ItemsPage() {
         results={importResults}
       />
 
+      <ValidationErrorsDialog
+        open={isValidationErrorsOpen}
+        onClose={() => setIsValidationErrorsOpen(false)}
+        errors={validationErrors?.errors || []}
+        totalRows={validationErrors?.totalRows || 0}
+        validRows={validationErrors?.validRows || 0}
+        invalidRows={validationErrors?.invalidRows || 0}
+      />
+
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         open={deleteDialogOpen}
@@ -694,5 +784,31 @@ export default function ItemsPage() {
         variant="default"
       />
     </PageContainer>
-);
+  );
+}
+
+// Wrap with Error Boundary to catch rendering errors
+export default function ItemsPage() {
+  return (
+    <ErrorBoundary fallback={
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <div className="max-w-md w-full bg-red-50 border border-red-200 rounded-lg p-6">
+          <h3 className="text-lg font-bold text-red-900 mb-2">
+            Unable to load Items Management
+          </h3>
+          <p className="text-sm text-red-700 mb-4">
+            An error occurred while loading the items. This might be due to invalid data from the server.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    }>
+      <ItemsPageContent />
+    </ErrorBoundary>
+  );
 }
