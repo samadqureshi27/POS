@@ -23,7 +23,8 @@ export class MenuService {
       if (params?.categoryId) queryParams.append("categoryId", params.categoryId);
       if (params?.isActive !== undefined) queryParams.append("isActive", String(params.isActive));
       if (params?.page) queryParams.append("page", String(params.page));
-      if (params?.limit) queryParams.append("limit", String(params.limit));
+      // Set default limit to 100 if not provided
+      queryParams.append("limit", String(params?.limit || 100));
       if (params?.sort) queryParams.append("sort", params.sort);
       if (params?.order) queryParams.append("order", params.order);
 
@@ -33,6 +34,7 @@ export class MenuService {
       const response = await fetch(url, {
         method: "GET",
         headers: buildHeaders(),
+        cache: "no-store", // Prevent caching issues
       });
 
       const data = await response.json();
