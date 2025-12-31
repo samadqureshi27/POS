@@ -232,7 +232,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
     });
     additionalStateRef.current = newState;
     setAdditionalState(newState);
-  }, [additionalData]);
+  }, [additionalData, entityName]);
 
   // Initialize data
   useEffect(() => {

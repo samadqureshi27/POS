@@ -91,6 +91,41 @@ body {
   background-color: #9ca3af;
 }
 
+/* Invisible scrollbar that appears on hover */
+.scrollbar-invisible {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.scrollbar-invisible::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-invisible::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-invisible::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar-invisible:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.4);
+}
+
+.scrollbar-invisible::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+/* Firefox */
+.scrollbar-invisible:hover {
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+}
+
 /* Global CSS - Add this to your globals.css or styles.css */
 
 /* Desktop table view - default styling */
