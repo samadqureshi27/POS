@@ -1,0 +1,11 @@
+src/app/(items-management)/items/page.tsx(690,13): error TS1005: ')' expected.
+src/app/(items-management)/items/page.tsx(690,15): error TS17002: Expected corresponding JSX closing tag for 'PageContainer'.
+src/app/(items-management)/items/page.tsx(692,10): error TS1128: Declaration or statement expected.
+src/app/(items-management)/items/page.tsx(693,7): error TS1161: Unterminated regular expression literal.
+src/app/(items-management)/items/page.tsx(697,18): error TS1136: Property assignment expected.
+src/app/(items-management)/items/page.tsx(697,21): error TS1005: ';' expected.
+src/app/(items-management)/items/page.tsx(697,49): error TS1128: Declaration or statement expected.
+src/app/(items-management)/items/page.tsx(700,8): error TS1109: Expression expected.
+src/app/(items-management)/items/page.tsx(732,5): error TS1128: Declaration or statement expected.
+src/app/(items-management)/items/page.tsx(733,1): error TS1109: Expression expected.
+src/app/(items-management)/items/page.tsx(734,1): error TS1128: Declaration or statement expected.
