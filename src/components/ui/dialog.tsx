@@ -23,6 +23,7 @@ const DialogOverlay = React.forwardRef<
       "transition-all duration-200",
       "overflow-y-scroll overflow-x-hidden",
       "min-h-screen",
+      "scrollbar-invisible",
       className
     )}
     {...props}

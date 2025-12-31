@@ -94,14 +94,6 @@ export class RecipeService {
         recipes = data.items;
       }
 
-      console.log("📋 RecipeService.listRecipes - Raw API response:", data);
-      console.log("📋 RecipeService.listRecipes - Extracted recipes:", recipes);
-      console.log("📋 RecipeService.listRecipes - Recipe count:", Array.isArray(recipes) ? recipes.length : 0);
-      if (Array.isArray(recipes) && recipes.length > 0) {
-        console.log("📋 RecipeService.listRecipes - First recipe:", recipes[0]);
-        console.log("📋 RecipeService.listRecipes - Sub recipes:", recipes.filter((r: any) => r.type === "sub").length);
-      }
-
       return {
         success: true,
         data: recipes,
@@ -191,11 +183,6 @@ export class RecipeService {
 
       const data = await response.json();
 
-      console.log("🔴 RAW API RESPONSE:", data);
-      console.log("🔴 data.result:", data.result);
-      console.log("🔴 data.data:", data.data);
-      console.log("🔴 Top level keys:", Object.keys(data));
-
       if (!response.ok) {
         return {
           success: false,
@@ -207,23 +194,14 @@ export class RecipeService {
       let createdRecipe = data;
       if (data.result) {
         createdRecipe = data.result;
-        console.log("🔴 Extracted from data.result:", createdRecipe);
       } else if (data.data) {
         createdRecipe = data.data;
-        console.log("🔴 Extracted from data.data:", createdRecipe);
-      } else {
-        console.log("🔴 Using data directly:", createdRecipe);
       }
 
       // If the response has recipe property (with-variants endpoint), extract just the recipe
       if (createdRecipe.recipe) {
-        console.log("🔴 Response has .recipe property, extracting it");
         createdRecipe = createdRecipe.recipe;
       }
-
-      console.log("🔴 FINAL createdRecipe:", createdRecipe);
-      console.log("🔴 createdRecipe.name:", createdRecipe.name);
-      console.log("🔴 createdRecipe._id:", createdRecipe._id);
 
       return {
         success: true,

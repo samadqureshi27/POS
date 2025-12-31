@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { UtensilsCrossed, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
@@ -22,6 +22,10 @@ const MenuItemsManagementPage = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<MenuItemOption | null>(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(21);
 
   const {
     // Data
@@ -123,6 +127,18 @@ const MenuItemsManagementPage = () => {
     }
   };
 
+  // Calculate pagination
+  const totalItems = filteredItems.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = filteredItems.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, categoryFilter]);
+
   // Show skeleton loading during initial load
   if (loading) {
     return <GlobalSkeleton type="management" showSummaryCards={false} showActionBar={true} />;
@@ -174,7 +190,7 @@ const MenuItemsManagementPage = () => {
 
       {/* Menu Items Grid */}
       <ResponsiveGrid<MenuItemOption>
-        items={filteredItems}
+        items={paginatedItems}
         loading={loading}
         loadingText="Loading menu items..."
         viewMode={viewMode}
@@ -184,6 +200,13 @@ const MenuItemsManagementPage = () => {
         getItemId={(item) => item.ID}
         onEdit={openEditModal}
         onDelete={handleDelete}
+        // Pagination props
+        showPagination={true}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        onPageChange={setCurrentPage}
         columns={[
           {
             key: "Name",
