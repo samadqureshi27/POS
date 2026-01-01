@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Loader2, GripVertical, UtensilsCrossed, BookOpen, X, Search, Plus, Upload, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { RecipeService } from "@/lib/services/recipe-service";
+import { MenuVariationsService } from "@/lib/services/menu-variations-service";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +65,9 @@ export default function MenuItemModalNew({
   const [selectedRecipe, setSelectedRecipe] = useState<string>("");
   const [recipeVariations, setRecipeVariations] = useState<any[]>([]);
   const [loadingVariations, setLoadingVariations] = useState(false);
+
+  // Menu item variations state (to be posted after menu item creation)
+  const [selectedVariations, setSelectedVariations] = useState<string[]>([]);
 
   // Search states
   const [categorySearch, setCategorySearch] = useState("");
@@ -132,6 +136,7 @@ export default function MenuItemModalNew({
         setSelectedCategory("");
         setSelectedRecipe("");
         setRecipeVariations([]);
+        setSelectedVariations([]);
       }
     }
   }, [isOpen, editingItem]);
@@ -173,9 +178,20 @@ export default function MenuItemModalNew({
     setFormData(prev => ({ ...prev, categoryId }));
   };
 
+  const handleVariationToggle = (variationId: string) => {
+    setSelectedVariations(prev => {
+      if (prev.includes(variationId)) {
+        return prev.filter(id => id !== variationId);
+      } else {
+        return [...prev, variationId];
+      }
+    });
+  };
+
   const handleRecipeSelect = async (recipeId: string) => {
     setSelectedRecipe(recipeId);
     setFormData(prev => ({ ...prev, recipeId }));
+    setSelectedVariations([]); // Clear selected variations when recipe changes
 
     if (recipeId && recipeId !== 'none') {
       try {
@@ -298,6 +314,9 @@ export default function MenuItemModalNew({
   );
 
   const handleSave = async () => {
+    console.log("🟡 handleSave called");
+    console.log("🟡 selectedVariations at start:", selectedVariations);
+
     if (!formData.name || !formData.categoryId) {
       toast.error("Please fill in all required fields (Name, Category)");
       return;
@@ -340,7 +359,18 @@ export default function MenuItemModalNew({
         metadata: formData.metadata || {},
       };
 
-      await onSubmit(payload);
+      // Submit the menu item first
+      const result = await onSubmit(payload);
+
+      console.log("Menu item creation result:", result);
+      console.log("Selected variations:", selectedVariations);
+
+      // If menu item was created successfully and variations are selected, post them
+      if (result && result.success && result.data && result.data._id && selectedVariations.length > 0) {
+        console.log("Posting variations for menu item:", result.data._id);
+        await postMenuVariations(result.data._id);
+      }
+
       onClose();
     } catch (error) {
       logError("Error saving menu item", error, {
@@ -348,6 +378,84 @@ export default function MenuItemModalNew({
         action: "handleSave",
         itemName: formData.name,
       });
+    }
+  };
+
+  const postMenuVariations = async (menuItemId: string) => {
+    try {
+      console.log("🔵 postMenuVariations called with menuItemId:", menuItemId);
+      console.log("🔵 selectedVariations:", selectedVariations);
+      console.log("🔵 recipeVariations:", recipeVariations);
+
+      const basePrice = formData.pricing?.basePrice || 0;
+      let successCount = 0;
+      let failCount = 0;
+
+      for (let i = 0; i < selectedVariations.length; i++) {
+        const variationId = selectedVariations[i];
+        const recipeVariation = recipeVariations.find(v => (v._id || String(v)) === variationId);
+
+        console.log("🔵 Processing variation", i, "- variationId:", variationId);
+        console.log("🔵 Found recipeVariation:", recipeVariation);
+
+        if (!recipeVariation) {
+          console.log("⚠️ Recipe variation not found, skipping");
+          continue;
+        }
+
+        const variationPayload = {
+          menuItemId: menuItemId,
+          recipeVariantId: variationId,
+          name: recipeVariation.name,
+          type: recipeVariation.type || "size",
+          priceDelta: recipeVariation.baseCostAdjustment || 0,
+          sizeMultiplier: recipeVariation.sizeMultiplier || 1,
+          isDefault: i === 0, // First variation is default
+          isActive: recipeVariation.isActive !== false,
+          displayOrder: i,
+        };
+
+        console.log("🔵 Variation payload:", variationPayload);
+
+        try {
+          console.log("🔵 Calling MenuVariationsService.createVariation...");
+          const response = await MenuVariationsService.createVariation(variationPayload);
+          console.log("🔵 Variation creation response:", response);
+
+          if (response.success) {
+            successCount++;
+            console.log("✅ Variation created successfully");
+          } else {
+            failCount++;
+            console.log("❌ Variation creation failed:", response.message);
+            logError("Failed to create menu variation", new Error(response.message), {
+              component: "MenuItemModalNew",
+              action: "postMenuVariations",
+              variationName: recipeVariation.name,
+            });
+          }
+        } catch (error) {
+          console.log("❌ Exception in createVariation call:", error);
+          failCount++;
+        }
+      }
+
+      console.log(`🔵 Finished posting variations - Success: ${successCount}, Failed: ${failCount}`);
+
+      if (successCount > 0) {
+        toast.success(`${successCount} variation(s) added successfully`);
+      }
+      if (failCount > 0) {
+        toast.error(`${failCount} variation(s) failed to add`);
+      }
+    } catch (error) {
+      console.log("❌ Error in postMenuVariations:", error);
+      logError("Error posting menu variations", error, {
+        component: "MenuItemModalNew",
+        action: "postMenuVariations",
+        menuItemId,
+      });
+      toast.error("Failed to add some variations");
     }
   };
 
@@ -805,9 +913,16 @@ export default function MenuItemModalNew({
             {selectedRecipe && selectedRecipe !== 'none' && (
               <div className="border-t border-[#d5d5dd] bg-white p-3 max-h-64 overflow-y-auto">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Variations
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Variations
+                    </p>
+                    {selectedVariations.length > 0 && (
+                      <span className="text-[9px] font-black bg-purple-500 text-white px-1.5 py-0.5 rounded-full">
+                        {selectedVariations.length} SELECTED
+                      </span>
+                    )}
+                  </div>
                   {loadingVariations && (
                     <Loader2 className="h-3 w-3 animate-spin text-purple-600" />
                   )}
@@ -819,15 +934,38 @@ export default function MenuItemModalNew({
 
                 {!loadingVariations && recipeVariations.length > 0 && (
                   <div className="space-y-1.5">
-                    {recipeVariations.map((variation: any, index: number) => (
-                      <div
-                        key={variation._id || index}
-                        className="text-xs p-2 bg-purple-50 rounded-sm border border-purple-100"
-                      >
-                        <p className="font-medium text-purple-900">{variation.name}</p>
-                        <p className="text-purple-600 text-[10px]">{variation.type}</p>
-                      </div>
-                    ))}
+                    {recipeVariations.map((variation: any, index: number) => {
+                      const variationId = variation._id || String(index);
+                      const isSelected = selectedVariations.includes(variationId);
+
+                      return (
+                        <div
+                          key={variationId}
+                          onClick={() => handleVariationToggle(variationId)}
+                          className={cn(
+                            "text-xs p-2 rounded-sm border cursor-pointer transition-all",
+                            isSelected
+                              ? "bg-purple-100 border-purple-300"
+                              : "bg-purple-50 border-purple-100 hover:bg-purple-100"
+                          )}
+                        >
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => {}} // Handled by parent div onClick
+                              className="rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-purple-900">{variation.name}</p>
+                              <p className="text-purple-600 text-[10px]">
+                                {variation.type} {variation.sizeMultiplier && `• ${variation.sizeMultiplier}x`}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

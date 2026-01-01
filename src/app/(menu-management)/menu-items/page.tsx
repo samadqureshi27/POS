@@ -7,7 +7,7 @@ import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import MenuItemModal from "./_components/menu-item-modal-new";
+import MenuItemModal from "./_components/menu-item-modal-batch";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useMenuItemData } from "@/lib/hooks/useMenuItemData";
 import { MenuItemOption } from "@/lib/types/menu";
@@ -357,6 +357,7 @@ const MenuItemsManagementPage = () => {
         actionLoading={actionLoading}
         categories={categories}
         recipes={recipes}
+        onSuccess={refreshData}
       />
 
       {/* Delete Confirmation Dialog */}

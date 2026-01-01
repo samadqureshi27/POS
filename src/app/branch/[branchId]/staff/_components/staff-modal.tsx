@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ChipMultiSelect, type ChipOption } from "@/components/ui/chip-multiselect";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import type { TenantStaff } from "@/lib/services/staff-service";
 import { StaffService } from "@/lib/services/staff-service";
@@ -69,6 +70,9 @@ const StaffModal: React.FC<StaffModalProps> = ({
     metadata: {},
   });
 
+  // Single branch ID state
+  const [selectedBranchId, setSelectedBranchId] = useState<string>(branchId || "");
+
   // Phone number state (separate from TenantStaff type)
   const [phone, setPhone] = useState<string>("");
 
@@ -80,14 +84,6 @@ const StaffModal: React.FC<StaffModalProps> = ({
   const isManager = formData.roles?.includes("manager");
   const showPosTerminals = isCashier || isManager;
   const hasOtherRoles = !formData.roles || formData.roles.length === 0 || formData.roles.some(role => role !== "cashier" && role !== "manager");
-
-  // Convert branches to ChipOption format
-  const branchOptions = useMemo<ChipOption[]>(() => {
-    return branches.map((branch) => ({
-      id: branch._id || branch.id || "",
-      label: branch.code ? `${branch.name} (${branch.code})` : branch.name,
-    }));
-  }, [branches]);
 
   // Convert roles to ChipOption format
   const roleOptions = useMemo<ChipOption[]>(() => {
@@ -133,6 +129,9 @@ const StaffModal: React.FC<StaffModalProps> = ({
           status: fullStaff.status || "active",
           metadata: fullStaff.metadata || {},
         });
+        // Set single branch from branchIds array
+        const staffBranchId = fullStaff.branchIds && fullStaff.branchIds.length > 0 ? fullStaff.branchIds[0] : (branchId || "");
+        setSelectedBranchId(staffBranchId);
         // Set phone from full staff data
         setPhone((fullStaff as any).phone || (fullStaff.metadata as any)?.phone || "");
         // Set POS IDs from full staff data
@@ -144,9 +143,9 @@ const StaffModal: React.FC<StaffModalProps> = ({
     }
   };
 
-  // Load POS terminals when branches or roles change (for cashier/manager)
+  // Load POS terminals when branch or roles change (for cashier/manager)
   useEffect(() => {
-    if (isOpen && showPosTerminals && formData.branchIds && formData.branchIds.length > 0) {
+    if (isOpen && showPosTerminals && selectedBranchId) {
       loadPosTerminals();
     } else {
       // Clear terminals if conditions not met
@@ -156,7 +155,7 @@ const StaffModal: React.FC<StaffModalProps> = ({
         setPosIds([]);
       }
     }
-  }, [isOpen, showPosTerminals, formData.branchIds]);
+  }, [isOpen, showPosTerminals, selectedBranchId]);
 
   // Filter out invalid POS IDs when terminals list changes
   useEffect(() => {
@@ -185,34 +184,20 @@ const StaffModal: React.FC<StaffModalProps> = ({
   };
 
   const loadPosTerminals = async () => {
-    if (!formData.branchIds || formData.branchIds.length === 0) {
+    if (!selectedBranchId) {
       setPosTerminals([]);
       return;
     }
 
     try {
       setLoadingTerminals(true);
-      // Fetch terminals for all selected branches and combine them
-      const terminalPromises = formData.branchIds.map((branchId) =>
-        PosService.getTerminalsByBranch(branchId)
-      );
-      
-      const results = await Promise.all(terminalPromises);
-      const allTerminals: PosTerminal[] = [];
-      
-      results.forEach((result) => {
-        if (result.success && result.data) {
-          allTerminals.push(...result.data);
-        }
-      });
+      const result = await PosService.getTerminalsByBranch(selectedBranchId);
 
-      // Remove duplicates based on terminal ID
-      const uniqueTerminals = allTerminals.filter(
-        (terminal, index, self) =>
-          index === self.findIndex((t) => (t._id || t.id) === (terminal._id || terminal.id))
-      );
-
-      setPosTerminals(uniqueTerminals);
+      if (result.success && result.data) {
+        setPosTerminals(result.data);
+      } else {
+        setPosTerminals([]);
+      }
     } catch (error) {
       console.error("Error loading POS terminals:", error);
       toast.error("Failed to load POS terminals");
@@ -239,6 +224,9 @@ const StaffModal: React.FC<StaffModalProps> = ({
         status: item.status || "active",
         metadata: item.metadata || {},
       });
+      // Set single branch from branchIds array
+      const itemBranchId = item.branchIds && item.branchIds.length > 0 ? item.branchIds[0] : (branchId || "");
+      setSelectedBranchId(itemBranchId);
       // Set phone from item if available (check both top-level and metadata)
       setPhone((item as any).phone || (item.metadata as any)?.phone || "");
       // Set POS IDs from item if available
@@ -256,6 +244,7 @@ const StaffModal: React.FC<StaffModalProps> = ({
         status: "active",
         metadata: {},
       });
+      setSelectedBranchId(branchId || "");
       setPhone("");
       setPosIds([]);
     }
@@ -288,35 +277,21 @@ const StaffModal: React.FC<StaffModalProps> = ({
       }
     }
 
-    if (!formData.branchIds || formData.branchIds.length === 0) {
-      toast.error("Please select at least one branch");
+    if (!selectedBranchId) {
+      toast.error("Please select a branch");
       return;
     }
 
-    // Build payload matching API structure
-    // For CREATE: use branchIds (array)
-    // For UPDATE: use assignedBranchId (singular, first branch from array)
+    // Build payload matching API structure - only include necessary fields
     const payload: any = {
       fullName: formData.fullName,
       email: formData.email,
       roles: formData.roles || [],
       isStaff: true,
       status: formData.status || "active",
+      // Backend requires branchIds as array with at least 1 item
+      branchIds: [selectedBranchId],
     };
-
-    // Branch assignment: array for create, singular for update
-    if (isEditing) {
-      // UPDATE: Use assignedBranchId (singular) - staff can only be assigned to one branch
-      const firstBranchId = formData.branchIds && formData.branchIds.length > 0 
-        ? formData.branchIds[0] 
-        : (branchId || null);
-      if (firstBranchId) {
-        payload.assignedBranchId = firstBranchId;
-      }
-    } else {
-      // CREATE: Use branchIds (array)
-      payload.branchIds = formData.branchIds || [];
-    }
 
     // Include phone if provided - always check current state value
     const phoneValue = phone?.trim() || "";
@@ -324,12 +299,25 @@ const StaffModal: React.FC<StaffModalProps> = ({
       payload.phone = phoneValue;
     }
 
-    // Always include posIds when cashier/manager role is selected or when editing
-    // Check roles directly from formData to ensure we catch the current state
+    // Check if POS terminals are being assigned
     const hasCashierOrManager = formData.roles?.some(role => role === "cashier" || role === "manager");
-    if (hasCashierOrManager || isEditing) {
+
+    // Always include posIds array when cashier/manager role is selected
+    if (hasCashierOrManager) {
       payload.posIds = Array.isArray(posIds) ? posIds : [];
     }
+
+    // Include assignedBranchId when posIds is being sent (even if empty array)
+    // Backend requires this field when posIds field is present in payload
+    if (hasCashierOrManager) {
+      payload.assignedBranchId = selectedBranchId;
+    }
+
+    // Debug: Log payload before sending
+    console.log("Payload being sent:", JSON.stringify(payload, null, 2));
+    console.log("Roles:", formData.roles);
+    console.log("Has cashier/manager:", hasCashierOrManager);
+    console.log("Selected Branch ID:", selectedBranchId);
 
     // Only include password if provided (for non-cashier roles)
     if (formData.password) {
@@ -360,8 +348,8 @@ const StaffModal: React.FC<StaffModalProps> = ({
     }));
   };
 
-  const handleBranchChange = (selectedIds: string[]) => {
-    handleInputChange("branchIds", selectedIds);
+  const handleBranchChange = (value: string) => {
+    setSelectedBranchId(value);
   };
 
   const handleRoleChange = (selectedIds: string[]) => {
@@ -485,24 +473,38 @@ const StaffModal: React.FC<StaffModalProps> = ({
 
             </div>
 
-            {/* Branches - Multi-select - Full width */}
+            {/* Branch - Single select - Full width */}
             <div className="w-full">
               <div className="flex items-center gap-2 mb-1.5">
                 <Label className="text-sm font-medium text-[#656565]">
-                  Assigned Branches <span className="text-red-500">*</span>
+                  Assigned Branch <span className="text-red-500">*</span>
                 </Label>
-                <CustomTooltip label="Select one or more branches to assign this staff member to" direction="right">
+                <CustomTooltip label="Select the branch to assign this staff member to" direction="right">
                   <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
                 </CustomTooltip>
               </div>
-              <ChipMultiSelect
-                value={formData.branchIds || []}
-                options={branchOptions}
-                placeholder="Nothing selected"
-                loading={loadingBranches}
-                disabled={actionLoading}
-                onChange={handleBranchChange}
-              />
+              <Select
+                value={selectedBranchId}
+                onValueChange={handleBranchChange}
+                disabled={actionLoading || loadingBranches}
+              >
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue placeholder="Select a branch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {branches.length > 0 ? (
+                    branches.map((branch) => (
+                      <SelectItem key={branch._id || branch.id} value={branch._id || branch.id || ""}>
+                        {branch.code ? `${branch.name} (${branch.code})` : branch.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="px-2 py-4 text-center text-sm text-gray-500">
+                      {loadingBranches ? "Loading branches..." : "No branches available"}
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Roles - Multi-select - Full width */}
@@ -531,10 +533,10 @@ const StaffModal: React.FC<StaffModalProps> = ({
                   <Label className="text-sm font-medium text-[#656565]">
                     POS Terminals
                   </Label>
-                  <CustomTooltip 
-                    label={!formData.branchIds || formData.branchIds.length === 0
-                      ? "Select branches first to see available POS terminals"
-                      : "Select POS terminals for this staff member (optional)"} 
+                  <CustomTooltip
+                    label={!selectedBranchId
+                      ? "Select a branch first to see available POS terminals"
+                      : "Select POS terminals for this staff member (optional)"}
                     direction="right"
                   >
                     <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
@@ -545,7 +547,7 @@ const StaffModal: React.FC<StaffModalProps> = ({
                   options={posTerminalOptions}
                   placeholder="Nothing selected"
                   loading={loadingTerminals}
-                  disabled={actionLoading || loadingBranches || !formData.branchIds || formData.branchIds.length === 0}
+                  disabled={actionLoading || loadingBranches || !selectedBranchId}
                   onChange={handlePosTerminalChange}
                 />
               </div>
