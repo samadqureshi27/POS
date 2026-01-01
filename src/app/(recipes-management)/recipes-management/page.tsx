@@ -6,7 +6,7 @@ import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
-import RecipeModalNew from "./_components/recipe-modal";
+import RecipeModalNew from "./_components/recipe-modal-new";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeData } from "@/lib/hooks/useRecipeData";
 import { RecipeOption } from "@/lib/types/recipes";

@@ -279,14 +279,25 @@ export class RecipeService {
   }
 
   /**
-   * Update existing recipe
+   * Update existing recipe (variations handled separately)
    */
   static async updateRecipe(id: string, updates: Partial<Recipe>): Promise<ApiResponse<Recipe>> {
     try {
+      const hasVariations = updates.variations && updates.variations.length > 0;
+
+      // Remove variations from the update payload - they need to be handled separately
+      const { variations, ...recipeUpdates } = updates;
+
+      console.log(`🔄 Updating recipe ${id}`, {
+        hasVariations,
+        variationsCount: variations?.length || 0,
+        note: hasVariations ? "⚠️ Variations will not be saved (backend endpoint not implemented)" : undefined,
+      });
+
       const response = await fetch(`/api/recipes/${id}`, {
         method: "PUT",
         headers: buildHeaders(),
-        body: JSON.stringify(updates),
+        body: JSON.stringify(recipeUpdates),
       });
 
       const data = await response.json();
@@ -306,15 +317,20 @@ export class RecipeService {
         updatedRecipe = data.data;
       }
 
-      // If the response has recipe property (with-variants endpoint), extract just the recipe
+      // If the response has recipe property, extract just the recipe
       if (updatedRecipe.recipe) {
         updatedRecipe = updatedRecipe.recipe;
+      }
+
+      // Show warning if variations were provided but not saved
+      if (hasVariations) {
+        console.warn("⚠️ Recipe updated, but variations were not saved. Backend endpoint '/api/recipes/:id/with-variants' not implemented.");
       }
 
       return {
         success: true,
         data: updatedRecipe,
-        message: data.message || "Recipe updated successfully",
+        message: data.message || "Recipe updated successfully" + (hasVariations ? " (variations not saved)" : ""),
       };
     } catch (error: any) {
       logError("Error updating recipe", error, {
