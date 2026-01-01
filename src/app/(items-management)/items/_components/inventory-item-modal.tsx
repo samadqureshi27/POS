@@ -94,7 +94,7 @@ export default function InventoryItemModal({
           isActive: editingItem.isActive ?? true,
         });
 
-        // Set category input for new category creation (if needed)
+        // Clear category input (category is selected, shown below)
         setCategoryInput("");
         // Load vendors and branches from mock API (not yet in backend)
         setSelectedVendors([]);
@@ -194,17 +194,9 @@ export default function InventoryItemModal({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleCategorySelect = (categoryId: string) => {
-    handleFieldChange("categoryId", categoryId);
-    setCategoryInput(""); // Clear input when selecting existing category
-    setShowNewCategoryInput(false); // Hide input when selecting existing category
-  };
-
   const handleAddCategory = async () => {
     const categoryName = categoryInput.trim();
     if (!categoryName) {
-      // Show input field if not already shown
-      setShowNewCategoryInput(true);
       return;
     }
 
@@ -220,7 +212,6 @@ export default function InventoryItemModal({
         const newCategoryId = response.data._id || response.data.id || "";
         handleFieldChange("categoryId", newCategoryId);
         setCategoryInput(""); // Clear input after successful creation
-        setShowNewCategoryInput(false); // Hide input after successful creation
         toast.success("Category created successfully");
       } else {
         toast.error(response.message || "Failed to create category");
@@ -367,37 +358,27 @@ export default function InventoryItemModal({
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
                   <Label className="text-sm font-medium text-[#656565]">Category</Label>
-                  <CustomTooltip label="Select a category or create a new one using the + button" direction="right">
+                  <CustomTooltip label="Type to create a new category or press Enter to save" direction="right">
                     <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
                   </CustomTooltip>
                 </div>
                 <div className="grid grid-cols-[1fr_auto] gap-2 mt-1.5">
-                  <Select
-                    value={typeof formData.categoryId === 'string' ? formData.categoryId : formData.categoryId?._id || formData.categoryId?.id || ""}
-                    onValueChange={(value) => handleCategorySelect(value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.length > 0 ? (
-                        categories.map((cat) => (
-                          <SelectItem key={cat._id || cat.id} value={cat._id || cat.id || ""}>
-                            {cat.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <div className="px-2 py-4 text-center text-sm text-gray-500">
-                          No categories available. Create one using the + button.
-                        </div>
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    value={categoryInput}
+                    onChange={(e) => setCategoryInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && categoryInput.trim()) {
+                        handleAddCategory();
+                      }
+                    }}
+                    placeholder="Type category name..."
+                    className=""
+                  />
 
                   <Button
                     type="button"
                     onClick={handleAddCategory}
-                    disabled={addingCategory}
+                    disabled={addingCategory || !categoryInput.trim()}
                     variant="outline"
                     className="h-14 border-gray-300"
                     title="Add new category"
@@ -409,23 +390,13 @@ export default function InventoryItemModal({
                     )}
                   </Button>
                 </div>
-                {/* Input for creating new category - shown when + button is clicked */}
-                {showNewCategoryInput && (
-                  <Input
-                    value={categoryInput}
-                    onChange={(e) => setCategoryInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && categoryInput.trim()) {
-                        handleAddCategory();
-                      } else if (e.key === 'Escape') {
-                        setShowNewCategoryInput(false);
-                        setCategoryInput("");
-                      }
-                    }}
-                    placeholder="Enter new category name and press Enter or click +"
-                    className="mt-2"
-                    autoFocus
-                  />
+                {/* Show selected category */}
+                {formData.categoryId && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    Selected: <span className="font-semibold">
+                      {categories.find(c => (c._id || c.id) === formData.categoryId)?.name || formData.categoryId}
+                    </span>
+                  </div>
                 )}
               </div>
 

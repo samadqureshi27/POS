@@ -144,9 +144,10 @@ export const StaffService = {
       if (payload.metadata !== undefined) apiPayload.metadata = payload.metadata;
       if (payload.branchId !== undefined) apiPayload.branchId = payload.branchId;
       if (payload.status !== undefined) apiPayload.status = payload.status;
-      // Include phone and posIds from payload (these are not in TenantStaff type but are in API)
+      // Include phone, posIds, assignedBranchId from payload (these are not in TenantStaff type but are in API)
       if ((payload as any).phone !== undefined) apiPayload.phone = (payload as any).phone;
       if ((payload as any).posIds !== undefined) apiPayload.posIds = (payload as any).posIds;
+      if ((payload as any).assignedBranchId !== undefined) apiPayload.assignedBranchId = (payload as any).assignedBranchId;
       if ((payload as any).isStaff !== undefined) apiPayload.isStaff = (payload as any).isStaff;
 
       const res = await fetch(url, {

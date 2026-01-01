@@ -115,6 +115,10 @@ export default function RecipeModalNew({
   const [draggedInventory, setDraggedInventory] = useState<string | null>(null);
   const [draggedRecipe, setDraggedRecipe] = useState<string | null>(null);
 
+  // Refs for auto-focus and scroll
+  const ingredientRefs = React.useRef<{ [key: number]: HTMLInputElement | null }>({});
+  const variantRefs = React.useRef<{ [key: number]: HTMLDivElement | null }>({});
+
   useEffect(() => {
     if (isOpen) {
       if (editingItem) {
@@ -195,7 +199,19 @@ export default function RecipeModalNew({
         unit: itemUnit,
       };
 
+      const newIndex = recipeIngredients.length;
       setRecipeIngredients([...recipeIngredients, newIngredient]);
+
+      // Auto-focus and scroll to the new ingredient
+      setTimeout(() => {
+        const inputRef = ingredientRefs.current[newIndex];
+        if (inputRef) {
+          inputRef.focus();
+          inputRef.select();
+          inputRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+
       toast.success(`Added ${itemName} to ingredients`, {
         duration: 2000,
         position: "top-right",
@@ -245,7 +261,19 @@ export default function RecipeModalNew({
         unit: "portion",
       };
 
+      const newIndex = recipeIngredients.length;
       setRecipeIngredients([...recipeIngredients, newIngredient]);
+
+      // Auto-focus and scroll to the new ingredient
+      setTimeout(() => {
+        const inputRef = ingredientRefs.current[newIndex];
+        if (inputRef) {
+          inputRef.focus();
+          inputRef.select();
+          inputRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+
       toast.success(`Added ${recipeName} to ingredients`, {
         duration: 2000,
         position: "top-right",
@@ -277,7 +305,16 @@ export default function RecipeModalNew({
       ingredients: [],
       isActive: true,
     };
+    const newIndex = variants.length;
     setVariants([...variants, newVariant]);
+
+    // Auto-scroll to the new variant
+    setTimeout(() => {
+      const variantRef = variantRefs.current[newIndex];
+      if (variantRef) {
+        variantRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   };
 
   // Add standard size variants
@@ -564,7 +601,7 @@ export default function RecipeModalNew({
                 if (draggedRecipe) handleRecipeDrop(e);
               }}
               className={cn(
-                "rounded-sm border-2 border-dashed p-4 transition-all duration-200 min-h-[200px] max-h-[300px] overflow-y-auto scrollbar-invisible",
+                "rounded-sm border-2 border-dashed p-4 transition-all duration-200 min-h-[200px]",
                 recipeIngredients.length > 0
                   ? "bg-blue-50/30 border-blue-300"
                   : "bg-gray-50 border-gray-300 hover:border-blue-400 hover:bg-blue-50/50"
@@ -579,7 +616,7 @@ export default function RecipeModalNew({
                   </p>
                 </div>
               ) : (
-                <div className="space-y-2 pr-1">
+                <div className="space-y-2">
                   {recipeIngredients.map((ingredient, index) => (
                     <div
                       key={index}
@@ -604,6 +641,9 @@ export default function RecipeModalNew({
                             <div>
                               <Label className="text-xs text-gray-500 mb-1">Quantity</Label>
                               <Input
+                                ref={(el) => {
+                                  ingredientRefs.current[index] = el;
+                                }}
                                 type="number"
                                 min="0"
                                 step="0.01"
@@ -714,10 +754,13 @@ export default function RecipeModalNew({
                   <p className="text-xs text-gray-400 mt-1">Click standard sizes above or add custom variant</p>
                 </div>
               ) : (
-                <div className="space-y-3 max-h-[250px] overflow-y-auto pr-1 scrollbar-invisible">
+                <div className="space-y-3">
                   {variants.map((variant, index) => (
                     <div
                       key={index}
+                      ref={(el) => {
+                        variantRefs.current[index] = el;
+                      }}
                       className="bg-white border border-[#d5d5dd] rounded-sm p-4 hover:border-blue-300 transition-colors"
                     >
                       {/* Header with Name and Badge */}
