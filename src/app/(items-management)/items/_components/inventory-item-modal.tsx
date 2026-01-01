@@ -212,6 +212,7 @@ export default function InventoryItemModal({
         const newCategoryId = response.data._id || response.data.id || "";
         handleFieldChange("categoryId", newCategoryId);
         setCategoryInput(""); // Clear input after successful creation
+        setShowNewCategoryInput(false); // Hide input and show dropdown
         toast.success("Category created successfully");
       } else {
         toast.error(response.message || "Failed to create category");
@@ -358,44 +359,105 @@ export default function InventoryItemModal({
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
                   <Label className="text-sm font-medium text-[#656565]">Category</Label>
-                  <CustomTooltip label="Type to create a new category or press Enter to save" direction="right">
+                  <CustomTooltip label="Select existing category or create new" direction="right">
                     <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
                   </CustomTooltip>
                 </div>
-                <div className="grid grid-cols-[1fr_auto] gap-2 mt-1.5">
-                  <Input
-                    value={categoryInput}
-                    onChange={(e) => setCategoryInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && categoryInput.trim()) {
-                        handleAddCategory();
-                      }
-                    }}
-                    placeholder="Type category name..."
-                    className=""
-                  />
 
-                  <Button
-                    type="button"
-                    onClick={handleAddCategory}
-                    disabled={addingCategory || !categoryInput.trim()}
-                    variant="outline"
-                    className="h-14 border-gray-300"
-                    title="Add new category"
-                  >
-                    {addingCategory ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
+                {!showNewCategoryInput ? (
+                  <div className="grid grid-cols-[1fr_auto] gap-2 mt-1.5">
+                    <Select
+                      value={formData.categoryId}
+                      onValueChange={(value) => {
+                        if (value === "__new__") {
+                          setShowNewCategoryInput(true);
+                          setCategoryInput("");
+                        } else {
+                          handleFieldChange("categoryId", value);
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="">
+                        <SelectValue placeholder="Select category..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.length > 0 && categories.map((category) => (
+                          <SelectItem
+                            key={category._id || category.id}
+                            value={category._id || category.id || ""}
+                          >
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="__new__" className="text-blue-600 font-medium">
+                          <div className="flex items-center gap-2">
+                            <Plus className="h-4 w-4" />
+                            Create New Category
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setShowNewCategoryInput(true);
+                        setCategoryInput("");
+                      }}
+                      variant="outline"
+                      className="h-14 border-gray-300"
+                      title="Create new category"
+                    >
                       <Plus className="h-5 w-5 stroke-[1.5]" />
-                    )}
-                  </Button>
-                </div>
-                {/* Show selected category */}
-                {formData.categoryId && (
-                  <div className="mt-2 text-sm text-gray-600">
-                    Selected: <span className="font-semibold">
-                      {categories.find(c => (c._id || c.id) === formData.categoryId)?.name || formData.categoryId}
-                    </span>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-2 mt-1.5">
+                    <Input
+                      value={categoryInput}
+                      onChange={(e) => setCategoryInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && categoryInput.trim()) {
+                          handleAddCategory();
+                        }
+                        if (e.key === 'Escape') {
+                          setShowNewCategoryInput(false);
+                          setCategoryInput("");
+                        }
+                      }}
+                      placeholder="Type new category name..."
+                      className=""
+                      autoFocus
+                    />
+
+                    <Button
+                      type="button"
+                      onClick={handleAddCategory}
+                      disabled={addingCategory || !categoryInput.trim()}
+                      variant="outline"
+                      className="h-14 border-gray-300"
+                      title="Save new category"
+                    >
+                      {addingCategory ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <Save className="h-5 w-5 stroke-[1.5]" />
+                      )}
+                    </Button>
+
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setShowNewCategoryInput(false);
+                        setCategoryInput("");
+                      }}
+                      variant="outline"
+                      className="h-14 border-gray-300"
+                      title="Cancel"
+                      disabled={addingCategory}
+                    >
+                      <Trash2 className="h-5 w-5 stroke-[1.5]" />
+                    </Button>
                   </div>
                 )}
               </div>

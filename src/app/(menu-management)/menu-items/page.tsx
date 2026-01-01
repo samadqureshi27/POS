@@ -357,6 +357,7 @@ const MenuItemsManagementPage = () => {
         actionLoading={actionLoading}
         categories={categories}
         recipes={recipes}
+        onSuccess={refreshData}
       />
 
       {/* Delete Confirmation Dialog */}

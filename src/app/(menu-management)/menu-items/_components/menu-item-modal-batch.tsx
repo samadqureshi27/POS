@@ -17,6 +17,7 @@ import { MenuItemService, TenantMenuItem } from "@/lib/services/menu-item-servic
 import { RecipeService } from "@/lib/services/recipe-service";
 import { MenuVariationsService } from "@/lib/services/menu-variations-service";
 import { logError } from "@/lib/util/logger";
+import { formatPrice } from "@/lib/util/formatters";
 
 // Interfaces
 interface MenuItemFormData {
@@ -50,14 +51,20 @@ interface CategoryFormData {
 interface MenuItemModalBatchProps {
   isOpen: boolean;
   onClose: () => void;
+  editingItem?: any | null;
+  onSubmit?: (data: any) => Promise<any>;
+  actionLoading?: boolean;
   categories: any[];
   recipes: any[];
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 export default function MenuItemModalBatch({
   isOpen,
   onClose,
+  editingItem,
+  onSubmit,
+  actionLoading = false,
   categories,
   recipes,
   onSuccess,
@@ -93,23 +100,71 @@ export default function MenuItemModalBatch({
 
   useEffect(() => {
     if (isOpen) {
-      // Reset everything when modal opens
-      setSelectedCategoryId("");
-      setSelectedCategoryName("");
-      setCategoryFormData({
-        name: "",
-        description: "",
-        parentId: null,
-        displayOrder: 0,
-        isActive: true,
-      });
-      const initialItem = createEmptyMenuItem();
-      setMenuItems([initialItem]);
-      setActiveMenuItemId(initialItem.id);
+      if (editingItem && editingItem._raw) {
+        // EDIT MODE: Load existing menu item
+        const raw = editingItem._raw;
+
+        // Extract IDs
+        const categoryId = typeof raw.categoryId === 'object' && raw.categoryId?._id
+          ? raw.categoryId._id
+          : raw.categoryId || "";
+        const recipeId = typeof raw.recipeId === 'object' && raw.recipeId?._id
+          ? raw.recipeId._id
+          : raw.recipeId || "";
+
+        // Set category
+        const category = categories.find(c => String(c._id || c.id) === String(categoryId));
+        setSelectedCategoryId(String(categoryId));
+        setSelectedCategoryName(category?.name || "");
+
+        // Create menu item from existing data
+        const editMenuItem: MenuItemFormData = {
+          id: raw._id || raw.id || `edit-${Date.now()}`,
+          name: raw.name || "",
+          description: raw.description || "",
+          recipeId: recipeId ? String(recipeId) : undefined,
+          recipeName: typeof raw.recipeId === 'object' ? raw.recipeId?.name : undefined,
+          pricing: {
+            basePrice: raw.pricing?.basePrice || 0,
+            priceIncludesTax: raw.pricing?.priceIncludesTax || false,
+            currency: raw.pricing?.currency || "PKR",
+          },
+          isActive: raw.isActive !== false,
+          displayOrder: raw.displayOrder || 0,
+          tags: raw.tags || [],
+          media: raw.media || [],
+          selectedVariations: [],
+          recipeVariations: [],
+          isCollapsed: false,
+        };
+
+        setMenuItems([editMenuItem]);
+        setActiveMenuItemId(editMenuItem.id);
+
+        // Fetch recipe variations if recipe exists
+        if (recipeId) {
+          fetchRecipeVariationsForEdit(String(recipeId), editMenuItem.id);
+        }
+      } else {
+        // CREATE MODE: Reset everything
+        setSelectedCategoryId("");
+        setSelectedCategoryName("");
+        setCategoryFormData({
+          name: "",
+          description: "",
+          parentId: null,
+          displayOrder: 0,
+          isActive: true,
+        });
+        const initialItem = createEmptyMenuItem();
+        setMenuItems([initialItem]);
+        setActiveMenuItemId(initialItem.id);
+      }
+
       setCategorySearch("");
       setRecipeSearch("");
     }
-  }, [isOpen]);
+  }, [isOpen, editingItem, categories]);
 
   const createEmptyMenuItem = (): MenuItemFormData => ({
     id: `temp-${Date.now()}-${Math.random()}`,
@@ -130,6 +185,29 @@ export default function MenuItemModalBatch({
     recipeVariations: [],
     isCollapsed: false,
   });
+
+  // Helper to fetch recipe variations for edit mode
+  const fetchRecipeVariationsForEdit = async (recipeId: string, menuItemId: string) => {
+    try {
+      const recipeResponse = await RecipeService.getRecipe(recipeId, true);
+      if (recipeResponse.success && recipeResponse.data) {
+        const { variants } = recipeResponse.data;
+        if (variants && Array.isArray(variants)) {
+          setMenuItems(prevItems => prevItems.map(item =>
+            item.id === menuItemId
+              ? { ...item, recipeVariations: variants }
+              : item
+          ));
+        }
+      }
+    } catch (error) {
+      logError("Error fetching recipe variations for edit", error, {
+        component: "MenuItemModalBatch",
+        action: "fetchRecipeVariationsForEdit",
+        recipeId,
+      });
+    }
+  };
 
   // Category handlers
   const handleCategorySelect = (categoryId: string) => {
@@ -349,76 +427,103 @@ export default function MenuItemModalBatch({
     }
 
     setSubmitting(true);
+
     try {
-      let successCount = 0;
-      let failCount = 0;
+      const isEditMode = editingItem && editingItem._raw;
 
-      for (const menuItem of menuItems) {
-        try {
-          const payload: Partial<TenantMenuItem> = {
-            name: menuItem.name,
-            description: menuItem.description,
-            categoryId: selectedCategoryId,
-            recipeId: menuItem.recipeId,
-            pricing: menuItem.pricing,
-            isActive: menuItem.isActive,
-            displayOrder: menuItem.displayOrder,
-            tags: menuItem.tags,
-            media: menuItem.media,
-            branchIds: [],
-            metadata: {},
-          };
+      if (isEditMode && onSubmit) {
+        // EDIT MODE: Update single item using parent's onSubmit
+        const menuItem = menuItems[0];
+        const payload = {
+          name: menuItem.name,
+          slug: menuItem.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+          code: "",
+          description: menuItem.description,
+          categoryId: selectedCategoryId,
+          recipeId: menuItem.recipeId || undefined,
+          pricing: menuItem.pricing,
+          isActive: menuItem.isActive,
+          displayOrder: menuItem.displayOrder,
+          tags: menuItem.tags,
+          media: menuItem.media,
+          branchIds: [],
+          metadata: {},
+        };
 
-          const response = await MenuItemService.createItem(payload);
+        await onSubmit(payload);
+        onClose();
+      } else {
+        // CREATE MODE: Batch create items
+        let successCount = 0;
+        let failCount = 0;
 
-          if (response.success && response.data) {
-            successCount++;
+        for (const menuItem of menuItems) {
+          try {
+            const payload: Partial<TenantMenuItem> = {
+              name: menuItem.name,
+              description: menuItem.description,
+              categoryId: selectedCategoryId,
+              recipeId: menuItem.recipeId,
+              pricing: menuItem.pricing,
+              isActive: menuItem.isActive,
+              displayOrder: menuItem.displayOrder,
+              tags: menuItem.tags,
+              media: menuItem.media,
+              branchIds: [],
+              metadata: {},
+            };
 
-            // Create variations if any selected
-            if (menuItem.selectedVariations.length > 0 && response.data._id) {
-              await createMenuVariations(response.data._id, menuItem);
+            const response = await MenuItemService.createItem(payload);
+
+            if (response.success && response.data) {
+              successCount++;
+
+              // Create variations if any selected
+              if (menuItem.selectedVariations.length > 0 && response.data._id) {
+                await createMenuVariations(response.data._id, menuItem);
+              }
+            } else {
+              failCount++;
+              logError("Failed to create menu item", new Error(response.message), {
+                component: "MenuItemModalBatch",
+                action: "handleSubmit",
+                itemName: menuItem.name,
+              });
             }
-          } else {
+          } catch (error) {
             failCount++;
-            logError("Failed to create menu item", new Error(response.message), {
+            logError("Error creating menu item", error, {
               component: "MenuItemModalBatch",
               action: "handleSubmit",
               itemName: menuItem.name,
             });
           }
-        } catch (error) {
-          failCount++;
-          logError("Error creating menu item", error, {
-            component: "MenuItemModalBatch",
-            action: "handleSubmit",
-            itemName: menuItem.name,
-          });
         }
-      }
 
-      if (successCount > 0) {
-        toast.success(`${successCount} menu item(s) created successfully`);
+        if (successCount > 0) {
+          toast.success(`${successCount} menu item(s) created successfully`);
 
-        // Reset form state before closing
-        setMenuItems([]);
-        setSelectedCategoryId("");
-        setSelectedCategoryName("");
-        setActiveMenuItemId("");
+          // Reset form state before closing
+          setMenuItems([]);
+          setSelectedCategoryId("");
+          setSelectedCategoryName("");
+          setActiveMenuItemId("");
 
-        // Call parent callbacks
-        onSuccess();
-        onClose();
-      }
+          // Call parent callbacks
+          if (onSuccess) onSuccess();
+          onClose();
+        }
 
-      if (failCount > 0) {
-        toast.error(`${failCount} menu item(s) failed to create`);
+        if (failCount > 0) {
+          toast.error(`${failCount} menu item(s) failed to create`);
+        }
       }
     } catch (error) {
       logError("Error submitting menu items", error, {
         component: "MenuItemModalBatch",
         action: "handleSubmit",
       });
-      toast.error("Failed to create menu items");
+      toast.error(editingItem ? "Failed to update menu item" : "Failed to create menu items");
     } finally {
       setSubmitting(false);
     }
@@ -476,6 +581,9 @@ export default function MenuItemModalBatch({
     recipe.name.toLowerCase().includes(recipeSearch.toLowerCase())
   );
 
+  // Check if in edit mode
+  const isEditMode = !!(editingItem && editingItem._raw);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
@@ -485,13 +593,17 @@ export default function MenuItemModalBatch({
         className="max-h-[90vh]"
       >
         <DialogHeader>
-          <DialogTitle className="text-xl">Batch Create Menu Items</DialogTitle>
+          <DialogTitle className="text-xl">
+            {isEditMode ? "Edit Menu Item" : "Batch Create Menu Items"}
+          </DialogTitle>
         </DialogHeader>
 
         <DialogBody className="px-0" style={{ height: 'calc(90vh - 200px)', maxHeight: 'calc(90vh - 200px)' }}>
           <div className="flex gap-0 h-full overflow-hidden">
-            {/* Left Panel - Categories */}
-            <div className="w-80 flex flex-col border-r border-[#d5d5dd] shrink-0 h-full bg-gradient-to-b from-gray-50 to-white">
+            {/* Left Panel - Categories (Create Mode) OR Variations (Edit Mode) */}
+            {!isEditMode ? (
+              /* Category Panel - Create Mode Only */
+              <div className="w-80 flex flex-col border-r border-[#d5d5dd] shrink-0 h-full bg-gradient-to-b from-gray-50 to-white">
               {/* Scrollable Content Wrapper */}
               <div className="flex-1 overflow-y-auto scrollbar-invisible min-h-0">
                 {/* Header with Title */}
@@ -739,16 +851,198 @@ export default function MenuItemModalBatch({
                 )}
               </div>
             </div>
+            ) : (
+              /* Variations Panel - Edit Mode Only */
+              <div className="w-80 flex flex-col border-r border-[#d5d5dd] shrink-0 h-full bg-gradient-to-b from-purple-50 to-white">
+                {/* Header */}
+                <div className="px-4 py-4 border-b border-[#d5d5dd] bg-white shrink-0 sticky top-0 z-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="h-8 w-8 rounded-lg bg-purple-500 flex items-center justify-center">
+                      <Package className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900">Recipe Variations</h3>
+                      <p className="text-xs text-gray-500">Available options</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Current Category Display */}
+                {selectedCategoryId && (
+                  <div className="px-4 py-3 border-b border-blue-200 bg-blue-50 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <UtensilsCrossed className="h-4 w-4 text-blue-600" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Category</p>
+                        <p className="text-sm font-bold text-blue-900 truncate">{selectedCategoryName}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Variations List */}
+                <div className="flex-1 overflow-y-auto scrollbar-invisible px-3 py-3">
+                  {(() => {
+                    const activeItem = menuItems.find(item => item.id === activeMenuItemId);
+
+                    if (!activeItem?.recipeId) {
+                      return (
+                        <div className="text-center py-12">
+                          <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                          <p className="text-sm font-medium text-gray-500">No Recipe Linked</p>
+                          <p className="text-xs text-gray-400 mt-1">This menu item has no recipe attached</p>
+                        </div>
+                      );
+                    }
+
+                    if (activeItem.recipeVariations.length === 0) {
+                      return (
+                        <div className="text-center py-12">
+                          <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                          <p className="text-sm font-medium text-gray-500">No Variations</p>
+                          <p className="text-xs text-gray-400 mt-1">This recipe has no variations</p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between mb-3 px-1">
+                          <Label className="text-[10px] font-black text-gray-500 uppercase tracking-wider">
+                            Available ({activeItem.recipeVariations.length})
+                          </Label>
+                        </div>
+
+                        {activeItem.recipeVariations.map((variation: any, index: number) => {
+                          const variationId = variation._id || String(index);
+
+                          return (
+                            <div
+                              key={variationId}
+                              className="bg-white border-2 border-purple-200 rounded-lg p-3 hover:border-purple-400 hover:shadow-md transition-all duration-200"
+                            >
+                              {/* Variation Header */}
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <div className={cn(
+                                      "w-2 h-2 rounded-full shrink-0",
+                                      variation.type === 'size' ? 'bg-blue-500' :
+                                      variation.type === 'flavor' ? 'bg-purple-500' :
+                                      variation.type === 'crust' ? 'bg-orange-500' :
+                                      'bg-green-500'
+                                    )} />
+                                    <h4 className="text-sm font-bold text-gray-900 truncate">
+                                      {variation.name}
+                                    </h4>
+                                  </div>
+                                  {variation.description && (
+                                    <p className="text-xs text-gray-600 line-clamp-2 ml-4">
+                                      {variation.description}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <span className={cn(
+                                  "px-2 py-0.5 text-[9px] font-black rounded-full uppercase tracking-wider shrink-0 ml-2",
+                                  variation.type === 'size' ? 'bg-blue-100 text-blue-700' :
+                                  variation.type === 'flavor' ? 'bg-purple-100 text-purple-700' :
+                                  variation.type === 'crust' ? 'bg-orange-100 text-orange-700' :
+                                  'bg-green-100 text-green-700'
+                                )}>
+                                  {variation.type}
+                                </span>
+                              </div>
+
+                              {/* Price Delta */}
+                              {variation.baseCostAdjustment !== undefined && variation.baseCostAdjustment !== 0 && (
+                                <div className="flex items-center gap-2 mb-2 ml-4">
+                                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                    Price Delta:
+                                  </span>
+                                  <span className={cn(
+                                    "text-sm font-bold",
+                                    variation.baseCostAdjustment > 0 ? "text-green-600" : "text-red-600"
+                                  )}>
+                                    {variation.baseCostAdjustment > 0 ? '+' : ''}
+                                    {formatPrice(variation.baseCostAdjustment)} PKR
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Ingredients (Stubbed for future implementation) */}
+                              {variation.ingredients && variation.ingredients.length > 0 ? (
+                                <div className="mt-2 pt-2 border-t border-purple-100">
+                                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                                    Ingredients:
+                                  </p>
+                                  <div className="space-y-1">
+                                    {variation.ingredients.map((ingredient: any, idx: number) => (
+                                      <div key={idx} className="flex items-center gap-2 ml-2">
+                                        <div className="w-1 h-1 rounded-full bg-purple-400 shrink-0" />
+                                        <span className="text-xs text-gray-700">
+                                          {ingredient.name || ingredient}
+                                          {ingredient.quantity && (
+                                            <span className="text-[10px] text-gray-500 ml-1">
+                                              ({ingredient.quantity} {ingredient.unit})
+                                            </span>
+                                          )}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="mt-2 pt-2 border-t border-purple-100">
+                                  <p className="text-[10px] text-gray-400 italic ml-2">
+                                    No additional ingredients
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Size Multiplier */}
+                              {variation.sizeMultiplier && variation.sizeMultiplier !== 1 && (
+                                <div className="mt-2 pt-2 border-t border-purple-100">
+                                  <div className="flex items-center gap-2 ml-2">
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                      Size:
+                                    </span>
+                                    <span className="text-xs font-bold text-purple-700">
+                                      {variation.sizeMultiplier}x
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Info Footer */}
+                <div className="border-t border-[#d5d5dd] bg-purple-50/50 p-3 shrink-0">
+                  <div className="flex items-start gap-2">
+                    <Info className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
+                    <p className="text-xs text-purple-800">
+                      Variations show different options for this menu item. Ingredients will be available once recipe ingredient management is implemented.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Middle Panel - Menu Items */}
             <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
               {/* Sticky Category Header */}
               <div
                 ref={categoryDropZoneRef}
-                onDragOver={handleCategoryDragOver}
-                onDrop={handleCategoryDrop}
+                onDragOver={!isEditMode ? handleCategoryDragOver : undefined}
+                onDrop={!isEditMode ? handleCategoryDrop : undefined}
                 className={cn(
-                  "shrink-0 mx-4 mt-4 mb-3 rounded-sm border-2 border-dashed p-4 transition-all duration-200",
+                  "shrink-0 mx-4 mt-4 mb-3 rounded-sm border-2 p-4 transition-all duration-200",
+                  isEditMode ? "border-solid" : "border-dashed",
                   selectedCategoryId
                     ? "bg-blue-50 border-blue-300"
                     : "bg-gray-50 border-gray-300 hover:border-blue-400 hover:bg-blue-50/50"
@@ -795,6 +1089,7 @@ export default function MenuItemModalBatch({
                     menuItem={menuItem}
                     index={index}
                     isActive={activeMenuItemId === menuItem.id}
+                    isEditMode={isEditMode}
                     onSetActive={() => setActiveMenuItemId(menuItem.id)}
                     onUpdate={handleUpdateMenuItem}
                     onRemove={handleRemoveMenuItem}
@@ -807,21 +1102,24 @@ export default function MenuItemModalBatch({
                   />
                 ))}
 
-                {/* Add Another Menu Item Button */}
-                <Button
-                  onClick={handleAddMenuItem}
-                  variant="outline"
-                  className="w-full h-12 border-2 border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50/50 text-gray-600 hover:text-blue-600"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Another Menu Item
-                </Button>
+                {/* Add Another Menu Item Button - Only in create mode */}
+                {!isEditMode && (
+                  <Button
+                    onClick={handleAddMenuItem}
+                    variant="outline"
+                    className="w-full h-12 border-2 border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50/50 text-gray-600 hover:text-blue-600"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Another Menu Item
+                  </Button>
+                )}
                 </div>
               </div>
             </div>
 
-            {/* Right Panel - Recipes */}
-            <div className="w-72 flex flex-col border-l border-[#d5d5dd] shrink-0 h-full overflow-hidden">
+            {/* Right Panel - Recipes (Hidden in edit mode) */}
+            {!isEditMode && (
+              <div className="w-72 flex flex-col border-l border-[#d5d5dd] shrink-0 h-full overflow-hidden">
               <div className="px-4 py-3 border-b border-[#d5d5dd] bg-white shrink-0">
                 <div className="flex items-center gap-2 mb-2">
                   <ChefHat className="h-4 w-4 text-[#656565]" />
@@ -930,29 +1228,30 @@ export default function MenuItemModalBatch({
                 );
               })()}
             </div>
+            )}
           </div>
         </DialogBody>
 
         <DialogFooter>
           <Button
             onClick={handleSubmit}
-            disabled={submitting || !selectedCategoryId}
+            disabled={(submitting || actionLoading) || !selectedCategoryId}
             className="bg-black hover:bg-gray-800 text-white px-8 h-11"
           >
-            {submitting ? (
+            {(submitting || actionLoading) ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                Creating {menuItems.length} Item(s)...
+                {isEditMode ? "Updating..." : `Creating ${menuItems.length} Item(s)...`}
               </>
             ) : (
-              `Create ${menuItems.length} Menu Item(s)`
+              isEditMode ? "Update Menu Item" : `Create ${menuItems.length} Menu Item(s)`
             )}
           </Button>
           <Button
             onClick={onClose}
             variant="outline"
             className="px-8 h-11 border-gray-300"
-            disabled={submitting}
+            disabled={submitting || actionLoading}
           >
             Cancel
           </Button>
@@ -967,6 +1266,7 @@ interface MenuItemCardProps {
   menuItem: MenuItemFormData;
   index: number;
   isActive: boolean;
+  isEditMode: boolean;
   onSetActive: () => void;
   onUpdate: (id: string, field: keyof MenuItemFormData, value: any) => void;
   onRemove: (id: string) => void;
@@ -982,6 +1282,7 @@ function MenuItemCard({
   menuItem,
   index,
   isActive,
+  isEditMode,
   onSetActive,
   onUpdate,
   onRemove,
@@ -1033,27 +1334,32 @@ function MenuItemCard({
           >
             {menuItem.isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
           </button>
-          <button
-            onClick={() => onRemove(menuItem.id)}
-            className="h-6 w-6 rounded-sm flex items-center justify-center hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          {!isEditMode && (
+            <button
+              onClick={() => onRemove(menuItem.id)}
+              className="h-6 w-6 rounded-sm flex items-center justify-center hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Card Body */}
       {!menuItem.isCollapsed && (
         <div className="p-4 space-y-4">
-          {/* Recipe Drop Zone */}
+          {/* Recipe Drop Zone - Disabled in edit mode */}
           <div
-            onDragOver={onRecipeDragOver}
-            onDrop={(e) => onRecipeDrop(e, menuItem.id)}
+            onDragOver={!isEditMode ? onRecipeDragOver : undefined}
+            onDrop={!isEditMode ? (e) => onRecipeDrop(e, menuItem.id) : undefined}
             className={cn(
-              "rounded-sm border-2 border-dashed p-3 transition-all duration-200",
+              "rounded-sm border-2 p-3 transition-all duration-200",
+              isEditMode ? "border-solid cursor-not-allowed" : "border-dashed",
               menuItem.recipeId
                 ? "bg-purple-50 border-purple-300"
-                : "bg-gray-50 border-gray-300 hover:border-purple-400 hover:bg-purple-50/50"
+                : isEditMode
+                  ? "bg-gray-100 border-gray-300"
+                  : "bg-gray-50 border-gray-300 hover:border-purple-400 hover:bg-purple-50/50"
             )}
           >
             {menuItem.recipeId ? (
@@ -1061,25 +1367,29 @@ function MenuItemCard({
                 <div className="flex items-center gap-2">
                   <ChefHat className="h-4 w-4 text-purple-600" />
                   <div>
-                    <p className="text-xs font-bold text-purple-600 uppercase">Recipe</p>
-                    <p className="text-sm font-medium text-purple-900">{menuItem.recipeName}</p>
+                    <p className="text-xs font-bold text-purple-600 uppercase">Recipe {isEditMode && "(Linked)"}</p>
+                    <p className="text-sm font-medium text-purple-900">{menuItem.recipeName || "Linked Recipe"}</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    onUpdate(menuItem.id, "recipeId", undefined);
-                    onUpdate(menuItem.id, "recipeName", undefined);
-                    onUpdate(menuItem.id, "recipeVariations", []);
-                    onUpdate(menuItem.id, "selectedVariations", []);
-                  }}
-                  className="text-purple-600 hover:text-purple-800 p-1 rounded-sm hover:bg-purple-100 transition-colors"
-                >
-                  <X className="h-3 w-3" />
-                </button>
+                {!isEditMode && (
+                  <button
+                    onClick={() => {
+                      onUpdate(menuItem.id, "recipeId", undefined);
+                      onUpdate(menuItem.id, "recipeName", undefined);
+                      onUpdate(menuItem.id, "recipeVariations", []);
+                      onUpdate(menuItem.id, "selectedVariations", []);
+                    }}
+                    className="text-purple-600 hover:text-purple-800 p-1 rounded-sm hover:bg-purple-100 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
               </div>
             ) : (
               <div className="text-center py-1">
-                <p className="text-xs font-medium text-gray-600">Drag recipe here (optional)</p>
+                <p className="text-xs font-medium text-gray-600">
+                  {isEditMode ? "No recipe linked" : "Drag recipe here (optional)"}
+                </p>
               </div>
             )}
           </div>

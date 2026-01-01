@@ -400,9 +400,21 @@ export default function RecipeModalNew({
       variations: variants.length > 0 ? variants : undefined,
     };
 
+    console.log('📤 Submitting recipe data:', {
+      ...submitData,
+      variationsCount: variants.length,
+      variations: variants,
+    });
+
     setLoading(true);
     try {
-      await onSubmit(submitData);
+      const response = await onSubmit(submitData);
+      console.log('📥 API Response:', response);
+
+      // Check if variations are in the response
+      if (variants.length > 0 && !response?.variations) {
+        console.warn('⚠️ Variations were sent but not returned in response');
+      }
     } finally {
       setLoading(false);
     }
