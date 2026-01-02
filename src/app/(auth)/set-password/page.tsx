@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useEffect, Suspense } from "react";
-import { Lock, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Lock, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AcceptInviteService } from "@/lib/services/accept-invite-service";
 
 const SetPasswordContent: React.FC = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ const SetPasswordContent: React.FC = () => {
   const [validationErrors, setValidationErrors] = useState<{
     newPassword?: string;
     confirmPassword?: string;
+    general?: string;
   }>({});
   const [success, setSuccess] = useState(false);
 
@@ -30,6 +32,15 @@ const SetPasswordContent: React.FC = () => {
     number: false,
     special: false,
   });
+
+  useEffect(() => {
+    // Check if token exists
+    if (!token) {
+      setValidationErrors({
+        general: "Invalid or missing invitation token. Please check your invitation link.",
+      });
+    }
+  }, [token]);
 
   useEffect(() => {
     // Check password strength
@@ -67,19 +78,47 @@ const SetPasswordContent: React.FC = () => {
   const handleSetPassword = async () => {
     if (!validateForm()) return;
 
+    if (!token) {
+      setValidationErrors({
+        general: "Invalid invitation token. Please check your invitation link.",
+      });
+      return;
+    }
+
     setIsLoading(true);
+    setValidationErrors({});
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/auth/set-password', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ token, password: newPassword })
-      // });
+      // Use the service layer
+      const result = await AcceptInviteService.acceptInvite({
+        token,
+        password: newPassword,
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (!result.success) {
+        // Handle validation errors from backend
+        if (result.errors && Array.isArray(result.errors)) {
+          const backendErrors: any = {};
+          result.errors.forEach((err: { field: string; message: string }) => {
+            if (err.field === 'password') {
+              backendErrors.newPassword = err.message;
+            } else if (err.field === 'confirmPassword') {
+              backendErrors.confirmPassword = err.message;
+            } else if (err.field === 'token') {
+              backendErrors.general = err.message;
+            }
+          });
+          setValidationErrors(backendErrors);
+        } else {
+          // Handle general error message
+          setValidationErrors({
+            general: result.error || "Failed to set password. Please try again.",
+          });
+        }
+        return;
+      }
 
+      // Success
       setSuccess(true);
 
       // Redirect to login after 2 seconds
@@ -89,7 +128,7 @@ const SetPasswordContent: React.FC = () => {
     } catch (error) {
       console.error("Error setting password:", error);
       setValidationErrors({
-        newPassword: "Failed to set password. Please try again.",
+        general: "An unexpected error occurred. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -163,6 +202,18 @@ const SetPasswordContent: React.FC = () => {
           </p>
         </div>
 
+        {/* General Error Alert */}
+        {validationErrors.general && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-sm flex items-start">
+            <AlertCircle size={18} className="text-red-600 mt-0.5 mr-3 flex-shrink-0" />
+            <p className="text-red-700 text-sm">
+              {typeof validationErrors.general === 'string' 
+                ? validationErrors.general 
+                : 'An error occurred. Please try again.'}
+            </p>
+          </div>
+        )}
+
         {/* Password Strength Indicator */}
         {newPassword && (
           <div className="mb-6">
@@ -235,10 +286,11 @@ const SetPasswordContent: React.FC = () => {
                   setValidationErrors((prev) => ({
                     ...prev,
                     newPassword: undefined,
+                    general: undefined,
                   }));
                 }}
                 placeholder="Enter your password"
-                disabled={isLoading}
+                disabled={isLoading || !token}
                 className="placeholder-gray-400 text-sm tracking-wide rounded-sm py-3 sm:py-4 pl-12 pr-12"
               />
               <Lock
@@ -249,13 +301,16 @@ const SetPasswordContent: React.FC = () => {
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                disabled={isLoading}
               >
                 {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {validationErrors.newPassword && (
               <p className="text-red-500 text-xs mt-1.5">
-                {validationErrors.newPassword}
+                {typeof validationErrors.newPassword === 'string'
+                  ? validationErrors.newPassword
+                  : 'Invalid password'}
               </p>
             )}
           </div>
@@ -278,10 +333,11 @@ const SetPasswordContent: React.FC = () => {
                   setValidationErrors((prev) => ({
                     ...prev,
                     confirmPassword: undefined,
+                    general: undefined,
                   }));
                 }}
                 placeholder="Re-enter your password"
-                disabled={isLoading}
+                disabled={isLoading || !token}
                 className="placeholder-gray-400 text-sm tracking-wide rounded-sm py-3 sm:py-4 pl-12 pr-12"
               />
               <Lock
@@ -292,13 +348,16 @@ const SetPasswordContent: React.FC = () => {
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                disabled={isLoading}
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {validationErrors.confirmPassword && (
               <p className="text-red-500 text-xs mt-1.5">
-                {validationErrors.confirmPassword}
+                {typeof validationErrors.confirmPassword === 'string'
+                  ? validationErrors.confirmPassword
+                  : 'Passwords do not match'}
               </p>
             )}
           </div>
@@ -309,7 +368,7 @@ const SetPasswordContent: React.FC = () => {
               type="button"
               size="lg"
               className="w-full bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest py-3 sm:py-4 rounded-sm text-xs sm:text-sm"
-              disabled={isLoading || !newPassword || !confirmPassword}
+              disabled={isLoading || !newPassword || !confirmPassword || !token}
               onClick={handleSetPassword}
             >
               {isLoading ? "SETTING PASSWORD..." : "SET PASSWORD"}

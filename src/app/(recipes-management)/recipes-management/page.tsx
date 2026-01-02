@@ -14,7 +14,6 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { formatPrice, formatCurrency } from "@/lib/util/formatters";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
-import { GridActionButtons } from "@/components/ui/grid-action-buttons";
 import { cn } from "@/lib/utils";
 
 // add view only modal for recipe items with compact view

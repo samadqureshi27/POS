@@ -3,7 +3,6 @@
 import React from "react";
 import { useRouter } from 'next/navigation';
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
-import { Toast } from "@/components/ui/toast";
 import CustomerSummaryCards from "./_components/customer-summary-cards";
 import CustomerTable from "./_components/customer-table";
 import ImportExportControls from "@/components/ui/import-export-btn";

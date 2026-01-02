@@ -2,7 +2,6 @@
 "use client";
 import React from "react";
 import ActionButtons from '@/components/ui/setting-buttons';
-import { Toast } from '@/components/ui/toast';
 import { useToast } from '@/lib/hooks/toast';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { Toaster } from '@/components/ui/sonner';

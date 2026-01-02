@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
 import DetailsForm from './detail-form';
 import OptionValuesForm from './option-value-form';
 import { MenuItemOptions, MenuModalProps } from '@/lib/types/menuItemOptions';
