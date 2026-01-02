@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { RecipeVariantInput } from "./recipe-variant-input";
 
 // API Recipe structure
 interface RecipeIngredient {
@@ -377,6 +378,85 @@ export default function RecipeModalNew({
     setVariants(variants.filter((_, i) => i !== index));
   };
 
+  const handleUpdateVariantIngredient = (vIndex: number, iIndex: number, field: keyof RecipeIngredient, value: any) => {
+    const updatedVariants = [...variants];
+    const updatedIngredients = [...(updatedVariants[vIndex].ingredients || [])];
+    updatedIngredients[iIndex] = { ...updatedIngredients[iIndex], [field]: value };
+    updatedVariants[vIndex] = { ...updatedVariants[vIndex], ingredients: updatedIngredients };
+    setVariants(updatedVariants);
+  };
+
+  const handleRemoveVariantIngredient = (vIndex: number, iIndex: number) => {
+    const updatedVariants = [...variants];
+    const updatedIngredients = (updatedVariants[vIndex].ingredients || []).filter((_, i) => i !== iIndex);
+    updatedVariants[vIndex] = { ...updatedVariants[vIndex], ingredients: updatedIngredients };
+    setVariants(updatedVariants);
+  };
+
+  const handleVariantIngredientDrop = (vIndex: number, e: React.DragEvent) => {
+    e.preventDefault();
+
+    let itemToAdd: RecipeIngredient | null = null;
+    let itemName = "";
+
+    if (draggedInventory) {
+      const item = ingredients.find(
+        (inv) => String(inv._id || inv.id || inv.ID) === draggedInventory
+      );
+      if (item) {
+        itemName = item.Name || item.name || "";
+        itemToAdd = {
+          sourceType: "inventory",
+          sourceId: String(item._id || item.id || item.ID),
+          nameSnapshot: itemName,
+          quantity: 1,
+          unit: item.Unit || item.baseUnit || "pc",
+        };
+      }
+    } else if (draggedRecipe) {
+      const recipe = availableRecipeOptions.find(
+        (rec) => String(rec._id || rec.ID) === draggedRecipe
+      );
+      if (recipe) {
+        itemName = recipe.Name || "";
+        itemToAdd = {
+          sourceType: "recipe",
+          sourceId: String(recipe._id || recipe.ID),
+          nameSnapshot: itemName,
+          quantity: 1,
+          unit: "portion",
+        };
+      }
+    }
+
+    if (itemToAdd) {
+      const updatedVariants = [...variants];
+      const variant = updatedVariants[vIndex];
+      const existingIngredients = variant.ingredients || [];
+
+      if (existingIngredients.some(ing => ing.sourceId === itemToAdd!.sourceId)) {
+        toast.error(`${itemName} is already added to this variant`, {
+          duration: 3000,
+          position: "top-right"
+        });
+        return;
+      }
+
+      updatedVariants[vIndex] = {
+        ...variant,
+        ingredients: [...existingIngredients, itemToAdd]
+      };
+      setVariants(updatedVariants);
+      toast.success(`Added ${itemName} to ${variant.name || `Variant ${vIndex + 1}`}`, {
+        duration: 2000,
+        position: "top-right"
+      });
+    }
+
+    setDraggedInventory(null);
+    setDraggedRecipe(null);
+  };
+
   // Bulk recipe management
   const handleAddToList = () => {
     if (!formData.name) {
@@ -551,7 +631,13 @@ export default function RecipeModalNew({
             ? recipe.variations.map((v: any) => ({
               ...v,
               sizeMultiplier: parseNum(v.sizeMultiplier, 1),
-              baseCostAdjustment: parseNum(v.baseCostAdjustment, 0)
+              baseCostAdjustment: parseNum(v.baseCostAdjustment, 0),
+              ingredients: v.ingredients && v.ingredients.length > 0
+                ? v.ingredients.map((ing: any) => ({
+                  ...ing,
+                  quantity: parseNum(ing.quantity, 0)
+                }))
+                : undefined
             }))
             : undefined,
         };
@@ -859,13 +945,13 @@ export default function RecipeModalNew({
                       }}
                       onFocus={(e) => e.target.select()}
                       placeholder="1"
-                      className="h-14 text-[15px]"
+                      className="h-14 text-[15px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-[#374151] mb-1.5 block">Status</Label>
-                    <div className="flex items-center justify-between rounded-sm border border-[#e5e5e5] bg-[#f8f8fa] px-4 py-3 h-14">
-                      <span className="text-[#1f2937] text-sm font-medium">Active</span>
+                    <div className="flex items-center justify-between rounded-sm border border-[#d5d5dd] bg-[#f8f8fa] px-4 h-14 w-full">
+                      <span className="text-[#111827] text-sm font-medium">Active</span>
                       <Switch
                         checked={formData.isActive === true}
                         onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
@@ -905,8 +991,8 @@ export default function RecipeModalNew({
                     className={cn(
                       "rounded-sm border-2 border-dashed p-3 transition-all min-h-[160px]",
                       recipeIngredients.length > 0
-                        ? "bg-[#eff6ff] border-[#93c5fd]"
-                        : "bg-[#f9fafb] border-[#d1d5db] hover:border-[#93c5fd] hover:bg-[#eff6ff]/50"
+                        ? "bg-[#f8f8fa] border-[#111827]"
+                        : "bg-[#f9fafb] border-[#d1d5db] hover:border-[#111827] hover:bg-gray-50"
                     )}
                   >
                     {recipeIngredients.length === 0 ? (
@@ -926,26 +1012,17 @@ export default function RecipeModalNew({
                         {recipeIngredients.map((ingredient, index) => (
                           <div
                             key={index}
-                            className="p-4 border border-[#d5d5dd] rounded-sm bg-white hover:bg-gray-50/50 transition-colors"
+                            className="p-3 border border-[#d5d5dd] rounded-sm bg-white transition-colors"
                           >
-                            <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-start justify-between mb-3">
                               <div className="flex items-center gap-2 min-w-0 flex-1">
-                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-sm bg-[#111827] text-white text-[11px] font-bold">
-                                  {index + 1}
-                                </div>
                                 <div className="min-w-0 flex-1">
-                                  <div className="text-[15px] font-semibold text-[#111827] truncate">
+                                  <div className="text-[14px] font-semibold text-[#111827] truncate">
                                     {ingredient.nameSnapshot}
                                   </div>
-                                  <div className="flex items-center gap-1.5 mt-0.5">
-                                    {ingredient.sourceType === "inventory" ? (
-                                      <Package className="h-3.5 w-3.5 text-[#ea580c]" />
-                                    ) : (
-                                      <ChefHat className="h-3.5 w-3.5 text-[#9333ea]" />
-                                    )}
+                                  <div className="flex items-center gap-1 mt-0.5">
                                     <span className={cn(
-                                      "text-[10px] font-bold uppercase tracking-wider",
-                                      ingredient.sourceType === "inventory" ? "text-[#ea580c]" : "text-[#9333ea]"
+                                      "text-[9px] font-bold uppercase tracking-wider text-[#656565]"
                                     )}>
                                       {ingredient.sourceType}
                                     </span>
@@ -957,13 +1034,13 @@ export default function RecipeModalNew({
                                 onClick={() => handleRemoveIngredient(index)}
                                 className="text-[#9ca3af] hover:text-[#ef4444] transition-colors p-1"
                               >
-                                <X size={18} />
+                                <X size={16} />
                               </button>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                               <div>
-                                <Label className="text-sm font-medium text-[#656565] mb-2 block">Quantity</Label>
+                                <Label className="text-[11px] font-medium text-[#656565] mb-1 block">Quantity</Label>
                                 <Input
                                   ref={(el) => {
                                     ingredientRefs.current[index] = el;
@@ -977,26 +1054,14 @@ export default function RecipeModalNew({
                                   }}
                                   onFocus={(e) => e.target.select()}
                                   placeholder="0"
-                                  className="h-14 text-[15px]"
+                                  className="h-9 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                               </div>
                               <div>
-                                <Label className="text-sm font-medium text-[#656565] mb-2 block">Unit</Label>
-                                <Select
-                                  value={ingredient.unit}
-                                  onValueChange={(value) => handleUpdateIngredient(index, "unit", value)}
-                                >
-                                  <SelectTrigger className="h-14 text-[15px] bg-white">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {getCompatibleUnits(ingredient.unit).map((unit) => (
-                                      <SelectItem key={unit} value={unit}>
-                                        {unit}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
+                                <Label className="text-[11px] font-medium text-[#656565] mb-1 block">Unit</Label>
+                                <div className="flex h-9 items-center px-4 rounded-sm bg-[#f8f8fa] border border-[#d5d5dd] text-xs font-medium text-[#656565]">
+                                  {ingredient.unit || "—"}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -1081,96 +1146,18 @@ export default function RecipeModalNew({
                     ) : (
                       <div className="space-y-3 p-1">
                         {variants.map((variant, index) => (
-                          <div
+                          <RecipeVariantInput
                             key={index}
-                            ref={(el) => {
-                              variantRefs.current[index] = el;
-                            }}
-                            className="p-4 border border-[#d5d5dd] rounded-sm bg-white hover:bg-gray-50/50 transition-colors"
-                          >
-                            <div className="flex items-start justify-between mb-4">
-                              <div className="flex items-center gap-2">
-                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-sm bg-[#111827] text-white text-[11px] font-bold">
-                                  {index + 1}
-                                </div>
-                                <div className="text-[15px] font-semibold text-[#111827]">
-                                  Variant {index + 1}
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveVariant(index)}
-                                className="text-[#9ca3af] hover:text-[#ef4444] transition-colors p-1"
-                              >
-                                <X size={18} />
-                              </button>
-                            </div>
-
-                            <div className="space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <Label className="text-sm font-medium text-[#656565] mb-2 block">Name</Label>
-                                  <Input
-                                    value={variant.name}
-                                    onChange={(e) => handleUpdateVariant(index, "name", e.target.value)}
-                                    placeholder="e.g., Large"
-                                    className="h-14 text-[15px]"
-                                  />
-                                </div>
-                                <div>
-                                  <Label className="text-sm font-medium text-[#656565] mb-2 block">Type</Label>
-                                  <Select
-                                    value={variant.type}
-                                    onValueChange={(value) => handleUpdateVariant(index, "type", value)}
-                                  >
-                                    <SelectTrigger className="h-14 text-[15px] bg-white">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="size">Size</SelectItem>
-                                      <SelectItem value="flavor">Flavor</SelectItem>
-                                      <SelectItem value="crust">Crust</SelectItem>
-                                      <SelectItem value="addon">Addon</SelectItem>
-                                      <SelectItem value="custom">Custom</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <Label className="text-sm font-medium text-[#656565] mb-2 block">
-                                    Size Multiplier
-                                  </Label>
-                                  <Input
-                                    type="number"
-                                    min="0"
-                                    step="0.1"
-                                    value={variant.sizeMultiplier ?? ""}
-                                    onChange={(e) => {
-                                      handleUpdateVariant(index, "sizeMultiplier", e.target.value);
-                                    }}
-                                    onFocus={(e) => e.target.select()}
-                                    placeholder="1.0"
-                                    className="h-14 text-[15px]"
-                                  />
-                                </div>
-                                <div>
-                                  <Label className="text-sm font-medium text-[#656565] mb-2 block">Cost Adjustment</Label>
-                                  <Input
-                                    type="number"
-                                    step="0.01"
-                                    value={variant.baseCostAdjustment ?? ""}
-                                    onChange={(e) => {
-                                      handleUpdateVariant(index, "baseCostAdjustment", e.target.value);
-                                    }}
-                                    onFocus={(e) => e.target.select()}
-                                    placeholder="0.00"
-                                    className="h-14 text-[15px]"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                            variant={variant}
+                            index={index}
+                            ingredients={ingredients}
+                            availableRecipeOptions={availableRecipeOptions}
+                            onUpdate={handleUpdateVariant}
+                            onRemove={handleRemoveVariant}
+                            onIngredientUpdate={handleUpdateVariantIngredient}
+                            onIngredientRemove={handleRemoveVariantIngredient}
+                            onIngredientDrop={handleVariantIngredientDrop}
+                          />
                         ))}
                       </div>
                     )}
