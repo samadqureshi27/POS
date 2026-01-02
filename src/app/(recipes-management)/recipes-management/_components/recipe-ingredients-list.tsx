@@ -110,22 +110,26 @@ export function RecipeIngredientsList({
         return (
           <div
             key={index}
-            className={`group relative overflow-hidden rounded-sm border bg-white transition-all hover:bg-gray-50/50 ${hasErrors
+            className={`group relative overflow-hidden rounded-sm border bg-white transition-all ${hasErrors
               ? "border-red-300"
               : "border-[#d5d5dd]"
               }`}
           >
-            <div className="p-4 space-y-4">
+            <div className="p-3 space-y-4">
               {/* Card Header */}
-              <div className="flex items-start justify-between mb-2">
+              <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <div className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-sm font-bold text-[11px] text-white ${hasErrors ? "bg-red-500" : "bg-[#111827]"}`}>
-                    {index + 1}
-                  </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[15px] font-semibold text-[#111827] truncate">
+                    <div className="text-[14px] font-semibold text-[#111827] truncate">
                       {ingredient.nameSnapshot || "New Ingredient"}
                     </div>
+                    {ingredient.sourceId && (
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-[#656565]">
+                          {ingredient.sourceType}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <button
@@ -133,131 +137,135 @@ export function RecipeIngredientsList({
                   onClick={() => onRemoveIngredient(index)}
                   className="text-[#9ca3af] hover:text-[#ef4444] transition-colors p-1"
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
               </div>
 
-              {/* Source Type Selection */}
-              <div>
-                <Label className="text-sm font-medium text-[#656565] mb-2 block">Source Type</Label>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onUpdateIngredient(index, "sourceType", "inventory")}
-                    className={`flex flex-1 items-center justify-center gap-2 rounded-sm border h-14 px-4 text-[15px] font-medium transition-all cursor-pointer ${ingredient.sourceType === "inventory"
-                      ? "border-[#111827] bg-[#111827] text-white"
-                      : "border-[#d5d5dd] bg-white text-[#656565] hover:bg-[#f8f8fa]"
-                      }`}
-                  >
-                    <Package className="h-4 w-4" />
-                    Inventory
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onUpdateIngredient(index, "sourceType", "recipe")}
-                    className={`flex flex-1 items-center justify-center gap-2 rounded-sm border h-14 px-4 text-[15px] font-medium transition-all cursor-pointer ${ingredient.sourceType === "recipe"
-                      ? "border-[#111827] bg-[#111827] text-white"
-                      : "border-[#d5d5dd] bg-white text-[#656565] hover:bg-[#f8f8fa]"
-                      }`}
-                  >
-                    <UtensilsCrossed className="h-4 w-4" />
-                    Sub Recipe
-                  </button>
-                </div>
-              </div>
+              {!ingredient.sourceId && (
+                <div className="space-y-4">
+                  {/* Source Type Selection */}
+                  <div>
+                    <Label className="text-[11px] font-medium text-[#656565] mb-2 block">Source Type</Label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onUpdateIngredient(index, "sourceType", "inventory")}
+                        className={`flex flex-1 items-center justify-center gap-2 rounded-sm border h-10 px-4 text-sm font-medium transition-all cursor-pointer ${ingredient.sourceType === "inventory"
+                          ? "border-[#111827] bg-[#111827] text-white"
+                          : "border-[#d5d5dd] bg-white text-[#656565] hover:bg-[#f8f8fa]"
+                          }`}
+                      >
+                        <Package className="h-3.5 w-3.5" />
+                        Inventory
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onUpdateIngredient(index, "sourceType", "recipe")}
+                        className={`flex flex-1 items-center justify-center gap-2 rounded-sm border h-10 px-4 text-sm font-medium transition-all cursor-pointer ${ingredient.sourceType === "recipe"
+                          ? "border-[#111827] bg-[#111827] text-white"
+                          : "border-[#d5d5dd] bg-white text-[#656565] hover:bg-[#f8f8fa]"
+                          }`}
+                      >
+                        <UtensilsCrossed className="h-3.5 w-3.5" />
+                        Sub Recipe
+                      </button>
+                    </div>
+                  </div>
 
-              {/* Search Input */}
-              <div>
-                <Label className="text-sm font-medium text-[#656565] mb-2 block">
-                  {ingredient.sourceType === "inventory" ? "Search Inventory" : "Search Sub Recipe"}
-                </Label>
-                <div className="relative group">
-                  <Input
-                    value={ingredientInputs[index] || ""}
-                    onChange={(e) => onIngredientInputChange(index, e.target.value)}
-                    onFocus={() => {
-                      setFocusedIngredientIndex(index);
-                      setShowSuggestionsParent({ ...showSuggestions, [index]: true });
-                    }}
-                    onBlur={() =>
-                      setTimeout(() => {
-                        setShowSuggestionsParent({ ...showSuggestions, [index]: false });
-                      }, 200)
-                    }
-                    placeholder="Type to search..."
-                    className={`h-14 text-[15px] pr-10 bg-white ${hasErrors && !ingredient.sourceId
-                      ? "border-red-300"
-                      : ingredient.sourceId
-                        ? "border-green-300"
-                        : "border-[#d5d5dd]"
-                      }`}
-                    id={`ingredient-input-${index}`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => onToggleDropdown(index)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#656565] hover:text-[#111827] z-10 cursor-pointer"
-                  >
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
+                  {/* Search Input */}
+                  <div>
+                    <Label className="text-[11px] font-medium text-[#656565] mb-2 block">
+                      {ingredient.sourceType === "inventory" ? "Search Inventory" : "Search Sub Recipe"}
+                    </Label>
+                    <div className="relative group">
+                      <Input
+                        value={ingredientInputs[index] || ""}
+                        onChange={(e) => onIngredientInputChange(index, e.target.value)}
+                        onFocus={() => {
+                          setFocusedIngredientIndex(index);
+                          setShowSuggestionsParent({ ...showSuggestions, [index]: true });
+                        }}
+                        onBlur={() =>
+                          setTimeout(() => {
+                            setShowSuggestionsParent({ ...showSuggestions, [index]: false });
+                          }, 200)
+                        }
+                        placeholder="Type to search..."
+                        className={`h-10 text-sm pr-10 bg-white ${hasErrors && !ingredient.sourceId
+                          ? "border-red-300"
+                          : ingredient.sourceId
+                            ? "border-green-300"
+                            : "border-[#d5d5dd]"
+                          }`}
+                        id={`ingredient-input-${index}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => onToggleDropdown(index)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#656565] hover:text-[#111827] z-10 cursor-pointer"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </button>
 
-                  {/* Dropdown with premium shadow */}
-                  {showDropdown && (
-                    <div className="absolute left-0 right-0 top-full z-[300] mt-1 max-h-56 overflow-y-auto rounded-sm border border-[#dcdfe3] bg-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] [&::-webkit-scrollbar]:hidden">
-                      {suggestions.inventory.length > 0 && (
-                        <div>
-                          <div className="sticky top-0 z-10 border-b border-[#dcdfe3] bg-[#f8f8fa] px-3 py-1.5">
-                            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#656565]">
-                              <Package className="h-3 w-3" />
-                              INVENTORY
-                            </div>
-                          </div>
-                          {suggestions.inventory.map((item) => (
-                            <button
-                              key={item._id || item.id || item.ID}
-                              type="button"
-                              onClick={() => onSelectIngredient(index, item, "inventory")}
-                              className="w-full border-b border-[#dcdfe3] px-3 py-2 text-left transition-colors hover:bg-gray-50 last:border-0 cursor-pointer"
-                            >
-                              <div className="font-semibold text-sm text-[#111827]">{item.Name || item.name}</div>
-                              <div className="text-[11px] text-[#656565] mt-0.5 uppercase tracking-tight">
-                                Unit: <span className="font-bold">{item.Unit || item.baseUnit || "pc"}</span>
+                      {/* Dropdown with premium shadow */}
+                      {showDropdown && (
+                        <div className="absolute left-0 right-0 top-full z-[300] mt-1 max-h-56 overflow-y-auto rounded-sm border border-[#dcdfe3] bg-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] [&::-webkit-scrollbar]:hidden">
+                          {suggestions.inventory.length > 0 && (
+                            <div>
+                              <div className="sticky top-0 z-10 border-b border-[#dcdfe3] bg-[#f8f8fa] px-3 py-1.5">
+                                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#656565]">
+                                  <Package className="h-3 w-3" />
+                                  INVENTORY
+                                </div>
                               </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      {suggestions.recipes.length > 0 && (
-                        <div>
-                          <div className="sticky top-0 z-10 border-b border-[#dcdfe3] bg-[#f8f8fa] px-3 py-1.5">
-                            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#656565]">
-                              <UtensilsCrossed className="h-3 w-3" />
-                              SUB RECIPES
+                              {suggestions.inventory.map((item) => (
+                                <button
+                                  key={item._id || item.id || item.ID}
+                                  type="button"
+                                  onClick={() => onSelectIngredient(index, item, "inventory")}
+                                  className="w-full border-b border-[#dcdfe3] px-3 py-2 text-left transition-colors hover:bg-gray-50 last:border-0 cursor-pointer"
+                                >
+                                  <div className="font-semibold text-sm text-[#111827]">{item.Name || item.name}</div>
+                                  <div className="text-[11px] text-[#656565] mt-0.5 uppercase tracking-tight">
+                                    Unit: <span className="font-bold">{item.Unit || item.baseUnit || "pc"}</span>
+                                  </div>
+                                </button>
+                              ))}
                             </div>
-                          </div>
-                          {suggestions.recipes.map((recipe) => (
-                            <button
-                              key={recipe._id || recipe.ID}
-                              type="button"
-                              onClick={() => onSelectIngredient(index, recipe, "recipe")}
-                              className="w-full border-b border-[#dcdfe3] px-3 py-2 text-left transition-colors hover:bg-gray-50 last:border-0 cursor-pointer"
-                            >
-                              <div className="font-semibold text-sm text-[#111827]">{recipe.Name || recipe.name}</div>
-                              <div className="text-[11px] text-[#656565] mt-0.5 uppercase tracking-tight font-bold">Sub Recipe</div>
-                            </button>
-                          ))}
+                          )}
+
+                          {suggestions.recipes.length > 0 && (
+                            <div>
+                              <div className="sticky top-0 z-10 border-b border-[#dcdfe3] bg-[#f8f8fa] px-3 py-1.5">
+                                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#656565]">
+                                  <UtensilsCrossed className="h-3 w-3" />
+                                  SUB RECIPES
+                                </div>
+                              </div>
+                              {suggestions.recipes.map((recipe) => (
+                                <button
+                                  key={recipe._id || recipe.ID}
+                                  type="button"
+                                  onClick={() => onSelectIngredient(index, recipe, "recipe")}
+                                  className="w-full border-b border-[#dcdfe3] px-3 py-2 text-left transition-colors hover:bg-gray-50 last:border-0 cursor-pointer"
+                                >
+                                  <div className="font-semibold text-sm text-[#111827]">{recipe.Name || recipe.name}</div>
+                                  <div className="text-[11px] text-[#656565] mt-0.5 uppercase tracking-tight font-bold">Sub Recipe</div>
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Quantity & Unit Row */}
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-sm font-medium text-[#656565] mb-2 block">Quantity</Label>
+                  <Label className="text-[11px] font-medium text-[#656565] mb-2 block">Quantity</Label>
                   <Input
                     type="number"
                     step="any"
@@ -268,7 +276,7 @@ export function RecipeIngredientsList({
                     }}
                     onFocus={(e) => e.target.select()}
                     placeholder="0"
-                    className={`h-14 text-[15px] bg-white ${hasErrors && (!ingredient.quantity || ingredient.quantity <= 0)
+                    className={`h-9 text-sm bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${hasErrors && (!ingredient.quantity || ingredient.quantity <= 0)
                       ? "border-red-300"
                       : "border-[#d5d5dd]"
                       }`}
@@ -276,8 +284,8 @@ export function RecipeIngredientsList({
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-[#656565] mb-2 block">Unit</Label>
-                  <div className="flex h-14 items-center justify-center rounded-sm bg-[#f8f8fa] border border-[#d5d5dd] px-4 text-[15px] font-medium text-[#656565]">
+                  <Label className="text-[11px] font-medium text-[#656565] mb-2 block">Unit</Label>
+                  <div className="flex h-9 items-center px-4 rounded-sm bg-[#f8f8fa] border border-[#d5d5dd] text-xs font-medium text-[#656565]">
                     {ingredient.unit || "—"}
                   </div>
                 </div>
