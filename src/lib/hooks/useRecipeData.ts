@@ -183,13 +183,32 @@ export const useRecipeData = () => {
   const handleModalSubmit = async (data: RecipePayload) => {
     if (hook.editingItem) {
       const recipeId = (hook.editingItem as any)._id || hook.editingItem.ID.toString();
-      const result = await hook.update(recipeId as any, data);
+
+      // Ensure type is included - use from data or fallback to editingItem's type
+      const updateData = {
+        ...data,
+        type: data.type || (hook.editingItem as any).type || "final",
+      };
+
+      console.log('🔍 handleModalSubmit - UPDATE MODE', {
+        recipeId,
+        type: updateData.type,
+        hasVariations: updateData.variations && updateData.variations.length > 0,
+        variationsCount: updateData.variations?.length || 0,
+      });
+
+      const result = await hook.update(recipeId as any, updateData);
       if (result.success) {
         hook.closeModal();
         hook.clearSelection();
       }
       return result;
     } else {
+      console.log('🔍 handleModalSubmit - CREATE MODE', {
+        type: data.type,
+        hasVariations: data.variations && data.variations.length > 0,
+      });
+
       const result = await hook.create(data);
       if (result.success) {
         hook.closeModal();
