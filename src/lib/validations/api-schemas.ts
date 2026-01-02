@@ -22,6 +22,7 @@ import { VALIDATION_LIMITS } from '@/lib/constants';
  * Login Request Schema
  * Validates email/password login requests
  */
+
 export const LoginRequestSchema = z.object({
   email: z
     .string()
@@ -444,3 +445,8 @@ export function validateQueryParams<T>(
   const params = Object.fromEntries(searchParams.entries());
   return schema.parse(params);
 }
+
+export const AcceptInviteRequestSchema = z.object({
+  token: z.string(),
+  password: z.string(),
+});
