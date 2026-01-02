@@ -36,7 +36,7 @@ export const useMenuItemData = () => {
         Recipe: recipe?.name || "",
         RecipeId: recipeId,
         BasePrice: item.pricing?.basePrice || 0,
-        Currency: item.pricing?.currency || "SAR",
+        Currency: item.pricing?.currency || "PKR",
         PriceIncludesTax: item.pricing?.priceIncludesTax || false,
         Tags: item.tags || [],
         DisplayOrder: item.displayOrder || 0,

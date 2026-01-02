@@ -124,7 +124,7 @@ export const MenuItemService = {
       pricing: payload.pricing ?? {
         basePrice: 0,
         priceIncludesTax: false,
-        currency: "SAR"
+        currency: "PKR"
       },
       isActive: payload.isActive ?? true,
       displayOrder: payload.displayOrder ?? 0,
