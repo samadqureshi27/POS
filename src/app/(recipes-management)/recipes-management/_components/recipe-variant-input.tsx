@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RecipeVariantInline, RecipeIngredient } from "@/lib/types/recipes";
-// Removed RecipeIngredientsList import - using simplified ingredient input for variants
 
 interface RecipeVariantInputProps {
   variant: RecipeVariantInline;
@@ -35,153 +34,153 @@ export function RecipeVariantInput({
   onRemove,
 }: RecipeVariantInputProps) {
   return (
-    <div className="border border-[#d5d5dd] rounded-sm p-4 space-y-4 bg-white">
-      <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-sm font-bold text-sm bg-[#1f2937] text-white">
-          {index + 1}
+    <div className="p-4 border border-[#d5d5dd] rounded-sm bg-white hover:bg-gray-50/50 transition-colors">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-sm bg-[#111827] text-white text-[11px] font-bold">
+            {index + 1}
+          </div>
+          <div className="text-[15px] font-semibold text-[#111827]">
+            Variant {index + 1}
+          </div>
         </div>
-        <h4 className="text-[15px] font-medium text-[#1f2937] flex-1">
-          Variant {index + 1}
-        </h4>
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
           onClick={() => onRemove(index)}
-          className="h-8 w-8 p-0 text-[#656565] hover:bg-red-50 hover:text-red-600 cursor-pointer"
+          className="text-[#9ca3af] hover:text-[#ef4444] transition-colors p-1 cursor-pointer"
         >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+          <X size={18} />
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Name */}
-        <div>
-          <Label htmlFor={`variant-name-${index}`} className="text-sm font-medium text-[#656565] mb-1.5">
-            Name <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id={`variant-name-${index}`}
-            value={variant.name}
-            onChange={(e) => onUpdate(index, "name", e.target.value)}
-            placeholder="e.g., Small (8 inch)"
-            className="mt-1.5"
-            required
-          />
-        </div>
-
-        {/* Type */}
-        <div>
-          <Label htmlFor={`variant-type-${index}`} className="text-sm font-medium text-[#656565] mb-1.5">
-            Type <span className="text-red-500">*</span>
-          </Label>
-          <Select
-            value={variant.type}
-            onValueChange={(value) => onUpdate(index, "type", value)}
-          >
-            <SelectTrigger id={`variant-type-${index}`} className="mt-1.5">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="size">Size</SelectItem>
-              <SelectItem value="flavor">Flavor</SelectItem>
-              <SelectItem value="crust">Crust</SelectItem>
-              <SelectItem value="custom">Custom</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Size Multiplier - Only for size type */}
-        {variant.type === "size" && (
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Name */}
           <div>
-            <Label htmlFor={`variant-multiplier-${index}`} className="text-sm font-medium text-[#656565] mb-1.5">
-              Size Multiplier
+            <Label className="text-sm font-medium text-[#656565] mb-2 block">
+              Name <span className="text-red-500">*</span>
             </Label>
             <Input
-              id={`variant-multiplier-${index}`}
+              id={`variant-name-${index}`}
+              value={variant.name}
+              onChange={(e) => onUpdate(index, "name", e.target.value)}
+              placeholder="e.g., Small (8 inch)"
+              className="h-14 text-[15px] bg-white border-[#d5d5dd]"
+              required
+            />
+          </div>
+
+          {/* Type */}
+          <div>
+            <Label className="text-sm font-medium text-[#656565] mb-2 block">
+              Type <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={variant.type}
+              onValueChange={(value) => onUpdate(index, "type", value)}
+            >
+              <SelectTrigger id={`variant-type-${index}`} className="h-14 text-[15px] bg-white border-[#d5d5dd]">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="size">Size</SelectItem>
+                <SelectItem value="flavor">Flavor</SelectItem>
+                <SelectItem value="crust">Crust</SelectItem>
+                <SelectItem value="custom">Custom</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Size Multiplier - Only for size type */}
+          {variant.type === "size" && (
+            <div>
+              <Label className="text-sm font-medium text-[#656565] mb-2 block">
+                Size Multiplier
+              </Label>
+              <Input
+                id={`variant-multiplier-${index}`}
+                type="number"
+                step="0.1"
+                min="0"
+                value={variant.sizeMultiplier ?? ""}
+                onChange={(e) => {
+                  onUpdate(index, "sizeMultiplier", e.target.value);
+                }}
+                onFocus={(e) => e.target.select()}
+                placeholder="1.0"
+                className="h-14 text-[15px] bg-white border-[#d5d5dd]"
+              />
+            </div>
+          )}
+
+          {/* Crust Type - Only for crust type */}
+          {variant.type === "crust" && (
+            <div>
+              <Label className="text-sm font-medium text-[#656565] mb-2 block">Crust Type</Label>
+              <Input
+                id={`variant-crust-${index}`}
+                value={variant.crustType || ""}
+                onChange={(e) => onUpdate(index, "crustType", e.target.value)}
+                placeholder="e.g., Thin, Thick, Stuffed"
+                className="h-14 text-[15px] bg-white border-[#d5d5dd]"
+              />
+            </div>
+          )}
+
+          {/* Base Cost Adjustment */}
+          <div>
+            <Label className="text-sm font-medium text-[#656565] mb-2 block">
+              Base Cost Adjustment ($)
+            </Label>
+            <Input
+              id={`variant-cost-${index}`}
               type="number"
-              step="0.1"
-              min="0"
-              value={variant.sizeMultiplier === 1 ? "" : (variant.sizeMultiplier || "")}
+              step="0.01"
+              value={variant.baseCostAdjustment ?? ""}
               onChange={(e) => {
-                const val = e.target.value;
-                onUpdate(index, "sizeMultiplier", val === '' ? 1 : parseFloat(val));
+                onUpdate(index, "baseCostAdjustment", e.target.value);
               }}
               onFocus={(e) => e.target.select()}
-              placeholder="1.0"
-              className="mt-1.5"
+              placeholder="0.00"
+              className="h-14 text-[15px] bg-white border-[#d5d5dd]"
             />
           </div>
-        )}
+        </div>
 
-        {/* Crust Type - Only for crust type */}
-        {variant.type === "crust" && (
-          <div>
-            <Label htmlFor={`variant-crust-${index}`} className="text-sm font-medium text-[#656565] mb-1.5">Crust Type</Label>
-            <Input
-              id={`variant-crust-${index}`}
-              value={variant.crustType || ""}
-              onChange={(e) => onUpdate(index, "crustType", e.target.value)}
-              placeholder="e.g., Thin, Thick, Stuffed"
-              className="mt-1.5"
-            />
-          </div>
-        )}
-
-        {/* Base Cost Adjustment */}
+        {/* Description */}
         <div>
-          <Label htmlFor={`variant-cost-${index}`} className="text-sm font-medium text-[#656565] mb-1.5">
-            Base Cost Adjustment ($)
-          </Label>
-          <Input
-            id={`variant-cost-${index}`}
-            type="number"
-            step="0.01"
-            value={variant.baseCostAdjustment === 0 ? "" : (variant.baseCostAdjustment || "")}
-            onChange={(e) => {
-              const val = e.target.value;
-              onUpdate(index, "baseCostAdjustment", val === '' ? 0 : parseFloat(val));
-            }}
-            onFocus={(e) => e.target.select()}
-            placeholder="0.00"
-            className="mt-1.5"
+          <Label className="text-sm font-medium text-[#656565] mb-2 block">Description</Label>
+          <Textarea
+            id={`variant-description-${index}`}
+            value={variant.description || ""}
+            onChange={(e) => onUpdate(index, "description", e.target.value)}
+            placeholder="Describe this variant..."
+            rows={2}
+            className="bg-white border-[#d5d5dd] resize-none"
           />
         </div>
-      </div>
 
-      {/* Description */}
-      <div>
-        <Label htmlFor={`variant-description-${index}`} className="text-sm font-medium text-[#656565] mb-1.5">Description</Label>
-        <Textarea
-          id={`variant-description-${index}`}
-          value={variant.description || ""}
-          onChange={(e) => onUpdate(index, "description", e.target.value)}
-          placeholder="Describe this variant..."
-          rows={2}
-          className="mt-1.5"
-        />
-      </div>
-
-      {/* Active Status */}
-      <div className="w-full">
-        <div className="flex items-center justify-between rounded-sm border border-[#d4d7dd] bg-[#f8f8fa] px-4 py-3 w-full">
-          <span className="text-[#1f2937] text-[15px] font-medium">Active</span>
-          <Switch
-            id={`variant-active-${index}`}
-            checked={variant.isActive}
-            onCheckedChange={(checked) => onUpdate(index, "isActive", checked)}
-          />
-        </div>
-      </div>
-
-      {/* Variant-specific Ingredients - Simplified for now */}
-      <div>
-        <Label className="text-sm font-medium text-[#656565] mb-1.5">Variant-Specific Ingredients (Optional)</Label>
-        {variant.ingredients && variant.ingredients.length > 0 && (
-          <div className="text-sm text-[#656565] bg-[#f8f8fa] border border-[#d5d5dd] p-3 rounded-sm mt-1.5">
-            {variant.ingredients.length} ingredient(s) configured
+        {/* Active Status */}
+        <div className="w-full">
+          <div className="flex items-center justify-between rounded-sm border border-[#d5d5dd] bg-[#f8f8fa] px-4 h-14 w-full">
+            <span className="text-[#111827] text-[15px] font-semibold">Active</span>
+            <Switch
+              id={`variant-active-${index}`}
+              checked={variant.isActive}
+              onCheckedChange={(checked) => onUpdate(index, "isActive", checked)}
+            />
           </div>
-        )}
+        </div>
+
+        {/* Variant-specific Ingredients - Simplified for now */}
+        <div>
+          <Label className="text-sm font-medium text-[#656565] mb-2 block">Variant-Specific Ingredients (Optional)</Label>
+          {variant.ingredients && variant.ingredients.length > 0 && (
+            <div className="text-sm text-[#656565] bg-[#f8f8fa] border border-[#d5d5dd] p-3 rounded-sm">
+              {variant.ingredients.length} ingredient(s) configured
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

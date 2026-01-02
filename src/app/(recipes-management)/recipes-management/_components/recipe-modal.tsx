@@ -94,8 +94,8 @@ export default function RecipeModal({
   });
 
   const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredient[]>([]);
-  const [ingredientInputs, setIngredientInputs] = useState<{[key: number]: string}>({});
-  const [showSuggestions, setShowSuggestions] = useState<{[key: number]: boolean}>({});
+  const [ingredientInputs, setIngredientInputs] = useState<{ [key: number]: string }>({});
+  const [showSuggestions, setShowSuggestions] = useState<{ [key: number]: boolean }>({});
   const [focusedIngredientIndex, setFocusedIngredientIndex] = useState<number | null>(null);
   const [variants, setVariants] = useState<RecipeVariantInline[]>([]);
   const [isVariantsExpanded, setIsVariantsExpanded] = useState(false);
@@ -124,7 +124,7 @@ export default function RecipeModal({
         setIsVariantsExpanded(existingVariants.length > 0);
         setIsIngredientsExpanded(true);
 
-        const inputs: {[key: number]: string} = {};
+        const inputs: { [key: number]: string } = {};
         existingIngredients.forEach((ing, index) => {
           inputs[index] = ing.nameSnapshot || "";
         });
@@ -261,8 +261,8 @@ export default function RecipeModal({
     delete newInputs[index];
     delete newSuggestions[index];
 
-    const reindexedInputs: {[key: number]: string} = {};
-    const reindexedSuggestions: {[key: number]: boolean} = {};
+    const reindexedInputs: { [key: number]: string } = {};
+    const reindexedSuggestions: { [key: number]: boolean } = {};
     Object.keys(newInputs).forEach((key) => {
       const oldIndex = parseInt(key);
       const newIndex = oldIndex > index ? oldIndex - 1 : oldIndex;
@@ -343,10 +343,23 @@ export default function RecipeModal({
       return;
     }
 
+    const parseNum = (val: any, fallback: number = 0) => {
+      if (val === "" || val === null || val === undefined) return fallback;
+      const parsed = parseFloat(val);
+      return isNaN(parsed) ? fallback : parsed;
+    };
+
     const submitData = {
       ...formData,
-      ingredients: recipeIngredients,
-      variations: variants.length > 0 ? variants : undefined, // Only include if variants exist
+      ingredients: recipeIngredients.map(ing => ({
+        ...ing,
+        quantity: parseNum(ing.quantity, 0)
+      })),
+      variations: variants.length > 0 ? variants.map(v => ({
+        ...v,
+        sizeMultiplier: parseNum(v.sizeMultiplier, 1),
+        baseCostAdjustment: parseNum(v.baseCostAdjustment, 0)
+      })) : undefined,
     };
 
     setLoading(true);
@@ -469,7 +482,7 @@ export default function RecipeModal({
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* Add Variant Button - Below empty state */}
                   <Button
                     type="button"
@@ -535,7 +548,7 @@ export default function RecipeModal({
             setShowSuggestions={setShowSuggestions}
             recipeType={recipeType}
           />
-          
+
           {/* Add Ingredient Button - Full Width Below List */}
           <Button
             type="button"
@@ -553,9 +566,9 @@ export default function RecipeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        size="4xl" 
-        fullHeight 
+      <DialogContent
+        size="4xl"
+        fullHeight
         onInteractOutside={(e) => e.preventDefault()}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >

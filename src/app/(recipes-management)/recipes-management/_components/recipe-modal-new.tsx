@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus, X, Search, UtensilsCrossed, Sparkles, Package, ChefHat, Info } from "lucide-react";
+import { Loader2, Plus, X, Search, UtensilsCrossed, Sparkles, Package, ChefHat, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -115,6 +116,24 @@ export default function RecipeModalNew({
   const [draggedInventory, setDraggedInventory] = useState<string | null>(null);
   const [draggedRecipe, setDraggedRecipe] = useState<string | null>(null);
 
+  // Collapsible panel states
+  const [inventoryExpanded, setInventoryExpanded] = useState(true);
+  const [subRecipesExpanded, setSubRecipesExpanded] = useState(true);
+  const [recipeFormExpanded, setRecipeFormExpanded] = useState(true);
+
+  // Bulk recipe state - list of recipes to be created
+  const [recipesList, setRecipesList] = useState<Array<{
+    id: string;
+    name: string;
+    type: "sub" | "final";
+    description: string;
+    ingredients: RecipeIngredient[];
+    variations: RecipeVariantInline[];
+    yield: number;
+    isActive: boolean;
+  }>>([]);
+  const [activeRecipeId, setActiveRecipeId] = useState<string | null>(null);
+
   // Refs for auto-focus and scroll
   const ingredientRefs = React.useRef<{ [key: number]: HTMLInputElement | null }>({});
   const variantRefs = React.useRef<{ [key: number]: HTMLDivElement | null }>({});
@@ -150,6 +169,9 @@ export default function RecipeModalNew({
       }
       setInventorySearch("");
       setRecipeSearch("");
+      setRecipesList([]);
+      setActiveRecipeId(null);
+      setRecipeFormExpanded(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, editingItem]);
@@ -355,66 +377,200 @@ export default function RecipeModalNew({
     setVariants(variants.filter((_, i) => i !== index));
   };
 
-  const handleSave = async () => {
+  // Bulk recipe management
+  const handleAddToList = () => {
     if (!formData.name) {
-      toast.error("Please enter a recipe name", {
-        duration: 5000,
+      toast.error("Please enter a recipe name before adding to list", {
+        duration: 3000,
         position: "top-right",
       });
       return;
     }
 
     if (recipeIngredients.length === 0) {
-      toast.error("Please add at least one ingredient", {
-        duration: 5000,
+      toast.error("Please add at least one ingredient before adding to list", {
+        duration: 3000,
         position: "top-right",
       });
       return;
     }
 
-    const invalidIngredients = recipeIngredients.filter(
-      (ing) => !ing.sourceId || !ing.quantity || ing.quantity <= 0 || !ing.unit
-    );
-
-    if (invalidIngredients.length > 0) {
-      toast.error(`${invalidIngredients.length} ingredient(s) have missing information`, {
-        duration: 5000,
-        position: "top-right",
-      });
-      return;
-    }
-
-    // Validate variants if any exist
-    const invalidVariants = variants.filter((v) => !v.name || !v.type);
-    if (invalidVariants.length > 0) {
-      toast.error(`${invalidVariants.length} variant(s) are missing required fields (name or type)`, {
-        duration: 5000,
-        position: "top-right",
-      });
-      return;
-    }
-
-    const submitData = {
-      ...formData,
-      ingredients: recipeIngredients,
-      variations: variants.length > 0 ? variants : undefined,
+    const newRecipe = {
+      id: `temp-${Date.now()}`,
+      name: formData.name || "",
+      type: formData.type || "final",
+      description: formData.description || "",
+      ingredients: [...recipeIngredients],
+      variations: [...variants],
+      yield: formData.yield || 1,
+      isActive: formData.isActive ?? true,
     };
 
-    console.log('📤 Submitting recipe data:', {
-      ...submitData,
-      variationsCount: variants.length,
-      variations: variants,
-    });
+    setRecipesList([...recipesList, newRecipe]);
 
+    // Reset form for next recipe
+    setFormData({
+      name: "",
+      type: formData.type, // Keep the same type
+      description: "",
+      ingredients: [],
+      isActive: true,
+      variations: [],
+      yield: 1,
+    });
+    setRecipeIngredients([]);
+    setVariants([]);
+
+    toast.success(`"${newRecipe.name}" added to list`, {
+      duration: 2000,
+      position: "top-right",
+    });
+  };
+
+  const handleRemoveFromList = (id: string) => {
+    const recipe = recipesList.find(r => r.id === id);
+    setRecipesList(recipesList.filter(r => r.id !== id));
+    if (recipe) {
+      toast.success(`"${recipe.name}" removed from list`, {
+        duration: 2000,
+        position: "top-right",
+      });
+    }
+  };
+
+  const handleEditFromList = (id: string) => {
+    const recipe = recipesList.find(r => r.id === id);
+    if (recipe) {
+      // Save current form if it has content
+      if (formData.name && recipeIngredients.length > 0) {
+        handleAddToList();
+      }
+
+      // Load selected recipe into form
+      setFormData({
+        name: recipe.name,
+        type: recipe.type,
+        description: recipe.description,
+        ingredients: recipe.ingredients,
+        isActive: recipe.isActive,
+        variations: recipe.variations,
+        yield: recipe.yield,
+      });
+      setRecipeIngredients([...recipe.ingredients]);
+      setVariants([...recipe.variations]);
+
+      // Remove from list since it's now being edited
+      setRecipesList(recipesList.filter(r => r.id !== id));
+      setActiveRecipeId(null);
+    }
+  };
+
+  const handleSave = async () => {
+    const parseNum = (val: any, fallback: number = 0) => {
+      if (val === "" || val === null || val === undefined) return fallback;
+      const parsed = parseFloat(val);
+      return isNaN(parsed) ? fallback : parsed;
+    };
+
+    const finalRecipesToSubmit: any[] = [...recipesList];
+    const isEditingMode = !!editingItem;
+
+    // 1. Validate and capture current form content
+    const hasCurrentFormContent = formData.name || recipeIngredients.length > 0;
+    let currentFormValid = false;
+
+    if (hasCurrentFormContent) {
+      if (!formData.name) {
+        toast.error("Please enter a recipe name", { duration: 5000, position: "top-right" });
+        return;
+      }
+
+      if (recipeIngredients.length === 0) {
+        toast.error("Please add at least one ingredient", { duration: 5000, position: "top-right" });
+        return;
+      }
+
+      const invalidIngredients = recipeIngredients.filter(
+        (ing) => !ing.sourceId || !ing.quantity || parseNum(ing.quantity, 0) <= 0 || !ing.unit
+      );
+
+      if (invalidIngredients.length > 0) {
+        toast.error(`Current recipe has ${invalidIngredients.length} ingredient(s) with missing information`, {
+          duration: 5000,
+          position: "top-right",
+        });
+        return;
+      }
+
+      const invalidVariants = variants.filter((v) => !v.name || !v.type);
+      if (invalidVariants.length > 0) {
+        toast.error(`Current recipe has ${invalidVariants.length} variant(s) missing required fields`, {
+          duration: 5000,
+          position: "top-right",
+        });
+        return;
+      }
+
+      // Add current form to the submission queue
+      finalRecipesToSubmit.push({
+        name: formData.name,
+        type: formData.type || "final",
+        description: formData.description || "",
+        ingredients: [...recipeIngredients],
+        variations: [...variants],
+        yield: formData.yield || 1,
+        isActive: formData.isActive ?? true,
+      });
+      currentFormValid = true;
+    }
+
+    // 2. Logic Check: What are we actually submitting?
+    if (finalRecipesToSubmit.length === 0 && !isEditingMode) {
+      toast.error("No recipes to submit. Add ingredients to create a recipe.", {
+        duration: 5000,
+        position: "top-right",
+      });
+      return;
+    }
+
+    // 3. Execution Phase
     setLoading(true);
     try {
-      const response = await onSubmit(submitData);
-      console.log('📥 API Response:', response);
+      console.log('📤 Submitting recipes:', finalRecipesToSubmit);
 
-      // Check if variations are in the response
-      if (variants.length > 0 && !response?.variations) {
-        console.warn('⚠️ Variations were sent but not returned in response');
+      // Submit each recipe in the queue
+      for (const recipe of finalRecipesToSubmit) {
+        const submitData = {
+          ...recipe,
+          yield: parseNum(recipe.yield, 1),
+          ingredients: recipe.ingredients.map((ing: any) => ({
+            ...ing,
+            quantity: parseNum(ing.quantity, 0)
+          })),
+          variations: recipe.variations && recipe.variations.length > 0
+            ? recipe.variations.map((v: any) => ({
+              ...v,
+              sizeMultiplier: parseNum(v.sizeMultiplier, 1),
+              baseCostAdjustment: parseNum(v.baseCostAdjustment, 0)
+            }))
+            : undefined,
+        };
+
+        await onSubmit(submitData);
       }
+
+      if (finalRecipesToSubmit.length > 1) {
+        toast.success(`Successfully created ${finalRecipesToSubmit.length} recipes`, {
+          duration: 3000,
+          position: "top-right",
+        });
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      toast.error("Some recipes failed to save", {
+        duration: 5000,
+        position: "top-right",
+      });
     } finally {
       setLoading(false);
     }
@@ -456,486 +612,678 @@ export default function RecipeModalNew({
   };
 
   const renderTabContent = (recipeType: "sub" | "final") => (
-    <div className="flex gap-4 h-full">
+    <div className="flex h-full w-full">
       {/* Left Panel - Inventory Items */}
-      <div className="w-72 flex flex-col border-r border-[#d5d5dd] pr-4 shrink-0">
-        <div className="mb-3 shrink-0">
-          <div className="flex items-center gap-2 mb-2">
-            <Package className="h-4 w-4 text-[#656565]" />
-            <Label className="text-xs font-bold text-[#656565] uppercase tracking-wider">
+      <div className="w-72 flex flex-col border-r border-[#e5e5e5] shrink-0 bg-white">
+        <div
+          className="flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f9fafb] border-b border-[#e5e5e5]"
+          onClick={() => setInventoryExpanded(!inventoryExpanded)}
+        >
+          <div className="flex items-center gap-2">
+            <Package className="h-4 w-4 text-[#6b7280]" />
+            <span className="text-[14px] font-semibold text-[#374151] uppercase leading-[14px]">
               Inventory Items
-            </Label>
+            </span>
+            {filteredInventory.length > 0 && (
+              <span className="text-[10px] font-medium text-[#6b7280] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-[10px]">
+                {filteredInventory.length}
+              </span>
+            )}
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              value={inventorySearch}
-              onChange={(e) => setInventorySearch(e.target.value)}
-              placeholder="Search inventory..."
-              className="pl-9 h-9 text-sm border-[#d5d5dd]"
-            />
-          </div>
-        </div>
-
-        <div className="overflow-y-auto space-y-1.5 pr-1 scrollbar-invisible" style={{ maxHeight: 'calc(90vh - 340px)' }}>
-          {filteredInventory.length === 0 ? (
-            <div className="text-center py-8">
-              <Package className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-gray-400">No inventory items</p>
-            </div>
+          {inventoryExpanded ? (
+            <ChevronUp className="h-4 w-4 text-[#9ca3af]" />
           ) : (
-            filteredInventory.map((item) => {
-              const itemId = String(item._id || item.id || item.ID);
-              const itemName = item.Name || item.name || "";
-              const itemUnit = item.Unit || item.baseUnit || "pc";
-              const isAdded = recipeIngredients.some(ing => ing.sourceId === itemId);
-
-              return (
-                <div
-                  key={itemId}
-                  draggable
-                  onDragStart={() => handleInventoryDragStart(itemId)}
-                  className={cn(
-                    "group relative bg-white border border-[#d5d5dd] rounded-sm p-2.5 cursor-grab active:cursor-grabbing transition-all duration-200",
-                    isAdded
-                      ? "opacity-40 cursor-not-allowed"
-                      : "hover:border-blue-400 hover:shadow-sm"
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-sm flex items-center justify-center bg-orange-50/50 border border-orange-100/50 text-orange-600 shrink-0">
-                      <Package className="h-4 w-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-bold text-gray-900 truncate">{itemName}</div>
-                      <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
-                        {itemUnit}
-                      </div>
-                    </div>
-                  </div>
-                  {isAdded && (
-                    <div className="absolute top-1 right-1">
-                      <span className="text-[9px] font-black bg-green-500 text-white px-1.5 py-0.5 rounded-full">
-                        ADDED
-                      </span>
-                    </div>
-                  )}
-                </div>
-              );
-            })
+            <ChevronDown className="h-4 w-4 text-[#9ca3af]" />
           )}
         </div>
+
+        {inventoryExpanded && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="h-[41px] px-3 flex items-center bg-white relative border-b border-[#e5e5e5]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9ca3af]" />
+              <input
+                type="text"
+                value={inventorySearch}
+                onChange={(e) => setInventorySearch(e.target.value)}
+                placeholder="Search inventory..."
+                className="pl-9 h-full w-full border-0 p-0 focus:ring-0 focus:outline-none bg-transparent text-[15px] leading-tight"
+              />
+            </div>
+
+            <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {filteredInventory.length === 0 ? (
+                <div className="text-center py-8">
+                  <Package className="h-10 w-10 text-[#d1d5db] mx-auto mb-2" />
+                  <p className="text-sm text-[#9ca3af]">No inventory items</p>
+                </div>
+              ) : (
+                filteredInventory.map((item) => {
+                  const itemId = String(item._id || item.id || item.ID);
+                  const itemName = item.Name || item.name || "";
+                  const itemUnit = item.Unit || item.baseUnit || "pc";
+                  const isAdded = recipeIngredients.some(ing => ing.sourceId === itemId);
+
+                  return (
+                    <div
+                      key={itemId}
+                      draggable={!isAdded}
+                      onDragStart={() => !isAdded && handleInventoryDragStart(itemId)}
+                      className={cn(
+                        "group relative flex items-center h-[41px] px-3 bg-white border-b border-[#e5e7eb] transition-all",
+                        isAdded
+                          ? "opacity-50 cursor-not-allowed"
+                          : "cursor-grab active:cursor-grabbing hover:bg-[#e0f2fe]"
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Package className="h-4 w-4 text-[#ea580c] shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-[#111827] truncate leading-tight">{itemName}</div>
+                          <div className="text-[10px] text-[#9ca3af] font-medium uppercase leading-tight">
+                            {itemUnit}
+                          </div>
+                        </div>
+                      </div>
+                      {isAdded && (
+                        <div className="absolute top-1/2 -translate-y-1/2 right-3">
+                          <span className="text-[9px] font-semibold bg-[#22c55e] text-white px-1.5 py-0.5 rounded">
+                            ADDED
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Center Panel - Recipe Form */}
-      <div className="flex-1 px-2 overflow-hidden flex flex-col">
-        <div className="space-y-6 overflow-y-auto pr-2 scrollbar-invisible" style={{ maxHeight: 'calc(90vh - 280px)' }}>
-          {/* Name */}
-          <div>
-            <Label className="text-sm font-medium text-[#656565] mb-1.5">
-              Recipe Name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              value={formData.name}
-              onChange={(e) => handleFieldChange("name", e.target.value)}
-              placeholder={
-                recipeType === "sub"
-                  ? "e.g., Burger Sauce, Grilled Patty"
-                  : "e.g., Cheeseburger, Caesar Salad"
-              }
-              className="mt-1.5 border-[#d5d5dd]"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <Label className="text-sm font-medium text-[#656565] mb-1.5">Description (Optional)</Label>
-            <Textarea
-              value={formData.description}
-              onChange={(e) => handleFieldChange("description", e.target.value)}
-              placeholder="Brief description..."
-              className="mt-1.5 min-h-[80px] resize-none border-[#d5d5dd]"
-              rows={3}
-            />
-          </div>
-
-          {/* Yield */}
-          <div>
-            <Label className="text-sm font-medium text-[#656565] mb-1.5">
-              Yield (Portions)
-            </Label>
-            <Input
-              type="number"
-              min="1"
-              value={formData.yield || 1}
-              onChange={(e) => handleFieldChange("yield", parseInt(e.target.value) || 1)}
-              className="mt-1.5 border-[#d5d5dd]"
-            />
-          </div>
-
-          {/* Active Status */}
-          <div className="w-full">
-            <div className="flex items-center justify-between rounded-sm border border-[#d5d5dd] bg-[#f8f8fa] px-4 py-3 w-full">
-              <span className="text-[#1f2937] text-sm font-medium">Active</span>
-              <Switch
-                checked={formData.isActive === true}
-                onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
-              />
-            </div>
-          </div>
-
-          {/* Ingredients Drop Zone */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Label className="text-sm font-medium text-[#656565]">
-                Ingredients <span className="text-red-500">*</span>
-              </Label>
-              <CustomTooltip
-                label="Drag items from the side panels or click to add"
-                direction="right"
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-white">
+        <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden m-0 p-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {/* Saved Recipes List - Each as collapsible section */}
+          {recipesList.map((recipe, recipeIndex) => (
+            <div key={recipe.id}>
+              <div
+                className="sticky top-0 z-20 flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f0fdf4] hover:bg-[#dcfce7] transition-colors border-b border-[#e5e5e5]"
+                onClick={() => setActiveRecipeId(activeRecipeId === recipe.id ? null : recipe.id)}
               >
-                <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
-              </CustomTooltip>
-              {recipeIngredients.length > 0 && (
-                <span className="text-xs font-semibold bg-[#1f2937] text-white px-2 py-0.5 rounded-full">
-                  {recipeIngredients.length}
-                </span>
-              )}
-            </div>
-
-            <div
-              onDragOver={(e) => {
-                handleInventoryDragOver(e);
-                handleRecipeDragOver(e);
-              }}
-              onDrop={(e) => {
-                if (draggedInventory) handleInventoryDrop(e);
-                if (draggedRecipe) handleRecipeDrop(e);
-              }}
-              className={cn(
-                "rounded-sm border-2 border-dashed p-4 transition-all duration-200 min-h-[200px]",
-                recipeIngredients.length > 0
-                  ? "bg-blue-50/30 border-blue-300"
-                  : "bg-gray-50 border-gray-300 hover:border-blue-400 hover:bg-blue-50/50"
-              )}
-            >
-              {recipeIngredients.length === 0 ? (
-                <div className="text-center py-8">
-                  <UtensilsCrossed className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm font-medium text-gray-600 mb-1">No ingredients yet</p>
-                  <p className="text-xs text-gray-400">
-                    Drag items from left or right panel
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {recipeIngredients.map((ingredient, index) => (
-                    <div
-                      key={index}
-                      className="bg-white border border-[#d5d5dd] rounded-sm p-3 hover:border-blue-400 transition-colors"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            {ingredient.sourceType === "inventory" ? (
-                              <Package className="h-4 w-4 text-orange-600" />
-                            ) : (
-                              <ChefHat className="h-4 w-4 text-purple-600" />
-                            )}
-                            <span className="text-sm font-bold text-gray-900">
-                              {ingredient.nameSnapshot}
-                            </span>
-                            <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-widest border text-gray-600 bg-gray-50 border-gray-200">
-                              {ingredient.sourceType}
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div>
-                              <Label className="text-xs text-gray-500 mb-1">Quantity</Label>
-                              <Input
-                                ref={(el) => {
-                                  ingredientRefs.current[index] = el;
-                                }}
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={ingredient.quantity}
-                                onChange={(e) =>
-                                  handleUpdateIngredient(index, "quantity", parseFloat(e.target.value) || 0)
-                                }
-                                className="h-8 text-sm border-[#d5d5dd]"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs text-gray-500 mb-1">Unit</Label>
-                              <select
-                                value={ingredient.unit}
-                                onChange={(e) =>
-                                  handleUpdateIngredient(index, "unit", e.target.value)
-                                }
-                                className="h-8 w-full text-sm border border-[#d5d5dd] rounded-sm px-2 bg-white"
-                              >
-                                {getCompatibleUnits(ingredient.unit).map((unit) => (
-                                  <option key={unit} value={unit}>
-                                    {unit}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveIngredient(index)}
-                          className="shrink-0 h-6 w-6 rounded-sm flex items-center justify-center hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Variants Section - Only for Final Recipes */}
-          {recipeType === "final" && (
-            <div>
-              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Label className="text-sm font-medium text-[#656565]">Recipe Variants</Label>
-                  <CustomTooltip label="Add size, flavor, or crust variants" direction="right">
-                    <Info className="h-4 w-4 text-gray-400 cursor-pointer" />
-                  </CustomTooltip>
-                  {variants.length > 0 && (
-                    <span className="text-xs font-semibold bg-[#1f2937] text-white px-2 py-0.5 rounded-full">
-                      {variants.length}
-                    </span>
+                  <div className="h-4 w-4 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-[10px] font-semibold">
+                    {recipeIndex + 1}
+                  </div>
+                  <span className={cn(
+                    "text-xs font-semibold px-1.5 rounded uppercase h-5 flex items-center leading-none",
+                    recipe.type === "final" ? "bg-[#eff6ff] text-[#3b82f6]" : "bg-[#faf5ff] text-[#9333ea]"
+                  )}>
+                    {recipe.type}
+                  </span>
+                  <span className="text-xs font-semibold text-[#374151] leading-none">
+                    {recipe.name} ({recipe.ingredients.length} ingredients)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditFromList(recipe.id);
+                    }}
+                    className="flex items-center justify-center text-[#6b7280] hover:text-[#3b82f6] transition-colors"
+                    title="Edit in form"
+                  >
+                    <Info className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFromList(recipe.id);
+                    }}
+                    className="flex items-center justify-center text-[#6b7280] hover:text-[#ef4444] transition-colors"
+                    title="Remove"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  {activeRecipeId === recipe.id ? (
+                    <ChevronUp className="h-4 w-4 text-[#9ca3af]" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-[#9ca3af]" />
                   )}
                 </div>
-                <Button
-                  type="button"
-                  onClick={handleAddVariant}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 px-3 border-gray-300"
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1.5" />
-                  Custom Variant
-                </Button>
               </div>
-
-              {/* Standard Size Buttons */}
-              <div className="mb-4 p-4 rounded-sm border border-[#d5d5dd] bg-[#f8f8fa]">
-                <Label className="text-xs font-bold text-[#656565] uppercase tracking-wider mb-2 block">
-                  Standard Sizes
-                </Label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleAddStandardSize("Small", 1)}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-sm border-2 border-dashed border-[#d5d5dd] bg-white hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 group"
-                  >
-                    <div className="text-xs font-black text-gray-900 group-hover:text-blue-600">SMALL</div>
-                    <div className="text-[10px] font-bold text-gray-400 group-hover:text-blue-500">1x</div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAddStandardSize("Medium", 1.5)}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-sm border-2 border-dashed border-[#d5d5dd] bg-white hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 group"
-                  >
-                    <div className="text-xs font-black text-gray-900 group-hover:text-blue-600">MEDIUM</div>
-                    <div className="text-[10px] font-bold text-gray-400 group-hover:text-blue-500">1.5x</div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAddStandardSize("Large", 2)}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-sm border-2 border-dashed border-[#d5d5dd] bg-white hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 group"
-                  >
-                    <div className="text-xs font-black text-gray-900 group-hover:text-blue-600">LARGE</div>
-                    <div className="text-[10px] font-bold text-gray-400 group-hover:text-blue-500">2x</div>
-                  </button>
-                </div>
-              </div>
-
-              {variants.length === 0 ? (
-                <div className="rounded-sm border border-dashed border-[#d5d5dd] bg-white p-8 text-center">
-                  <Sparkles className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">No variants yet</p>
-                  <p className="text-xs text-gray-400 mt-1">Click standard sizes above or add custom variant</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {variants.map((variant, index) => (
-                    <div
-                      key={index}
-                      ref={(el) => {
-                        variantRefs.current[index] = el;
-                      }}
-                      className="bg-white border border-[#d5d5dd] rounded-sm p-4 hover:border-blue-300 transition-colors"
-                    >
-                      {/* Header with Name and Badge */}
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <span className={cn(
-                            "px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border",
-                            variant.type === "size" ? "bg-blue-50 text-blue-600 border-blue-100" :
-                            variant.type === "flavor" ? "bg-purple-50 text-purple-600 border-purple-100" :
-                            variant.type === "crust" ? "bg-orange-50 text-orange-600 border-orange-100" :
-                            "bg-gray-50 text-gray-600 border-gray-100"
-                          )}>
-                            {variant.type.toUpperCase()}
-                          </span>
-                          {variant.type === "size" && (
-                            <span className="text-xs font-bold text-blue-600">
-                              {variant.sizeMultiplier}x multiplier
-                            </span>
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveVariant(index)}
-                          className="shrink-0 h-6 w-6 rounded-sm flex items-center justify-center hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-
-                      {/* Form Fields */}
-                      <div className="grid grid-cols-2 gap-3 mb-3">
-                        <div>
-                          <Label className="text-xs text-gray-500 mb-1">Variant Name</Label>
-                          <Input
-                            value={variant.name}
-                            onChange={(e) => handleUpdateVariant(index, "name", e.target.value)}
-                            placeholder="e.g., Large, Spicy"
-                            className="h-8 text-sm border-[#d5d5dd]"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs text-gray-500 mb-1">Type</Label>
-                          <select
-                            value={variant.type}
-                            onChange={(e) => handleUpdateVariant(index, "type", e.target.value)}
-                            className="h-8 w-full text-sm border border-[#d5d5dd] rounded-sm px-2 bg-white"
-                          >
-                            <option value="size">Size</option>
-                            <option value="flavor">Flavor</option>
-                            <option value="crust">Crust</option>
-                            <option value="addon">Addon</option>
-                            <option value="custom">Custom</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label className="text-xs text-gray-500 mb-1">
-                            Size Multiplier
-                            {variant.type === "size" && (
-                              <span className="text-blue-600 ml-1">*</span>
-                            )}
-                          </Label>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.1"
-                            value={variant.sizeMultiplier || 1}
-                            onChange={(e) =>
-                              handleUpdateVariant(index, "sizeMultiplier", parseFloat(e.target.value) || 1)
-                            }
-                            className="h-8 text-sm border-[#d5d5dd]"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs text-gray-500 mb-1">Cost Adjustment</Label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={variant.baseCostAdjustment || 0}
-                            onChange={(e) =>
-                              handleUpdateVariant(index, "baseCostAdjustment", parseFloat(e.target.value) || 0)
-                            }
-                            className="h-8 text-sm border-[#d5d5dd]"
-                          />
-                        </div>
-                      </div>
+              {activeRecipeId === recipe.id && (
+                <div className="p-4 bg-[#f9fafb] border-t border-[#e5e5e5]">
+                  <div className="text-xs text-[#6b7280] space-y-2">
+                    {recipe.description && <p><span className="font-medium">Description:</span> {recipe.description}</p>}
+                    <p><span className="font-medium">Yield:</span> {recipe.yield} portion(s)</p>
+                    <p><span className="font-medium">Status:</span> {recipe.isActive ? "Active" : "Inactive"}</p>
+                    <div>
+                      <span className="font-medium">Ingredients:</span>
+                      <ul className="mt-1 ml-4 list-disc">
+                        {recipe.ingredients.map((ing, i) => (
+                          <li key={i}>{ing.nameSnapshot} - {ing.quantity} {ing.unit}</li>
+                        ))}
+                      </ul>
                     </div>
-                  ))}
+                    {recipe.variations.length > 0 && (
+                      <div>
+                        <span className="font-medium">Variants:</span>
+                        <ul className="mt-1 ml-4 list-disc">
+                          {recipe.variations.map((v, i) => (
+                            <li key={i}>{v.name} ({v.type})</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
+          ))}
+
+          {/* Current Recipe Form - Collapsible Header */}
+          <div
+            className="sticky top-0 z-20 flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f9fafb] border-b border-[#e5e5e5]"
+            onClick={() => setRecipeFormExpanded(!recipeFormExpanded)}
+          >
+            <div className="flex items-center gap-2">
+              {recipesList.length > 0 && (
+                <div className="h-4 w-4 rounded-full bg-[#e5e7eb] text-[#6b7280] flex items-center justify-center text-[10px] font-semibold">
+                  {recipesList.length + 1}
+                </div>
+              )}
+              <UtensilsCrossed className="h-4 w-4 text-[#6b7280]" />
+              <span className="text-[14px] font-semibold text-[#374151] uppercase leading-[14px]">
+                {editingItem ? "Edit Recipe" : (formData.name?.trim() || "New Recipe")}
+              </span>
+              {!formData.name?.trim() && recipesList.length > 0 && (
+                <span className="text-[10px] text-[#9ca3af] leading-[10px]">(optional)</span>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {recipeFormExpanded ? (
+                <ChevronUp className="h-4 w-4 text-[#9ca3af]" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-[#9ca3af]" />
+              )}
+            </div>
+          </div>
+
+          {recipeFormExpanded && (
+            <div className="p-4">
+              <div className="space-y-5">
+                {/* Name */}
+                <div>
+                  <Label className="text-sm font-medium text-[#374151] mb-1.5 block">
+                    Recipe Name <span className="text-[#ef4444]">*</span>
+                  </Label>
+                  <Input
+                    value={formData.name}
+                    onChange={(e) => handleFieldChange("name", e.target.value)}
+                    placeholder={
+                      recipeType === "sub"
+                        ? "e.g., Burger Sauce, Grilled Patty"
+                        : "e.g., Cheeseburger, Caesar Salad"
+                    }
+                    className="h-14 text-[15px]"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <Label className="text-sm font-medium text-[#374151] mb-1.5 block">Description (Optional)</Label>
+                  <Textarea
+                    value={formData.description}
+                    onChange={(e) => handleFieldChange("description", e.target.value)}
+                    placeholder="Brief description..."
+                    className="min-h-[72px] resize-none text-[15px]"
+                    rows={2}
+                  />
+                </div>
+
+                {/* Yield & Active Status Row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-[#374151] mb-1.5 block">
+                      Yield (Portions)
+                    </Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={formData.yield ?? ""}
+                      onChange={(e) => {
+                        handleFieldChange("yield", e.target.value);
+                      }}
+                      onFocus={(e) => e.target.select()}
+                      placeholder="1"
+                      className="h-14 text-[15px]"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-[#374151] mb-1.5 block">Status</Label>
+                    <div className="flex items-center justify-between rounded-sm border border-[#e5e5e5] bg-[#f8f8fa] px-4 py-3 h-14">
+                      <span className="text-[#1f2937] text-sm font-medium">Active</span>
+                      <Switch
+                        checked={formData.isActive === true}
+                        onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ingredients Drop Zone */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Label className="text-sm font-medium text-[#374151]">
+                      Ingredients <span className="text-[#ef4444]">*</span>
+                    </Label>
+                    <CustomTooltip
+                      label="Drag items from the side panels"
+                      direction="right"
+                    >
+                      <Info className="h-3.5 w-3.5 text-[#9ca3af] cursor-pointer" />
+                    </CustomTooltip>
+                    {recipeIngredients.length > 0 && (
+                      <span className="text-[10px] font-semibold bg-[#111827] text-white px-2 py-0.5 rounded-full">
+                        {recipeIngredients.length}
+                      </span>
+                    )}
+                  </div>
+
+                  <div
+                    onDragOver={(e) => {
+                      handleInventoryDragOver(e);
+                      handleRecipeDragOver(e);
+                    }}
+                    onDrop={(e) => {
+                      if (draggedInventory) handleInventoryDrop(e);
+                      if (draggedRecipe) handleRecipeDrop(e);
+                    }}
+                    className={cn(
+                      "rounded-sm border-2 border-dashed p-3 transition-all min-h-[160px]",
+                      recipeIngredients.length > 0
+                        ? "bg-[#eff6ff] border-[#93c5fd]"
+                        : "bg-[#f9fafb] border-[#d1d5db] hover:border-[#93c5fd] hover:bg-[#eff6ff]/50"
+                    )}
+                  >
+                    {recipeIngredients.length === 0 ? (
+                      <div className="relative overflow-hidden rounded-sm border border-dashed border-[#d5d5dd] bg-[#f8f8fa] p-12 text-center transition-all">
+                        <div className="relative z-10">
+                          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#111827] shadow-lg">
+                            <UtensilsCrossed className="h-8 w-8 text-white" />
+                          </div>
+                          <h3 className="mb-2 text-lg font-bold text-[#111827]">No Ingredients Yet</h3>
+                          <p className="mx-auto max-w-sm text-sm text-[#656565]">
+                            Start building your recipe by dragging items from the side panels
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 p-1">
+                        {recipeIngredients.map((ingredient, index) => (
+                          <div
+                            key={index}
+                            className="p-4 border border-[#d5d5dd] rounded-sm bg-white hover:bg-gray-50/50 transition-colors"
+                          >
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-sm bg-[#111827] text-white text-[11px] font-bold">
+                                  {index + 1}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="text-[15px] font-semibold text-[#111827] truncate">
+                                    {ingredient.nameSnapshot}
+                                  </div>
+                                  <div className="flex items-center gap-1.5 mt-0.5">
+                                    {ingredient.sourceType === "inventory" ? (
+                                      <Package className="h-3.5 w-3.5 text-[#ea580c]" />
+                                    ) : (
+                                      <ChefHat className="h-3.5 w-3.5 text-[#9333ea]" />
+                                    )}
+                                    <span className={cn(
+                                      "text-[10px] font-bold uppercase tracking-wider",
+                                      ingredient.sourceType === "inventory" ? "text-[#ea580c]" : "text-[#9333ea]"
+                                    )}>
+                                      {ingredient.sourceType}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveIngredient(index)}
+                                className="text-[#9ca3af] hover:text-[#ef4444] transition-colors p-1"
+                              >
+                                <X size={18} />
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium text-[#656565] mb-2 block">Quantity</Label>
+                                <Input
+                                  ref={(el) => {
+                                    ingredientRefs.current[index] = el;
+                                  }}
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  value={ingredient.quantity ?? ""}
+                                  onChange={(e) => {
+                                    handleUpdateIngredient(index, "quantity", e.target.value);
+                                  }}
+                                  onFocus={(e) => e.target.select()}
+                                  placeholder="0"
+                                  className="h-14 text-[15px]"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium text-[#656565] mb-2 block">Unit</Label>
+                                <Select
+                                  value={ingredient.unit}
+                                  onValueChange={(value) => handleUpdateIngredient(index, "unit", value)}
+                                >
+                                  <SelectTrigger className="h-14 text-[15px] bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {getCompatibleUnits(ingredient.unit).map((unit) => (
+                                      <SelectItem key={unit} value={unit}>
+                                        {unit}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Variants Section - Only for Final Recipes */}
+                {recipeType === "final" && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm font-medium text-[#374151]">Recipe Variants</Label>
+                        <CustomTooltip label="Add size, flavor, or crust variants" direction="right">
+                          <Info className="h-3.5 w-3.5 text-[#9ca3af] cursor-pointer" />
+                        </CustomTooltip>
+                        {variants.length > 0 && (
+                          <span className="text-[10px] font-semibold bg-[#111827] text-white px-2 py-0.5 rounded-full">
+                            {variants.length}
+                          </span>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={handleAddVariant}
+                        variant="outline"
+                        size="sm"
+                        className="h-8 px-3 text-xs border-[#e5e7eb]"
+                      >
+                        <Plus className="h-3.5 w-3.5 mr-1" />
+                        Custom
+                      </Button>
+                    </div>
+
+                    {/* Standard Size Buttons */}
+                    <div className="mb-4 p-4 rounded-sm border border-[#d5d5dd] bg-[#f8f8fa]">
+                      <Label className="text-[10px] font-bold text-[#656565] uppercase tracking-wider mb-3 block">
+                        Quick Add Sizes
+                      </Label>
+                      <div className="grid grid-cols-3 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => handleAddStandardSize("Small", 1)}
+                          className="flex flex-col items-center gap-0.5 py-2 px-3 rounded-md border border-[#e5e7eb] bg-white hover:border-[#3b82f6] hover:bg-[#eff6ff] transition-all group"
+                        >
+                          <div className="text-xs font-semibold text-[#374151] group-hover:text-[#3b82f6]">Small</div>
+                          <div className="text-[10px] text-[#9ca3af] group-hover:text-[#3b82f6]">1x</div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAddStandardSize("Medium", 1.5)}
+                          className="flex flex-col items-center gap-0.5 py-2 px-3 rounded-md border border-[#e5e7eb] bg-white hover:border-[#3b82f6] hover:bg-[#eff6ff] transition-all group"
+                        >
+                          <div className="text-xs font-semibold text-[#374151] group-hover:text-[#3b82f6]">Medium</div>
+                          <div className="text-[10px] text-[#9ca3af] group-hover:text-[#3b82f6]">1.5x</div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAddStandardSize("Large", 2)}
+                          className="flex flex-col items-center gap-0.5 py-2 px-3 rounded-md border border-[#e5e7eb] bg-white hover:border-[#3b82f6] hover:bg-[#eff6ff] transition-all group"
+                        >
+                          <div className="text-xs font-semibold text-[#374151] group-hover:text-[#3b82f6]">Large</div>
+                          <div className="text-[10px] text-[#9ca3af] group-hover:text-[#3b82f6]">2x</div>
+                        </button>
+                      </div>
+                    </div>
+
+                    {variants.length === 0 ? (
+                      <div className="relative overflow-hidden rounded-sm border border-dashed border-[#d5d5dd] bg-[#f8f8fa] p-12 text-center transition-all">
+                        <div className="relative z-10">
+                          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#111827] shadow-lg">
+                            <Sparkles className="h-8 w-8 text-white" />
+                          </div>
+                          <h3 className="mb-2 text-lg font-bold text-[#111827]">No Variants Yet</h3>
+                          <p className="mx-auto max-w-sm text-sm text-[#656565]">
+                            Use quick add or create a custom variant above
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 p-1">
+                        {variants.map((variant, index) => (
+                          <div
+                            key={index}
+                            ref={(el) => {
+                              variantRefs.current[index] = el;
+                            }}
+                            className="p-4 border border-[#d5d5dd] rounded-sm bg-white hover:bg-gray-50/50 transition-colors"
+                          >
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center gap-2">
+                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-sm bg-[#111827] text-white text-[11px] font-bold">
+                                  {index + 1}
+                                </div>
+                                <div className="text-[15px] font-semibold text-[#111827]">
+                                  Variant {index + 1}
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveVariant(index)}
+                                className="text-[#9ca3af] hover:text-[#ef4444] transition-colors p-1"
+                              >
+                                <X size={18} />
+                              </button>
+                            </div>
+
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label className="text-sm font-medium text-[#656565] mb-2 block">Name</Label>
+                                  <Input
+                                    value={variant.name}
+                                    onChange={(e) => handleUpdateVariant(index, "name", e.target.value)}
+                                    placeholder="e.g., Large"
+                                    className="h-14 text-[15px]"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-[#656565] mb-2 block">Type</Label>
+                                  <Select
+                                    value={variant.type}
+                                    onValueChange={(value) => handleUpdateVariant(index, "type", value)}
+                                  >
+                                    <SelectTrigger className="h-14 text-[15px] bg-white">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="size">Size</SelectItem>
+                                      <SelectItem value="flavor">Flavor</SelectItem>
+                                      <SelectItem value="crust">Crust</SelectItem>
+                                      <SelectItem value="addon">Addon</SelectItem>
+                                      <SelectItem value="custom">Custom</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label className="text-sm font-medium text-[#656565] mb-2 block">
+                                    Size Multiplier
+                                  </Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="0.1"
+                                    value={variant.sizeMultiplier ?? ""}
+                                    onChange={(e) => {
+                                      handleUpdateVariant(index, "sizeMultiplier", e.target.value);
+                                    }}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder="1.0"
+                                    className="h-14 text-[15px]"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium text-[#656565] mb-2 block">Cost Adjustment</Label>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={variant.baseCostAdjustment ?? ""}
+                                    onChange={(e) => {
+                                      handleUpdateVariant(index, "baseCostAdjustment", e.target.value);
+                                    }}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder="0.00"
+                                    className="h-14 text-[15px]"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           )}
+
         </div>
+
+        {/* Fixed Center Action Bar - Unified with container flow, top border only */}
+        {!editingItem && (
+          <Button
+            type="button"
+            onClick={handleAddToList}
+            variant="outline"
+            className={cn(
+              "shrink-0 w-full h-[41px] rounded-none border-t border-x-0 border-b-0 border-[#e5e7eb] bg-white text-[15px] font-medium transition-all duration-200 hover:bg-[#111827] hover:text-white hover:border-[#111827] text-[#374151]",
+              (!formData.name || recipeIngredients.length === 0) && "opacity-50 grayscale cursor-not-allowed"
+            )}
+            disabled={!formData.name || recipeIngredients.length === 0}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Another Recipe
+          </Button>
+        )}
       </div>
 
       {/* Right Panel - Sub Recipes */}
-      <div className="w-72 flex flex-col border-l border-[#d5d5dd] pl-4 shrink-0">
-        <div className="mb-3 shrink-0">
-          <div className="flex items-center gap-2 mb-2">
-            <ChefHat className="h-4 w-4 text-[#656565]" />
-            <Label className="text-xs font-bold text-[#656565] uppercase tracking-wider">
+      <div className="w-72 flex flex-col shrink-0 border-l border-[#e5e5e5] bg-white">
+        <div
+          className="flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f9fafb] border-b border-[#e5e5e5]"
+          onClick={() => setSubRecipesExpanded(!subRecipesExpanded)}
+        >
+          <div className="flex items-center gap-2">
+            <ChefHat className="h-4 w-4 text-[#6b7280]" />
+            <span className="text-[14px] font-semibold text-[#374151] uppercase leading-[14px]">
               Sub Recipes
-            </Label>
+            </span>
+            {filteredRecipes.length > 0 && (
+              <span className="text-[10px] font-medium text-[#6b7280] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-[10px]">
+                {filteredRecipes.length}
+              </span>
+            )}
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              value={recipeSearch}
-              onChange={(e) => setRecipeSearch(e.target.value)}
-              placeholder="Search recipes..."
-              className="pl-9 h-9 text-sm border-[#d5d5dd]"
-            />
-          </div>
-        </div>
-
-        <div className="overflow-y-auto space-y-1.5 pr-1 scrollbar-invisible" style={{ maxHeight: 'calc(90vh - 340px)' }}>
-          {filteredRecipes.length === 0 ? (
-            <div className="text-center py-8">
-              <ChefHat className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-gray-400">No sub recipes</p>
-            </div>
+          {subRecipesExpanded ? (
+            <ChevronUp className="h-4 w-4 text-[#9ca3af]" />
           ) : (
-            filteredRecipes.map((recipe) => {
-              const recipeId = String(recipe._id || recipe.ID);
-              const recipeName = recipe.Name || "";
-              const isAdded = recipeIngredients.some(ing => ing.sourceId === recipeId);
-
-              return (
-                <div
-                  key={recipeId}
-                  draggable
-                  onDragStart={() => handleRecipeDragStart(recipeId)}
-                  className={cn(
-                    "group relative bg-white border border-[#d5d5dd] rounded-sm p-2.5 cursor-grab active:cursor-grabbing transition-all duration-200",
-                    isAdded
-                      ? "opacity-40 cursor-not-allowed"
-                      : "hover:border-purple-400 hover:shadow-sm"
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-sm flex items-center justify-center bg-purple-50/50 border border-purple-100/50 text-purple-600 shrink-0">
-                      <ChefHat className="h-4 w-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-bold text-gray-900 truncate">{recipeName}</div>
-                      <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
-                        Sub Recipe
-                      </div>
-                    </div>
-                  </div>
-                  {isAdded && (
-                    <div className="absolute top-1 right-1">
-                      <span className="text-[9px] font-black bg-green-500 text-white px-1.5 py-0.5 rounded-full">
-                        ADDED
-                      </span>
-                    </div>
-                  )}
-                </div>
-              );
-            })
+            <ChevronDown className="h-4 w-4 text-[#9ca3af]" />
           )}
         </div>
+
+        {subRecipesExpanded && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="h-[41px] px-3 flex items-center bg-white relative border-b border-[#e5e5e5]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9ca3af]" />
+              <input
+                type="text"
+                value={recipeSearch}
+                onChange={(e) => setRecipeSearch(e.target.value)}
+                placeholder="Search recipes..."
+                className="pl-9 h-full w-full focus:ring-0 focus:outline-none bg-transparent text-[15px] leading-tight"
+              />
+            </div>
+
+            <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {filteredRecipes.length === 0 ? (
+                <div className="text-center py-8">
+                  <ChefHat className="h-10 w-10 text-[#d1d5db] mx-auto mb-2" />
+                  <p className="text-sm text-[#9ca3af]">No sub recipes</p>
+                </div>
+              ) : (
+                filteredRecipes.map((recipe) => {
+                  const recipeId = String(recipe._id || recipe.ID);
+                  const recipeName = recipe.Name || "";
+                  const isAdded = recipeIngredients.some(ing => ing.sourceId === recipeId);
+
+                  return (
+                    <div
+                      key={recipeId}
+                      draggable={!isAdded}
+                      onDragStart={() => !isAdded && handleRecipeDragStart(recipeId)}
+                      className={cn(
+                        "group relative flex items-center h-[41px] px-3 bg-white border-b border-[#e5e7eb] transition-all",
+                        isAdded
+                          ? "opacity-50 cursor-not-allowed"
+                          : "cursor-grab active:cursor-grabbing hover:bg-[#f3e8ff]"
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ChefHat className="h-4 w-4 text-[#9333ea] shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-[#111827] truncate leading-tight">{recipeName}</div>
+                          <div className="text-[10px] text-[#9ca3af] font-medium uppercase leading-tight">
+                            Sub Recipe
+                          </div>
+                        </div>
+                      </div>
+                      {isAdded && (
+                        <div className="absolute top-1/2 -translate-y-1/2 right-3">
+                          <span className="text-[9px] font-semibold bg-[#22c55e] text-white px-1.5 py-0.5 rounded">
+                            ADDED
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -943,12 +1291,12 @@ export default function RecipeModalNew({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        size="5xl"
+        size="full"
         onInteractOutside={(e) => e.preventDefault()}
         onOpenAutoFocus={(e) => e.preventDefault()}
-        className="max-h-[90vh]"
+        className="!h-[95vh] !max-h-[95vh] flex flex-col overflow-hidden"
       >
-        <DialogHeader>
+        <DialogHeader className="shrink-0 pb-2">
           <DialogTitle className="text-xl">
             {editingItem ? "Edit Recipe" : "Create Recipe"}
           </DialogTitle>
@@ -957,43 +1305,48 @@ export default function RecipeModalNew({
         <Tabs
           value={formData.type}
           onValueChange={(value) => handleFieldChange("type", value as "sub" | "final")}
+          className="flex-1 flex flex-col overflow-hidden"
         >
-          <div className="px-8 pb-4 pt-2 flex-shrink-0">
+          <div className="px-8 pb-1 pt-2 shrink-0">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="final">Final Recipe</TabsTrigger>
               <TabsTrigger value="sub">Sub Recipe</TabsTrigger>
             </TabsList>
           </div>
 
-          <DialogBody className="px-8 overflow-hidden scrollbar-invisible" style={{ maxHeight: 'calc(90vh - 200px)' }}>
-            <TabsContent value="final" className="mt-0 h-full">
-              {renderTabContent("final")}
+          <DialogBody className="flex-1 overflow-hidden px-8 pt-0 pb-2">
+            <TabsContent value="final" className="mt-0 h-full data-[state=active]:flex">
+              <div className="flex-1 border border-[#e5e5e5] rounded-sm overflow-hidden">
+                {renderTabContent("final")}
+              </div>
             </TabsContent>
-            <TabsContent value="sub" className="mt-0 h-full">
-              {renderTabContent("sub")}
+            <TabsContent value="sub" className="mt-0 h-full data-[state=active]:flex">
+              <div className="flex-1 border border-[#e5e5e5] rounded-sm overflow-hidden">
+                {renderTabContent("sub")}
+              </div>
             </TabsContent>
           </DialogBody>
         </Tabs>
 
-        <DialogFooter>
+        <DialogFooter className="shrink-0 pt-3 bg-white">
           <Button
             onClick={handleSave}
             disabled={!formData.name || loading || actionLoading}
-            className="bg-black hover:bg-gray-800 text-white px-8 h-11"
+            className="bg-[#111827] hover:bg-[#1f2937] text-white px-6 h-11 text-[15px]"
           >
             {loading || actionLoading ? (
               <>
-                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Saving...
               </>
             ) : (
-              <>{editingItem ? "Update" : "Submit"}</>
+              <>{editingItem ? "Update Recipe" : "Create Recipe"}</>
             )}
           </Button>
           <Button
             onClick={onClose}
             variant="outline"
-            className="px-8 h-11 border-gray-300"
+            className="px-6 h-11 border-[#e5e7eb] text-[15px]"
             disabled={loading || actionLoading}
           >
             Cancel
