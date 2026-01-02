@@ -123,11 +123,12 @@ export class RecipeService {
    */
   static async getRecipe(id: string, includeVariants: boolean = true): Promise<ApiResponse<any>> {
     try {
-      // Use the new /with-variants endpoint if variants are requested
-      let url = `/api/recipes/${id}`;
-      if (includeVariants) {
-        url += `?withVariants=1&activeOnly=true&page=1&limit=50`;
-      }
+      // Use the with-variants endpoint if variants are requested
+      const url = includeVariants
+        ? `/api/recipes/with-variants/${id}`
+        : `/api/recipes/${id}`;
+
+      console.log(`📖 Fetching recipe ${id} with includeVariants=${includeVariants} from ${url}`);
 
       const response = await fetch(url, {
         method: "GET",
@@ -143,7 +144,7 @@ export class RecipeService {
         };
       }
 
-      // The new endpoint returns: {status, message, result: {recipe, variants, count, page, limit}}
+      // The with-variants endpoint returns: {status, message, result: {recipe, variants, count, page, limit}}
       let recipe = data;
       let variants = [];
 
@@ -154,6 +155,8 @@ export class RecipeService {
         recipe = data.data.recipe || data.data;
         variants = data.data.variants || [];
       }
+
+      console.log(`✅ Recipe fetched successfully. Variants count: ${variants.length}`);
 
       return {
         success: true,
@@ -279,25 +282,31 @@ export class RecipeService {
   }
 
   /**
-   * Update existing recipe (variations handled separately)
+   * Update existing recipe with variants
    */
   static async updateRecipe(id: string, updates: Partial<Recipe>): Promise<ApiResponse<Recipe>> {
     try {
+      const isFinalRecipe = updates.type === "final";
       const hasVariations = updates.variations && updates.variations.length > 0;
 
-      // Remove variations from the update payload - they need to be handled separately
-      const { variations, ...recipeUpdates } = updates;
-
       console.log(`🔄 Updating recipe ${id}`, {
+        isFinalRecipe,
         hasVariations,
-        variationsCount: variations?.length || 0,
-        note: hasVariations ? "⚠️ Variations will not be saved (backend endpoint not implemented)" : undefined,
+        variationsCount: hasVariations ? updates.variations?.length : 0,
+        recipeType: updates.type,
       });
 
-      const response = await fetch(`/api/recipes/${id}`, {
+      // Always use with-variants endpoint for final recipes to ensure variants are properly handled
+      const endpoint = isFinalRecipe
+        ? `/api/recipes/with-variants/${id}`
+        : `/api/recipes/${id}`;
+
+      console.log(`📡 Using endpoint: ${endpoint}`);
+
+      const response = await fetch(endpoint, {
         method: "PUT",
         headers: buildHeaders(),
-        body: JSON.stringify(recipeUpdates),
+        body: JSON.stringify(updates),
       });
 
       const data = await response.json();
@@ -322,15 +331,10 @@ export class RecipeService {
         updatedRecipe = updatedRecipe.recipe;
       }
 
-      // Show warning if variations were provided but not saved
-      if (hasVariations) {
-        console.warn("⚠️ Recipe updated, but variations were not saved. Backend endpoint '/api/recipes/:id/with-variants' not implemented.");
-      }
-
       return {
         success: true,
         data: updatedRecipe,
-        message: data.message || "Recipe updated successfully" + (hasVariations ? " (variations not saved)" : ""),
+        message: data.message || "Recipe updated successfully",
       };
     } catch (error: any) {
       logError("Error updating recipe", error, {
@@ -340,6 +344,60 @@ export class RecipeService {
       return {
         success: false,
         message: error.message || "Failed to update recipe",
+      };
+    }
+  }
+
+  /**
+   * Update recipe with variants using the dedicated endpoint
+   */
+  static async updateRecipeWithVariants(id: string, updates: Partial<Recipe>): Promise<ApiResponse<Recipe>> {
+    try {
+      console.log(`🔄 Updating recipe with variants ${id}`, {
+        variationsCount: updates.variations?.length || 0,
+      });
+
+      const response = await fetch(`/api/recipes/with-variants/${id}`, {
+        method: "PUT",
+        headers: buildHeaders(),
+        body: JSON.stringify(updates),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to update recipe with variants",
+        };
+      }
+
+      // Handle different API response structures
+      let updatedRecipe = data;
+      if (data.result) {
+        updatedRecipe = data.result;
+      } else if (data.data) {
+        updatedRecipe = data.data;
+      }
+
+      // If the response has recipe property, extract just the recipe
+      if (updatedRecipe.recipe) {
+        updatedRecipe = updatedRecipe.recipe;
+      }
+
+      return {
+        success: true,
+        data: updatedRecipe,
+        message: data.message || "Recipe with variants updated successfully",
+      };
+    } catch (error: any) {
+      logError("Error updating recipe with variants", error, {
+        component: "RecipeService",
+        action: "updateRecipeWithVariants",
+      });
+      return {
+        success: false,
+        message: error.message || "Failed to update recipe with variants",
       };
     }
   }
