@@ -138,6 +138,15 @@ export default function RecipeModalNew({
   // Refs for auto-focus and scroll
   const ingredientRefs = React.useRef<{ [key: number]: HTMLInputElement | null }>({});
   const variantRefs = React.useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const recipesListRefs = React.useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  useEffect(() => {
+    const handleInitialResponsive = () => {
+      if (window.innerWidth < 1024) setInventoryExpanded(false);
+      if (window.innerWidth < 1280) setSubRecipesExpanded(false);
+    };
+    handleInitialResponsive();
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -322,7 +331,7 @@ export default function RecipeModalNew({
     const newVariant: RecipeVariantInline = {
       name: "",
       description: "",
-      type: "size",
+      type: "custom",
       sizeMultiplier: 1,
       baseCostAdjustment: 0,
       ingredients: [],
@@ -337,7 +346,7 @@ export default function RecipeModalNew({
       if (variantRef) {
         variantRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-    }, 100);
+    }, 150);
   };
 
   // Add standard size variants
@@ -361,11 +370,20 @@ export default function RecipeModalNew({
       ingredients: [],
       isActive: true,
     };
+    const newIndex = variants.length;
     setVariants([...variants, newVariant]);
     toast.success(`${sizeName} size added`, {
       duration: 2000,
       position: "top-right",
     });
+
+    // Auto-scroll to the new variant
+    setTimeout(() => {
+      const variantRef = variantRefs.current[newIndex];
+      if (variantRef) {
+        variantRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 150);
   };
 
   const handleUpdateVariant = (index: number, field: keyof RecipeVariantInline, value: any) => {
@@ -505,6 +523,14 @@ export default function RecipeModalNew({
       duration: 2000,
       position: "top-right",
     });
+
+    // Auto-scroll to the newly added recipe in the list
+    setTimeout(() => {
+      const recipeRef = recipesListRefs.current[newRecipe.id];
+      if (recipeRef) {
+        recipeRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 150);
   };
 
   const handleRemoveFromList = (id: string) => {
@@ -700,18 +726,24 @@ export default function RecipeModalNew({
   const renderTabContent = (recipeType: "sub" | "final") => (
     <div className="flex h-full w-full">
       {/* Left Panel - Inventory Items */}
-      <div className="w-72 flex flex-col border-r border-[#e5e5e5] shrink-0 bg-white">
+      <div className={cn(
+        "flex flex-col border-r border-[#d5d5dd] shrink-0 bg-white transition-all duration-300 overflow-hidden",
+        inventoryExpanded ? "w-[20%]" : "w-0 md:w-10 opacity-0 md:opacity-100"
+      )}>
         <div
-          className="flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f9fafb] border-b border-[#e5e5e5]"
+          className="flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f9fafb] border-b border-[#d5d5dd]"
           onClick={() => setInventoryExpanded(!inventoryExpanded)}
         >
-          <div className="flex items-center gap-2">
-            <Package className="h-4 w-4 text-[#6b7280]" />
-            <span className="text-[14px] font-semibold text-[#374151] uppercase leading-[14px]">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Package className="h-4 w-4 text-[#6b7280] shrink-0" />
+            <span className={cn(
+              "text-[14px] font-semibold text-[#374151] uppercase leading-[14px] truncate transition-opacity duration-200",
+              !inventoryExpanded && "opacity-0 md:hidden"
+            )}>
               Inventory Items
             </span>
             {filteredInventory.length > 0 && (
-              <span className="text-[10px] font-medium text-[#6b7280] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-[10px]">
+              <span className="text-[10px] font-medium text-[#6b7280] bg-white border border-[#d5d5dd] px-1.5 py-0.5 rounded leading-[10px]">
                 {filteredInventory.length}
               </span>
             )}
@@ -725,7 +757,7 @@ export default function RecipeModalNew({
 
         {inventoryExpanded && (
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="h-[41px] px-3 flex items-center bg-white relative border-b border-[#e5e5e5]">
+            <div className="h-[41px] px-3 flex items-center bg-white relative border-b border-[#d5d5dd]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9ca3af]" />
               <input
                 type="text"
@@ -755,7 +787,7 @@ export default function RecipeModalNew({
                       draggable={!isAdded}
                       onDragStart={() => !isAdded && handleInventoryDragStart(itemId)}
                       className={cn(
-                        "group relative flex items-center h-[41px] px-3 bg-white border-b border-[#e5e7eb] transition-all",
+                        "group relative flex items-center h-[41px] px-3 bg-white border-b border-[#d5d5dd] transition-all",
                         isAdded
                           ? "opacity-50 cursor-not-allowed"
                           : "cursor-grab active:cursor-grabbing hover:bg-[#e0f2fe]"
@@ -787,13 +819,32 @@ export default function RecipeModalNew({
       </div>
 
       {/* Center Panel - Recipe Form */}
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-white">
+      <div className="w-[60%] flex-1 flex flex-col overflow-hidden min-w-0 bg-white relative">
+        {/* Mobile Panel Toggles - Positioned at top-32 for better visibility and workflow */}
+        <div className="lg:hidden absolute left-0 top-32 z-40">
+          <button
+            onClick={() => setInventoryExpanded(!inventoryExpanded)}
+            className="p-1.5 bg-[#111827] text-white rounded-r-md shadow-lg hover:bg-[#1f2937] transition-colors"
+            title={inventoryExpanded ? "Collapse Inventory" : "Expand Inventory"}
+          >
+            <Package className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="xl:hidden absolute right-0 top-32 z-40">
+          <button
+            onClick={() => setSubRecipesExpanded(!subRecipesExpanded)}
+            className="p-1.5 bg-[#111827] text-white rounded-l-md shadow-lg hover:bg-[#1f2937] transition-colors"
+            title={subRecipesExpanded ? "Collapse Sub Recipes" : "Expand Sub Recipes"}
+          >
+            <Sparkles className="h-4 w-4" />
+          </button>
+        </div>
         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden m-0 p-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Saved Recipes List - Each as collapsible section */}
           {recipesList.map((recipe, recipeIndex) => (
-            <div key={recipe.id}>
+            <div key={recipe.id} ref={el => { recipesListRefs.current[recipe.id] = el; }}>
               <div
-                className="sticky top-0 z-20 flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f0fdf4] hover:bg-[#dcfce7] transition-colors border-b border-[#e5e5e5]"
+                className="sticky top-0 z-20 flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f0fdf4] hover:bg-[#dcfce7] transition-colors border-b border-[#d5d5dd]"
                 onClick={() => setActiveRecipeId(activeRecipeId === recipe.id ? null : recipe.id)}
               >
                 <div className="flex items-center gap-2">
@@ -841,7 +892,7 @@ export default function RecipeModalNew({
                 </div>
               </div>
               {activeRecipeId === recipe.id && (
-                <div className="p-4 bg-[#f9fafb] border-t border-[#e5e5e5]">
+                <div className="p-4 bg-[#f9fafb] border-t border-[#d5d5dd]">
                   <div className="text-xs text-[#6b7280] space-y-2">
                     {recipe.description && <p><span className="font-medium">Description:</span> {recipe.description}</p>}
                     <p><span className="font-medium">Yield:</span> {recipe.yield} portion(s)</p>
@@ -872,7 +923,7 @@ export default function RecipeModalNew({
 
           {/* Current Recipe Form - Collapsible Header */}
           <div
-            className="sticky top-0 z-20 flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f9fafb] border-b border-[#e5e5e5]"
+            className="sticky top-0 z-20 flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f9fafb] border-b border-[#d5d5dd]"
             onClick={() => setRecipeFormExpanded(!recipeFormExpanded)}
           >
             <div className="flex items-center gap-2">
@@ -989,23 +1040,21 @@ export default function RecipeModalNew({
                       if (draggedRecipe) handleRecipeDrop(e);
                     }}
                     className={cn(
-                      "rounded-sm border-2 border-dashed p-3 transition-all min-h-[160px]",
+                      "rounded-sm border-2 border-dashed transition-all hover:border-[#111827] hover:bg-gray-50 cursor-pointer",
                       recipeIngredients.length > 0
-                        ? "bg-[#f8f8fa] border-[#111827]"
-                        : "bg-[#f9fafb] border-[#d1d5db] hover:border-[#111827] hover:bg-gray-50"
+                        ? "bg-[#f8f8fa] border-[#d5d5dd] p-4"
+                        : "bg-[#f8f8fa] border-[#d5d5dd] px-12 py-16 text-center"
                     )}
                   >
                     {recipeIngredients.length === 0 ? (
-                      <div className="relative overflow-hidden rounded-sm border border-dashed border-[#d5d5dd] bg-[#f8f8fa] p-12 text-center transition-all">
-                        <div className="relative z-10">
-                          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#111827] shadow-lg">
-                            <UtensilsCrossed className="h-8 w-8 text-white" />
-                          </div>
-                          <h3 className="mb-2 text-lg font-bold text-[#111827]">No Ingredients Yet</h3>
-                          <p className="mx-auto max-w-sm text-sm text-[#656565]">
-                            Start building your recipe by dragging items from the side panels
-                          </p>
+                      <div className="relative z-10 flex flex-col items-center">
+                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#111827] shadow-lg">
+                          <Package className="h-8 w-8 text-white" />
                         </div>
+                        <h3 className="mb-2 text-lg font-bold text-[#111827]">No Ingredients Yet</h3>
+                        <p className="mx-auto max-w-sm text-sm text-[#656565]">
+                          Start building your recipe by dragging items from the <span className="font-semibold text-[#111827]">side panels</span>
+                        </p>
                       </div>
                     ) : (
                       <div className="space-y-3 p-1">
@@ -1073,91 +1122,47 @@ export default function RecipeModalNew({
 
                 {/* Variants Section - Only for Final Recipes */}
                 {recipeType === "final" && (
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Label className="text-sm font-medium text-[#374151]">Recipe Variants</Label>
-                        <CustomTooltip label="Add size, flavor, or crust variants" direction="right">
-                          <Info className="h-3.5 w-3.5 text-[#9ca3af] cursor-pointer" />
-                        </CustomTooltip>
-                        {variants.length > 0 && (
-                          <span className="text-[10px] font-semibold bg-[#111827] text-white px-2 py-0.5 rounded-full">
-                            {variants.length}
-                          </span>
-                        )}
-                      </div>
-                      <Button
-                        type="button"
-                        onClick={handleAddVariant}
-                        variant="outline"
-                        size="sm"
-                        className="h-8 px-3 text-xs border-[#e5e7eb]"
-                      >
-                        <Plus className="h-3.5 w-3.5 mr-1" />
-                        Custom
-                      </Button>
-                    </div>
-
-                    {/* Standard Size Buttons */}
-                    <div className="mb-4 p-4 rounded-sm border border-[#d5d5dd] bg-[#f8f8fa]">
-                      <Label className="text-[10px] font-bold text-[#656565] uppercase tracking-wider mb-3 block">
-                        Quick Add Sizes
-                      </Label>
-                      <div className="grid grid-cols-3 gap-3">
-                        <button
-                          type="button"
-                          onClick={() => handleAddStandardSize("Small", 1)}
-                          className="flex flex-col items-center gap-0.5 py-2 px-3 rounded-md border border-[#e5e7eb] bg-white hover:border-[#3b82f6] hover:bg-[#eff6ff] transition-all group"
-                        >
-                          <div className="text-xs font-semibold text-[#374151] group-hover:text-[#3b82f6]">Small</div>
-                          <div className="text-[10px] text-[#9ca3af] group-hover:text-[#3b82f6]">1x</div>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAddStandardSize("Medium", 1.5)}
-                          className="flex flex-col items-center gap-0.5 py-2 px-3 rounded-md border border-[#e5e7eb] bg-white hover:border-[#3b82f6] hover:bg-[#eff6ff] transition-all group"
-                        >
-                          <div className="text-xs font-semibold text-[#374151] group-hover:text-[#3b82f6]">Medium</div>
-                          <div className="text-[10px] text-[#9ca3af] group-hover:text-[#3b82f6]">1.5x</div>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAddStandardSize("Large", 2)}
-                          className="flex flex-col items-center gap-0.5 py-2 px-3 rounded-md border border-[#e5e7eb] bg-white hover:border-[#3b82f6] hover:bg-[#eff6ff] transition-all group"
-                        >
-                          <div className="text-xs font-semibold text-[#374151] group-hover:text-[#3b82f6]">Large</div>
-                          <div className="text-[10px] text-[#9ca3af] group-hover:text-[#3b82f6]">2x</div>
-                        </button>
-                      </div>
+                  <div className="mt-8">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Label className="text-sm font-medium text-[#374151]">Recipe Variants</Label>
+                      <CustomTooltip label="Add size, flavor, or crust variants" direction="right">
+                        <Info className="h-3.5 w-3.5 text-[#9ca3af] cursor-pointer" />
+                      </CustomTooltip>
+                      {variants.length > 0 && (
+                        <span className="text-[10px] font-semibold bg-[#111827] text-white px-2 py-0.5 rounded-full">
+                          {variants.length}
+                        </span>
+                      )}
                     </div>
 
                     {variants.length === 0 ? (
-                      <div className="relative overflow-hidden rounded-sm border border-dashed border-[#d5d5dd] bg-[#f8f8fa] p-12 text-center transition-all">
-                        <div className="relative z-10">
-                          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#111827] shadow-lg">
+                      <div className="relative overflow-hidden rounded-sm border-2 border-dashed border-[#d5d5dd] bg-[#f8f8fa] p-12 text-center transition-all mb-4 hover:border-[#111827] hover:bg-gray-50 cursor-pointer">
+                        <div className="relative z-10 flex flex-col items-center">
+                          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#111827] shadow-lg">
                             <Sparkles className="h-8 w-8 text-white" />
                           </div>
                           <h3 className="mb-2 text-lg font-bold text-[#111827]">No Variants Yet</h3>
                           <p className="mx-auto max-w-sm text-sm text-[#656565]">
-                            Use quick add or create a custom variant above
+                            Create standard sizes or a custom variant below to expand your menu
                           </p>
                         </div>
                       </div>
                     ) : (
-                      <div className="space-y-3 p-1">
+                      <div className="space-y-3 p-1 mb-6">
                         {variants.map((variant, index) => (
-                          <RecipeVariantInput
-                            key={index}
-                            variant={variant}
-                            index={index}
-                            ingredients={ingredients}
-                            availableRecipeOptions={availableRecipeOptions}
-                            onUpdate={handleUpdateVariant}
-                            onRemove={handleRemoveVariant}
-                            onIngredientUpdate={handleUpdateVariantIngredient}
-                            onIngredientRemove={handleRemoveVariantIngredient}
-                            onIngredientDrop={handleVariantIngredientDrop}
-                          />
+                          <div key={index} ref={el => { variantRefs.current[index] = el; }}>
+                            <RecipeVariantInput
+                              variant={variant}
+                              index={index}
+                              ingredients={ingredients}
+                              availableRecipeOptions={availableRecipeOptions}
+                              onUpdate={handleUpdateVariant}
+                              onRemove={handleRemoveVariant}
+                              onIngredientUpdate={handleUpdateVariantIngredient}
+                              onIngredientRemove={handleRemoveVariantIngredient}
+                              onIngredientDrop={handleVariantIngredientDrop}
+                            />
+                          </div>
                         ))}
                       </div>
                     )}
@@ -1167,39 +1172,93 @@ export default function RecipeModalNew({
             </div>
           )}
 
-        </div>
+          {/* Center Panel - Dynamic Action Slabs (Inline at end of scroll) */}
+          <div className="flex flex-col shrink-0 mt-4">
+            {/* Variant Creation Slabs - Only for Final Recipes */}
+            {recipeType === "final" && (
+              <div className="flex flex-col">
+                {/* Size Slabs Row */}
+                {(() => {
+                  const availableSizes = [
+                    { name: "Small", multiplier: 1 },
+                    { name: "Medium", multiplier: 1.5 },
+                    { name: "Large", multiplier: 2 }
+                  ].filter(size => !variants.some(v => v.name.toLowerCase() === size.name.toLowerCase()));
 
-        {/* Fixed Center Action Bar - Unified with container flow, top border only */}
-        {!editingItem && (
-          <Button
-            type="button"
-            onClick={handleAddToList}
-            variant="outline"
-            className={cn(
-              "shrink-0 w-full h-[41px] rounded-none border-t border-x-0 border-b-0 border-[#e5e7eb] bg-white text-[15px] font-medium transition-all duration-200 hover:bg-[#111827] hover:text-white hover:border-[#111827] text-[#374151]",
-              (!formData.name || recipeIngredients.length === 0) && "opacity-50 grayscale cursor-not-allowed"
+                  if (availableSizes.length === 0) return null;
+
+                  return (
+                    <div className="flex bg-white h-[41px] border-t border-[#d5d5dd]">
+                      {availableSizes.map(size => (
+                        <button
+                          key={size.name}
+                          type="button"
+                          onClick={() => handleAddStandardSize(size.name, size.multiplier)}
+                          className="flex-1 flex flex-col items-center justify-center border-r last:border-r-0 border-[#d5d5dd] hover:bg-[#111827] group transition-all"
+                        >
+                          <span className="text-[12px] font-bold text-[#111827] group-hover:text-white leading-none mb-0.5">
+                            {size.name}
+                          </span>
+                          <span className="text-[9px] font-medium text-[#656565] group-hover:text-gray-300 leading-none">
+                            {size.multiplier}x Yield
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })()}
+
+                <Button
+                  type="button"
+                  onClick={handleAddVariant}
+                  variant="outline"
+                  className="shrink-0 w-full h-[41px] rounded-none border-t border-x-0 border-b-0 border-[#d5d5dd] bg-white text-[15px] font-medium transition-all duration-200 hover:bg-[#111827] hover:text-white hover:border-[#111827] text-[#374151] group"
+                >
+                  <Plus className="h-4 w-4 mr-2 text-[#6b7280] group-hover:text-white transition-colors" />
+                  Add Custom Recipe Variant
+                </Button>
+              </div>
             )}
-            disabled={!formData.name || recipeIngredients.length === 0}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Another Recipe
-          </Button>
-        )}
+
+            {/* Core Action Slab */}
+            {!editingItem && (
+              <Button
+                type="button"
+                onClick={handleAddToList}
+                variant="outline"
+                className={cn(
+                  "shrink-0 w-full h-[41px] rounded-none border-t border-x-0 border-b-0 border-[#d5d5dd] bg-white text-[15px] font-medium transition-all duration-200 hover:bg-[#111827] hover:text-white hover:border-[#111827] text-[#374151]",
+                  (!formData.name || recipeIngredients.length === 0) && "opacity-50 grayscale cursor-not-allowed"
+                )}
+                disabled={!formData.name || recipeIngredients.length === 0}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Another Recipe
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Right Panel - Sub Recipes */}
-      <div className="w-72 flex flex-col shrink-0 border-l border-[#e5e5e5] bg-white">
+      <div className={cn(
+        "flex flex-col border-l border-[#d5d5dd] shrink-0 bg-white transition-all duration-300 overflow-hidden",
+        subRecipesExpanded ? "w-[20%]" : "w-0 md:w-10 opacity-0 md:opacity-100"
+      )}>
         <div
-          className="flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f9fafb] border-b border-[#e5e5e5]"
+          className="flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f9fafb] border-b border-[#d5d5dd]"
           onClick={() => setSubRecipesExpanded(!subRecipesExpanded)}
         >
-          <div className="flex items-center gap-2">
-            <ChefHat className="h-4 w-4 text-[#6b7280]" />
-            <span className="text-[14px] font-semibold text-[#374151] uppercase leading-[14px]">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <UtensilsCrossed className="h-4 w-4 text-[#6b7280] shrink-0" />
+            <span className={cn(
+              "text-[14px] font-semibold text-[#374151] uppercase leading-[14px] truncate transition-opacity duration-200",
+              !subRecipesExpanded && "opacity-0 md:hidden"
+            )}>
               Sub Recipes
             </span>
             {filteredRecipes.length > 0 && (
-              <span className="text-[10px] font-medium text-[#6b7280] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-[10px]">
+              <span className="text-[10px] font-medium text-[#6b7280] bg-white border border-[#d5d5dd] px-1.5 py-0.5 rounded leading-[10px]">
                 {filteredRecipes.length}
               </span>
             )}
@@ -1213,7 +1272,7 @@ export default function RecipeModalNew({
 
         {subRecipesExpanded && (
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="h-[41px] px-3 flex items-center bg-white relative border-b border-[#e5e5e5]">
+            <div className="h-[41px] px-3 flex items-center bg-white relative border-b border-[#d5d5dd]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9ca3af]" />
               <input
                 type="text"
@@ -1242,7 +1301,7 @@ export default function RecipeModalNew({
                       draggable={!isAdded}
                       onDragStart={() => !isAdded && handleRecipeDragStart(recipeId)}
                       className={cn(
-                        "group relative flex items-center h-[41px] px-3 bg-white border-b border-[#e5e7eb] transition-all",
+                        "group relative flex items-center h-[41px] px-3 bg-white border-b border-[#d5d5dd] transition-all",
                         isAdded
                           ? "opacity-50 cursor-not-allowed"
                           : "cursor-grab active:cursor-grabbing hover:bg-[#f3e8ff]"
@@ -1303,12 +1362,12 @@ export default function RecipeModalNew({
 
           <DialogBody className="flex-1 overflow-hidden px-8 pt-0 pb-2">
             <TabsContent value="final" className="mt-0 h-full data-[state=active]:flex">
-              <div className="flex-1 border border-[#e5e5e5] rounded-sm overflow-hidden">
+              <div className="flex-1 border border-[#d5d5dd] rounded-sm overflow-hidden">
                 {renderTabContent("final")}
               </div>
             </TabsContent>
             <TabsContent value="sub" className="mt-0 h-full data-[state=active]:flex">
-              <div className="flex-1 border border-[#e5e5e5] rounded-sm overflow-hidden">
+              <div className="flex-1 border border-[#d5d5dd] rounded-sm overflow-hidden">
                 {renderTabContent("sub")}
               </div>
             </TabsContent>
@@ -1333,7 +1392,7 @@ export default function RecipeModalNew({
           <Button
             onClick={onClose}
             variant="outline"
-            className="px-6 h-11 border-[#e5e7eb] text-[15px]"
+            className="px-6 h-11 border-[#d5d5dd] text-[15px]"
             disabled={loading || actionLoading}
           >
             Cancel
