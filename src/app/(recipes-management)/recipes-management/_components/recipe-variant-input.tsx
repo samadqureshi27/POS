@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Trash2, Plus, X, Info } from "lucide-react";
+import { Trash2, Plus, X, Info, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -189,10 +189,10 @@ export function RecipeVariantInput({
 
             <div
               className={cn(
-                "p-4 rounded-sm border-2 border-dashed transition-all",
+                "rounded-sm border-2 border-dashed transition-all hover:border-[#111827] hover:bg-gray-50 cursor-pointer",
                 variant.ingredients && variant.ingredients.length > 0
-                  ? "bg-[#f8f8fa] border-[#111827]"
-                  : "bg-[#f8f8fa] border-[#d5d5dd] hover:border-[#111827] hover:bg-gray-50"
+                  ? "bg-[#f8f8fa] border-[#d5d5dd] p-4"
+                  : "bg-[#f8f8fa] border-[#d5d5dd] p-8 text-center"
               )}
               onDragOver={(e) => {
                 e.preventDefault();
@@ -255,8 +255,14 @@ export function RecipeVariantInput({
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-4">
-                  <p className="text-xs text-[#656565] font-medium">Drop ingredients here</p>
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-sm bg-[#111827] shadow-md">
+                    <Package className="h-6 w-6 text-white" />
+                  </div>
+                  <h4 className="mb-1 text-sm font-bold text-[#111827]">No Ingredients Yet</h4>
+                  <p className="text-[11px] text-[#656565]">
+                    Drag items from the side panels
+                  </p>
                 </div>
               )}
             </div>

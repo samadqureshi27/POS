@@ -423,6 +423,60 @@ export class RecipeService {
   }
 
   /**
+   * Update recipe with variants using the dedicated endpoint
+   */
+  static async updateRecipeWithVariants(id: string, updates: Partial<Recipe>): Promise<ApiResponse<Recipe>> {
+    try {
+      console.log(`🔄 Updating recipe with variants ${id}`, {
+        variationsCount: updates.variations?.length || 0,
+      });
+
+      const response = await fetch(`/api/recipes/with-variants/${id}`, {
+        method: "PUT",
+        headers: buildHeaders(),
+        body: JSON.stringify(updates),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to update recipe with variants",
+        };
+      }
+
+      // Handle different API response structures
+      let updatedRecipe = data;
+      if (data.result) {
+        updatedRecipe = data.result;
+      } else if (data.data) {
+        updatedRecipe = data.data;
+      }
+
+      // If the response has recipe property, extract just the recipe
+      if (updatedRecipe.recipe) {
+        updatedRecipe = updatedRecipe.recipe;
+      }
+
+      return {
+        success: true,
+        data: updatedRecipe,
+        message: data.message || "Recipe with variants updated successfully",
+      };
+    } catch (error: any) {
+      logError("Error updating recipe with variants", error, {
+        component: "RecipeService",
+        action: "updateRecipeWithVariants",
+      });
+      return {
+        success: false,
+        message: error.message || "Failed to update recipe with variants",
+      };
+    }
+  }
+
+  /**
    * Delete recipe
    */
   static async deleteRecipe(id: string): Promise<ApiResponse<void>> {
