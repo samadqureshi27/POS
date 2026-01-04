@@ -1,6 +1,7 @@
 // Recipe Service
 import { buildHeaders } from "@/lib/util/service-helpers";
 import { logError } from "@/lib/util/logger";
+import { handleApiError, ParsedError } from "@/lib/util/error-handler";
 
 // Recipe Ingredient structure matching Postman API
 export interface RecipeIngredient {
@@ -54,6 +55,7 @@ export interface ApiResponse<T> {
   success: boolean;
   message?: string;
   data?: T;
+  error?: ParsedError;
 }
 
 export class RecipeService {
@@ -70,9 +72,14 @@ export class RecipeService {
       const data = await response.json();
 
       if (!response.ok) {
+        const parsedError = handleApiError(
+          { ...data, status: response.status },
+          'fetch recipes'
+        );
         return {
           success: false,
-          message: data.message || "Failed to fetch recipes",
+          message: parsedError.message,
+          error: parsedError,
         };
       }
 
@@ -107,13 +114,11 @@ export class RecipeService {
         data: recipes,
       };
     } catch (error: any) {
-      logError("Error fetching recipes", error, {
-        component: "RecipeService",
-        action: "listRecipes",
-      });
+      const parsedError = handleApiError(error, 'fetch recipes');
       return {
         success: false,
-        message: error.message || "Failed to fetch recipes",
+        message: parsedError.message,
+        error: parsedError,
       };
     }
   }
@@ -138,9 +143,14 @@ export class RecipeService {
       const data = await response.json();
 
       if (!response.ok) {
+        const parsedError = handleApiError(
+          { ...data, status: response.status },
+          'fetch recipe'
+        );
         return {
           success: false,
-          message: data.message || "Failed to fetch recipe",
+          message: parsedError.message,
+          error: parsedError,
         };
       }
 
@@ -166,13 +176,11 @@ export class RecipeService {
         },
       };
     } catch (error: any) {
-      logError("Error fetching recipe", error, {
-        component: "RecipeService",
-        action: "getRecipe",
-      });
+      const parsedError = handleApiError(error, 'fetch recipe');
       return {
         success: false,
-        message: error.message || "Failed to fetch recipe",
+        message: parsedError.message,
+        error: parsedError,
       };
     }
   }
@@ -195,9 +203,14 @@ export class RecipeService {
       const data = await response.json();
 
       if (!response.ok) {
+        const parsedError = handleApiError(
+          { ...data, status: response.status },
+          'create recipe'
+        );
         return {
           success: false,
-          message: data.message || "Failed to create recipe",
+          message: parsedError.message,
+          error: parsedError,
         };
       }
 
@@ -220,13 +233,11 @@ export class RecipeService {
         message: data.message || "Recipe created successfully",
       };
     } catch (error: any) {
-      logError("Error creating recipe", error, {
-        component: "RecipeService",
-        action: "createRecipe",
-      });
+      const parsedError = handleApiError(error, 'create recipe');
       return {
         success: false,
-        message: error.message || "Failed to create recipe",
+        message: parsedError.message,
+        error: parsedError,
       };
     }
   }
@@ -245,9 +256,14 @@ export class RecipeService {
       const data = await response.json();
 
       if (!response.ok) {
+        const parsedError = handleApiError(
+          { ...data, status: response.status },
+          'create recipe with variants'
+        );
         return {
           success: false,
-          message: data.message || "Failed to create recipe with variants",
+          message: parsedError.message,
+          error: parsedError,
         };
       }
 
@@ -270,13 +286,11 @@ export class RecipeService {
         message: data.message || "Recipe with variants created successfully",
       };
     } catch (error: any) {
-      logError("Error creating recipe with variants", error, {
-        component: "RecipeService",
-        action: "createRecipeWithVariants",
-      });
+      const parsedError = handleApiError(error, 'create recipe with variants');
       return {
         success: false,
-        message: error.message || "Failed to create recipe with variants",
+        message: parsedError.message,
+        error: parsedError,
       };
     }
   }
@@ -312,9 +326,14 @@ export class RecipeService {
       const data = await response.json();
 
       if (!response.ok) {
+        const parsedError = handleApiError(
+          { ...data, status: response.status },
+          'update recipe'
+        );
         return {
           success: false,
-          message: data.message || "Failed to update recipe",
+          message: parsedError.message,
+          error: parsedError,
         };
       }
 
@@ -337,13 +356,11 @@ export class RecipeService {
         message: data.message || "Recipe updated successfully",
       };
     } catch (error: any) {
-      logError("Error updating recipe", error, {
-        component: "RecipeService",
-        action: "updateRecipe",
-      });
+      const parsedError = handleApiError(error, 'update recipe');
       return {
         success: false,
-        message: error.message || "Failed to update recipe",
+        message: parsedError.message,
+        error: parsedError,
       };
     }
   }
@@ -366,9 +383,14 @@ export class RecipeService {
       const data = await response.json();
 
       if (!response.ok) {
+        const parsedError = handleApiError(
+          { ...data, status: response.status },
+          'update recipe with variants'
+        );
         return {
           success: false,
-          message: data.message || "Failed to update recipe with variants",
+          message: parsedError.message,
+          error: parsedError,
         };
       }
 
@@ -391,13 +413,11 @@ export class RecipeService {
         message: data.message || "Recipe with variants updated successfully",
       };
     } catch (error: any) {
-      logError("Error updating recipe with variants", error, {
-        component: "RecipeService",
-        action: "updateRecipeWithVariants",
-      });
+      const parsedError = handleApiError(error, 'update recipe with variants');
       return {
         success: false,
-        message: error.message || "Failed to update recipe with variants",
+        message: parsedError.message,
+        error: parsedError,
       };
     }
   }
@@ -415,9 +435,14 @@ export class RecipeService {
       const data = await response.json();
 
       if (!response.ok) {
+        const parsedError = handleApiError(
+          { ...data, status: response.status },
+          'delete recipe'
+        );
         return {
           success: false,
-          message: data.message || "Failed to delete recipe",
+          message: parsedError.message,
+          error: parsedError,
         };
       }
 
@@ -426,13 +451,11 @@ export class RecipeService {
         message: data.message || "Recipe deleted successfully",
       };
     } catch (error: any) {
-      logError("Error deleting recipe", error, {
-        component: "RecipeService",
-        action: "deleteRecipe",
-      });
+      const parsedError = handleApiError(error, 'delete recipe');
       return {
         success: false,
-        message: error.message || "Failed to delete recipe",
+        message: parsedError.message,
+        error: parsedError,
       };
     }
   }
