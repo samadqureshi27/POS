@@ -2,6 +2,7 @@
 
 import { buildHeaders } from "@/lib/util/service-helpers";
 import { logError } from "@/lib/util/logger";
+import { handleApiError, ParsedError } from "@/lib/util/error-handler";
 
 // ==================== Types ====================
 
@@ -60,6 +61,7 @@ export interface ApiResponse<T> {
   message?: string;
   data?: T;
   stats?: BranchInventoryStats;
+  error?: ParsedError;
 }
 
 // ==================== Configuration ====================
@@ -124,11 +126,12 @@ export const BranchInventoryService = {
       const stats = calculateStats(itemsResponse.data);
       return { success: true, data: stats };
     } catch (error: any) {
-      logError("Error getting branch inventory stats", error, {
-        component: "BranchInventoryService",
-        action: "getStats",
-      });
-      return { success: false, message: error.message };
+      const parsedError = handleApiError(error, 'getting branch inventory stats');
+      return {
+        success: false,
+        message: parsedError.message,
+        error: parsedError,
+      };
     }
   },
 
@@ -155,7 +158,15 @@ export const BranchInventoryService = {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        return { success: false, message: data?.message || `List items failed (${res.status})` };
+        const parsedError = handleApiError(
+          { ...data, status: res.status },
+          'list items'
+        );
+        return {
+          success: false,
+          message: parsedError.message,
+          error: parsedError,
+        };
       }
 
       let items: BranchInventoryItem[] = data?.items ?? data?.result ?? data?.data ?? [];
@@ -168,11 +179,12 @@ export const BranchInventoryService = {
 
       return { success: true, data: items };
     } catch (error: any) {
-      logError("Error listing branch inventory items", error, {
-        component: "BranchInventoryService",
-        action: "listItems",
-      });
-      return { success: false, message: error.message };
+      const parsedError = handleApiError(error, 'listing branch inventory items');
+      return {
+        success: false,
+        message: parsedError.message,
+        error: parsedError,
+      };
     }
   },
 
@@ -184,7 +196,15 @@ export const BranchInventoryService = {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        return { success: false, message: data?.message || `Get item failed (${res.status})` };
+        const parsedError = handleApiError(
+          { ...data, status: res.status },
+          'get item'
+        );
+        return {
+          success: false,
+          message: parsedError.message,
+          error: parsedError,
+        };
       }
 
       const item: BranchInventoryItem = data?.result ?? data?.data ?? data;
@@ -192,11 +212,12 @@ export const BranchInventoryService = {
 
       return { success: true, data: item };
     } catch (error: any) {
-      logError("Error getting branch inventory item", error, {
-        component: "BranchInventoryService",
-        action: "getItem",
-      });
-      return { success: false, message: error.message };
+      const parsedError = handleApiError(error, 'getting branch inventory item');
+      return {
+        success: false,
+        message: parsedError.message,
+        error: parsedError,
+      };
     }
   },
 
@@ -230,7 +251,15 @@ export const BranchInventoryService = {
 
       if (!res.ok) {
         console.error("❌ API Error Response:", data);
-        return { success: false, message: data?.message || data?.error?.message || `Create item failed (${res.status})` };
+        const parsedError = handleApiError(
+          { ...data, status: res.status },
+          'create item'
+        );
+        return {
+          success: false,
+          message: parsedError.message,
+          error: parsedError,
+        };
       }
 
       console.log("✅ Successfully created branch inventory item:", data);
@@ -253,11 +282,12 @@ export const BranchInventoryService = {
 
       return { success: true, data: item };
     } catch (error: any) {
-      logError("Error creating branch inventory item", error, {
-        component: "BranchInventoryService",
-        action: "createItem",
-      });
-      return { success: false, message: error.message };
+      const parsedError = handleApiError(error, 'creating branch inventory item');
+      return {
+        success: false,
+        message: parsedError.message,
+        error: parsedError,
+      };
     }
   },
 
@@ -283,7 +313,15 @@ export const BranchInventoryService = {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        return { success: false, message: data?.message || `Update item failed (${res.status})` };
+        const parsedError = handleApiError(
+          { ...data, status: res.status },
+          'update item'
+        );
+        return {
+          success: false,
+          message: parsedError.message,
+          error: parsedError,
+        };
       }
 
       const item: BranchInventoryItem = data?.result ?? data?.data ?? data;
@@ -291,11 +329,12 @@ export const BranchInventoryService = {
 
       return { success: true, data: item };
     } catch (error: any) {
-      logError("Error updating branch inventory item", error, {
-        component: "BranchInventoryService",
-        action: "updateItem",
-      });
-      return { success: false, message: error.message };
+      const parsedError = handleApiError(error, 'updating branch inventory item');
+      return {
+        success: false,
+        message: parsedError.message,
+        error: parsedError,
+      };
     }
   },
 
@@ -307,16 +346,25 @@ export const BranchInventoryService = {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        return { success: false, message: data?.message || `Delete item failed (${res.status})` };
+        const parsedError = handleApiError(
+          { ...data, status: res.status },
+          'delete item'
+        );
+        return {
+          success: false,
+          message: parsedError.message,
+          error: parsedError,
+        };
       }
 
       return { success: true, data: null };
     } catch (error: any) {
-      logError("Error deleting branch inventory item", error, {
-        component: "BranchInventoryService",
-        action: "deleteItem",
-      });
-      return { success: false, message: error.message };
+      const parsedError = handleApiError(error, 'deleting branch inventory item');
+      return {
+        success: false,
+        message: parsedError.message,
+        error: parsedError,
+      };
     }
   },
 };

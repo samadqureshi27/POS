@@ -50,6 +50,9 @@ export interface ResponsiveGridProps<T> {
   // Actions
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  onArchive?: (item: T) => void;  // Archive action (preferred over delete)
+  onRestore?: (item: T) => void;  // Restore archived items
+  getItemStatus?: (item: T) => boolean;  // Function to check if item is active (default: true)
   customActions?: (item: T) => ReactNode;
   showActions?: boolean;
 
@@ -78,6 +81,9 @@ export default function ResponsiveGrid<T>({
   columns = [],
   onEdit,
   onDelete,
+  onArchive,
+  onRestore,
+  getItemStatus,
   customActions,
   showActions = true,
   className = "",
@@ -119,7 +125,10 @@ export default function ResponsiveGrid<T>({
     }
 
     const actions: GridActionButton[] = [];
-    
+
+    // Check if item is active (default to true if no status checker provided)
+    const isActive = getItemStatus ? getItemStatus(item) : true;
+
     if (onEdit) {
       actions.push({
         label: "Edit",
@@ -127,8 +136,33 @@ export default function ResponsiveGrid<T>({
         variant: "edit",
       });
     }
-    
-    if (onDelete) {
+
+    // Show Archive or Restore based on item status
+    if (onArchive && onRestore) {
+      if (isActive) {
+        // Item is active, show Archive button
+        actions.push({
+          label: "Archive",
+          onClick: () => onArchive(item),
+          variant: "delete",
+        });
+      } else {
+        // Item is archived, show Restore button
+        actions.push({
+          label: "Restore",
+          onClick: () => onRestore(item),
+          variant: "edit",  // Use edit (green) styling for restore
+        });
+      }
+    } else if (onArchive) {
+      // Only archive provided
+      actions.push({
+        label: "Archive",
+        onClick: () => onArchive(item),
+        variant: "delete",
+      });
+    } else if (onDelete) {
+      // Fallback to delete
       actions.push({
         label: "Delete",
         onClick: () => onDelete(item),
@@ -157,7 +191,7 @@ export default function ResponsiveGrid<T>({
                       {column.header}
                     </th>
                   ))}
-                  {showActions && (onEdit || onDelete || customActions) && (
+                  {showActions && (onEdit || onDelete || onArchive || onRestore || customActions) && (
                     <th className="px-6 py-3 text-right text-[10px] font-bold text-gray-500 uppercase tracking-wider w-24">
                       ACTIONS
                     </th>
@@ -177,7 +211,7 @@ export default function ResponsiveGrid<T>({
                           : String((item as any)[column.key] || "—")}
                       </td>
                     ))}
-                    {showActions && (onEdit || onDelete || customActions) && (
+                    {showActions && (onEdit || onDelete || onArchive || onRestore || customActions) && (
                       <td className="px-6 py-3 text-right w-24 whitespace-nowrap">
                         {renderActions(item)}
                       </td>
