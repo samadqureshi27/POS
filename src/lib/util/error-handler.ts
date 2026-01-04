@@ -97,50 +97,70 @@ export function parseApiError(error: any, fallbackMessage: string = 'An unexpect
 
 /**
  * Convert technical error messages to user-friendly ones
+ * IMPORTANT: Preserve backend messages as they are already user-friendly
  */
 function getUserFriendlyMessage(message: string, type: ParsedError['type']): string {
-  const lowerMessage = message.toLowerCase();
+  // If message is already meaningful (not technical), return it as-is
+  // Backend messages should be shown directly to users
+  if (message && message.length > 0) {
+    const lowerMessage = message.toLowerCase();
 
-  // Common error patterns and their user-friendly alternatives
+    // Only convert very technical/generic messages
+    const technicalPatterns = [
+      'internal server error',
+      '500',
+      '502',
+      '503',
+      '504',
+      'fetch failed',
+      'network request failed',
+      'typeerror',
+      'referenceerror',
+    ];
+
+    const isTechnical = technicalPatterns.some(pattern =>
+      lowerMessage.includes(pattern)
+    );
+
+    // If not technical, return the backend message as-is
+    if (!isTechnical) {
+      return message;
+    }
+  }
+
+  // Only apply friendly messages for technical/generic errors
+  const lowerMessage = (message || '').toLowerCase();
+
+  // Network and technical error mappings only
   const errorMappings: Record<string, string> = {
     'route not found': 'The requested feature is currently unavailable.',
     'unauthorized': 'You need to log in to perform this action.',
     'forbidden': 'You don\'t have permission to perform this action.',
-    'not found': 'The requested item could not be found.',
     'network error': 'Connection to the server was lost. Please try again.',
     'timeout': 'The request took too long. Please try again.',
     'internal server error': 'A server error occurred. Our team has been notified.',
-    'bad request': 'The request contains invalid data. Please check your input.',
-    'duplicate': 'This item already exists.',
-    'invalid': 'The provided information is invalid.',
-    'required': 'Required information is missing.',
-    'validation failed': 'Please check the form for errors.',
-    'conflict': 'This action conflicts with existing data.',
+    'fetch failed': 'Connection to the server failed. Please check your internet.',
   };
 
-  // Check if message matches any known pattern
+  // Check if message matches any technical pattern
   for (const [pattern, friendly] of Object.entries(errorMappings)) {
     if (lowerMessage.includes(pattern)) {
       return friendly;
     }
   }
 
-  // Type-specific defaults
+  // Type-specific defaults for empty/technical messages
   switch (type) {
-    case 'validation':
-      return 'Please correct the highlighted errors and try again.';
     case 'authentication':
       return 'Please log in to continue.';
     case 'authorization':
       return 'You don\'t have permission to perform this action.';
-    case 'not_found':
-      return 'The requested resource was not found.';
     case 'network':
       return 'Network connection failed. Please check your internet.';
     case 'server':
       return 'A server error occurred. Please try again later.';
     default:
-      // Return the original message if no mapping found
+      // Return the original message (backend message should be preserved)
       return message || 'An unexpected error occurred.';
   }
 }

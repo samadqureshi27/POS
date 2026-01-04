@@ -140,7 +140,7 @@ export const useRecipeData = () => {
     );
 
     const recipeIdsToDelete = recipesToDelete.map(recipe => recipe._id || recipe.ID.toString());
-    return hook.delete(recipeIdsToDelete as any);
+    return hook.deleteItems(recipeIdsToDelete as any);
   };
 
   // Single recipe delete

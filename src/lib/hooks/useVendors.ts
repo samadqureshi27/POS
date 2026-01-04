@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { VendorAPI } from "../util/vendor-api";
 import { useSelection } from "./selection";
-import { useToast } from './toast';
+import { Toast } from "@/lib/util/toast-helpers";
 import { useVendorModal } from "./vendorModal";
 import { VendorItem, VendorFormData } from "@/lib/types/vendors";
 import { logError } from "@/lib/util/logger";
@@ -13,7 +13,7 @@ export const useVendorManagement = (branchId: number) => {
     const [actionLoading, setActionLoading] = useState(false);
 
     // Custom hooks
-    const { toast, toastVisible, showToast, hideToast } = useToast();
+    
     const {
         selectedItems,
         handleSelectAll,
@@ -36,7 +36,7 @@ export const useVendorManagement = (branchId: number) => {
     // Load vendor items
     const loadVendorItems = async () => {
         if (!branchId) {
-            showToast("Branch ID not found", "error");
+            Toast.error("Branch ID not found");
             setLoading(false);
             return;
         }
@@ -55,7 +55,7 @@ export const useVendorManagement = (branchId: number) => {
                 action: "loadVendorItems",
                 branchId,
             });
-            showToast("Failed to load vendor items", "error");
+            Toast.error("Failed to load vendor items");
         } finally {
             setLoading(false);
         }
@@ -84,7 +84,7 @@ export const useVendorManagement = (branchId: number) => {
                 await loadVendorItems();
                 closeModal();
                 setSearchTerm("");
-                showToast(response.message || "Vendor created successfully", "success");
+                Toast.success(response.message || "Vendor created successfully");
             }
         } catch (error) {
             logError("Error creating vendor", error, {
@@ -93,7 +93,7 @@ export const useVendorManagement = (branchId: number) => {
                 branchId,
                 companyName: itemData.Company_Name,
             });
-            showToast("Failed to create vendor", "error");
+            Toast.error("Failed to create vendor");
         } finally {
             setActionLoading(false);
         }
@@ -116,10 +116,10 @@ export const useVendorManagement = (branchId: number) => {
                     )
                 );
                 closeModal();
-                showToast(response.message || "Vendor updated successfully", "success");
+                Toast.success(response.message || "Vendor updated successfully");
             }
         } catch (error) {
-            showToast("Failed to update vendor", "error");
+            Toast.error("Failed to update vendor");
         } finally {
             setActionLoading(false);
         }
@@ -134,10 +134,10 @@ export const useVendorManagement = (branchId: number) => {
             if (response.success) {
                 await loadVendorItems();
                 clearSelection();
-                showToast(response.message || "Vendor items deleted successfully", "success");
+                Toast.success(response.message || "Vendor items deleted successfully");
             }
         } catch (error) {
-            showToast("Failed to delete vendor items", "error");
+            Toast.error("Failed to delete vendor items");
         } finally {
             setActionLoading(false);
         }
@@ -146,7 +146,7 @@ export const useVendorManagement = (branchId: number) => {
     // Modal submit handler
     const handleModalSubmit = () => {
         if (!formData.Company_Name.trim() || !formData.Name.trim()) {
-            showToast("Please fill in all required fields", "error");
+            Toast.error("Please fill in all required fields");
             return;
         }
         
@@ -176,12 +176,6 @@ export const useVendorManagement = (branchId: number) => {
         loading,
         actionLoading,
         statistics,
-
-        // Toast
-        toast,
-        toastVisible,
-        hideToast,
-
         // Selection
         selectedItems,
         isAllSelected,

@@ -1,7 +1,7 @@
 // components/login/EmailVerificationOverlay.tsx
 "use client";
+import { Toast } from "@/lib/util/toast-helpers";
 import React from "react";
-import { toast } from "sonner";
 import { User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,7 +54,7 @@ const EmailVerificationOverlay: React.FC = () => {
   const handleResendEmail = async () => {
     // Note: The reset email is stored in the context
     // You can add a resend API call here if needed
-    toast.success("Reset email has been resent!");
+    Toast.success("Reset email has been resent!");
   };
 
   if (!showVerification) return null;

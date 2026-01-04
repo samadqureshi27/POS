@@ -1,8 +1,8 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
 import { Loader2, GripVertical, UtensilsCrossed, BookOpen, X, Search, Plus, Upload, Image as ImageIcon } from "lucide-react";
-import { toast } from "sonner";
 import { RecipeService } from "@/lib/services/recipe-service";
 import { MenuVariationsService } from "@/lib/services/menu-variations-service";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
@@ -318,12 +318,12 @@ export default function MenuItemModalNew({
     console.log("🟡 selectedVariations at start:", selectedVariations);
 
     if (!formData.name || !formData.categoryId) {
-      toast.error("Please fill in all required fields (Name, Category)");
+      Toast.error("Please fill in all required fields (Name, Category);");
       return;
     }
 
     if (!formData.pricing?.basePrice || formData.pricing.basePrice <= 0) {
-      toast.error("Please enter a valid price");
+      Toast.error("Please enter a valid price");
       return;
     }
 
@@ -335,7 +335,7 @@ export default function MenuItemModalNew({
         : undefined;
 
       if (!categoryId) {
-        toast.error("Category is required");
+        Toast.error("Category is required");
         return;
       }
 
@@ -443,10 +443,10 @@ export default function MenuItemModalNew({
       console.log(`🔵 Finished posting variations - Success: ${successCount}, Failed: ${failCount}`);
 
       if (successCount > 0) {
-        toast.success(`${successCount} variation(s) added successfully`);
+        Toast.success(`${successCount} variation(s); added successfully`);
       }
       if (failCount > 0) {
-        toast.error(`${failCount} variation(s) failed to add`);
+        Toast.error(`${failCount} variation(s); failed to add`);
       }
     } catch (error) {
       console.log("❌ Error in postMenuVariations:", error);
@@ -455,7 +455,7 @@ export default function MenuItemModalNew({
         action: "postMenuVariations",
         menuItemId,
       });
-      toast.error("Failed to add some variations");
+      Toast.error("Failed to add some variations");
     }
   };
 
@@ -795,7 +795,7 @@ export default function MenuItemModalNew({
                       type="button"
                       variant="outline"
                       className="h-14 px-4"
-                      onClick={() => toast.info("File upload will be implemented soon")}
+                      onClick={() => Toast.info("File upload will be implemented soon")}
                     >
                       <Upload className="h-4 w-4" />
                     </Button>

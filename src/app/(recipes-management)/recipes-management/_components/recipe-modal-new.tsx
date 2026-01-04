@@ -1,5 +1,7 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
+
 import React, { useState, useEffect, useMemo } from "react";
 import { Loader2, Plus, X, Search, UtensilsCrossed, Sparkles, Package, ChefHat, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
@@ -12,9 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { showErrorToast, showSuccessToast } from "@/lib/util/toast-helpers";
 import { RecipeVariantInput } from "./recipe-variant-input";
+import { InventoryService } from "@/lib/services/inventory-service";
 
 // API Recipe structure
 interface RecipeIngredient {
@@ -70,7 +71,7 @@ interface InventoryItem {
   name?: string;
   Unit?: string;
   baseUnit?: string;
-  type?: "stock" | "service";
+  type?: "stock" | "nonstock" | "service";
   quantity?: number;
   reorderPoint?: number;
   sku?: string;
@@ -100,6 +101,13 @@ export default function RecipeModalNew({
   const [loading, setLoading] = useState(false);
   const [addingToList, setAddingToList] = useState(false);
   const [localSubRecipes, setLocalSubRecipes] = useState<any[]>([]);
+
+  // Infinite scroll states for inventory
+  const [localInventory, setLocalInventory] = useState<InventoryItem[]>([]);
+  const [inventoryPage, setInventoryPage] = useState(1);
+  const [inventoryHasMore, setInventoryHasMore] = useState(true);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
+  const inventoryScrollRef = React.useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<Partial<Recipe>>({
     name: "",
@@ -153,6 +161,88 @@ export default function RecipeModalNew({
     handleInitialResponsive();
   }, []);
 
+  // Fetch inventory with pagination
+  const fetchInventory = React.useCallback(async (page: number, searchQuery: string = "", reset: boolean = false) => {
+    if (inventoryLoading) return;
+
+    setInventoryLoading(true);
+    try {
+      const ITEMS_PER_PAGE = 50;
+      const response = await InventoryService.listItems({
+        page,
+        limit: ITEMS_PER_PAGE,
+        q: searchQuery,
+      });
+
+      if (response.success && response.data) {
+        const newItems = response.data;
+
+        if (reset) {
+          setLocalInventory(newItems);
+        } else {
+          setLocalInventory(prev => [...prev, ...newItems]);
+        }
+
+        // If we got fewer items than requested, we've reached the end
+        setInventoryHasMore(newItems.length >= ITEMS_PER_PAGE);
+      } else {
+        console.error('Failed to fetch inventory:', response.message);
+        if (reset) {
+          setLocalInventory([]);
+        }
+        setInventoryHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error fetching inventory:', error);
+      if (reset) {
+        setLocalInventory([]);
+      }
+      setInventoryHasMore(false);
+    } finally {
+      setInventoryLoading(false);
+    }
+  }, [inventoryLoading]);
+
+  // Initial load when modal opens or panel expands
+  useEffect(() => {
+    if (isOpen && inventoryExpanded && localInventory.length === 0) {
+      console.log('📦 Initial inventory load...');
+      setInventoryPage(1);
+      setInventoryHasMore(true);
+      fetchInventory(1, inventorySearch, true);
+    }
+  }, [isOpen, inventoryExpanded]);
+
+  // Handle search changes with debounce
+  useEffect(() => {
+    if (!isOpen || !inventoryExpanded) return;
+
+    const debounceTimer = setTimeout(() => {
+      console.log('🔍 Inventory search changed:', inventorySearch);
+      setInventoryPage(1);
+      setInventoryHasMore(true);
+      fetchInventory(1, inventorySearch, true);
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [inventorySearch]);
+
+  // Infinite scroll handler
+  const handleInventoryScroll = React.useCallback(() => {
+    const scrollContainer = inventoryScrollRef.current;
+    if (!scrollContainer || inventoryLoading || !inventoryHasMore) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+    const scrollThreshold = 200; // pixels from bottom
+
+    if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
+      const nextPage = inventoryPage + 1;
+      console.log('📜 Loading more inventory, page:', nextPage);
+      setInventoryPage(nextPage);
+      fetchInventory(nextPage, inventorySearch, false);
+    }
+  }, [inventoryLoading, inventoryHasMore, inventoryPage, inventorySearch, fetchInventory]);
+
   useEffect(() => {
     if (isOpen) {
       // Refresh recipes when modal opens to get latest sub recipes
@@ -194,6 +284,12 @@ export default function RecipeModalNew({
       setActiveRecipeId(null);
       setRecipeFormExpanded(true);
       setLocalSubRecipes([]);
+      // Reset inventory when modal closes
+      if (!isOpen) {
+        setLocalInventory([]);
+        setInventoryPage(1);
+        setInventoryHasMore(true);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, editingItem]);
@@ -215,7 +311,9 @@ export default function RecipeModalNew({
     e.preventDefault();
     if (!draggedInventory) return;
 
-    const item = ingredients.find(
+    // Search in both passed ingredients and locally fetched inventory
+    const allInventory = [...ingredients, ...localInventory];
+    const item = allInventory.find(
       (inv) => String(inv._id || inv.id || inv.ID) === draggedInventory
     );
 
@@ -227,7 +325,7 @@ export default function RecipeModalNew({
       // Check if already added
       const exists = recipeIngredients.some(ing => ing.sourceId === itemId);
       if (exists) {
-        showErrorToast("This item is already added to ingredients", "Duplicate item");
+        Toast.error("This item is already added to ingredients");
         setDraggedInventory(null);
         return;
       }
@@ -253,7 +351,7 @@ export default function RecipeModalNew({
         }
       }, 100);
 
-      showSuccessToast(`Added ${itemName} to ingredients`, { duration: 2000 });
+      Toast.success(`Added ${itemName} to ingredients`, { duration: 2000 });
     }
 
     setDraggedInventory(null);
@@ -292,7 +390,7 @@ export default function RecipeModalNew({
       // Check if already added
       const exists = recipeIngredients.some(ing => ing.sourceId === recipeId);
       if (exists) {
-        showErrorToast("This recipe is already added to ingredients", "Duplicate recipe");
+        Toast.error("This recipe is already added to ingredients");
         setDraggedRecipe(null);
         return;
       }
@@ -318,7 +416,7 @@ export default function RecipeModalNew({
         }
       }, 100);
 
-      showSuccessToast(`Added ${recipeName} to ingredients`, { duration: 2000 });
+      Toast.success(`Added ${recipeName} to ingredients`, { duration: 2000 });
     } else {
       console.warn('⚠️ Recipe not found for drop:', draggedRecipe);
     }
@@ -365,7 +463,7 @@ export default function RecipeModalNew({
     // Check if size already exists
     const exists = variants.some(v => v.name.toLowerCase() === sizeName.toLowerCase() && v.type === "size");
     if (exists) {
-      showErrorToast(`${sizeName} size variant already exists`, "Duplicate variant");
+      Toast.error(`${sizeName} size variant already exists`);
       return;
     }
 
@@ -380,8 +478,8 @@ export default function RecipeModalNew({
     };
     const newIndex = variants.length;
     setVariants([...variants, newVariant]);
-    showSuccessToast(`${sizeName} size added`, { duration: 2000 });
-    toast.success(`${sizeName} size added`, {
+    Toast.success(`${sizeName} size added`, { duration: 2000 });
+    Toast.success(`${sizeName} size added`, {
       duration: 2000,
       position: "top-right",
     });
@@ -427,7 +525,9 @@ export default function RecipeModalNew({
     let itemName = "";
 
     if (draggedInventory) {
-      const item = ingredients.find(
+      // Search in both passed ingredients and locally fetched inventory
+      const allInventory = [...ingredients, ...localInventory];
+      const item = allInventory.find(
         (inv) => String(inv._id || inv.id || inv.ID) === draggedInventory
       );
       if (item) {
@@ -464,7 +564,7 @@ export default function RecipeModalNew({
       const existingIngredients = variant.ingredients || [];
 
       if (existingIngredients.some(ing => ing.sourceId === itemToAdd!.sourceId)) {
-        showErrorToast(`${itemName} is already added to this variant`, "Duplicate item");
+        Toast.error(`${itemName} is already added to this variant`);
         return;
       }
 
@@ -473,7 +573,7 @@ export default function RecipeModalNew({
         ingredients: [...existingIngredients, itemToAdd]
       };
       setVariants(updatedVariants);
-      showSuccessToast(`Added ${itemName} to ${variant.name || `Variant ${vIndex + 1}`}`, { duration: 2000 });
+      Toast.success(`Added ${itemName} to ${variant.name || `Variant ${vIndex + 1}`}`, { duration: 2000 });
     }
 
     setDraggedInventory(null);
@@ -483,12 +583,12 @@ export default function RecipeModalNew({
   // Bulk recipe management
   const handleAddToList = async () => {
     if (!formData.name) {
-      showErrorToast("Please enter a recipe name before adding to list", "Validation error");
+      Toast.error("Please enter a recipe name before adding to list");
       return;
     }
 
     if (recipeIngredients.length === 0) {
-      showErrorToast("Please add at least one ingredient before adding to list", "Validation error");
+      Toast.error("Please add at least one ingredient before adding to list");
       return;
     }
 
@@ -530,7 +630,7 @@ export default function RecipeModalNew({
         console.log('🔍 Sub Recipe Creation Result:', result);
 
         if (result.success) {
-          showSuccessToast(`"${newRecipe.name}" created successfully`, {
+          Toast.success(`"${newRecipe.name}" created successfully`, {
             duration: 2000,
           });
 
@@ -600,17 +700,13 @@ export default function RecipeModalNew({
           setRecipeIngredients([]);
           setVariants([]);
         } else {
-          showErrorToast(
-            result.error || result.message || "Failed to create sub recipe",
-            "Failed to create sub recipe"
+          Toast.error(
+            result.error || result.message || "Failed to create sub recipe"
           );
         }
       } catch (error) {
         console.error('Error creating sub recipe:', error);
-        showErrorToast(
-          error,
-          "Failed to create sub recipe"
-        );
+        Toast.error(error);
       } finally {
         setAddingToList(false);
       }
@@ -631,9 +727,9 @@ export default function RecipeModalNew({
       setRecipeIngredients([]);
       setVariants([]);
 
-      showSuccessToast(`"${newRecipe.name}" added to list`, { duration: 2000 });
+      Toast.success(`"${newRecipe.name}" added to list`, { duration: 2000 });
     }
-    toast.success(`"${newRecipe.name}" added to list`, {
+    Toast.success(`"${newRecipe.name}" added to list`, {
       duration: 2000,
       position: "top-right",
     });
@@ -651,7 +747,7 @@ export default function RecipeModalNew({
     const recipe = recipesList.find(r => r.id === id);
     setRecipesList(recipesList.filter(r => r.id !== id));
     if (recipe) {
-      showSuccessToast(`"${recipe.name}" removed from list`, { duration: 2000 });
+      Toast.success(`"${recipe.name}" removed from list`, { duration: 2000 });
     }
   };
 
@@ -698,12 +794,12 @@ export default function RecipeModalNew({
 
     if (hasCurrentFormContent) {
       if (!formData.name) {
-        showErrorToast("Please enter a recipe name", "Validation error", { duration: 5000 });
+        Toast.error("Please enter a recipe name", { duration: 5000 });
         return;
       }
 
       if (recipeIngredients.length === 0) {
-        showErrorToast("Please add at least one ingredient", "Validation error", { duration: 5000 });
+        Toast.error("Please add at least one ingredient", { duration: 5000 });
         return;
       }
 
@@ -712,21 +808,13 @@ export default function RecipeModalNew({
       );
 
       if (invalidIngredients.length > 0) {
-        showErrorToast(
-          `Current recipe has ${invalidIngredients.length} ingredient(s) with missing information`,
-          "Validation error",
-          { duration: 5000 }
-        );
+        Toast.error(`Current recipe has ${invalidIngredients.length} ingredient(s) with missing information`, { duration: 5000 });
         return;
       }
 
       const invalidVariants = variants.filter((v) => !v.name || !v.type);
       if (invalidVariants.length > 0) {
-        showErrorToast(
-          `Current recipe has ${invalidVariants.length} variant(s) missing required fields`,
-          "Validation error",
-          { duration: 5000 }
-        );
+        Toast.error(`Current recipe has ${invalidVariants.length} variant(s) missing required fields`, { duration: 5000 });
         return;
       }
 
@@ -745,11 +833,7 @@ export default function RecipeModalNew({
 
     // 2. Logic Check: What are we actually submitting?
     if (finalRecipesToSubmit.length === 0 && !isEditingMode) {
-      showErrorToast(
-        "No recipes to submit. Add ingredients to create a recipe.",
-        "Validation error",
-        { duration: 5000 }
-      );
+      Toast.error("No recipes to submit. Add ingredients to create a recipe.", { duration: 5000 });
       return;
     }
 
@@ -820,23 +904,19 @@ export default function RecipeModalNew({
       }
 
       if (finalRecipesToSubmit.length > 1) {
-        showSuccessToast(`Successfully created ${finalRecipesToSubmit.length} recipes`, { duration: 3000 });
+        Toast.success(`Successfully created ${finalRecipesToSubmit.length} recipes`, { duration: 3000 });
       }
     } catch (error) {
       console.error('Submit error:', error);
-      showErrorToast(error, "Some recipes failed to save", { duration: 5000 });
+      Toast.error(error, { duration: 5000 });
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter inventory and recipes
-  const filteredInventory = ingredients.filter((item) => {
-    const name = (item.Name || item.name || "").toLowerCase();
-    const sku = (item.sku || "").toLowerCase();
-    const search = inventorySearch.toLowerCase();
-    return name.includes(search) || sku.includes(search);
-  });
+  // Use localInventory (fetched with pagination) instead of passed ingredients
+  // The search filtering is done server-side in the fetchInventory function
+  const filteredInventory = localInventory;
 
   // Merge available recipes with locally created sub recipes
   const allSubRecipes = useMemo(() => {
@@ -942,14 +1022,25 @@ export default function RecipeModalNew({
               />
             </div>
 
-            <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {filteredInventory.length === 0 ? (
+            <div
+              ref={inventoryScrollRef}
+              onScroll={handleInventoryScroll}
+              className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {inventoryLoading && filteredInventory.length === 0 ? (
+                <div className="text-center py-8">
+                  <Loader2 className="h-10 w-10 text-[#9ca3af] mx-auto mb-2 animate-spin" />
+                  <p className="text-sm text-[#9ca3af]">Loading inventory...</p>
+                </div>
+              ) : filteredInventory.length === 0 ? (
                 <div className="text-center py-8">
                   <Package className="h-10 w-10 text-[#d1d5db] mx-auto mb-2" />
                   <p className="text-sm text-[#9ca3af]">No inventory items</p>
                 </div>
               ) : (
-                filteredInventory.map((item) => {
+                <>
+                {filteredInventory.map((item) => {
                   const itemId = String(item._id || item.id || item.ID);
                   const itemName = item.Name || item.name || "";
                   const itemUnit = item.Unit || item.baseUnit || "pc";
@@ -985,7 +1076,18 @@ export default function RecipeModalNew({
                       )}
                     </div>
                   );
-                })
+                })}
+                {inventoryLoading && filteredInventory.length > 0 && (
+                  <div className="text-center py-4 border-t border-[#e5e7eb]">
+                    <Loader2 className="h-5 w-5 text-[#9ca3af] mx-auto animate-spin" />
+                  </div>
+                )}
+                {!inventoryLoading && !inventoryHasMore && filteredInventory.length > 0 && (
+                  <div className="text-center py-3 border-t border-[#e5e7eb]">
+                    <p className="text-xs text-[#9ca3af]">All items loaded</p>
+                  </div>
+                )}
+                </>
               )}
             </div>
           </div>

@@ -2,10 +2,10 @@
 import React from "react";
 
 // Types
-import { LicenseInfo, ApiResponse, ToastState } from '@/lib/types/billing';
+import { LicenseInfo, ApiResponse } from '@/lib/types/billing';
 
 // Hooks
-import { useToast } from '@/lib/hooks';
+import { Toast } from "@/lib/util/toast-helpers";
 import { Toaster } from "@/components/ui/sonner";
 import { useLicense } from '@/lib/hooks/useLicense';
 
@@ -18,7 +18,7 @@ import { ResourcesAllocationCard } from './_components/resource-allocation-card'
 import { UpdateLicenseCard } from './_components/update-license-card';
 
 const BillingLicensePage = () => {
-  const { showToast } = useToast();
+  
 
   const {
     licenseInfo,
@@ -29,7 +29,7 @@ const BillingLicensePage = () => {
     setLicenseKeyInput,
     handleRecheck,
     handleUpdateLicense,
-  } = useLicense({ showToast });
+  } = useLicense();
 
   if (loading) {
     return <GlobalSkeleton type="management" showActionBar={false} />;

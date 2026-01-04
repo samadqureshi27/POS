@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { Toast } from "@/lib/util/toast-helpers";
 import { Package, Plus, Upload, Download, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { Toaster } from "sonner";
-import { showErrorToast, showSuccessToast } from "@/lib/util/toast-helpers";
+
+import { Toaster } from "@/components/ui/sonner";
+
 import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { StatCardsGrid } from "@/components/ui/stat-cards-grid";
@@ -128,13 +130,13 @@ function ItemsPageContent() {
         if (token) {
           // We have a token but backend rejected it - it might be expired
           console.warn('Token exists but was rejected by backend. Token might be expired.');
-          toast.error('Your session has expired. Please login again.');
+          Toast.error('Your session has expired. Please login again.');
           setTimeout(() => {
             window.location.href = '/login';
           }, 1000);
         } else {
           // No token at all - definitely need to login
-          toast.error('Please login to continue.');
+          Toast.error('Please login to continue.');
           window.location.href = '/login';
         }
         return;
@@ -145,7 +147,7 @@ function ItemsPageContent() {
         component: "ItemsManagement",
         action: "loadItems",
       });
-      toast.error(response.message || 'Failed to load items');
+      Toast.error(response.message || 'Failed to load items');
     }
     setLoading(false);
   };
@@ -197,13 +199,13 @@ function ItemsPageContent() {
 
     const itemId = itemToArchive._id || itemToArchive.id;
     if (!itemId) {
-      showErrorToast("Item ID is missing", "Invalid item");
+      Toast.error("Item ID is missing");
       return;
     }
 
     const response = await InventoryService.archiveItem(itemId);
     if (response.success) {
-      showSuccessToast(`Archived "${itemToArchive.name}" successfully`, { duration: 5000 });
+      Toast.success(`Archived "${itemToArchive.name}" successfully`, { duration: 5000 });
 
       // Optimistic update: Update item status in local state or remove if filter is set to Active
       if (filterStatus === "Active") {
@@ -221,9 +223,8 @@ function ItemsPageContent() {
       // Refresh stats
       loadItems(false);
     } else {
-      showErrorToast(
+      Toast.error(
         response.error || response.message || "Failed to archive item",
-        "Archive failed",
         { duration: 5000 }
       );
     }
@@ -239,13 +240,13 @@ function ItemsPageContent() {
 
     const itemId = itemToRestore._id || itemToRestore.id;
     if (!itemId) {
-      showErrorToast("Item ID is missing", "Invalid item");
+      Toast.error("Item ID is missing");
       return;
     }
 
     const response = await InventoryService.restoreItem(itemId);
     if (response.success) {
-      showSuccessToast(`Restored "${itemToRestore.name}" successfully`, { duration: 5000 });
+      Toast.success(`Restored "${itemToRestore.name}" successfully`, { duration: 5000 });
 
       // Optimistic update: Update item status in local state or remove if filter is set to Inactive
       if (filterStatus === "Inactive") {
@@ -263,9 +264,8 @@ function ItemsPageContent() {
       // Refresh stats
       loadItems(false);
     } else {
-      showErrorToast(
+      Toast.error(
         response.error || response.message || "Failed to restore item",
-        "Restore failed",
         { duration: 5000 }
       );
     }
@@ -278,7 +278,7 @@ function ItemsPageContent() {
       if (editingItem) {
         const itemId = editingItem._id || editingItem.id;
         if (!itemId) {
-          toast.error("Item ID is missing");
+          Toast.error("Item ID is missing");
           return;
         }
         response = await InventoryService.updateItem(itemId, data);
@@ -291,7 +291,7 @@ function ItemsPageContent() {
       if (response.success) {
         // Show success toast FIRST
         const message = editingItem ? "Item updated successfully" : "Item added successfully";
-        toast.success(message, {
+        Toast.success(message, {
           duration: 5000,
           position: "top-right",
         });
@@ -337,11 +337,11 @@ function ItemsPageContent() {
           }
         }
       } else {
-        toast.error(`Failed to save item: ${response.message}`);
+        Toast.error(`Failed to save item: ${response.message}`);
       }
     } catch (error: any) {
       console.error("Error saving item:", error);
-      toast.error(error?.message || "Failed to save item");
+      Toast.error(error?.message || "Failed to save item");
     }
   };
 
@@ -359,16 +359,16 @@ function ItemsPageContent() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        toast.success('Template downloaded successfully');
+        Toast.success('Template downloaded successfully');
       } else {
-        toast.error(`Failed to download template: ${response.message}`);
+        Toast.error(`Failed to download template: ${response.message}`);
       }
     } catch (error) {
       logError('Error downloading template', error, {
         component: "ItemsManagement",
         action: "handleDownloadTemplate",
       });
-      toast.error('Failed to download template. Please try again.');
+      Toast.error('Failed to download template. Please try again.');
     }
   };
 
@@ -389,16 +389,16 @@ function ItemsPageContent() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        toast.success('Items exported successfully');
+        Toast.success('Items exported successfully');
       } else {
-        toast.error(`Failed to export items: ${response.message}`);
+        Toast.error(`Failed to export items: ${response.message}`);
       }
     } catch (error) {
       logError('Error exporting items', error, {
         component: "ItemsManagement",
         action: "handleExport",
       });
-      toast.error('Failed to export items. Please try again.');
+      Toast.error('Failed to export items. Please try again.');
     }
   };
 
@@ -414,7 +414,7 @@ function ItemsPageContent() {
     const allowedTypes = ['.csv', '.xlsx'];
     const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!allowedTypes.includes(fileExtension)) {
-      toast.error('Please select a CSV or XLSX file.');
+      Toast.error('Please select a CSV or XLSX file.');
       return;
     }
 
@@ -436,12 +436,12 @@ function ItemsPageContent() {
           fileInputRef.current.value = "";
         }
 
-        toast.error(`Found ${validationResult.invalidRows} validation error(s). Please fix and try again.`);
+        Toast.error(`Found ${validationResult.invalidRows} validation error(s);. Please fix and try again.`);
         return;
       }
 
       // Show success message
-      toast.success(`✅ Validation passed! All ${validationResult.totalRows} rows are valid.`);
+      Toast.success(`✅ Validation passed! All ${validationResult.totalRows} rows are valid.`);
     }
 
     // Store file and show duplicate policy dialog
@@ -472,14 +472,14 @@ function ItemsPageContent() {
         setIsImportResultsOpen(true);
         loadItems(); // Refresh the items list
       } else {
-        toast.error(`Import failed: ${response.message || 'Unknown error occurred'}`);
+        Toast.error(`Import failed: ${response.message || 'Unknown error occurred'}`);
       }
     } catch (error) {
       logError('Error importing items', error, {
         component: "ItemsManagement",
         action: "processImport",
       });
-      toast.error('Failed to import file. Please check the file format and try again.');
+      Toast.error('Failed to import file. Please check the file format and try again.');
     } finally {
       // Reset file input and pending file
       if (fileInputRef.current) {

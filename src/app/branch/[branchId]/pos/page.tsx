@@ -6,8 +6,8 @@ import { Monitor, Plus, AlertCircle, Trash2 } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "sonner";
-import { useToast } from "@/lib/hooks";
+import { Toaster } from "@/components/ui/sonner";
+import { Toast } from "@/lib/util/toast-helpers";
 import PosModal from "./_components/pos-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { usePosManagement } from "@/lib/hooks/usePosManagement";
@@ -21,7 +21,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 const PosListPage = () => {
     const params = useParams();
     const branchId = params?.branchId as string;
-    const { showToast } = useToast();
+    
 
     const {
         // State
@@ -94,7 +94,7 @@ const PosListPage = () => {
 
     const handleDeletePos = () => {
         if (selectedItems.length === 0) {
-            showToast("Please select POS systems to delete", "warning");
+            Toast.warning("Please select POS systems to delete");
             return;
         }
         setDeleteDialogOpen(true);

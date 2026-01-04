@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
 import { LicenseInfo } from '@/lib/types/billing';
 import { LicenseAPI } from '../util/license-api';
+import { Toast } from "@/lib/util/toast-helpers";
 
-interface UseLicenseProps {
-    showToast: (message: string, type: "success" | "error") => void;
-}
-
-export const useLicense = ({ showToast }: UseLicenseProps) => {
+export const useLicense = () => {
     const [licenseInfo, setLicenseInfo] = useState<LicenseInfo | null>(null);
     const [loading, setLoading] = useState(true);
     const [rechecking, setRechecking] = useState(false);
@@ -20,7 +17,7 @@ export const useLicense = ({ showToast }: UseLicenseProps) => {
             if (!response.success) throw new Error(response.message);
             setLicenseInfo(response.data);
         } catch {
-            showToast("Failed to load license information", "error");
+            Toast.error("Failed to load license information");
         } finally {
             setLoading(false);
         }
@@ -32,13 +29,10 @@ export const useLicense = ({ showToast }: UseLicenseProps) => {
             const response = await LicenseAPI.recheckLicense();
             if (response.success) {
                 setLicenseInfo(response.data);
-                showToast(
-                    response.message || "License rechecked successfully! ✨",
-                    "success"
-                );
+                Toast.success(response.message || "License rechecked successfully! ✨");
             }
         } catch {
-            showToast("Failed to recheck license. Please try again.", "error");
+            Toast.error("Failed to recheck license. Please try again.");
         } finally {
             setRechecking(false);
         }
@@ -47,7 +41,7 @@ export const useLicense = ({ showToast }: UseLicenseProps) => {
     const handleUpdateLicense = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!licenseKeyInput.trim()) {
-            showToast("Please enter a license key", "error");
+            Toast.error("Please enter a license key");
             return;
         }
 
@@ -57,17 +51,10 @@ export const useLicense = ({ showToast }: UseLicenseProps) => {
             if (response.success) {
                 setLicenseInfo(response.data);
                 setLicenseKeyInput("");
-                showToast(
-                    response.message || "License updated successfully! 🎉",
-                    "success"
-                );
+                Toast.success(response.message || "License updated successfully! 🎉");
             }
         } catch (error: any) {
-            showToast(
-                error.message ||
-                "Failed to update license. Please check your key and try again.",
-                "error"
-            );
+            Toast.error(error.message || "Failed to update license. Please check your key and try again.");
         } finally {
             setUpdating(false);
         }

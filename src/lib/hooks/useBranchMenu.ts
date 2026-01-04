@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { BranchMenuService, type EffectiveMenuItem, type BranchMenuConfig } from "@/lib/services/branch-menu-service";
 import { resolveBranchObjectId } from "@/lib/services/branch-resolver";
-import { toast } from "sonner";
+import { Toast } from "@/lib/util/toast-helpers";
 import { logError } from "@/lib/util/logger";
 
 export function useBranchMenu(branchId: string | number) {
@@ -32,7 +32,7 @@ export function useBranchMenu(branchId: string | number) {
       }
 
       console.error("❌ Branch not found with ID:", branchId);
-      toast.error(`Branch "${branchId}" not found.`);
+      Toast.error(`Branch "${branchId}" not found.`);
       return null;
     } catch (error: any) {
       logError("Error fetching branch ObjectId", error, {
@@ -40,7 +40,7 @@ export function useBranchMenu(branchId: string | number) {
         action: "fetchBranchObjectId",
         branchId,
       });
-      toast.error(`Failed to load branch information: ${error.message || 'Unknown error'}`);
+      Toast.error(`Failed to load branch information: ${error.message || 'Unknown error'}`);
       return null;
     }
   };
@@ -78,7 +78,7 @@ export function useBranchMenu(branchId: string | number) {
         action: "loadMenuItems",
         branchId,
       });
-      toast.error(`Failed to load menu for Branch #${branchId}`);
+      Toast.error(`Failed to load menu for Branch #${branchId}`);
       setItems([]);
     } finally {
       if (!skipLoadingState) {
@@ -154,7 +154,7 @@ export function useBranchMenu(branchId: string | number) {
       });
 
       if (response.success) {
-        toast.success("Menu item added to branch successfully");
+        Toast.success("Menu item added to branch successfully");
 
         // Refresh data without showing loading skeleton
         await loadMenuItems(true);
@@ -170,7 +170,7 @@ export function useBranchMenu(branchId: string | number) {
         action: "handleAddToMenu",
         branchId,
       });
-      toast.error(error.message || "Failed to add menu item");
+      Toast.error(error.message || "Failed to add menu item");
     } finally {
       setActionLoading(false);
     }
@@ -183,7 +183,7 @@ export function useBranchMenu(branchId: string | number) {
       const response = await BranchMenuService.updateConfig(id, data);
 
       if (response.success) {
-        toast.success("Menu configuration updated successfully");
+        Toast.success("Menu configuration updated successfully");
 
         // Refresh data without showing loading skeleton
         await loadMenuItems(true);
@@ -200,7 +200,7 @@ export function useBranchMenu(branchId: string | number) {
         branchId,
         configId: id,
       });
-      toast.error(error.message || "Failed to update menu configuration");
+      Toast.error(error.message || "Failed to update menu configuration");
     } finally {
       setActionLoading(false);
     }
@@ -213,7 +213,7 @@ export function useBranchMenu(branchId: string | number) {
       const response = await BranchMenuService.deleteConfig(id);
 
       if (response.success) {
-        toast.success("Menu item removed from branch");
+        Toast.success("Menu item removed from branch");
 
         // Refresh data without showing loading skeleton
         await loadMenuItems(true);
@@ -227,7 +227,7 @@ export function useBranchMenu(branchId: string | number) {
         branchId,
         configId: id,
       });
-      toast.error(error.message || "Failed to remove menu item");
+      Toast.error(error.message || "Failed to remove menu item");
     } finally {
       setActionLoading(false);
     }

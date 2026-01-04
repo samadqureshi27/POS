@@ -139,7 +139,8 @@ export const StaffService = {
 
       // Optional fields
       if (payload.roleGrants !== undefined) apiPayload.roleGrants = payload.roleGrants;
-      if (payload.pin !== undefined) apiPayload.pin = payload.pin;
+      // Only include PIN if it's a valid non-empty string
+      if (payload.pin && payload.pin.trim().length > 0) apiPayload.pin = payload.pin.trim();
       if (payload.position !== undefined) apiPayload.position = payload.position;
       if (payload.metadata !== undefined) apiPayload.metadata = payload.metadata;
       if (payload.branchId !== undefined) apiPayload.branchId = payload.branchId;
@@ -149,6 +150,9 @@ export const StaffService = {
       if ((payload as any).posIds !== undefined) apiPayload.posIds = (payload as any).posIds;
       if ((payload as any).assignedBranchId !== undefined) apiPayload.assignedBranchId = (payload as any).assignedBranchId;
       if ((payload as any).isStaff !== undefined) apiPayload.isStaff = (payload as any).isStaff;
+
+      // Debug: Log the final payload being sent to backend
+      console.log("🔧 StaffService.createStaff - Final API Payload:", JSON.stringify(apiPayload, null, 2));
 
       const res = await fetch(url, {
         method: "POST",

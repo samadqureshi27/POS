@@ -103,6 +103,12 @@ export function useDataManager<TRaw = any, TTransformed = any>(
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const ITEMS_PER_PAGE = 50;
+
   // Filter states (support common patterns)
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | "Active" | "Inactive">("");
@@ -135,11 +141,15 @@ export function useDataManager<TRaw = any, TTransformed = any>(
   }, []);
 
   // Load items
-  const loadItems = useCallback(async (skipLoadingState = false) => {
+  const loadItems = useCallback(async (skipLoadingState = false, pageNum = 1, append = false) => {
     try {
       // Only set loading state during initial load, not during refresh
       if (!skipLoadingState) {
-        setLoading(true);
+        if (append) {
+          setLoadingMore(true);
+        } else {
+          setLoading(true);
+        }
       }
 
       // Get the list method (could be list, listCategories, listMenuItems, etc.)
@@ -155,7 +165,15 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         return;
       }
 
-      const response = await listFn();
+      // Try to call with pagination params, fall back to no params if service doesn't support it
+      let response;
+      try {
+        response = await listFn({ page: pageNum, limit: ITEMS_PER_PAGE });
+      } catch (error) {
+        // If pagination fails, try without params
+        console.log(`Service ${entityName} may not support pagination, loading all items`);
+        response = await listFn();
+      }
 
       if (response.success) {
         let dataArray = response.data;
@@ -180,7 +198,16 @@ export function useDataManager<TRaw = any, TTransformed = any>(
           ? dataArray.map((item: any, index: number) => transformData(item, index, additionalStateRef.current))
           : dataArray;
 
-        setItems(transformedData);
+        // Append or replace items based on mode
+        if (append) {
+          setItems(prev => [...prev, ...transformedData]);
+        } else {
+          setItems(transformedData);
+        }
+
+        // Update pagination state
+        setHasMore(transformedData.length >= ITEMS_PER_PAGE);
+        setPage(pageNum);
       } else {
         logError(response.message || `Failed to load ${entityName}s`, undefined, {
           component: "useDataManager",
@@ -200,11 +227,21 @@ export function useDataManager<TRaw = any, TTransformed = any>(
       setItems([]);
     } finally {
       if (!skipLoadingState) {
-        setLoading(false);
+        if (append) {
+          setLoadingMore(false);
+        } else {
+          setLoading(false);
+        }
       }
       setIsInitialLoad(false);
     }
-  }, [service, entityName, transformData, extractDataArray, showToast, listMethod]);
+  }, [service, entityName, transformData, extractDataArray, showToast, listMethod, ITEMS_PER_PAGE]);
+
+  // Load more items (next page)
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    await loadItems(false, page + 1, true);
+  }, [loadItems, page, loadingMore, hasMore]);
 
   // Load additional data
   const loadAdditionalData = useCallback(async () => {
@@ -536,6 +573,11 @@ export function useDataManager<TRaw = any, TTransformed = any>(
     actionLoading,
     toast,
 
+    // Pagination states
+    page,
+    hasMore,
+    loadingMore,
+
     // Filter states
     searchTerm,
     statusFilter,
@@ -558,6 +600,7 @@ export function useDataManager<TRaw = any, TTransformed = any>(
     delete: () => deleteItems(selectedItems),
     deleteItems,
     load: loadItems,
+    loadMore,
 
     // Selection handlers
     handleSelectItem,

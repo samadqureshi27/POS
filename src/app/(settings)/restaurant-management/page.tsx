@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 import ActionButtons from '@/components/ui/setting-buttons';
-import { useToast } from '@/lib/hooks/toast';
+import { Toast } from "@/lib/util/toast-helpers";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { Toaster } from '@/components/ui/sonner';
 import { PageContainer } from '@/components/ui/page-container';
@@ -26,8 +26,6 @@ const RestaurantProfilePage = () => {
     handleSave,
     resetForm,
   } = useRestaurantProfile();
-
-  const { toast, toastVisible, hideToast } = useToast();
 
   if (loading) {
     return <GlobalSkeleton type="management" showActionBar={false} />;

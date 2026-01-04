@@ -1,8 +1,8 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
 import { Loader2, Plus, X, Info } from "lucide-react";
-import { toast } from "sonner";
 import { RecipeService } from "@/lib/services/recipe-service";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -282,12 +282,12 @@ export default function MenuItemModal({
 
   const handleSave = async () => {
     if (!formData.name || !formData.categoryId) {
-      toast.error("Please fill in all required fields (Name, Category)");
+      Toast.error("Please fill in all required fields (Name, Category);");
       return;
     }
 
     if (!formData.pricing?.basePrice || formData.pricing.basePrice <= 0) {
-      toast.error("Please enter a valid price");
+      Toast.error("Please enter a valid price");
       return;
     }
 
@@ -302,7 +302,7 @@ export default function MenuItemModal({
         : undefined;
 
       if (!categoryId) {
-        toast.error("Category is required");
+        Toast.error("Category is required");
         return;
       }
 
