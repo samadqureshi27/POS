@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { ReportsAPI } from "../util/report-api";
-import { useToast } from './toast';
+import { Toast } from "@/lib/util/toast-helpers";
 import { useImportExport } from './importExportHook';
 import { ReportItem } from "@/lib/types/reports";
 import { logError } from "@/lib/util/logger";
@@ -12,7 +12,7 @@ export const useReportsManagement = (branchId: string) => {
     const [loading, setLoading] = useState(true);
 
     // Custom hooks
-    const { toast, toastVisible, showToast, hideToast } = useToast();
+    
 
     // Import/Export functionality
     const { 
@@ -20,13 +20,13 @@ export const useReportsManagement = (branchId: string) => {
         handleImport, 
         isLoading: importExportLoading 
     } = useImportExport({
-        onExportSuccess: () => showToast("Inventory report exported successfully", "success"),
-        onExportError: (error) => showToast(error, "error"),
+        onExportSuccess: () => Toast.success("Inventory report exported successfully"),
+        onExportError: (error) => Toast.error(error),
         onImportSuccess: (data) => {
             // You can add logic here to process imported data
-            showToast("Inventory data imported successfully", "success");
+            Toast.success("Inventory data imported successfully");
         },
-        onImportError: (error) => showToast(error, "error"),
+        onImportError: (error) => Toast.error(error),
         validateImportData: (data) => {
             if (data.length === 0) return { isValid: false, error: "File is empty" };
             const requiredFields = ['Name', 'Unit', 'InitialStock', 'Total_Value'];
@@ -41,7 +41,7 @@ export const useReportsManagement = (branchId: string) => {
     // Load report items
     const loadReportItems = async () => {
         if (!branchId) {
-            showToast("Branch ID not found", "error");
+            Toast.error("Branch ID not found");
             setLoading(false);
             return;
         }
@@ -60,7 +60,7 @@ export const useReportsManagement = (branchId: string) => {
                 action: "loadReportItems",
                 branchId,
             });
-            showToast("Failed to load inventory items", "error");
+            Toast.error("Failed to load inventory items");
         } finally {
             setLoading(false);
         }
@@ -144,12 +144,6 @@ export const useReportsManagement = (branchId: string) => {
         unitFilter,
         loading,
         statistics,
-
-        // Toast
-        toast,
-        toastVisible,
-        hideToast,
-
         // Import/Export
         handleExport,
         handleImport,

@@ -1,5 +1,7 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
+
 // Dashboard.tsx - Main Dashboard Component
 
 import React, { useState, useCallback } from "react";
@@ -18,7 +20,6 @@ import { useDashboardData } from "@/lib/hooks/useDashboardData";
 
 // Components
 import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PageHeader } from "@/components/ui/page-header";
 import { PeriodSelector } from "@/components/ui/period-selector";
@@ -41,16 +42,16 @@ const Dashboard = () => {
   const handleToast = useCallback((message: string, type: 'success' | 'error' | 'info') => {
     switch (type) {
       case "success":
-        toast.success(message);
+        Toast.success(message);
         break;
       case "error":
-        toast.error(message);
+        Toast.error(message);
         break;
       case "info":
-        toast.info(message);
+        Toast.info(message);
         break;
       default:
-        toast(message);
+        Toast.info(message);
     }
   }, []);
 

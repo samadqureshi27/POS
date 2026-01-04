@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ModifierService, TenantModifier } from "@/lib/services/modifier-service";
 import { MenuItemOptions } from "@/lib/types/menuItemOptions";
-import { useToast } from "@/lib/hooks";
+import { Toast } from "@/lib/util/toast-helpers";
 import { AddonsGroupsService } from "@/lib/services/addons-groups-service";
 import { AddonsItemsService } from "@/lib/services/addons-items-service";
 import { logError } from "@/lib/util/logger";
@@ -40,7 +40,7 @@ const mapApiModifierToItem = (apiMod: TenantModifier, index: number): MenuItemOp
 };
 
 export const useMenuOptions = () => {
-    const { showToast } = useToast();
+    
     const [MenuItemOptionss, setMenuItemOptionss] = useState<MenuItemOptions[]>([]);
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
@@ -167,7 +167,7 @@ export const useMenuOptions = () => {
                 component: "useMenuOptions",
                 action: "loadMenuItemOptionss"
             });
-            showToast(error instanceof Error ? error.message : "Failed to load addon groups", "error");
+            Toast.error(error instanceof Error ? error.message : "Failed to load addon groups");
         } finally {
             if (!skipLoadingState) {
                 setLoading(false);
@@ -191,17 +191,17 @@ export const useMenuOptions = () => {
 
             // Validate required fields for new add-ons structure
             if (!itemData.categoryId) {
-                showToast("Please select a menu category", "error");
+                Toast.error("Please select a menu category");
                 return { success: false };
             }
 
             if (!itemData.groupId) {
-                showToast("Please select or create an add-on group", "error");
+                Toast.error("Please select or create an add-on group");
                 return { success: false };
             }
 
             if (!itemData.addonItems || itemData.addonItems.length === 0) {
-                showToast("Please add at least one add-on item", "error");
+                Toast.error("Please add at least one add-on item");
                 return { success: false };
             }
 
@@ -227,10 +227,10 @@ export const useMenuOptions = () => {
                 setEditingItem(null);
                 setSearchTerm("");
                 setDisplayFilter("");
-                // showToast("Add-on items created successfully", "success");
+                // Toast.success("Add-on items created successfully");
                 return { success: true };
             } else {
-                showToast(response.message || "Failed to create add-on items", "error");
+                Toast.error(response.message || "Failed to create add-on items");
                 return { success: false };
             }
         } catch (error) {
@@ -240,7 +240,7 @@ export const useMenuOptions = () => {
                 categoryId: itemData.categoryId,
                 groupId: itemData.groupId
             });
-            showToast(error instanceof Error ? error.message : "Failed to create add-on items", "error");
+            Toast.error(error instanceof Error ? error.message : "Failed to create add-on items");
             return { success: false };
         } finally {
             setActionLoading(false);
@@ -249,7 +249,7 @@ export const useMenuOptions = () => {
 
     const handleUpdateItem = async (itemData: Omit<MenuItemOptions, "ID">): Promise<{ success: boolean }> => {
         if (!editingItem || !editingItem.backendId) {
-            showToast("Add-on group ID not found", "error");
+            Toast.error("Add-on group ID not found");
             return { success: false };
         }
 
@@ -258,17 +258,17 @@ export const useMenuOptions = () => {
 
             // Validate required fields
             if (!itemData.categoryId) {
-                showToast("Please select a menu category", "error");
+                Toast.error("Please select a menu category");
                 return { success: false };
             }
 
             if (!itemData.groupId) {
-                showToast("Please select or create an add-on group", "error");
+                Toast.error("Please select or create an add-on group");
                 return { success: false };
             }
 
             if (!itemData.addonItems || itemData.addonItems.length === 0) {
-                showToast("Please add at least one add-on item", "error");
+                Toast.error("Please add at least one add-on item");
                 return { success: false };
             }
 
@@ -278,7 +278,7 @@ export const useMenuOptions = () => {
                     name: itemData.groupName || itemData.Name,
                 });
                 if (!groupUpdateRes.success) {
-                    showToast(groupUpdateRes.message || "Failed to update group name", "error");
+                    Toast.error(groupUpdateRes.message || "Failed to update group name");
                     return { success: false };
                 }
             }
@@ -292,7 +292,7 @@ export const useMenuOptions = () => {
                 action: "handleUpdateItem",
                 groupId: itemData.groupId
             });
-            showToast(error instanceof Error ? error.message : "Failed to update add-on", "error");
+            Toast.error(error instanceof Error ? error.message : "Failed to update add-on");
             return { success: false };
         } finally {
             setActionLoading(false);
@@ -323,10 +323,10 @@ export const useMenuOptions = () => {
             await loadMenuItemOptionss();
             setSelectedItems([]);
             const count = idsToDelete.length;
-            showToast(`${count} modifier${count > 1 ? 's' : ''} deleted successfully`, "success");
+            Toast.success(`${count} modifier${count > 1 ? 's' : ''} deleted successfully`);
         } catch (error) {
             console.error("Error deleting modifiers:", error);
-            showToast(error instanceof Error ? error.message : "Failed to delete some modifiers", "error");
+            Toast.error(error instanceof Error ? error.message : "Failed to delete some modifiers");
         } finally {
             setActionLoading(false);
         }
@@ -366,7 +366,7 @@ export const useMenuOptions = () => {
 
     const handleModalSubmit = async (): Promise<{ success: boolean }> => {
         if (!isFormValid()) {
-            showToast("Please fix form errors before submitting", "error");
+            Toast.error("Please fix form errors before submitting");
             return { success: false };
         }
 

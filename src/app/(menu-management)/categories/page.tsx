@@ -1,11 +1,12 @@
 "use client";
+import { Toast } from "@/lib/util/toast-helpers";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FolderTree, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { toast } from "sonner";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import CategoryModal from "./_components/category-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -61,7 +62,7 @@ const CategoriesManagementPage = () => {
     const result = await handleModalSubmitOriginal(data);
     if (result.success) {
       const message = editingItem ? "Category updated successfully" : "Category added successfully";
-      toast.success(message, {
+      Toast.success(message, {
         duration: 5000,
         position: "top-right",
       });
@@ -85,7 +86,7 @@ const CategoriesManagementPage = () => {
         component: "CategoriesManagement",
         action: "confirmDelete",
       });
-      toast.error("Category ID is missing");
+      Toast.error("Category ID is missing");
       return;
     }
 
@@ -94,14 +95,14 @@ const CategoriesManagementPage = () => {
       const result = await deleteCategory(categoryId);
 
       if (result.success) {
-        toast.success("Category deleted successfully", {
+        Toast.success("Category deleted successfully", {
           duration: 5000,
           position: "top-right",
         });
         setDeleteDialogOpen(false);
         setCategoryToDelete(null);
       } else {
-        toast.error("Failed to delete category", {
+        Toast.error("Failed to delete category", {
           duration: 5000,
           position: "top-right",
         });
@@ -112,7 +113,7 @@ const CategoriesManagementPage = () => {
         action: "confirmDelete",
         categoryId: categoryToDelete?.ID,
       });
-      toast.error(error.message || "Failed to delete category", {
+      Toast.error(error.message || "Failed to delete category", {
         duration: 5000,
         position: "top-right",
       });

@@ -1,6 +1,6 @@
 // hooks/useCustomers.ts
 import { useState, useEffect, useMemo } from 'react';
-import { CustomerItem, ToastState, CustomerSummaryData } from '@/lib/types/customer-details';
+import { CustomerItem, CustomerSummaryData } from '@/lib/types/customer-details';
 import { CustomerAPI } from '../util/customer-details-api';
 import { filterCustomers, calculateCustomerSummary } from '../util/customer-details-utils';
 
@@ -60,26 +60,4 @@ export const useCustomerSummary = (customers: CustomerItem[]): CustomerSummaryDa
     return useMemo(() => {
         return calculateCustomerSummary(customers);
     }, [customers]);
-};
-
-export const useToast = () => {
-    const [toast, setToast] = useState<ToastState | null>(null);
-
-    // Auto-close toast
-    useEffect(() => {
-        if (toast) {
-            const timer = setTimeout(() => setToast(null), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [toast]);
-
-    const showToast = (message: string, type: "success" | "error") => {
-        setToast({ message, type });
-    };
-
-    return {
-        toast,
-        showToast,
-        hideToast: () => setToast(null)
-    };
 };

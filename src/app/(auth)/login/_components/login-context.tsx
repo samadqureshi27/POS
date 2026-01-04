@@ -1,8 +1,8 @@
 // contexts/LoginContext.tsx
 "use client";
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { createContext, useContext, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import authService from "@/lib/auth-service";
 // import {
 //   validateAdminLoginForm,
@@ -187,7 +187,7 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
       );
 
       if (response.success && response.user) {
-        toast.success("Login successful! Redirecting...");
+        Toast.success("Login successful! Redirecting...");
 
         // Wait for cookies to be set before redirecting
         // This ensures middleware can read the token
@@ -241,13 +241,13 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
             : "Login failed. Please check your credentials.");
 
         setError(errorMessage);
-        toast.error(errorMessage);
+        Toast.error(errorMessage);
       }
     } catch (error: any) {
       console.error("Admin login error:", error);
       const errorMsg = "Network error. Please check your connection.";
       setError(errorMsg);
-      toast.error(errorMsg);
+      Toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -261,7 +261,7 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
       const response = await authService.pinLogin(pin, role || "manager");
 
       if (response.success && response.user) {
-        toast.success("Login successful! Redirecting...");
+        Toast.success("Login successful! Redirecting...");
 
         // Wait for cookies to be set before redirecting
         const waitForCookies = async () => {

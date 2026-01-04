@@ -2,7 +2,7 @@
 import React from "react";
 
 // Hooks
-import { useToast } from '@/lib/hooks';
+import { Toast } from "@/lib/util/toast-helpers";
 import { useSettings } from '@/lib/hooks/gsettings';
 
 // Components
@@ -15,7 +15,7 @@ import { PageHeader } from "@/components/ui/page-header";
 
 
 const GeneralSettingsPage = () => {
-  const { showToast } = useToast();
+  
 
   const {
     settings,
@@ -27,8 +27,8 @@ const GeneralSettingsPage = () => {
     handleSave,
     handleResetToDefaults,
   } = useSettings({
-    onSuccess: (message) => showToast(message, "success"),
-    onError: (message) => showToast(message, "error"),
+    onSuccess: (message) => Toast.success(message),
+    onError: (message) => Toast.error(message),
   });
 
   if (loading || !settings) {

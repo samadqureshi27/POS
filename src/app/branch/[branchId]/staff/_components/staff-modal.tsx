@@ -1,5 +1,6 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect, useMemo } from "react";
 import { Loader2, Info } from "lucide-react";
 import {
@@ -21,14 +22,12 @@ import type { TenantStaff } from "@/lib/services/staff-service";
 import { StaffService } from "@/lib/services/staff-service";
 import { BranchService, type TenantBranch } from "@/lib/services/branch-service";
 import { PosService, type PosTerminal } from "@/lib/services/pos-service";
-import { toast } from "sonner";
-
 interface StaffModalProps {
   isOpen: boolean;
   item: TenantStaff | null;
   branchId: string | null;
   onClose: () => void;
-  onSave: (data: Partial<TenantStaff>) => Promise<void>;
+  onSave: (data: Partial<TenantStaff>) => Promise<TenantStaff | null>; // Return created staff
   onUpdate: (id: string, data: Partial<TenantStaff>) => Promise<void>;
   actionLoading: boolean;
 }
@@ -84,6 +83,8 @@ const StaffModal: React.FC<StaffModalProps> = ({
   const isManager = formData.roles?.includes("manager");
   const showPosTerminals = isCashier || isManager;
   const hasOtherRoles = !formData.roles || formData.roles.length === 0 || formData.roles.some(role => role !== "cashier" && role !== "manager");
+  // Check if ONLY cashier role is selected (no other roles)
+  const isCashierOnly = formData.roles?.length === 1 && formData.roles[0] === "cashier";
 
   // Convert roles to ChipOption format
   const roleOptions = useMemo<ChipOption[]>(() => {
@@ -177,7 +178,7 @@ const StaffModal: React.FC<StaffModalProps> = ({
       }
     } catch (error) {
       console.error("Error loading branches:", error);
-      toast.error("Failed to load branches");
+      Toast.error("Failed to load branches");
     } finally {
       setLoadingBranches(false);
     }
@@ -200,7 +201,7 @@ const StaffModal: React.FC<StaffModalProps> = ({
       }
     } catch (error) {
       console.error("Error loading POS terminals:", error);
-      toast.error("Failed to load POS terminals");
+      Toast.error("Failed to load POS terminals");
       setPosTerminals([]);
     } finally {
       setLoadingTerminals(false);
@@ -255,30 +256,32 @@ const StaffModal: React.FC<StaffModalProps> = ({
 
     // Validation
     if (!formData.fullName?.trim()) {
-      toast.error("Please enter staff member's full name");
+      Toast.error("Please enter staff member's full name");
       return;
     }
 
-    if (hasOtherRoles) {
+    // Email required for all roles
     if (!formData.email?.trim()) {
-      toast.error("Please enter email address");
+      Toast.error("Please enter email address");
       return;
-      }
-      if (!isEditing && !formData.password?.trim()) {
-        toast.error("Please enter password for new staff member");
-        return;
-      }
     }
 
+    // Password required for all roles EXCEPT cashier-only
+    if (!isCashierOnly && !isEditing && !formData.password?.trim()) {
+      Toast.error("Please enter password for new staff member");
+      return;
+    }
+
+    // PIN required for cashier role (when creating new staff)
     if (isCashier && !isEditing) {
       if (!formData.pin || formData.pin.length !== 6) {
-        toast.error("Please enter a 6-digit PIN for the cashier");
+        Toast.error("Please enter a 6-digit PIN for the cashier");
         return;
       }
     }
 
     if (!selectedBranchId) {
-      toast.error("Please select a branch");
+      Toast.error("Please select a branch");
       return;
     }
 
@@ -317,15 +320,24 @@ const StaffModal: React.FC<StaffModalProps> = ({
     console.log("Payload being sent:", JSON.stringify(payload, null, 2));
     console.log("Roles:", formData.roles);
     console.log("Has cashier/manager:", hasCashierOrManager);
+    console.log("Is cashier only:", isCashierOnly);
     console.log("Selected Branch ID:", selectedBranchId);
 
-    // Only include password if provided (for non-cashier roles)
-    if (formData.password) {
+    // Include password if provided (NOT for cashier-only role)
+    if (!isCashierOnly && formData.password) {
       payload.password = formData.password;
     }
 
+    // Workaround for unique pinKey constraint:
+    // If cashier, include a temporary unique PIN to avoid duplicate null values
+    // This will be immediately replaced by the real PIN via /set-pin endpoint
+    if (isCashier && !isEditing) {
+      // Generate temporary unique 6-digit PIN using timestamp
+      const tempPin = String(Date.now()).slice(-6);
+      payload.pin = tempPin;
+    }
+
     // Optional fields
-    if (formData.pin) payload.pin = formData.pin;
     if (formData.roleGrants && formData.roleGrants.length > 0) {
       payload.roleGrants = formData.roleGrants;
     }
@@ -334,10 +346,48 @@ const StaffModal: React.FC<StaffModalProps> = ({
       payload.metadata = formData.metadata;
     }
 
+    // Handle create/update flow
     if (isEditing && (item?._id || item?.id)) {
       await onUpdate(item._id || item.id!, payload);
     } else {
-      await onSave(payload);
+      // Step 1: Create staff member (with temporary PIN for cashiers)
+      console.log("📝 Creating staff member...");
+      const createdStaff = await onSave(payload);
+      console.log("✅ Staff created:", createdStaff);
+
+      // Step 2: If cashier role, set the REAL PIN via dedicated endpoint
+      if (isCashier && formData.pin && formData.pin.length === 6) {
+        if (!createdStaff) {
+          console.error("❌ Cannot set PIN: createdStaff is null/undefined");
+          Toast.error("Staff created but PIN setup failed: No staff ID returned");
+          return;
+        }
+
+        const staffId = createdStaff._id || createdStaff.id;
+        if (!staffId) {
+          console.error("❌ Cannot set PIN: No staff ID found in response");
+          Toast.error("Staff created but PIN setup failed: No staff ID");
+          return;
+        }
+
+        console.log("🔐 Setting real PIN for staff:", staffId, "PIN:", formData.pin, "Branch:", selectedBranchId);
+
+        try {
+          const pinResponse = await StaffService.setPin(staffId, formData.pin, selectedBranchId);
+          console.log("📌 Set PIN response:", JSON.stringify(pinResponse, null, 2));
+
+          if (pinResponse.success) {
+            console.log("✅ PIN set successfully!");
+            Toast.success("Cashier created and PIN set successfully!");
+          } else {
+            console.error("❌ PIN setup failed:", pinResponse.message);
+            Toast.error(`Staff created but PIN setup failed: ${pinResponse.message}`);
+          }
+        } catch (pinError: any) {
+          console.error("❌ Exception while setting PIN:", pinError);
+          Toast.error(`Staff created but PIN setup error: ${pinError.message}`);
+        }
+      }
     }
   };
 
@@ -394,8 +444,7 @@ const StaffModal: React.FC<StaffModalProps> = ({
                 />
               </div>
 
-              {/* Email - Conditional */}
-              {hasOtherRoles && (
+              {/* Email - Always visible for all roles */}
               <div className="md:col-span-1">
                 <Label htmlFor="email" className="text-sm font-medium text-[#656565]">
                   Email Address <span className="text-red-500">*</span>
@@ -411,10 +460,9 @@ const StaffModal: React.FC<StaffModalProps> = ({
                   required
                 />
               </div>
-              )}
 
-              {/* Password - Conditional */}
-              {hasOtherRoles && (
+              {/* Password - Only for non-cashier roles */}
+              {!isCashierOnly && (
               <div className="md:col-span-1">
                 <Label htmlFor="password" className="text-sm font-medium text-[#656565]">
                   Password {!isEditing && <span className="text-red-500">*</span>}
@@ -452,21 +500,21 @@ const StaffModal: React.FC<StaffModalProps> = ({
               {isCashier && !isEditing && (
               <div className="md:col-span-1">
                 <Label htmlFor="pin" className="text-sm font-medium text-[#656565]">
-                    PIN (6 digits) <span className="text-red-500">*</span>
+                  PIN (6 digits) <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="pin"
                   type="text"
                   value={formData.pin || ""}
                   onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 6);
                     handleInputChange("pin", value);
                   }}
                   className="mt-1.5"
                   disabled={actionLoading}
-                    placeholder="123456"
-                    maxLength={6}
-                    required
+                  placeholder="123456"
+                  maxLength={6}
+                  required
                 />
               </div>
               )}

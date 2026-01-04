@@ -1,11 +1,11 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle, DollarSign } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { DateFilter } from "@/components/ui/date-filter";
-import { toast } from "sonner";
 import { StaffTable } from "./components/payroll-staff-table";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
@@ -32,7 +32,7 @@ const StaffManagementPage = () => {
   // Handle staff data loading errors
   React.useEffect(() => {
     if (!loading && !branchId) {
-      toast.error("Branch ID not found");
+      Toast.error("Branch ID not found");
     }
   }, [loading, branchId]);
 

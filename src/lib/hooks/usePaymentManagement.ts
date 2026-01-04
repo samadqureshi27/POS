@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { PaymentAPI } from "../util/payment-api";
 import { useSelection } from "./selection";
-import { useToast } from './toast';
+import { Toast } from "@/lib/util/toast-helpers";
 import { usePaymentModal } from "./paymentModal";
 import { PaymentMethod } from "@/lib/types/payment";
 import { logError } from "@/lib/util/logger";
@@ -15,7 +15,7 @@ export const usePaymentManagement = () => {
     const [actionLoading, setActionLoading] = useState(false);
 
     // Custom hooks
-    const { toast, toastVisible, showToast, hideToast } = useToast();
+    
     const {
         selectedItems,
         handleSelectAll,
@@ -51,7 +51,7 @@ export const usePaymentManagement = () => {
                 component: "usePaymentManagement",
                 action: "loadPaymentMethods",
             });
-            showToast("Failed to load payment methods", "error");
+            Toast.error("Failed to load payment methods");
         } finally {
             setLoading(false);
         }
@@ -79,7 +79,7 @@ export const usePaymentManagement = () => {
                 setPaymentMethods((prevItems) => [...prevItems, response.data]);
                 closeModal();
                 setSearchTerm("");
-                showToast(response.message || "Payment method created successfully", "success");
+                Toast.success(response.message || "Payment method created successfully");
             }
         } catch (error) {
             logError("Error creating payment method", error, {
@@ -87,7 +87,7 @@ export const usePaymentManagement = () => {
                 action: "handleCreateItem",
                 paymentName: itemData.Name,
             });
-            showToast("Failed to create payment method", "error");
+            Toast.error("Failed to create payment method");
         } finally {
             setActionLoading(false);
         }
@@ -109,10 +109,10 @@ export const usePaymentManagement = () => {
                     )
                 );
                 closeModal();
-                showToast(response.message || "Payment method updated successfully", "success");
+                Toast.success(response.message || "Payment method updated successfully");
             }
         } catch (error) {
-            showToast("Failed to update payment method", "error");
+            Toast.error("Failed to update payment method");
         } finally {
             setActionLoading(false);
         }
@@ -130,10 +130,10 @@ export const usePaymentManagement = () => {
                     return remaining.map((it, idx) => ({ ...it, ID: idx + 1 }));
                 });
                 clearSelection();
-                showToast(response.message || "Payment methods deleted successfully", "success");
+                Toast.success(response.message || "Payment methods deleted successfully");
             }
         } catch (error) {
-            showToast("Failed to delete payment methods", "error");
+            Toast.error("Failed to delete payment methods");
         } finally {
             setActionLoading(false);
         }
@@ -142,7 +142,7 @@ export const usePaymentManagement = () => {
     // Modal submit handler
     const handleModalSubmit = () => {
         if (!formData.Name.trim() || !formData.TaxType.trim()) {
-            showToast("Please fill in all required fields", "error");
+            Toast.error("Please fill in all required fields");
             return;
         }
         if (editingItem) {
@@ -179,11 +179,6 @@ export const usePaymentManagement = () => {
         loading,
         actionLoading,
         statistics,
-
-        // Toast
-        toast,
-        toastVisible,
-        hideToast,
 
         // Selection
         selectedItems,

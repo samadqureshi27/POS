@@ -1,6 +1,6 @@
 // components/DetailsForm.tsx
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from 'react';
-import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -80,7 +80,7 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange })
   const handleAddGroup = async () => {
     if (!groupInput.trim()) return;
     if (!formData.categoryId) {
-      toast.error("Please select a category first");
+      Toast.error("Please select a category first");
       return;
     }
 
@@ -101,10 +101,10 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ formData, onFormDataChange })
         });
         setShowGroupSuggestions(false);
       } else {
-        toast.error(res.message || "Failed to create group");
+        Toast.error(res.message || "Failed to create group");
       }
     } catch (error) {
-      toast.error("An error occurred while creating the group");
+      Toast.error("An error occurred while creating the group");
     } finally {
       setAddingGroup(false);
     }

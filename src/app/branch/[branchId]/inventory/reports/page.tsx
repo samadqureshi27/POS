@@ -10,7 +10,7 @@ import ReportsTable from "./_components/reports-table";
 import ImportExportControls from "@/components/ui/import-export-btn";
 import { useReportsManagement } from "@/lib/hooks/useReport";
 import { useImportExport } from "@/lib/hooks/importExportHook";
-import { useToast } from "@/lib/hooks";
+import { Toast } from "@/lib/util/toast-helpers";
 import GlobalSkeleton from "@/components/ui/global-skeleton";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -33,12 +33,12 @@ const ReportsPage = () => {
     } = useReportsManagement(branchId);
 
     // Toast for export operations
-    const { showToast } = useToast();
+    
 
     // Export functionality only
     const { handleExportWithConfig, isLoading } = useImportExport({
-        onExportSuccess: () => showToast("Inventory report exported successfully", "success"),
-        onExportError: (error) => showToast(error, "error"),
+        onExportSuccess: () => Toast.success("Inventory report exported successfully"),
+        onExportError: (error) => Toast.error(error),
     });
 
     // Export functionality using predefined config

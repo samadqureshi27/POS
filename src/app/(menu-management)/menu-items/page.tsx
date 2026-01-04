@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { UtensilsCrossed, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { toast } from "sonner";
-import { Toaster } from "sonner";
+import { Toast } from "@/lib/util/toast-helpers";
+import { Toaster } from "@/components/ui/sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import MenuItemModal from "./_components/menu-item-modal-batch";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -69,7 +69,7 @@ const MenuItemsManagementPage = () => {
     const result = await handleModalSubmitOriginal(data);
     if (result.success) {
       const message = editingItem ? "Menu item updated successfully" : "Menu item added successfully";
-      toast.success(message, {
+      Toast.success(message, {
         duration: 5000,
         position: "top-right",
       });
@@ -93,7 +93,7 @@ const MenuItemsManagementPage = () => {
         component: "MenuItemsManagement",
         action: "confirmDelete",
       });
-      toast.error("Menu item ID is missing");
+      Toast.error("Menu item ID is missing");
       return;
     }
 
@@ -102,14 +102,14 @@ const MenuItemsManagementPage = () => {
       const result = await deleteMenuItem(itemId);
 
       if (result.success) {
-        toast.success("Menu item deleted successfully", {
+        Toast.success("Menu item deleted successfully", {
           duration: 5000,
           position: "top-right",
         });
         setDeleteDialogOpen(false);
         setItemToDelete(null);
       } else {
-        toast.error((result?.message as string) || "Failed to delete menu item", {
+        Toast.error(result?.error || "Failed to delete menu item", {
           duration: 5000,
           position: "top-right",
         });
@@ -120,7 +120,7 @@ const MenuItemsManagementPage = () => {
         action: "confirmDelete",
         itemId: itemToDelete?.ID,
       });
-      toast.error((error?.message as string) || "Failed to delete menu item", {
+      Toast.error((error?.message as string) || "Failed to delete menu item", {
         duration: 5000,
         position: "top-right",
       });

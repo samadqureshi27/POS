@@ -8,7 +8,7 @@ import CustomerTable from "./_components/customer-table";
 import ImportExportControls from "@/components/ui/import-export-btn";
 import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/hooks/useCustomerDetails";
 import { exportCustomersToCSV } from "@/lib/util/customer-details-utils";
-import { useToast } from "@/lib/hooks";
+import { Toast } from "@/lib/util/toast-helpers";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { Toaster } from "@/components/ui/sonner";
 import { PageContainer } from "@/components/ui/page-container";
@@ -21,7 +21,6 @@ const CustomerManagementPage = () => {
   const { customerItems, loading } = useCustomers();
   const { searchInput, searchTerm, setSearchInput, filteredCustomers } = useCustomerFiltering(customerItems);
   const summaryData = useCustomerSummary(filteredCustomers);
-  const { toast, showToast, hideToast } = useToast();
 
   // Handle customer row click - Navigate to dynamic route
   const handleCustomerClick = (customerId: number) => {
@@ -31,7 +30,7 @@ const CustomerManagementPage = () => {
   // Export functionality
   const handleExport = () => {
     exportCustomersToCSV(filteredCustomers);
-    showToast("Data exported successfully", "success");
+    Toast.success("Data exported successfully");
   };
 
   // Import functionality

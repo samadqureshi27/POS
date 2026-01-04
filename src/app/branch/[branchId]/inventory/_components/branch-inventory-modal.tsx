@@ -1,5 +1,6 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
 import { Loader2, Info } from "lucide-react";
 import {
@@ -23,8 +24,6 @@ import {
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import type { BranchInventoryItem } from "@/lib/services/branch-inventory-service";
 import { InventoryService, type InventoryItem } from "@/lib/services/inventory-service";
-import { toast } from "sonner";
-
 interface BranchInventoryModalProps {
   isOpen: boolean;
   editingItem: BranchInventoryItem | null;
@@ -106,7 +105,7 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
       }
     } catch (error) {
       console.error("Error loading items:", error);
-      toast.error("Failed to load available items");
+      Toast.error("Failed to load available items");
     } finally {
       setLoadingItems(false);
     }
@@ -117,17 +116,17 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
 
     // Validation
     if (!formData.branchId) {
-      toast.error("Branch ID is missing. Please try again.");
+      Toast.error("Branch ID is missing. Please try again.");
       return;
     }
 
     if (!formData.itemId) {
-      toast.error("Please select an item");
+      Toast.error("Please select an item");
       return;
     }
 
     if (formData.quantity === undefined || formData.quantity < 0) {
-      toast.error("Please enter a valid quantity");
+      Toast.error("Please enter a valid quantity");
       return;
     }
 

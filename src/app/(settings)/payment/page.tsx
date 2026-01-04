@@ -5,7 +5,7 @@ import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { Toaster } from "@/components/ui/sonner";
-import { useToast } from "@/lib/hooks";
+import { Toast } from "@/lib/util/toast-helpers";
 import PaymentModal from "./_components/payment-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { PageContainer } from '@/components/ui/page-container';
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const PaymentManagementPage = () => {
-  const { showToast } = useToast();
+  
   const {
     // State
     filteredItems,
@@ -74,7 +74,7 @@ const PaymentManagementPage = () => {
 
   const handleDeleteWithToast = async () => {
     if (selectedItems.length === 0) {
-      showToast("Please select payment methods to delete", "warning");
+      Toast.warning("Please select payment methods to delete");
       return;
     }
     setDeleteDialogOpen(true);
