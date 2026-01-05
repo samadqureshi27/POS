@@ -37,7 +37,7 @@ function ItemsPageContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(21);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(24);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Modals

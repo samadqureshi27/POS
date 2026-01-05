@@ -61,7 +61,7 @@ const BranchMenuPage = () => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(21);
+  const [itemsPerPage] = useState<number>(24);
 
   // Delete confirmation
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
