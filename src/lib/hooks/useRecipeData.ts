@@ -140,7 +140,7 @@ export const useRecipeData = () => {
     );
 
     const recipeIdsToDelete = recipesToDelete.map(recipe => recipe._id || recipe.ID.toString());
-    return hook.delete(recipeIdsToDelete as any);
+    return hook.deleteItems(recipeIdsToDelete as any);
   };
 
   // Single recipe delete
@@ -211,8 +211,11 @@ export const useRecipeData = () => {
 
       const result = await hook.create(data);
       if (result.success) {
-        hook.closeModal();
-        hook.clearSelection();
+        // Only close modal for final recipes, keep it open for sub recipes
+        if (data.type !== "sub") {
+          hook.closeModal();
+          hook.clearSelection();
+        }
       }
       return result;
     }

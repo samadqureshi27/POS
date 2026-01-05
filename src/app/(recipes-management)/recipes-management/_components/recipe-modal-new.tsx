@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { Toast } from "@/lib/util/toast-helpers";
+
+import React, { useState, useEffect, useMemo } from "react";
 import { Loader2, Plus, X, Search, UtensilsCrossed, Sparkles, Package, ChefHat, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -12,8 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 import { RecipeVariantInput } from "./recipe-variant-input";
+import { InventoryService } from "@/lib/services/inventory-service";
 
 // API Recipe structure
 interface RecipeIngredient {
@@ -69,7 +71,7 @@ interface InventoryItem {
   name?: string;
   Unit?: string;
   baseUnit?: string;
-  type?: "stock" | "service";
+  type?: "stock" | "nonstock" | "service";
   quantity?: number;
   reorderPoint?: number;
   sku?: string;
@@ -83,6 +85,7 @@ interface RecipeModalProps {
   onClose: () => void;
   onSubmit: (data: any) => Promise<any>;
   actionLoading: boolean;
+  onRefreshRecipes?: () => void;
 }
 
 export default function RecipeModalNew({
@@ -93,8 +96,18 @@ export default function RecipeModalNew({
   availableRecipeOptions,
   onSubmit,
   actionLoading,
+  onRefreshRecipes,
 }: RecipeModalProps) {
   const [loading, setLoading] = useState(false);
+  const [addingToList, setAddingToList] = useState(false);
+  const [localSubRecipes, setLocalSubRecipes] = useState<any[]>([]);
+
+  // Infinite scroll states for inventory
+  const [localInventory, setLocalInventory] = useState<InventoryItem[]>([]);
+  const [inventoryPage, setInventoryPage] = useState(1);
+  const [inventoryHasMore, setInventoryHasMore] = useState(true);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
+  const inventoryScrollRef = React.useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<Partial<Recipe>>({
     name: "",
@@ -148,8 +161,96 @@ export default function RecipeModalNew({
     handleInitialResponsive();
   }, []);
 
+  // Fetch inventory with pagination
+  const fetchInventory = React.useCallback(async (page: number, searchQuery: string = "", reset: boolean = false) => {
+    if (inventoryLoading) return;
+
+    setInventoryLoading(true);
+    try {
+      const ITEMS_PER_PAGE = 50;
+      const response = await InventoryService.listItems({
+        page,
+        limit: ITEMS_PER_PAGE,
+        q: searchQuery,
+      });
+
+      if (response.success && response.data) {
+        const newItems = response.data;
+
+        if (reset) {
+          setLocalInventory(newItems);
+        } else {
+          setLocalInventory(prev => [...prev, ...newItems]);
+        }
+
+        // If we got fewer items than requested, we've reached the end
+        setInventoryHasMore(newItems.length >= ITEMS_PER_PAGE);
+      } else {
+        console.error('Failed to fetch inventory:', response.message);
+        if (reset) {
+          setLocalInventory([]);
+        }
+        setInventoryHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error fetching inventory:', error);
+      if (reset) {
+        setLocalInventory([]);
+      }
+      setInventoryHasMore(false);
+    } finally {
+      setInventoryLoading(false);
+    }
+  }, [inventoryLoading]);
+
+  // Initial load when modal opens or panel expands
+  useEffect(() => {
+    if (isOpen && inventoryExpanded && localInventory.length === 0) {
+      console.log('📦 Initial inventory load...');
+      setInventoryPage(1);
+      setInventoryHasMore(true);
+      fetchInventory(1, inventorySearch, true);
+    }
+  }, [isOpen, inventoryExpanded]);
+
+  // Handle search changes with debounce
+  useEffect(() => {
+    if (!isOpen || !inventoryExpanded) return;
+
+    const debounceTimer = setTimeout(() => {
+      console.log('🔍 Inventory search changed:', inventorySearch);
+      setInventoryPage(1);
+      setInventoryHasMore(true);
+      fetchInventory(1, inventorySearch, true);
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [inventorySearch]);
+
+  // Infinite scroll handler
+  const handleInventoryScroll = React.useCallback(() => {
+    const scrollContainer = inventoryScrollRef.current;
+    if (!scrollContainer || inventoryLoading || !inventoryHasMore) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+    const scrollThreshold = 200; // pixels from bottom
+
+    if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
+      const nextPage = inventoryPage + 1;
+      console.log('📜 Loading more inventory, page:', nextPage);
+      setInventoryPage(nextPage);
+      fetchInventory(nextPage, inventorySearch, false);
+    }
+  }, [inventoryLoading, inventoryHasMore, inventoryPage, inventorySearch, fetchInventory]);
+
   useEffect(() => {
     if (isOpen) {
+      // Refresh recipes when modal opens to get latest sub recipes
+      if (onRefreshRecipes) {
+        console.log('🔄 Modal opened - refreshing recipes...');
+        onRefreshRecipes();
+      }
+
       if (editingItem) {
         const existingIngredients = editingItem.ingredients || [];
         const existingVariants: RecipeVariantInline[] = (editingItem as any).variations || [];
@@ -182,6 +283,13 @@ export default function RecipeModalNew({
       setRecipesList([]);
       setActiveRecipeId(null);
       setRecipeFormExpanded(true);
+      setLocalSubRecipes([]);
+      // Reset inventory when modal closes
+      if (!isOpen) {
+        setLocalInventory([]);
+        setInventoryPage(1);
+        setInventoryHasMore(true);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, editingItem]);
@@ -203,7 +311,9 @@ export default function RecipeModalNew({
     e.preventDefault();
     if (!draggedInventory) return;
 
-    const item = ingredients.find(
+    // Search in both passed ingredients and locally fetched inventory
+    const allInventory = [...ingredients, ...localInventory];
+    const item = allInventory.find(
       (inv) => String(inv._id || inv.id || inv.ID) === draggedInventory
     );
 
@@ -215,10 +325,7 @@ export default function RecipeModalNew({
       // Check if already added
       const exists = recipeIngredients.some(ing => ing.sourceId === itemId);
       if (exists) {
-        toast.error("This item is already added to ingredients", {
-          duration: 3000,
-          position: "top-right",
-        });
+        Toast.error("This item is already added to ingredients");
         setDraggedInventory(null);
         return;
       }
@@ -244,10 +351,7 @@ export default function RecipeModalNew({
         }
       }, 100);
 
-      toast.success(`Added ${itemName} to ingredients`, {
-        duration: 2000,
-        position: "top-right",
-      });
+      Toast.success(`Added ${itemName} to ingredients`, { duration: 2000 });
     }
 
     setDraggedInventory(null);
@@ -266,9 +370,18 @@ export default function RecipeModalNew({
     e.preventDefault();
     if (!draggedRecipe) return;
 
-    const recipe = availableRecipeOptions.find(
+    // Search in both available recipes and newly created local recipes
+    const allRecipes = [...availableRecipeOptions, ...localSubRecipes];
+    const recipe = allRecipes.find(
       (rec) => String(rec._id || rec.ID) === draggedRecipe
     );
+
+    console.log('🎯 Recipe Drop:', {
+      draggedRecipeId: draggedRecipe,
+      foundRecipe: recipe,
+      allRecipesCount: allRecipes.length,
+      localSubRecipesCount: localSubRecipes.length
+    });
 
     if (recipe) {
       const recipeId = String(recipe._id || recipe.ID);
@@ -277,10 +390,7 @@ export default function RecipeModalNew({
       // Check if already added
       const exists = recipeIngredients.some(ing => ing.sourceId === recipeId);
       if (exists) {
-        toast.error("This recipe is already added to ingredients", {
-          duration: 3000,
-          position: "top-right",
-        });
+        Toast.error("This recipe is already added to ingredients");
         setDraggedRecipe(null);
         return;
       }
@@ -306,10 +416,9 @@ export default function RecipeModalNew({
         }
       }, 100);
 
-      toast.success(`Added ${recipeName} to ingredients`, {
-        duration: 2000,
-        position: "top-right",
-      });
+      Toast.success(`Added ${recipeName} to ingredients`, { duration: 2000 });
+    } else {
+      console.warn('⚠️ Recipe not found for drop:', draggedRecipe);
     }
 
     setDraggedRecipe(null);
@@ -354,10 +463,7 @@ export default function RecipeModalNew({
     // Check if size already exists
     const exists = variants.some(v => v.name.toLowerCase() === sizeName.toLowerCase() && v.type === "size");
     if (exists) {
-      toast.error(`${sizeName} size variant already exists`, {
-        duration: 3000,
-        position: "top-right",
-      });
+      Toast.error(`${sizeName} size variant already exists`);
       return;
     }
 
@@ -372,7 +478,8 @@ export default function RecipeModalNew({
     };
     const newIndex = variants.length;
     setVariants([...variants, newVariant]);
-    toast.success(`${sizeName} size added`, {
+    Toast.success(`${sizeName} size added`, { duration: 2000 });
+    Toast.success(`${sizeName} size added`, {
       duration: 2000,
       position: "top-right",
     });
@@ -418,7 +525,9 @@ export default function RecipeModalNew({
     let itemName = "";
 
     if (draggedInventory) {
-      const item = ingredients.find(
+      // Search in both passed ingredients and locally fetched inventory
+      const allInventory = [...ingredients, ...localInventory];
+      const item = allInventory.find(
         (inv) => String(inv._id || inv.id || inv.ID) === draggedInventory
       );
       if (item) {
@@ -432,7 +541,9 @@ export default function RecipeModalNew({
         };
       }
     } else if (draggedRecipe) {
-      const recipe = availableRecipeOptions.find(
+      // Search in both available recipes and newly created local recipes
+      const allRecipes = [...availableRecipeOptions, ...localSubRecipes];
+      const recipe = allRecipes.find(
         (rec) => String(rec._id || rec.ID) === draggedRecipe
       );
       if (recipe) {
@@ -453,10 +564,7 @@ export default function RecipeModalNew({
       const existingIngredients = variant.ingredients || [];
 
       if (existingIngredients.some(ing => ing.sourceId === itemToAdd!.sourceId)) {
-        toast.error(`${itemName} is already added to this variant`, {
-          duration: 3000,
-          position: "top-right"
-        });
+        Toast.error(`${itemName} is already added to this variant`);
         return;
       }
 
@@ -465,10 +573,7 @@ export default function RecipeModalNew({
         ingredients: [...existingIngredients, itemToAdd]
       };
       setVariants(updatedVariants);
-      toast.success(`Added ${itemName} to ${variant.name || `Variant ${vIndex + 1}`}`, {
-        duration: 2000,
-        position: "top-right"
-      });
+      Toast.success(`Added ${itemName} to ${variant.name || `Variant ${vIndex + 1}`}`, { duration: 2000 });
     }
 
     setDraggedInventory(null);
@@ -476,20 +581,14 @@ export default function RecipeModalNew({
   };
 
   // Bulk recipe management
-  const handleAddToList = () => {
+  const handleAddToList = async () => {
     if (!formData.name) {
-      toast.error("Please enter a recipe name before adding to list", {
-        duration: 3000,
-        position: "top-right",
-      });
+      Toast.error("Please enter a recipe name before adding to list");
       return;
     }
 
     if (recipeIngredients.length === 0) {
-      toast.error("Please add at least one ingredient before adding to list", {
-        duration: 3000,
-        position: "top-right",
-      });
+      Toast.error("Please add at least one ingredient before adding to list");
       return;
     }
 
@@ -504,22 +603,133 @@ export default function RecipeModalNew({
       isActive: formData.isActive ?? true,
     };
 
-    setRecipesList([...recipesList, newRecipe]);
+    // If it's a sub recipe, save it to backend immediately
+    if (newRecipe.type === "sub") {
+      setAddingToList(true);
+      try {
+        const parseNum = (val: any, fallback: number = 0) => {
+          if (val === "" || val === null || val === undefined) return fallback;
+          const parsed = parseFloat(val);
+          return isNaN(parsed) ? fallback : parsed;
+        };
 
-    // Reset form for next recipe
-    setFormData({
-      name: "",
-      type: formData.type, // Keep the same type
-      description: "",
-      ingredients: [],
-      isActive: true,
-      variations: [],
-      yield: 1,
-    });
-    setRecipeIngredients([]);
-    setVariants([]);
+        const submitData = {
+          ...newRecipe,
+          yield: parseNum(newRecipe.yield, 1),
+          ingredients: newRecipe.ingredients.map((ing: any) => ({
+            ...ing,
+            quantity: parseNum(ing.quantity, 0)
+          })),
+        };
 
-    toast.success(`"${newRecipe.name}" added to list`, {
+        // Remove temporary id before submitting
+        delete (submitData as any).id;
+
+        const result = await onSubmit(submitData);
+
+        console.log('🔍 Sub Recipe Creation Result:', result);
+
+        if (result.success) {
+          Toast.success(`"${newRecipe.name}" created successfully`, {
+            duration: 2000,
+          });
+
+          // Add the newly created recipe to local state for instant display
+          // Handle different possible response structures
+          let createdRecipe = result.data;
+
+          // If data is wrapped in result property
+          if (result.data?.result) {
+            createdRecipe = result.data.result;
+          }
+
+          // If data has recipe property
+          if (createdRecipe?.recipe) {
+            createdRecipe = createdRecipe.recipe;
+          }
+
+          console.log('🔍 Extracted Recipe Data:', createdRecipe);
+
+          // If we still don't have recipe data, use the submitted data with a temporary ID
+          if (!createdRecipe || !createdRecipe._id) {
+            console.warn('⚠️ No recipe data in response, using submitted data');
+            createdRecipe = {
+              _id: `temp-${Date.now()}`,
+              ...submitData,
+              name: submitData.name,
+              isActive: submitData.isActive !== false,
+            };
+          }
+
+          if (createdRecipe) {
+            const newSubRecipe = {
+              _id: createdRecipe._id || createdRecipe.id || `temp-${Date.now()}`,
+              ID: createdRecipe._id || createdRecipe.id || `temp-${Date.now()}`,
+              Name: createdRecipe.name || submitData.name,
+              name: createdRecipe.name || submitData.name,
+              Status: (createdRecipe.isActive !== false ? "Active" : "Inactive") as "Active" | "Inactive",
+              Description: createdRecipe.description || submitData.description || "",
+              type: "sub" as const,
+              ingredients: createdRecipe.ingredients || submitData.ingredients || [],
+            };
+
+            console.log('✅ Adding to localSubRecipes:', newSubRecipe);
+            setLocalSubRecipes(prev => {
+              const updated = [...prev, newSubRecipe];
+              console.log('📋 Updated localSubRecipes:', updated);
+              return updated;
+            });
+          }
+
+          // Refresh recipes in background to update parent list
+          if (onRefreshRecipes) {
+            console.log('🔄 Sub recipe created - refreshing recipes in background...');
+            setTimeout(() => onRefreshRecipes(), 100);
+          }
+
+          // Reset form for next recipe
+          setFormData({
+            name: "",
+            type: formData.type, // Keep the same type
+            description: "",
+            ingredients: [],
+            isActive: true,
+            variations: [],
+            yield: 1,
+          });
+          setRecipeIngredients([]);
+          setVariants([]);
+        } else {
+          Toast.error(
+            result.error || result.message || "Failed to create sub recipe"
+          );
+        }
+      } catch (error) {
+        console.error('Error creating sub recipe:', error);
+        Toast.error(error);
+      } finally {
+        setAddingToList(false);
+      }
+    } else {
+      // For final recipes, keep the old behavior (add to list)
+      setRecipesList([...recipesList, newRecipe]);
+
+      // Reset form for next recipe
+      setFormData({
+        name: "",
+        type: formData.type, // Keep the same type
+        description: "",
+        ingredients: [],
+        isActive: true,
+        variations: [],
+        yield: 1,
+      });
+      setRecipeIngredients([]);
+      setVariants([]);
+
+      Toast.success(`"${newRecipe.name}" added to list`, { duration: 2000 });
+    }
+    Toast.success(`"${newRecipe.name}" added to list`, {
       duration: 2000,
       position: "top-right",
     });
@@ -537,10 +747,7 @@ export default function RecipeModalNew({
     const recipe = recipesList.find(r => r.id === id);
     setRecipesList(recipesList.filter(r => r.id !== id));
     if (recipe) {
-      toast.success(`"${recipe.name}" removed from list`, {
-        duration: 2000,
-        position: "top-right",
-      });
+      Toast.success(`"${recipe.name}" removed from list`, { duration: 2000 });
     }
   };
 
@@ -587,12 +794,12 @@ export default function RecipeModalNew({
 
     if (hasCurrentFormContent) {
       if (!formData.name) {
-        toast.error("Please enter a recipe name", { duration: 5000, position: "top-right" });
+        Toast.error("Please enter a recipe name", { duration: 5000 });
         return;
       }
 
       if (recipeIngredients.length === 0) {
-        toast.error("Please add at least one ingredient", { duration: 5000, position: "top-right" });
+        Toast.error("Please add at least one ingredient", { duration: 5000 });
         return;
       }
 
@@ -601,19 +808,13 @@ export default function RecipeModalNew({
       );
 
       if (invalidIngredients.length > 0) {
-        toast.error(`Current recipe has ${invalidIngredients.length} ingredient(s) with missing information`, {
-          duration: 5000,
-          position: "top-right",
-        });
+        Toast.error(`Current recipe has ${invalidIngredients.length} ingredient(s) with missing information`, { duration: 5000 });
         return;
       }
 
       const invalidVariants = variants.filter((v) => !v.name || !v.type);
       if (invalidVariants.length > 0) {
-        toast.error(`Current recipe has ${invalidVariants.length} variant(s) missing required fields`, {
-          duration: 5000,
-          position: "top-right",
-        });
+        Toast.error(`Current recipe has ${invalidVariants.length} variant(s) missing required fields`, { duration: 5000 });
         return;
       }
 
@@ -632,10 +833,7 @@ export default function RecipeModalNew({
 
     // 2. Logic Check: What are we actually submitting?
     if (finalRecipesToSubmit.length === 0 && !isEditingMode) {
-      toast.error("No recipes to submit. Add ingredients to create a recipe.", {
-        duration: 5000,
-        position: "top-right",
-      });
+      Toast.error("No recipes to submit. Add ingredients to create a recipe.", { duration: 5000 });
       return;
     }
 
@@ -668,39 +866,95 @@ export default function RecipeModalNew({
             : undefined,
         };
 
-        await onSubmit(submitData);
+        const result = await onSubmit(submitData);
+
+        // Add successfully created sub recipes to local state
+        if (result.success && submitData.type === "sub") {
+          let createdRecipe = result.data;
+
+          // Handle different response structures
+          if (result.data?.result) {
+            createdRecipe = result.data.result;
+          }
+          if (createdRecipe?.recipe) {
+            createdRecipe = createdRecipe.recipe;
+          }
+
+          // Fallback to submitted data if no response data
+          if (!createdRecipe || !createdRecipe._id) {
+            createdRecipe = {
+              _id: `temp-${Date.now()}`,
+              ...submitData,
+            };
+          }
+
+          const newSubRecipe = {
+            _id: createdRecipe._id || createdRecipe.id || `temp-${Date.now()}`,
+            ID: createdRecipe._id || createdRecipe.id || `temp-${Date.now()}`,
+            Name: createdRecipe.name || submitData.name,
+            name: createdRecipe.name || submitData.name,
+            Status: (createdRecipe.isActive !== false ? "Active" : "Inactive") as "Active" | "Inactive",
+            Description: createdRecipe.description || submitData.description || "",
+            type: "sub" as const,
+            ingredients: createdRecipe.ingredients || submitData.ingredients || [],
+          };
+
+          setLocalSubRecipes(prev => [...prev, newSubRecipe]);
+        }
       }
 
       if (finalRecipesToSubmit.length > 1) {
-        toast.success(`Successfully created ${finalRecipesToSubmit.length} recipes`, {
-          duration: 3000,
-          position: "top-right",
-        });
+        Toast.success(`Successfully created ${finalRecipesToSubmit.length} recipes`, { duration: 3000 });
       }
     } catch (error) {
       console.error('Submit error:', error);
-      toast.error("Some recipes failed to save", {
-        duration: 5000,
-        position: "top-right",
-      });
+      Toast.error(error, { duration: 5000 });
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter inventory and recipes
-  const filteredInventory = ingredients.filter((item) => {
-    const name = (item.Name || item.name || "").toLowerCase();
-    const sku = (item.sku || "").toLowerCase();
-    const search = inventorySearch.toLowerCase();
-    return name.includes(search) || sku.includes(search);
-  });
+  // Use localInventory (fetched with pagination) instead of passed ingredients
+  // The search filtering is done server-side in the fetchInventory function
+  const filteredInventory = localInventory;
 
-  const filteredRecipes = availableRecipeOptions.filter((recipe) => {
-    const name = (recipe.Name || "").toLowerCase();
-    const search = recipeSearch.toLowerCase();
-    return name.includes(search) && recipe.type === "sub";
-  });
+  // Merge available recipes with locally created sub recipes
+  const allSubRecipes = useMemo(() => {
+    const existingRecipes = availableRecipeOptions.filter(r => r.type === "sub");
+    // Add local recipes that aren't already in the list
+    const existingIds = new Set(existingRecipes.map(r => r._id || r.ID));
+    const newLocalRecipes = localSubRecipes.filter(r => !existingIds.has(r._id || r.ID));
+    const merged = [...existingRecipes, ...newLocalRecipes];
+
+    console.log('🔄 Merging sub recipes:', {
+      existingCount: existingRecipes.length,
+      localCount: localSubRecipes.length,
+      newLocalCount: newLocalRecipes.length,
+      totalCount: merged.length,
+      localSubRecipes,
+      newLocalRecipes,
+      merged
+    });
+
+    return merged;
+  }, [availableRecipeOptions, localSubRecipes]);
+
+  const filteredRecipes = useMemo(() => {
+    const filtered = allSubRecipes.filter((recipe) => {
+      const name = (recipe.Name || "").toLowerCase();
+      const search = recipeSearch.toLowerCase();
+      return name.includes(search);
+    });
+
+    console.log('🔍 Filtered Recipes:', {
+      searchTerm: recipeSearch,
+      allCount: allSubRecipes.length,
+      filteredCount: filtered.length,
+      filtered
+    });
+
+    return filtered;
+  }, [allSubRecipes, recipeSearch]);
 
   const getCompatibleUnits = (baseUnit: string): string[] => {
     const unit = baseUnit.toLowerCase();
@@ -768,14 +1022,25 @@ export default function RecipeModalNew({
               />
             </div>
 
-            <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {filteredInventory.length === 0 ? (
+            <div
+              ref={inventoryScrollRef}
+              onScroll={handleInventoryScroll}
+              className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {inventoryLoading && filteredInventory.length === 0 ? (
+                <div className="text-center py-8">
+                  <Loader2 className="h-10 w-10 text-[#9ca3af] mx-auto mb-2 animate-spin" />
+                  <p className="text-sm text-[#9ca3af]">Loading inventory...</p>
+                </div>
+              ) : filteredInventory.length === 0 ? (
                 <div className="text-center py-8">
                   <Package className="h-10 w-10 text-[#d1d5db] mx-auto mb-2" />
                   <p className="text-sm text-[#9ca3af]">No inventory items</p>
                 </div>
               ) : (
-                filteredInventory.map((item) => {
+                <>
+                {filteredInventory.map((item) => {
                   const itemId = String(item._id || item.id || item.ID);
                   const itemName = item.Name || item.name || "";
                   const itemUnit = item.Unit || item.baseUnit || "pc";
@@ -811,7 +1076,18 @@ export default function RecipeModalNew({
                       )}
                     </div>
                   );
-                })
+                })}
+                {inventoryLoading && filteredInventory.length > 0 && (
+                  <div className="text-center py-4 border-t border-[#e5e7eb]">
+                    <Loader2 className="h-5 w-5 text-[#9ca3af] mx-auto animate-spin" />
+                  </div>
+                )}
+                {!inventoryLoading && !inventoryHasMore && filteredInventory.length > 0 && (
+                  <div className="text-center py-3 border-t border-[#e5e7eb]">
+                    <p className="text-xs text-[#9ca3af]">All items loaded</p>
+                  </div>
+                )}
+                </>
               )}
             </div>
           </div>
@@ -1284,33 +1560,51 @@ export default function RecipeModalNew({
             </div>
 
             <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {(() => {
+                console.log('🎨 Rendering Sub Recipes Panel:', {
+                  filteredRecipesCount: filteredRecipes.length,
+                  localSubRecipesCount: localSubRecipes.length,
+                  filteredRecipes: filteredRecipes.map(r => ({ id: r._id || r.ID, name: r.Name })),
+                });
+                return null;
+              })()}
               {filteredRecipes.length === 0 ? (
                 <div className="text-center py-8">
                   <ChefHat className="h-10 w-10 text-[#d1d5db] mx-auto mb-2" />
                   <p className="text-sm text-[#9ca3af]">No sub recipes</p>
                 </div>
               ) : (
-                filteredRecipes.map((recipe) => {
+                filteredRecipes.map((recipe, index) => {
                   const recipeId = String(recipe._id || recipe.ID);
                   const recipeName = recipe.Name || "";
                   const isAdded = recipeIngredients.some(ing => ing.sourceId === recipeId);
+                  const isNewlyCreated = localSubRecipes.some(r => (r._id || r.ID) === (recipe._id || recipe.ID));
 
                   return (
                     <div
-                      key={recipeId}
+                      key={`${recipeId}-${index}`}
                       draggable={!isAdded}
                       onDragStart={() => !isAdded && handleRecipeDragStart(recipeId)}
                       className={cn(
-                        "group relative flex items-center h-[41px] px-3 bg-white border-b border-[#d5d5dd] transition-all",
+                        "group relative flex items-center h-[41px] px-3 border-b border-[#e5e7eb] transition-all",
+                        isNewlyCreated ? "bg-[#f0fdf4] animate-pulse" : "bg-white",
                         isAdded
                           ? "opacity-50 cursor-not-allowed"
                           : "cursor-grab active:cursor-grabbing hover:bg-[#f3e8ff]"
                       )}
                     >
                       <div className="flex items-center gap-2">
-                        <ChefHat className="h-4 w-4 text-[#9333ea] shrink-0" />
+                        <ChefHat className={cn(
+                          "h-4 w-4 shrink-0",
+                          isNewlyCreated ? "text-[#22c55e]" : "text-[#9333ea]"
+                        )} />
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-[#111827] truncate leading-tight">{recipeName}</div>
+                          <div className="text-sm font-medium text-[#111827] truncate leading-tight">
+                            {recipeName}
+                            {isNewlyCreated && (
+                              <span className="ml-1 text-[9px] font-bold text-[#22c55e]">NEW</span>
+                            )}
+                          </div>
                           <div className="text-[10px] text-[#9ca3af] font-medium uppercase leading-tight">
                             Sub Recipe
                           </div>

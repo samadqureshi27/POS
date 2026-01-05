@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { StaffService, type TenantStaff } from "@/lib/services/staff-service";
-import { toast } from "sonner";
+import { Toast } from "@/lib/util/toast-helpers";
 import { logError } from "@/lib/util/logger";
 
 export function useStaff(branchId?: string) {
@@ -40,7 +40,7 @@ export function useStaff(branchId?: string) {
         action: "loadStaff",
         branchId,
       });
-      toast.error("Failed to load staff members");
+      Toast.error("Failed to load staff members");
       setItems([]);
     } finally {
       setLoading(false);
@@ -94,18 +94,20 @@ export function useStaff(branchId?: string) {
   }, [items]);
 
   // Create staff
-  const handleCreateStaff = async (data: Partial<TenantStaff>) => {
+  const handleCreateStaff = async (data: Partial<TenantStaff>): Promise<TenantStaff | null> => {
     try {
       setActionLoading(true);
 
       const response = await StaffService.createStaff(data);
 
       if (response.success && response.data) {
-        toast.success("Staff member added successfully");
+        Toast.success("Staff member added successfully");
         // Optimistic update: Add new staff to local state
         setItems(prevItems => [...prevItems, response.data]);
         setIsModalOpen(false);
         setEditingItem(null);
+        // Return the created staff for PIN setup
+        return response.data;
       } else {
         throw new Error(response.message || "Failed to add staff member");
       }
@@ -115,7 +117,8 @@ export function useStaff(branchId?: string) {
         action: "handleCreateStaff",
         branchId,
       });
-      toast.error(error.message || "Failed to add staff member");
+      Toast.error(error.message || "Failed to add staff member");
+      return null;
     } finally {
       setActionLoading(false);
     }
@@ -128,7 +131,7 @@ export function useStaff(branchId?: string) {
       const response = await StaffService.updateStaff(id, data);
 
       if (response.success && response.data) {
-        toast.success("Staff member updated successfully");
+        Toast.success("Staff member updated successfully");
         // Optimistic update: Update staff in local state
         setItems(prevItems => prevItems.map(item =>
           (item._id || item.id) === id ? { ...item, ...response.data } : item
@@ -145,7 +148,7 @@ export function useStaff(branchId?: string) {
         branchId,
         staffId: id,
       });
-      toast.error(error.message || "Failed to update staff member");
+      Toast.error(error.message || "Failed to update staff member");
     } finally {
       setActionLoading(false);
     }
@@ -158,7 +161,7 @@ export function useStaff(branchId?: string) {
       const response = await StaffService.setPin(id, pin, branchId);
 
       if (response.success) {
-        toast.success("PIN set successfully");
+        Toast.success("PIN set successfully");
         // Optimistic update: Update PIN in local state
         setItems(prevItems => prevItems.map(item =>
           (item._id || item.id) === id ? { ...item, pin } : item
@@ -173,7 +176,7 @@ export function useStaff(branchId?: string) {
         branchId,
         staffId: id,
       });
-      toast.error(error.message || "Failed to set PIN");
+      Toast.error(error.message || "Failed to set PIN");
     } finally {
       setActionLoading(false);
     }
@@ -186,7 +189,7 @@ export function useStaff(branchId?: string) {
       const response = await StaffService.updateStatus(id, status, branchId);
 
       if (response.success) {
-        toast.success("Status updated successfully");
+        Toast.success("Status updated successfully");
         // Optimistic update: Update status in local state
         setItems(prevItems => prevItems.map(item =>
           (item._id || item.id) === id ? { ...item, status } : item
@@ -201,7 +204,7 @@ export function useStaff(branchId?: string) {
         branchId,
         staffId: id,
       });
-      toast.error(error.message || "Failed to update status");
+      Toast.error(error.message || "Failed to update status");
     } finally {
       setActionLoading(false);
     }

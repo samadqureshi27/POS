@@ -1,11 +1,12 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
+
 import React, { useState } from "react";
 import { Settings, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { toast } from "sonner";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import MenuModal from "./_components/menu-modal";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 import { useMenuOptions } from "@/lib/hooks/useMenuOptions";
@@ -54,7 +55,7 @@ const AddOnsPage = () => {
     const result = await handleModalSubmitOriginal();
     if (result.success) {
       const message = editingItem ? "Add-on updated successfully" : "Add-on created successfully";
-      toast.success(message, {
+      Toast.success(message, {
         duration: 5000,
         position: "top-right",
       });
@@ -65,7 +66,7 @@ const AddOnsPage = () => {
 
   const handleDelete = async (item: MenuItemOptions) => {
     if (!item.groupId) {
-      toast.error("Cannot delete: Invalid group ID", {
+      Toast.error("Cannot delete: Invalid group ID", {
         duration: 5000,
         position: "top-right",
       });
@@ -78,21 +79,21 @@ const AddOnsPage = () => {
       const deleteRes = await AddonsGroupsService.deleteGroup(item.groupId);
 
       if (deleteRes.success) {
-        toast.success("Add-on deleted successfully", {
+        Toast.success("Add-on deleted successfully", {
           duration: 5000,
           position: "top-right",
         });
         // Refresh to get latest data
         await refreshData();
       } else {
-        toast.error(deleteRes.message || "Failed to delete add-on", {
+        Toast.error(deleteRes.message || "Failed to delete add-on", {
           duration: 5000,
           position: "top-right",
         });
       }
     } catch (error) {
       console.error("Error deleting add-on:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to delete add-on", {
+      Toast.error(error instanceof Error ? error.message : "Failed to delete add-on", {
         duration: 5000,
         position: "top-right",
       });

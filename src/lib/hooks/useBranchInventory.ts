@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { BranchInventoryService, type BranchInventoryItem, type BranchInventoryStats } from "@/lib/services/branch-inventory-service";
 import { BranchService } from "@/lib/services/branch-service";
 import { resolveBranchObjectId } from "@/lib/services/branch-resolver";
-import { toast } from "sonner";
+import { Toast } from "@/lib/util/toast-helpers";
 import { logError } from "@/lib/util/logger";
 
 export function useBranchInventory(branchId: string | number) {
@@ -53,7 +53,7 @@ export function useBranchInventory(branchId: string | number) {
         })));
       }
 
-      toast.error(`Branch "${branchId}" not found. Check console for available branches.`);
+      Toast.error(`Branch "${branchId}" not found. Check console for available branches.`);
       return null;
     } catch (error: any) {
       logError("Error fetching branch ObjectId", error, {
@@ -61,7 +61,7 @@ export function useBranchInventory(branchId: string | number) {
         action: "fetchBranchObjectId",
         branchId,
       });
-      toast.error(`Failed to load branch information: ${error.message || 'Unknown error'}`);
+      Toast.error(`Failed to load branch information: ${error.message || 'Unknown error'}`);
       return null;
     }
   };
@@ -124,7 +124,7 @@ export function useBranchInventory(branchId: string | number) {
         action: "loadItems",
         branchId,
       });
-      toast.error(`Failed to load inventory for Branch #${branchId}`);
+      Toast.error(`Failed to load inventory for Branch #${branchId}`);
       setItems([]);
     } finally {
       setLoading(false);
@@ -179,7 +179,7 @@ export function useBranchInventory(branchId: string | number) {
       });
 
       if (response.success && response.data) {
-        toast.success("Inventory item created successfully");
+        Toast.success("Inventory item created successfully");
 
         // Extract item name from the populated response
         const createdItem = response.data;
@@ -214,7 +214,7 @@ export function useBranchInventory(branchId: string | number) {
         action: "handleCreateItem",
         branchId,
       });
-      toast.error(error.message || "Failed to create inventory item");
+      Toast.error(error.message || "Failed to create inventory item");
     } finally {
       setActionLoading(false);
     }
@@ -227,7 +227,7 @@ export function useBranchInventory(branchId: string | number) {
       const response = await BranchInventoryService.updateItem(id, data);
 
       if (response.success && response.data) {
-        toast.success("Inventory item updated successfully");
+        Toast.success("Inventory item updated successfully");
 
         // Extract item name from the populated response
         const updatedItem = response.data;
@@ -259,7 +259,7 @@ export function useBranchInventory(branchId: string | number) {
         branchId,
         itemId: id,
       });
-      toast.error(error.message || "Failed to update inventory item");
+      Toast.error(error.message || "Failed to update inventory item");
     } finally {
       setActionLoading(false);
     }
@@ -272,7 +272,7 @@ export function useBranchInventory(branchId: string | number) {
       const response = await BranchInventoryService.deleteItem(id);
 
       if (response.success) {
-        toast.success("Inventory item deleted successfully");
+        Toast.success("Inventory item deleted successfully");
         // Optimistic update: Remove item from local state
         setItems(prevItems => prevItems.filter(item => (item._id || item.id) !== id));
       } else {
@@ -285,7 +285,7 @@ export function useBranchInventory(branchId: string | number) {
         branchId,
         itemId: id,
       });
-      toast.error(error.message || "Failed to delete inventory item");
+      Toast.error(error.message || "Failed to delete inventory item");
     } finally {
       setActionLoading(false);
     }

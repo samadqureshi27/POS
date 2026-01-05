@@ -3,6 +3,7 @@
 import { buildHeaders } from "@/lib/util/service-helpers";
 import { logError } from "@/lib/util/logger";
 import { validateInventoryItems, validateInventoryItem } from "@/lib/util/data-validator";
+import { handleApiError, ParsedError } from "@/lib/util/error-handler";
 
 // ==================== Types ====================
 
@@ -105,6 +106,7 @@ export interface ApiResponse<T> {
   message?: string;
   data?: T;
   stats?: InventoryStats;
+  error?: ParsedError;
 }
 
 export interface InventoryStats {
@@ -334,7 +336,79 @@ export const InventoryService = {
     return { success: true, data: item };
   },
 
-  // Delete inventory item
+  // Archive inventory item (sets isActive: false)
+  async archiveItem(id: string): Promise<ApiResponse<InventoryItem>> {
+    try {
+      const url = buildUrl(`/t/inventory/items/${id}`);
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: buildHeaders(),
+        body: JSON.stringify({ isActive: false }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        const parsedError = handleApiError(
+          { ...data, status: res.status },
+          'archive item'
+        );
+        return {
+          success: false,
+          message: parsedError.message,
+          error: parsedError,
+        };
+      }
+
+      const item: InventoryItem = data?.result ?? data?.data ?? data;
+      return { success: true, data: item };
+    } catch (error: any) {
+      const parsedError = handleApiError(error, 'archiving inventory item');
+      return {
+        success: false,
+        message: parsedError.message,
+        error: parsedError,
+      };
+    }
+  },
+
+  // Restore inventory item (sets isActive: true)
+  async restoreItem(id: string): Promise<ApiResponse<InventoryItem>> {
+    try {
+      const url = buildUrl(`/t/inventory/items/${id}`);
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: buildHeaders(),
+        body: JSON.stringify({ isActive: true }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        const parsedError = handleApiError(
+          { ...data, status: res.status },
+          'restore item'
+        );
+        return {
+          success: false,
+          message: parsedError.message,
+          error: parsedError,
+        };
+      }
+
+      const item: InventoryItem = data?.result ?? data?.data ?? data;
+      return { success: true, data: item };
+    } catch (error: any) {
+      const parsedError = handleApiError(error, 'restoring inventory item');
+      return {
+        success: false,
+        message: parsedError.message,
+        error: parsedError,
+      };
+    }
+  },
+
+  // Delete inventory item (kept for backwards compatibility, but archive is recommended)
   async deleteItem(id: string): Promise<ApiResponse<null>> {
     const url = buildUrl(`/t/inventory/items/${id}`);
     const res = await fetch(url, { method: "DELETE", headers: buildHeaders() });

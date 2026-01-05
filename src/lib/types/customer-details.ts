@@ -1,5 +1,5 @@
 // types/customer.ts
-import { ApiResponse, ToastState } from "./common";
+import { ApiResponse } from "./common";
 
 export interface CustomerItem {
     Customer_ID: number;
@@ -13,11 +13,6 @@ export interface CustomerItem {
     Device: "Google Pay" | "Apple Pay";
     Registration_Date: string;
     Profile_Creation_Date: string;
-}
-
-export interface ToastState {
-    message: string;
-    type: "success" | "error";
 }
 
 export interface DateRangeState {

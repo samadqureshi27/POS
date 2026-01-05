@@ -1,5 +1,6 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
 import { Loader2, Info } from "lucide-react";
 import {
@@ -24,8 +25,6 @@ import {
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import type { EffectiveMenuItem, BranchMenuConfig } from "@/lib/services/branch-menu-service";
 import { MenuItemService, type TenantMenuItem } from "@/lib/services/menu-item-service";
-import { toast } from "sonner";
-
 interface BranchMenuModalProps {
   isOpen: boolean;
   item: EffectiveMenuItem | null;
@@ -128,7 +127,7 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
       }
     } catch (error) {
       console.error("Error loading menu items:", error);
-      toast.error("Failed to load available menu items");
+      Toast.error("Failed to load available menu items");
     } finally {
       setLoadingMenuItems(false);
     }
@@ -139,12 +138,12 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
 
     // Validation
     if (!formData.branchId) {
-      toast.error("Branch ID is missing. Please try again.");
+      Toast.error("Branch ID is missing. Please try again.");
       return;
     }
 
     if (!formData.menuItemId) {
-      toast.error("Please select a menu item");
+      Toast.error("Please select a menu item");
       return;
     }
 

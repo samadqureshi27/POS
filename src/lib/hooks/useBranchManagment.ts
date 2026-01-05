@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 // import { BranchAPI } from "../util/branch-api";
 import { useSelection } from "./selection";
-import { useToast } from './toast';
+import { Toast } from "@/lib/util/toast-helpers";
 import { useBranchModal } from "./branchModal";
 import { BranchItem } from "@/lib/types/branch";
 import { BranchService, TenantBranch } from "@/lib/services/branch-service";
@@ -17,7 +17,6 @@ export const useBranchManagement = () => {
     const [actionLoading, setActionLoading] = useState(false);
 
     // Custom hooks
-    const { toast, showToast, hideToast } = useToast();
     const {
         selectedItems,
         handleSelectAll,
@@ -72,11 +71,11 @@ export const useBranchManagement = () => {
                 component: "useBranchManagement",
                 action: "loadBranchItems",
             });
-            showToast("Failed to load Branch items", "error");
+            Toast.error("Failed to load Branch items");
         } finally {
             setLoading(false);
         }
-    }, [showToast]);
+    }, []);
 
     // Memoized filtering
     const filteredItems = useMemo(() => {
@@ -110,9 +109,9 @@ export const useBranchManagement = () => {
             if (response.success) {
                 await loadBranchItems();
                 closeModal();
-                showToast(response.message || "Branch created successfully", "success");
+                Toast.success(response.message || "Branch created successfully");
             } else {
-                showToast(response.message || "Create branch failed", "error");
+                Toast.error(response.message || "Create branch failed");
                 return;
             }
         } catch (error: any) {
@@ -121,7 +120,7 @@ export const useBranchManagement = () => {
                 action: "handleCreateItem",
                 branchName: itemData.Branch_Name,
             });
-            showToast(error?.message || "Failed to create Branch", "error");
+            Toast.error(error?.message || "Failed to create Branch");
         } finally {
             setActionLoading(false);
         }
@@ -130,7 +129,7 @@ export const useBranchManagement = () => {
     // Update item
     const handleUpdateItem = async (itemData: Omit<BranchItem, "Branch-ID">) => {
         if (!editingItem || !editingItem.backendId) {
-            showToast("Backend ID not found for selected branch", "error");
+            Toast.error("Backend ID not found for selected branch");
             return;
         }
         try {
@@ -148,12 +147,12 @@ export const useBranchManagement = () => {
             if (response.success) {
                 await loadBranchItems();
                 closeModal();
-                showToast(response.message || "Branch updated successfully", "success");
+                Toast.success(response.message || "Branch updated successfully");
             } else {
                 throw new Error(response.message || "Update branch failed");
             }
         } catch (error: any) {
-            showToast(error?.message || "Failed to update Branch", "error");
+            Toast.error(error?.message || "Failed to update Branch");
         } finally {
             setActionLoading(false);
         }
@@ -182,10 +181,10 @@ export const useBranchManagement = () => {
             await loadBranchItems();
             clearSelection();
             const count = idsToDelete.length;
-            showToast(`${count} branch${count > 1 ? 'es' : ''} deleted successfully`, "success");
+            Toast.success(`${count} branch${count > 1 ? 'es' : ''} deleted successfully`);
         } catch (error) {
             console.error("Failed to delete branches:", error);
-            showToast("Failed to delete some branches", "error");
+            Toast.error("Failed to delete some branches");
         } finally {
             setActionLoading(false);
         }
@@ -197,7 +196,7 @@ export const useBranchManagement = () => {
             !formData.Branch_Name.trim() ||
             !formData.Address.trim()
         ) {
-            showToast("Please fill all required fields", "error");
+            Toast.error("Please fill all required fields");
             return;
         }
         if (editingItem) {
@@ -227,10 +226,6 @@ export const useBranchManagement = () => {
         loading,
         actionLoading,
         statistics,
-
-        // Toast
-        toast,
-        hideToast,
 
         // Selection
         selectedItems,

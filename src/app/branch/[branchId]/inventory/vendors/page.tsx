@@ -7,7 +7,7 @@ import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { Toaster } from "@/components/ui/sonner";
-import { useToast } from "@/lib/hooks";
+import { Toast } from "@/lib/util/toast-helpers";
 import VendorModal from "./_components/vendor-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useVendorManagement } from "@/lib/hooks/useVendors";
@@ -20,7 +20,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 const VendorsPage = () => {
   const params = useParams();
   const branchId = parseInt(params?.branchId as string) || 1;
-  const { showToast } = useToast();
+  
 
   const {
     // State
@@ -74,7 +74,7 @@ const VendorsPage = () => {
 
   const handleDeleteWithToast = async () => {
     if (selectedItems.length === 0) {
-      showToast("Please select vendors to delete", "warning");
+      Toast.warning("Please select vendors to delete");
       return;
     }
     setDeleteDialogOpen(true);

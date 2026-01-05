@@ -2,7 +2,7 @@
 import React from "react";
 
 // Hooks
-import { useToast } from '@/lib/hooks';
+import { Toast } from "@/lib/util/toast-helpers";
 import { useModal } from '@/lib/hooks';
 import { useBackup } from '@/lib/hooks/useBackup';
 
@@ -17,7 +17,7 @@ import { PageContainer } from "@/components/ui/page-container";
 
 const BackupRecoveryPage = () => {
   // Custom hooks
-  const { showToast } = useToast();
+  
   const { modal, showModal, closeModal } = useModal();
   
   const {
@@ -34,7 +34,7 @@ const BackupRecoveryPage = () => {
     handleCreateBackup,
     handleDeleteBackup,
     handleRestoreBackup,
-  } = useBackup({ showToast, showModal });
+  } = useBackup({ showModal });
 
   if (loading) {
     return <GlobalSkeleton type="management" showActionBar={false} />;

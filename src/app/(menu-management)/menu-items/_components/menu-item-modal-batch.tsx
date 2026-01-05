@@ -1,5 +1,6 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
 import { Loader2, Plus, X, Search, UtensilsCrossed, BookOpen, ChefHat, Package, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
@@ -11,7 +12,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 import { MenuCategoryService } from "@/lib/services/menu-category-service";
 import { MenuItemService, TenantMenuItem } from "@/lib/services/menu-item-service";
 import { RecipeService } from "@/lib/services/recipe-service";
@@ -234,7 +234,7 @@ export default function MenuItemModalBatch({
 
   const handleQuickCreateCategory = async () => {
     if (!categoryFormData.name) {
-      toast.error("Category name is required");
+      Toast.error("Category name is required");
       return;
     }
 
@@ -252,7 +252,7 @@ export default function MenuItemModalBatch({
       const response = await MenuCategoryService.createCategory(payload);
 
       if (response.success && response.data) {
-        toast.success(`Category "${categoryFormData.name}" created successfully`);
+        Toast.success(`Category "${categoryFormData.name}" created successfully`);
 
         // Auto-select the newly created category
         const newCategoryId = String(response.data._id || response.data.id);
@@ -271,14 +271,14 @@ export default function MenuItemModalBatch({
         // Trigger parent to refresh categories
         onSuccess();
       } else {
-        toast.error(response.message || "Failed to create category");
+        Toast.error(response.message || "Failed to create category");
       }
     } catch (error) {
       logError("Error creating category", error, {
         component: "MenuItemModalBatch",
         action: "handleQuickCreateCategory",
       });
-      toast.error("Failed to create category");
+      Toast.error("Failed to create category");
     } finally {
       setCreatingCategory(false);
     }
@@ -293,7 +293,7 @@ export default function MenuItemModalBatch({
 
   const handleRemoveMenuItem = (id: string) => {
     if (menuItems.length === 1) {
-      toast.error("At least one menu item is required");
+      Toast.error("At least one menu item is required");
       return;
     }
     setMenuItems(menuItems.filter(item => item.id !== id));
@@ -381,7 +381,7 @@ export default function MenuItemModalBatch({
     }
 
     setDraggedRecipe(null);
-    toast.success(`Recipe "${recipeName}" added to menu item`);
+    Toast.success(`Recipe "${recipeName}" added to menu item`);
   };
 
   const handleVariationToggle = (menuItemId: string, variationId: string) => {
@@ -415,14 +415,14 @@ export default function MenuItemModalBatch({
   // Submit handler
   const handleSubmit = async () => {
     if (!selectedCategoryId) {
-      toast.error("Please select a category first");
+      Toast.error("Please select a category first");
       return;
     }
 
     // Validate all menu items
     const invalidItems = menuItems.filter(item => !item.name || item.pricing.basePrice <= 0);
     if (invalidItems.length > 0) {
-      toast.error(`${invalidItems.length} menu item(s) have missing or invalid data`);
+      Toast.error(`${invalidItems.length} menu item(s); have missing or invalid data`);
       return;
     }
 
@@ -501,7 +501,7 @@ export default function MenuItemModalBatch({
         }
 
         if (successCount > 0) {
-          toast.success(`${successCount} menu item(s) created successfully`);
+          Toast.success(`${successCount} menu item(s); created successfully`);
 
           // Reset form state before closing
           setMenuItems([]);
@@ -515,7 +515,7 @@ export default function MenuItemModalBatch({
         }
 
         if (failCount > 0) {
-          toast.error(`${failCount} menu item(s) failed to create`);
+          Toast.error(`${failCount} menu item(s); failed to create`);
         }
       }
     } catch (error) {
@@ -523,7 +523,7 @@ export default function MenuItemModalBatch({
         component: "MenuItemModalBatch",
         action: "handleSubmit",
       });
-      toast.error(editingItem ? "Failed to update menu item" : "Failed to create menu items");
+      Toast.error(editingItem ? "Failed to update menu item" : "Failed to create menu items");
     } finally {
       setSubmitting(false);
     }

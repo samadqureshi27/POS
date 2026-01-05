@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { RestaurantData } from '@/lib/types';
 import { RestaurantAPI } from '../util/restaurant-api';
 import { validateRestaurantForm } from '../util/validation';
-import { useToast } from './toast';
+import { Toast } from "@/lib/util/toast-helpers";
 
 export const useRestaurantProfile = () => {
     const [formData, setFormData] = useState<RestaurantData>({
@@ -24,7 +24,7 @@ export const useRestaurantProfile = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
-    const { showToast } = useToast();
+    
 
     const loadProfile = useCallback(async () => {
         try {
@@ -33,11 +33,11 @@ export const useRestaurantProfile = () => {
             if (!response.success) throw new Error(response.message);
             setFormData((prev) => ({ ...prev, ...response.data }));
         } catch {
-            showToast("Failed to load restaurant profile", "error");
+            Toast.error("Failed to load restaurant profile");
         } finally {
             setLoading(false);
         }
-    }, [showToast]);
+    }, []);
 
     const handleInputChange = useCallback((
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -55,27 +55,27 @@ export const useRestaurantProfile = () => {
     const handleLogoChange = useCallback((file: File | null) => {
         if (file && file.type.startsWith("image/")) {
             if (file.size > 5 * 1024 * 1024) {
-                showToast("File size must be less than 5MB", "error");
+                Toast.error("File size must be less than 5MB");
                 return;
             }
             setFormData((prev) => ({ ...prev, logo: file }));
             setPreviewUrl(URL.createObjectURL(file));
             setHasChanges(true);
-            showToast("Logo uploaded successfully!", "success");
+            Toast.success("Logo uploaded successfully!");
         }
-    }, [showToast]);
+    }, []);
 
     const removeLogo = useCallback(() => {
         setFormData((prev) => ({ ...prev, logo: null }));
         setPreviewUrl(null);
         setHasChanges(true);
-        showToast("Logo removed successfully", "success");
-    }, [showToast]);
+        Toast.success("Logo removed successfully");
+    }, []);
 
     const handleSave = useCallback(async () => {
         const validation = validateRestaurantForm(formData);
         if (!validation.isValid) {
-            showToast(validation.message, "error");
+            Toast.error(validation.message);
             return;
         }
 
@@ -85,17 +85,14 @@ export const useRestaurantProfile = () => {
             const response = await RestaurantAPI.updateProfile(dataToSave);
             if (response.success) {
                 setHasChanges(false);
-                showToast(
-                    response.message || "Restaurant profile updated successfully! ✨",
-                    "success"
-                );
+                Toast.success(response.message || "Restaurant profile updated successfully! ✨");
             }
         } catch {
-            showToast("Failed to save restaurant profile", "error");
+            Toast.error("Failed to save restaurant profile");
         } finally {
             setSaving(false);
         }
-    }, [formData, showToast]);
+    }, [formData]);
 
     const resetForm = useCallback(() => {
         loadProfile();

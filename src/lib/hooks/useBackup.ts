@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { BackupSettings, BackupHistoryItem } from "@/lib/types/backup";
 import { BackupAPI } from "../util/backup-api";
 import { logError } from "@/lib/util/logger";
+import { Toast } from "@/lib/util/toast-helpers";
 
 interface UseBackupProps {
-    showToast: (message: string, type: "success" | "error") => void;
     showModal: (
         title: string,
         message: string,
@@ -13,7 +13,7 @@ interface UseBackupProps {
     ) => void;
 }
 
-export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
+export const useBackup = ({ showModal }: UseBackupProps) => {
     const [settings, setSettings] = useState<BackupSettings | null>(null);
     const [backupHistory, setBackupHistory] = useState<BackupHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,11 +37,11 @@ export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
             setSettings(settingsResponse.data);
             setBackupHistory(historyResponse.data);
         } catch {
-            showToast("Failed to load backup data", "error");
+            Toast.error("Failed to load backup data");
         } finally {
             setLoading(false);
         }
-    }, [showToast]);
+    }, []);
 
     const handleSettingChange = useCallback(
         (key: keyof BackupSettings, value: any) => {
@@ -59,17 +59,14 @@ export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
             const response = await BackupAPI.updateSettings(settings);
             if (response.success) {
                 setHasChanges(false);
-                showToast(
-                    response.message || "Settings saved successfully! 🎉",
-                    "success"
-                );
+                Toast.success(response.message || "Settings saved successfully! 🎉");
             }
         } catch {
-            showToast("Failed to save settings. Please try again.", "error");
+            Toast.error("Failed to save settings. Please try again.");
         } finally {
             setSaving(false);
         }
-    }, [settings, showToast]);
+    }, [settings]);
 
     const handleCreateBackup = useCallback(
         async (type: "full" | "partial" = "full") => {
@@ -89,7 +86,7 @@ export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
 
                 // Check if at least one data type is selected
                 if (selectedData.length === 0) {
-                    showToast("Please select at least one data type to backup", "error");
+                    Toast.error("Please select at least one data type to backup");
                     return;
                 }
 
@@ -100,12 +97,9 @@ export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
                     if (historyResponse.success) {
                         setBackupHistory(historyResponse.data);
                     }
-                    showToast(
-                        `Backup created successfully with ${selectedData.length} data type(s)! ✨`,
-                        "success"
-                    );
+                    Toast.success(`Backup created successfully with ${selectedData.length} data type(s)! ✨`);
                 } else {
-                    showToast("Failed to create backup", "error");
+                    Toast.error("Failed to create backup");
                 }
             } catch (error) {
                 logError("Backup creation error", error, {
@@ -113,12 +107,12 @@ export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
                     action: "handleCreateBackup",
                     backupType: type,
                 });
-                showToast("Failed to create backup", "error");
+                Toast.error("Failed to create backup");
             } finally {
                 setCreatingBackup(false);
             }
         },
-        [settings, showToast]
+        [settings]
     );
 
     const handleDeleteBackup = useCallback(
@@ -139,13 +133,10 @@ export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
                             if (historyResponse.success) {
                                 setBackupHistory(historyResponse.data);
                             }
-                            showToast(
-                                response.message || "Backup deleted successfully! 🗑️",
-                                "success"
-                            );
+                            Toast.success(response.message || "Backup deleted successfully! 🗑️");
                         }
                     } catch {
-                        showToast("Failed to delete backup", "error");
+                        Toast.error("Failed to delete backup");
                     } finally {
                         setDeleting(null);
                     }
@@ -153,7 +144,7 @@ export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
                 true
             );
         },
-        [backupHistory, showModal, showToast]
+        [backupHistory, showModal]
     );
 
     const handleRestoreBackup = useCallback(
@@ -169,20 +160,17 @@ export const useBackup = ({ showToast, showModal }: UseBackupProps) => {
                         setRestoring(backupId);
                         const response = await BackupAPI.restoreBackup(backupId);
                         if (response.success) {
-                            showToast(
-                                response.message || "Backup restored successfully! 🔄",
-                                "success"
-                            );
+                            Toast.success(response.message || "Backup restored successfully! 🔄");
                         }
                     } catch {
-                        showToast("Failed to restore backup", "error");
+                        Toast.error("Failed to restore backup");
                     } finally {
                         setRestoring(null);
                     }
                 }
             );
         },
-        [backupHistory, showModal, showToast]
+        [backupHistory, showModal]
     );
 
     useEffect(() => {

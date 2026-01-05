@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { PosService } from "../services/pos-service";
 import { useSelection } from "./selection";
-import { useToast } from './toast';
+import { Toast } from "@/lib/util/toast-helpers";
 import { usePosModal } from "./posModal";
 import { PosItem } from "@/lib/types/pos";
 import { logError } from "@/lib/util/logger";
@@ -14,7 +14,7 @@ export const usePosManagement = (branchId: string) => {
     const [actionLoading, setActionLoading] = useState(false);
 
     // Custom hooks
-    const { toast, toastVisible, showToast, hideToast } = useToast();
+    
     const {
         selectedItems,
         handleSelectAll,
@@ -48,7 +48,7 @@ export const usePosManagement = (branchId: string) => {
     // Load POS items
     const loadPosItems = async () => {
         if (!branchId) {
-            showToast("Branch ID not found", "error");
+            Toast.error("Branch ID not found");
             setLoading(false);
             return;
         }
@@ -68,7 +68,7 @@ export const usePosManagement = (branchId: string) => {
                 action: "loadPosItems",
                 branchId,
             });
-            showToast("Failed to load POS items", "error");
+            Toast.error("Failed to load POS items");
         } finally {
             setLoading(false);
         }
@@ -98,7 +98,7 @@ export const usePosManagement = (branchId: string) => {
                 setPosItems(prev => [...prev, convertToFrontendFormat(response.data)]);
                 closeModal();
                 setSearchTerm("");
-                showToast(response.message || "POS created successfully", "success");
+                Toast.success(response.message || "POS created successfully");
             }
         } catch (error) {
             logError("Error creating POS", error, {
@@ -106,7 +106,7 @@ export const usePosManagement = (branchId: string) => {
                 action: "handleCreateItem",
                 branchId,
             });
-            showToast("Failed to create POS", "error");
+            Toast.error("Failed to create POS");
         } finally {
             setActionLoading(false);
         }
@@ -130,10 +130,10 @@ export const usePosManagement = (branchId: string) => {
                     )
                 );
                 closeModal();
-                showToast(response.message || "POS updated successfully", "success");
+                Toast.success(response.message || "POS updated successfully");
             }
         } catch (error) {
-            showToast("Failed to update POS", "error");
+            Toast.error("Failed to update POS");
         } finally {
             setActionLoading(false);
         }
@@ -149,10 +149,10 @@ export const usePosManagement = (branchId: string) => {
                 // Optimistic update: Remove deleted items from local state
                 setPosItems(prev => prev.filter(item => !selectedItems.includes(item.POS_ID)));
                 clearSelection();
-                showToast(response.message || "POS items deleted successfully", "success");
+                Toast.success(response.message || "POS items deleted successfully");
             }
         } catch (error) {
-            showToast("Failed to delete POS items", "error");
+            Toast.error("Failed to delete POS items");
         } finally {
             setActionLoading(false);
         }
@@ -161,11 +161,11 @@ export const usePosManagement = (branchId: string) => {
     // Modal submit handler
     const handleModalSubmit = () => {
         if (!formData.POS_Name.trim()) {
-            showToast("Please enter a POS name", "error");
+            Toast.error("Please enter a POS name");
             return;
         }
         if (!formData.machineId?.trim()) {
-            showToast("Please enter a Machine ID", "error");
+            Toast.error("Please enter a Machine ID");
             return;
         }
         if (editingItem) {
@@ -195,12 +195,6 @@ export const usePosManagement = (branchId: string) => {
         loading,
         actionLoading,
         statistics,
-
-        // Toast
-        toast,
-        toastVisible,
-        hideToast,
-
         // Selection - Updated to use POS_ID field
         selectedItems,
         isAllSelected,

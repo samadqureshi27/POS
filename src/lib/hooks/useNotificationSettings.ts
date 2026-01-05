@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { NotificationSettings } from "@/lib/types/notification";
 import { NotificationsAPI } from "../util/notifications-api";
+import { Toast } from "@/lib/util/toast-helpers";
 
-export const useNotificationSettings = (
-    onToast: (message: string, type: "success" | "error") => void
-) => {
+export const useNotificationSettings = () => {
     const [settings, setSettings] = useState<NotificationSettings | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -22,7 +21,7 @@ export const useNotificationSettings = (
             if (!response.success) throw new Error(response.message);
             setSettings(response.data);
         } catch {
-            onToast("Failed to load notification settings", "error");
+            Toast.error("Failed to load notification settings");
         } finally {
             setLoading(false);
         }
@@ -44,13 +43,10 @@ export const useNotificationSettings = (
             const response = await NotificationsAPI.updateSettings(settings);
             if (response.success) {
                 setHasChanges(false);
-                onToast(
-                    response.message || "Notification settings updated successfully!",
-                    "success"
-                );
+                Toast.success(response.message || "Notification settings updated successfully!");
             }
         } catch {
-            onToast("Failed to save notification settings", "error");
+            Toast.error("Failed to save notification settings");
         } finally {
             setSaving(false);
         }
@@ -63,13 +59,10 @@ export const useNotificationSettings = (
             if (response.success) {
                 setSettings(response.data);
                 setHasChanges(false);
-                onToast(
-                    response.message || "Settings reset to defaults successfully!",
-                    "success"
-                );
+                Toast.success(response.message || "Settings reset to defaults successfully!");
             }
         } catch {
-            onToast("Failed to reset settings", "error");
+            Toast.error("Failed to reset settings");
         } finally {
             setResetting(false);
         }

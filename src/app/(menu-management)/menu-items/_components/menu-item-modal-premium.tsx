@@ -1,12 +1,12 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
 import {
   Loader2, GripVertical, UtensilsCrossed, BookOpen, X, Search, Plus, Upload,
   Image as ImageIcon, Tag, DollarSign, Hash, Eye, EyeOff, Check, ChevronDown,
   Sparkles, AlertCircle, Info
 } from "lucide-react";
-import { toast } from "sonner";
 import { RecipeService } from "@/lib/services/recipe-service";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -189,7 +189,7 @@ export default function MenuItemModalPremium({
 
             if (recipe?.name && !prev.name) {
               updates.name = recipe.name;
-              toast.success("Name auto-filled from recipe");
+              Toast.success("Name auto-filled from recipe");
             }
 
             if (recipe?.description && !prev.description) {
@@ -202,7 +202,7 @@ export default function MenuItemModalPremium({
                 basePrice: recipe.totalCost || 0,
               };
               if (recipe.totalCost > 0) {
-                toast.success(`Price auto-filled: ${recipe.totalCost}`);
+                Toast.success(`Price auto-filled: ${recipe.totalCost}`);
               }
             }
 
@@ -245,7 +245,7 @@ export default function MenuItemModalPremium({
         tags: [...(prev.tags || []), currentTag.trim()],
       }));
       setCurrentTag("");
-      toast.success(`Tag "${currentTag.trim()}" added`);
+      Toast.success(`Tag "${currentTag.trim()}" added`);
     }
   };
 
@@ -275,7 +275,7 @@ export default function MenuItemModalPremium({
     if (draggedCategory) {
       handleCategorySelect(draggedCategory);
       setDraggedCategory(null);
-      toast.success("Category added!");
+      Toast.success("Category added!");
     }
   };
 
@@ -298,7 +298,7 @@ export default function MenuItemModalPremium({
     if (draggedRecipe) {
       handleRecipeSelect(draggedRecipe);
       setDraggedRecipe(null);
-      toast.success("Recipe added!");
+      Toast.success("Recipe added!");
     }
   };
 
@@ -312,12 +312,12 @@ export default function MenuItemModalPremium({
 
   const handleSave = async () => {
     if (!formData.name || !formData.categoryId) {
-      toast.error("Please fill in all required fields (Name, Category)");
+      Toast.error("Please fill in all required fields (Name, Category);");
       return;
     }
 
     if (!formData.pricing?.basePrice || formData.pricing.basePrice <= 0) {
-      toast.error("Please enter a valid price");
+      Toast.error("Please enter a valid price");
       return;
     }
 
@@ -329,7 +329,7 @@ export default function MenuItemModalPremium({
         : undefined;
 
       if (!categoryId) {
-        toast.error("Category is required");
+        Toast.error("Category is required");
         return;
       }
 
@@ -792,7 +792,7 @@ export default function MenuItemModalPremium({
                         type="button"
                         variant="outline"
                         className="h-12 px-6 border-2 border-gray-200 hover:border-blue-400"
-                        onClick={() => toast.info("File upload coming soon!")}
+                        onClick={() => Toast.info("File upload coming soon!")}
                       >
                         <Upload className="h-5 w-5 mr-2" />
                         Upload

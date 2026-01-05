@@ -1,9 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { Toast } from "@/lib/util/toast-helpers";
 import { Package, Plus, Upload, Download, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+
+import { Toaster } from "@/components/ui/sonner";
+
 import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { StatCardsGrid } from "@/components/ui/stat-cards-grid";
@@ -49,8 +53,10 @@ function ItemsPageContent() {
   const [isValidationErrorsOpen, setIsValidationErrorsOpen] = useState(false);
 
   // Confirmation Dialogs
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
+  const [itemToArchive, setItemToArchive] = useState<InventoryItem | null>(null);
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const [itemToRestore, setItemToRestore] = useState<InventoryItem | null>(null);
   const [duplicatePolicyDialogOpen, setDuplicatePolicyDialogOpen] = useState(false);
   const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
 
@@ -124,13 +130,13 @@ function ItemsPageContent() {
         if (token) {
           // We have a token but backend rejected it - it might be expired
           console.warn('Token exists but was rejected by backend. Token might be expired.');
-          toast.error('Your session has expired. Please login again.');
+          Toast.error('Your session has expired. Please login again.');
           setTimeout(() => {
             window.location.href = '/login';
           }, 1000);
         } else {
           // No token at all - definitely need to login
-          toast.error('Please login to continue.');
+          Toast.error('Please login to continue.');
           window.location.href = '/login';
         }
         return;
@@ -141,7 +147,7 @@ function ItemsPageContent() {
         component: "ItemsManagement",
         action: "loadItems",
       });
-      toast.error(response.message || 'Failed to load items');
+      Toast.error(response.message || 'Failed to load items');
     }
     setLoading(false);
   };
@@ -183,35 +189,85 @@ function ItemsPageContent() {
     setIsItemModalOpen(true);
   };
 
-  const handleDeleteItem = (item: InventoryItem) => {
-    setItemToDelete(item);
-    setDeleteDialogOpen(true);
+  const handleArchiveItem = (item: InventoryItem) => {
+    setItemToArchive(item);
+    setArchiveDialogOpen(true);
   };
 
-  const confirmDelete = async () => {
-    if (!itemToDelete) return;
+  const confirmArchive = async () => {
+    if (!itemToArchive) return;
 
-    const itemId = itemToDelete._id || itemToDelete.id;
+    const itemId = itemToArchive._id || itemToArchive.id;
     if (!itemId) {
-      toast.error("Item ID is missing");
+      Toast.error("Item ID is missing");
       return;
     }
 
-    const response = await InventoryService.deleteItem(itemId);
+    const response = await InventoryService.archiveItem(itemId);
     if (response.success) {
-      toast.success(`Deleted "${itemToDelete.name}" successfully`, {
-        duration: 5000,
-        position: "top-right",
-      });
-      // Optimistic update: Remove item from local state
-      setItems(prevItems => prevItems.filter(item => (item._id || item.id) !== itemId));
-      setDeleteDialogOpen(false);
-      setItemToDelete(null);
+      Toast.success(`Archived "${itemToArchive.name}" successfully`, { duration: 5000 });
+
+      // Optimistic update: Update item status in local state or remove if filter is set to Active
+      if (filterStatus === "Active") {
+        setItems(prevItems => prevItems.filter(item => (item._id || item.id) !== itemId));
+      } else {
+        setItems(prevItems => prevItems.map(item =>
+          (item._id || item.id) === itemId
+            ? { ...item, isActive: false }
+            : item
+        ));
+      }
+      setArchiveDialogOpen(false);
+      setItemToArchive(null);
+
+      // Refresh stats
+      loadItems(false);
     } else {
-      toast.error(`Failed to delete item: ${response.message}`, {
-        duration: 5000,
-        position: "top-right",
-      });
+      Toast.error(
+        response.error || response.message || "Failed to archive item",
+        { duration: 5000 }
+      );
+    }
+  };
+
+  const handleRestoreItem = (item: InventoryItem) => {
+    setItemToRestore(item);
+    setRestoreDialogOpen(true);
+  };
+
+  const confirmRestore = async () => {
+    if (!itemToRestore) return;
+
+    const itemId = itemToRestore._id || itemToRestore.id;
+    if (!itemId) {
+      Toast.error("Item ID is missing");
+      return;
+    }
+
+    const response = await InventoryService.restoreItem(itemId);
+    if (response.success) {
+      Toast.success(`Restored "${itemToRestore.name}" successfully`, { duration: 5000 });
+
+      // Optimistic update: Update item status in local state or remove if filter is set to Inactive
+      if (filterStatus === "Inactive") {
+        setItems(prevItems => prevItems.filter(item => (item._id || item.id) !== itemId));
+      } else {
+        setItems(prevItems => prevItems.map(item =>
+          (item._id || item.id) === itemId
+            ? { ...item, isActive: true }
+            : item
+        ));
+      }
+      setRestoreDialogOpen(false);
+      setItemToRestore(null);
+
+      // Refresh stats
+      loadItems(false);
+    } else {
+      Toast.error(
+        response.error || response.message || "Failed to restore item",
+        { duration: 5000 }
+      );
     }
   };
 
@@ -222,7 +278,7 @@ function ItemsPageContent() {
       if (editingItem) {
         const itemId = editingItem._id || editingItem.id;
         if (!itemId) {
-          toast.error("Item ID is missing");
+          Toast.error("Item ID is missing");
           return;
         }
         response = await InventoryService.updateItem(itemId, data);
@@ -235,7 +291,7 @@ function ItemsPageContent() {
       if (response.success) {
         // Show success toast FIRST
         const message = editingItem ? "Item updated successfully" : "Item added successfully";
-        toast.success(message, {
+        Toast.success(message, {
           duration: 5000,
           position: "top-right",
         });
@@ -281,11 +337,11 @@ function ItemsPageContent() {
           }
         }
       } else {
-        toast.error(`Failed to save item: ${response.message}`);
+        Toast.error(`Failed to save item: ${response.message}`);
       }
     } catch (error: any) {
       console.error("Error saving item:", error);
-      toast.error(error?.message || "Failed to save item");
+      Toast.error(error?.message || "Failed to save item");
     }
   };
 
@@ -303,16 +359,16 @@ function ItemsPageContent() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        toast.success('Template downloaded successfully');
+        Toast.success('Template downloaded successfully');
       } else {
-        toast.error(`Failed to download template: ${response.message}`);
+        Toast.error(`Failed to download template: ${response.message}`);
       }
     } catch (error) {
       logError('Error downloading template', error, {
         component: "ItemsManagement",
         action: "handleDownloadTemplate",
       });
-      toast.error('Failed to download template. Please try again.');
+      Toast.error('Failed to download template. Please try again.');
     }
   };
 
@@ -333,16 +389,16 @@ function ItemsPageContent() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        toast.success('Items exported successfully');
+        Toast.success('Items exported successfully');
       } else {
-        toast.error(`Failed to export items: ${response.message}`);
+        Toast.error(`Failed to export items: ${response.message}`);
       }
     } catch (error) {
       logError('Error exporting items', error, {
         component: "ItemsManagement",
         action: "handleExport",
       });
-      toast.error('Failed to export items. Please try again.');
+      Toast.error('Failed to export items. Please try again.');
     }
   };
 
@@ -358,7 +414,7 @@ function ItemsPageContent() {
     const allowedTypes = ['.csv', '.xlsx'];
     const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!allowedTypes.includes(fileExtension)) {
-      toast.error('Please select a CSV or XLSX file.');
+      Toast.error('Please select a CSV or XLSX file.');
       return;
     }
 
@@ -380,12 +436,12 @@ function ItemsPageContent() {
           fileInputRef.current.value = "";
         }
 
-        toast.error(`Found ${validationResult.invalidRows} validation error(s). Please fix and try again.`);
+        Toast.error(`Found ${validationResult.invalidRows} validation error(s);. Please fix and try again.`);
         return;
       }
 
       // Show success message
-      toast.success(`✅ Validation passed! All ${validationResult.totalRows} rows are valid.`);
+      Toast.success(`✅ Validation passed! All ${validationResult.totalRows} rows are valid.`);
     }
 
     // Store file and show duplicate policy dialog
@@ -416,14 +472,14 @@ function ItemsPageContent() {
         setIsImportResultsOpen(true);
         loadItems(); // Refresh the items list
       } else {
-        toast.error(`Import failed: ${response.message || 'Unknown error occurred'}`);
+        Toast.error(`Import failed: ${response.message || 'Unknown error occurred'}`);
       }
     } catch (error) {
       logError('Error importing items', error, {
         component: "ItemsManagement",
         action: "processImport",
       });
-      toast.error('Failed to import file. Please check the file format and try again.');
+      Toast.error('Failed to import file. Please check the file format and try again.');
     } finally {
       // Reset file input and pending file
       if (fileInputRef.current) {
@@ -439,6 +495,8 @@ function ItemsPageContent() {
 
   return (
     <PageContainer className="pt-6">
+      <Toaster position="top-right" />
+
       <PageHeader
         title="Inventory Hub"
         subtitle="Manage your items, units, and stock levels"
@@ -552,7 +610,9 @@ function ItemsPageContent() {
         emptyDescription="Start by adding your first inventory item"
         getItemId={(item) => item._id || item.id || ""}
         onEdit={handleEditItem}
-        onDelete={handleDeleteItem}
+        onArchive={handleArchiveItem}
+        onRestore={handleRestoreItem}
+        getItemStatus={(item) => item.isActive !== false}
         // Pagination props
         showPagination={true}
         currentPage={currentPage}
@@ -571,20 +631,22 @@ function ItemsPageContent() {
             key: "name",
             header: "Item",
             render: (item) => {
+              const isActive = item.isActive !== false;
               const typeColors = {
                 stock: { bg: "bg-green-50/50", border: "border-green-100/50", text: "text-green-600" },
                 nonstock: { bg: "bg-orange-50/50", border: "border-orange-100/50", text: "text-orange-600" },
                 service: { bg: "bg-purple-50/50", border: "border-purple-100/50", text: "text-purple-600" }
               };
-              const colors = typeColors[item.type] || typeColors.stock;
+              const greyColors = { bg: "bg-gray-50/50", border: "border-gray-200/50", text: "text-gray-400" };
+              const colors = isActive ? (typeColors[item.type] || typeColors.stock) : greyColors;
 
               return (
-                <div className="flex items-center gap-3">
+                <div className={cn("flex items-center gap-3", !isActive && "opacity-60")}>
                   <div className={`h-10 w-10 rounded-sm flex items-center justify-center border ${colors.bg} ${colors.border}`}>
                     <Package className={`h-5 w-5 ${colors.text}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-gray-900">{item.name}</div>
+                    <div className={cn("font-bold", isActive ? "text-gray-900" : "text-gray-500")}>{item.name}</div>
                     <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight truncate">
                       {getCategoryName(item.categoryId)}
                     </div>
@@ -659,17 +721,22 @@ function ItemsPageContent() {
         ]}
         renderGridCard={(item, actions) => {
           const isStock = item.type === "stock" || item.trackStock;
+          const isActive = item.isActive !== false;
 
-          // Define status and colors based on item type
+          // Define status and colors based on item type and active status
           const typeConfig = {
             stock: { label: "STOCK ITEM", color: "text-green-600 bg-green-50 border-green-100", bar: "bg-green-500", iconBg: "bg-green-50/50 border-green-100/50 text-green-600" },
             nonstock: { label: "NON-STOCK", color: "text-orange-600 bg-orange-50 border-orange-100", bar: "bg-orange-500", iconBg: "bg-orange-50/50 border-orange-100/50 text-orange-600" },
             service: { label: "SERVICE ITEM", color: "text-purple-600 bg-purple-50 border-purple-100", bar: "bg-purple-500", iconBg: "bg-purple-50/50 border-purple-100/50 text-purple-600" }
           };
-          const status = typeConfig[item.type] || typeConfig.stock;
+          const archivedConfig = { label: "ARCHIVED", color: "text-gray-500 bg-gray-50 border-gray-200", bar: "bg-gray-400", iconBg: "bg-gray-50/50 border-gray-200/50 text-gray-400" };
+          const status = isActive ? (typeConfig[item.type] || typeConfig.stock) : archivedConfig;
 
           return (
-            <div className="group relative bg-white border border-[#d5d5dd] rounded-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-200">
+            <div className={cn(
+              "group relative border border-[#d5d5dd] rounded-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-200",
+              isActive ? "bg-white" : "bg-gray-50/30 opacity-75"
+            )}>
               <div className={cn("h-0.5 w-full shrink-0 transition-colors", status.bar)} />
 
               <div className="p-4 flex flex-col flex-1">
@@ -694,7 +761,10 @@ function ItemsPageContent() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-1">
-                      <h3 className="text-sm font-bold text-gray-800 leading-tight truncate group-hover:text-black transition-colors" title={item.name}>
+                      <h3 className={cn(
+                        "text-sm font-bold leading-tight truncate group-hover:text-black transition-colors",
+                        isActive ? "text-gray-800" : "text-gray-500"
+                      )} title={item.name}>
                         {item.name}
                       </h3>
                       <div className="flex lg:hidden items-center gap-1 shrink-0">
@@ -759,16 +829,28 @@ function ItemsPageContent() {
         invalidRows={validationErrors?.invalidRows || 0}
       />
 
-      {/* Delete Confirmation Dialog */}
+      {/* Archive Confirmation Dialog */}
       <ConfirmDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        title="Delete Item"
-        description={`Are you sure you want to delete "${itemToDelete?.name}"? This action cannot be undone.`}
-        onConfirm={confirmDelete}
-        confirmText="Delete"
+        open={archiveDialogOpen}
+        onOpenChange={setArchiveDialogOpen}
+        title="Archive Item"
+        description={`Are you sure you want to archive "${itemToArchive?.name}"? This will set the item to inactive and it won't appear in active inventory.`}
+        onConfirm={confirmArchive}
+        confirmText="Archive"
         cancelText="Cancel"
         variant="destructive"
+      />
+
+      {/* Restore Confirmation Dialog */}
+      <ConfirmDialog
+        open={restoreDialogOpen}
+        onOpenChange={setRestoreDialogOpen}
+        title="Restore Item"
+        description={`Are you sure you want to restore "${itemToRestore?.name}"? This will set the item to active and it will appear in your active inventory.`}
+        onConfirm={confirmRestore}
+        confirmText="Restore"
+        cancelText="Cancel"
+        variant="default"
       />
 
       {/* Duplicate Policy Dialog */}

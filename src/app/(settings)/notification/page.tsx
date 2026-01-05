@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useToast } from '@/lib/hooks';
+import { Toast } from "@/lib/util/toast-helpers";
 import { useNotificationSettings } from "@/lib/hooks/useNotificationSettings";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { PageContainer } from '@/components/ui/page-container';
@@ -11,7 +11,7 @@ import { NOTIFICATION_SECTIONS } from "@/lib/util/notification-options";
 import ActionButtons from '@/components/ui/setting-buttons';
 
 const NotificationSettingsPage = () => {
-  const { showToast } = useToast();
+  
   const {
     settings,
     loading,
@@ -21,7 +21,7 @@ const NotificationSettingsPage = () => {
     handleSettingChange,
     handleSave,
     handleReset
-  } = useNotificationSettings(showToast);
+  } = useNotificationSettings();
 
   if (loading) {
     return <GlobalSkeleton type="management" showActionBar={false} />;

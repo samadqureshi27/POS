@@ -1,10 +1,10 @@
 // page.tsx - Refactored Main Component
 "use client";
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 // Import all our new components
-import { toast } from "sonner";
 import { PeriodSelector } from "@/components/ui/period-selector";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { DashboardSection } from "@/app/(main)/dashboard/_components/DashboardSection";
@@ -72,7 +72,7 @@ const OrderManagementPage = () => {
         component: "OrderManagement",
         action: "loadOrders",
       });
-      toast.error("Failed to load orders");
+      Toast.error("Failed to load orders");
     } finally {
       setLoading(false);
     }
@@ -92,7 +92,7 @@ const OrderManagementPage = () => {
         component: "OrderManagement",
         action: "loadOrderStats",
       });
-      toast.error("Failed to load order statistics");
+      Toast.error("Failed to load order statistics");
     } finally {
       setStatsLoading(false);
     }

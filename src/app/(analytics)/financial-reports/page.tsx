@@ -1,8 +1,8 @@
 // app/analytics/page.tsx
 "use client";
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useEffect, useRef, useCallback } from "react";
 import { useRouter } from 'next/navigation';
-import { toast } from "sonner";
 // Components
 import { StarRating } from '@/components/ui/StarRating';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -131,7 +131,7 @@ const AnalyticsDashboard = () => {
     // refetch();
 
     // Show success message
-    toast.success(`Expense of PKR ${expense.amount} for ${expense.category} has been added successfully!`);
+    Toast.success(`Expense of PKR ${expense.amount} for ${expense.category} has been added successfully!`);
   }, []);
 
   // Add error boundary for debugging

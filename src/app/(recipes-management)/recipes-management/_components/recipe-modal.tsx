@@ -1,5 +1,6 @@
 "use client";
 
+import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
 import { Loader2, Plus, UtensilsCrossed, Sparkles, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
@@ -13,8 +14,6 @@ import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { RecipeIngredientsList } from "./recipe-ingredients-list";
 import { RecipeVariantInput } from "./recipe-variant-input";
 import { RecipeVariantInline } from "@/lib/types/recipes";
-import { toast } from "sonner";
-
 // API Recipe structure
 interface RecipeIngredient {
   sourceType: "inventory" | "recipe";
@@ -313,7 +312,7 @@ export default function RecipeModal({
 
   const handleSave = async () => {
     if (!formData.name) {
-      toast.error("Please enter a recipe name", {
+      Toast.error("Please enter a recipe name", {
         duration: 5000,
         position: "top-right",
       });
@@ -326,7 +325,7 @@ export default function RecipeModal({
     });
 
     if (invalidIngredients.length > 0) {
-      toast.error(`${invalidIngredients.length} ingredient(s) have missing information`, {
+      Toast.error(`${invalidIngredients.length} ingredient(s); have missing information`, {
         duration: 5000,
         position: "top-right",
       });
@@ -336,7 +335,7 @@ export default function RecipeModal({
     // Validate variants if any exist
     const invalidVariants = variants.filter(v => !v.name || !v.type);
     if (invalidVariants.length > 0) {
-      toast.error(`${invalidVariants.length} variant(s) are missing required fields (name or type)`, {
+      Toast.error(`${invalidVariants.length} variant(s); are missing required fields (name or type)`, {
         duration: 5000,
         position: "top-right",
       });

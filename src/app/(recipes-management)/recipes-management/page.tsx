@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { UtensilsCrossed, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { toast } from "sonner";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
+import { Toast } from "@/lib/util/toast-helpers";
 import RecipeModalNew from "./_components/recipe-modal-new";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeData } from "@/lib/hooks/useRecipeData";
@@ -73,17 +73,17 @@ const RecipesManagementPage = () => {
     const result = await handleModalSubmitOriginal(data);
     if (result.success) {
       if (editingItem) {
-        toast.success("Recipe updated successfully", {
-          duration: 5000,
-          position: "top-right",
-        });
+        Toast.success("Recipe updated successfully", { duration: 5000 });
       } else {
-        toast.success("Recipe added successfully", {
-          duration: 5000,
-          position: "top-right",
-        });
+        // Only show toast for final recipes (sub recipes show their own toast in modal)
+        if (data.type !== "sub") {
+          Toast.success("Recipe added successfully", { duration: 5000 });
+        }
       }
       // No need to refresh - optimistic update in hook handles it
+    } else {
+      // Show error if submission failed
+      Toast.error(result.error || result.message || "Failed to save recipe", { duration: 5000 });
     }
     return result;
   };
@@ -101,10 +101,7 @@ const RecipesManagementPage = () => {
 
     if (!recipeId) {
       console.error("❌ Recipe ID is missing");
-      toast.error("Recipe ID is missing", {
-        duration: 5000,
-        position: "top-right",
-      });
+      Toast.error("Recipe ID is missing", { duration: 5000 });
       return;
     }
 
@@ -113,24 +110,15 @@ const RecipesManagementPage = () => {
       const result = await deleteRecipe(String(recipeId));
 
       if (result.success) {
-        toast.success("Recipe deleted successfully", {
-          duration: 5000,
-          position: "top-right",
-        });
+        Toast.success("Recipe deleted successfully", { duration: 5000 });
         setConfirmDialogOpen(false);
         setRecipeToDelete(null);
       } else {
-        toast.error((result?.error as string) || "Failed to delete recipe", {
-          duration: 5000,
-          position: "top-right",
-        });
+        Toast.error(result.error || result.message || "Failed to delete recipe", { duration: 5000 });
       }
     } catch (error: any) {
       console.error("Error deleting recipe:", error);
-      toast.error(error.message || "Failed to delete recipe", {
-        duration: 5000,
-        position: "top-right",
-      });
+      Toast.error(error, { duration: 5000 });
     }
   };
 
@@ -364,6 +352,7 @@ const RecipesManagementPage = () => {
         onClose={closeModal}
         onSubmit={handleModalSubmit}
         actionLoading={actionLoading}
+        onRefreshRecipes={refreshData}
       />
 
       {/* Delete Confirmation Dialog */}
