@@ -11,32 +11,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { cn } from "@/lib/utils";
 import { RecipeVariantInput } from "./recipe-variant-input";
+import { BatchList } from "@/components/ui/batch-list";
 import { InventoryService } from "@/lib/services/inventory-service";
+import { RecipeOption, RecipeIngredient, RecipeVariantInline } from "@/lib/types/recipes";
 
 // API Recipe structure
-interface RecipeIngredient {
-  sourceType: "inventory" | "recipe";
-  sourceId: string;
-  nameSnapshot?: string;
-  quantity: number;
-  unit: string;
-  convertToUnit?: string;
-}
 
-interface RecipeVariantInline {
-  name: string;
-  description?: string;
-  type: "size" | "flavor" | "crust" | "addon" | "custom";
-  sizeMultiplier?: number;
-  baseCostAdjustment?: number;
-  ingredients?: RecipeIngredient[];
-  isActive: boolean;
-  crustType?: string;
-}
 
 interface Recipe {
   _id?: string;
@@ -52,16 +35,7 @@ interface Recipe {
   variations?: RecipeVariantInline[];
 }
 
-interface RecipeOption {
-  ID: number;
-  Name: string;
-  Status: "Active" | "Inactive";
-  Description: string;
-  type?: "sub" | "final";
-  Priority?: number;
-  _id?: string;
-  ingredients?: RecipeIngredient[];
-}
+
 
 interface InventoryItem {
   ID?: number | string;
@@ -147,11 +121,11 @@ export default function RecipeModalNew({
     isActive: boolean;
   }>>([]);
   const [activeRecipeId, setActiveRecipeId] = useState<string | null>(null);
+  const [scrollToRecipeId, setScrollToRecipeId] = useState<string | null>(null);
 
   // Refs for auto-focus and scroll
   const ingredientRefs = React.useRef<{ [key: number]: HTMLInputElement | null }>({});
   const variantRefs = React.useRef<{ [key: number]: HTMLDivElement | null }>({});
-  const recipesListRefs = React.useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     const handleInitialResponsive = () => {
@@ -261,7 +235,7 @@ export default function RecipeModalNew({
           isActive: editingItem.Status === "Active",
           ingredients: existingIngredients,
           variations: existingVariants,
-          yield: 1,
+          yield: editingItem.yield || 1,
         });
         setRecipeIngredients(existingIngredients);
         setVariants(existingVariants);
@@ -701,7 +675,7 @@ export default function RecipeModalNew({
           setVariants([]);
         } else {
           Toast.error(
-            result.error || result.message || "Failed to create sub recipe"
+            result.error || "Failed to create sub recipe"
           );
         }
       } catch (error) {
@@ -735,12 +709,7 @@ export default function RecipeModalNew({
     });
 
     // Auto-scroll to the newly added recipe in the list
-    setTimeout(() => {
-      const recipeRef = recipesListRefs.current[newRecipe.id];
-      if (recipeRef) {
-        recipeRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 150);
+    setScrollToRecipeId(newRecipe.id);
   };
 
   const handleRemoveFromList = (id: string) => {
@@ -1040,53 +1009,53 @@ export default function RecipeModalNew({
                 </div>
               ) : (
                 <>
-                {filteredInventory.map((item) => {
-                  const itemId = String(item._id || item.id || item.ID);
-                  const itemName = item.Name || item.name || "";
-                  const itemUnit = item.Unit || item.baseUnit || "pc";
-                  const isAdded = recipeIngredients.some(ing => ing.sourceId === itemId);
+                  {filteredInventory.map((item) => {
+                    const itemId = String(item._id || item.id || item.ID);
+                    const itemName = item.Name || item.name || "";
+                    const itemUnit = item.Unit || item.baseUnit || "pc";
+                    const isAdded = recipeIngredients.some(ing => ing.sourceId === itemId);
 
-                  return (
-                    <div
-                      key={itemId}
-                      draggable={!isAdded}
-                      onDragStart={() => !isAdded && handleInventoryDragStart(itemId)}
-                      className={cn(
-                        "group relative flex items-center h-[41px] px-3 bg-white border-b border-[#d5d5dd] transition-all",
-                        isAdded
-                          ? "opacity-50 cursor-not-allowed"
-                          : "cursor-grab active:cursor-grabbing hover:bg-[#e0f2fe]"
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Package className="h-4 w-4 text-[#ea580c] shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-[#111827] truncate leading-tight">{itemName}</div>
-                          <div className="text-[10px] text-[#9ca3af] font-medium uppercase leading-tight">
-                            {itemUnit}
+                    return (
+                      <div
+                        key={itemId}
+                        draggable={!isAdded}
+                        onDragStart={() => !isAdded && handleInventoryDragStart(itemId)}
+                        className={cn(
+                          "group relative flex items-center h-[41px] px-3 bg-white border-b border-[#d5d5dd] transition-all",
+                          isAdded
+                            ? "opacity-50 cursor-not-allowed"
+                            : "cursor-grab active:cursor-grabbing hover:bg-[#e0f2fe]"
+                        )}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Package className="h-4 w-4 text-[#ea580c] shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-[#111827] truncate leading-tight">{itemName}</div>
+                            <div className="text-[10px] text-[#9ca3af] font-medium uppercase leading-tight">
+                              {itemUnit}
+                            </div>
                           </div>
                         </div>
+                        {isAdded && (
+                          <div className="absolute top-1/2 -translate-y-1/2 right-3">
+                            <span className="text-[9px] font-semibold bg-[#22c55e] text-white px-1.5 py-0.5 rounded">
+                              ADDED
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      {isAdded && (
-                        <div className="absolute top-1/2 -translate-y-1/2 right-3">
-                          <span className="text-[9px] font-semibold bg-[#22c55e] text-white px-1.5 py-0.5 rounded">
-                            ADDED
-                          </span>
-                        </div>
-                      )}
+                    );
+                  })}
+                  {inventoryLoading && filteredInventory.length > 0 && (
+                    <div className="text-center py-4 border-t border-[#e5e7eb]">
+                      <Loader2 className="h-5 w-5 text-[#9ca3af] mx-auto animate-spin" />
                     </div>
-                  );
-                })}
-                {inventoryLoading && filteredInventory.length > 0 && (
-                  <div className="text-center py-4 border-t border-[#e5e7eb]">
-                    <Loader2 className="h-5 w-5 text-[#9ca3af] mx-auto animate-spin" />
-                  </div>
-                )}
-                {!inventoryLoading && !inventoryHasMore && filteredInventory.length > 0 && (
-                  <div className="text-center py-3 border-t border-[#e5e7eb]">
-                    <p className="text-xs text-[#9ca3af]">All items loaded</p>
-                  </div>
-                )}
+                  )}
+                  {!inventoryLoading && !inventoryHasMore && filteredInventory.length > 0 && (
+                    <div className="text-center py-3 border-t border-[#e5e7eb]">
+                      <p className="text-xs text-[#9ca3af]">All items loaded</p>
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -1117,85 +1086,55 @@ export default function RecipeModalNew({
         </div>
         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden m-0 p-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Saved Recipes List - Each as collapsible section */}
-          {recipesList.map((recipe, recipeIndex) => (
-            <div key={recipe.id} ref={el => { recipesListRefs.current[recipe.id] = el; }}>
-              <div
-                className="sticky top-0 z-20 flex items-center justify-between cursor-pointer select-none px-3 h-[41px] leading-none box-border bg-[#f0fdf4] hover:bg-[#dcfce7] transition-colors border-b border-[#d5d5dd]"
-                onClick={() => setActiveRecipeId(activeRecipeId === recipe.id ? null : recipe.id)}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-[10px] font-semibold">
-                    {recipeIndex + 1}
-                  </div>
-                  <span className={cn(
-                    "text-xs font-semibold px-1.5 rounded uppercase h-5 flex items-center leading-none",
-                    recipe.type === "final" ? "bg-[#eff6ff] text-[#3b82f6]" : "bg-[#faf5ff] text-[#9333ea]"
-                  )}>
-                    {recipe.type}
-                  </span>
-                  <span className="text-xs font-semibold text-[#374151] leading-none">
-                    {recipe.name} ({recipe.ingredients.length} ingredients)
-                  </span>
+          <BatchList
+            items={recipesList}
+            expandedId={activeRecipeId}
+            onToggleExpand={(id) => setActiveRecipeId(id)}
+            onEdit={handleEditFromList}
+            onRemove={handleRemoveFromList}
+            scrollToId={scrollToRecipeId}
+            renderHeader={(recipe, index) => (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-[10px] font-semibold">
+                  {index + 1}
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditFromList(recipe.id);
-                    }}
-                    className="flex items-center justify-center text-[#6b7280] hover:text-[#3b82f6] transition-colors"
-                    title="Edit in form"
-                  >
-                    <Info className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveFromList(recipe.id);
-                    }}
-                    className="flex items-center justify-center text-[#6b7280] hover:text-[#ef4444] transition-colors"
-                    title="Remove"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                  {activeRecipeId === recipe.id ? (
-                    <ChevronUp className="h-4 w-4 text-[#9ca3af]" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-[#9ca3af]" />
-                  )}
-                </div>
+                <span className={cn(
+                  "text-xs font-semibold px-1.5 rounded uppercase h-5 flex items-center leading-none",
+                  recipe.type === "final" ? "bg-[#eff6ff] text-[#3b82f6]" : "bg-[#faf5ff] text-[#9333ea]"
+                )}>
+                  {recipe.type}
+                </span>
+                <span className="text-xs font-semibold text-[#374151] leading-none">
+                  {recipe.name} ({recipe.ingredients.length} ingredients)
+                </span>
               </div>
-              {activeRecipeId === recipe.id && (
-                <div className="p-4 bg-[#f9fafb] border-t border-[#d5d5dd]">
-                  <div className="text-xs text-[#6b7280] space-y-2">
-                    {recipe.description && <p><span className="font-medium">Description:</span> {recipe.description}</p>}
-                    <p><span className="font-medium">Yield:</span> {recipe.yield} portion(s)</p>
-                    <p><span className="font-medium">Status:</span> {recipe.isActive ? "Active" : "Inactive"}</p>
-                    <div>
-                      <span className="font-medium">Ingredients:</span>
-                      <ul className="mt-1 ml-4 list-disc">
-                        {recipe.ingredients.map((ing, i) => (
-                          <li key={i}>{ing.nameSnapshot} - {ing.quantity} {ing.unit}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    {recipe.variations.length > 0 && (
-                      <div>
-                        <span className="font-medium">Variants:</span>
-                        <ul className="mt-1 ml-4 list-disc">
-                          {recipe.variations.map((v, i) => (
-                            <li key={i}>{v.name} ({v.type})</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
+            )}
+            renderDetails={(recipe) => (
+              <div className="text-xs text-[#6b7280] space-y-2">
+                {recipe.description && <p><span className="font-medium">Description:</span> {recipe.description}</p>}
+                <p><span className="font-medium">Yield:</span> {recipe.yield} portion(s)</p>
+                <p><span className="font-medium">Status:</span> {recipe.isActive ? "Active" : "Inactive"}</p>
+                <div>
+                  <span className="font-medium">Ingredients:</span>
+                  <ul className="mt-1 ml-4 list-disc">
+                    {recipe.ingredients.map((ing: any, i: number) => (
+                      <li key={i}>{ing.nameSnapshot} - {ing.quantity} {ing.unit}</li>
+                    ))}
+                  </ul>
                 </div>
-              )}
-            </div>
-          ))}
+                {recipe.variations.length > 0 && (
+                  <div>
+                    <span className="font-medium">Variants:</span>
+                    <ul className="mt-1 ml-4 list-disc">
+                      {recipe.variations.map((v: any, i: number) => (
+                        <li key={i}>{v.name} ({v.type})</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          />
 
           {/* Current Recipe Form - Collapsible Header */}
           <div

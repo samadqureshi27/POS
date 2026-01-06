@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
-import { Toaster } from "@/components/ui/sonner";
 import ReportsTable from "./_components/reports-table";
 import ImportExportControls from "@/components/ui/import-export-btn";
 import { useReportsManagement } from "@/lib/hooks/useReport";
@@ -33,7 +32,7 @@ const ReportsPage = () => {
     } = useReportsManagement(branchId);
 
     // Toast for export operations
-    
+
 
     // Export functionality only
     const { handleExportWithConfig, isLoading } = useImportExport({
@@ -63,7 +62,7 @@ const ReportsPage = () => {
 
     return (
         <PageContainer hasSubmenu={true}>
-            <Toaster position="top-right" />
+
 
             {/* Coming Soon Content */}
             <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">

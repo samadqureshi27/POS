@@ -22,6 +22,7 @@ export const useRecipeData = () => {
       Status: (recipe.isActive === false ? "Inactive" : "Active") as "Active" | "Inactive",
       Description: recipe.description || "",
       type: recipe.type || "sub",
+      yield: recipe.yield || 1,
       Priority: 0,
       price: recipe.totalCost || 0,
       OptionValue: [] as string[],
@@ -57,8 +58,8 @@ export const useRecipeData = () => {
           let recipesArray = response.data;
           if (!Array.isArray(recipesArray)) {
             recipesArray = (response.data as any).recipes ||
-                          (response.data as any).data ||
-                          (response.data as any).items || [];
+              (response.data as any).data ||
+              (response.data as any).items || [];
           }
           return recipesArray.map((recipe: any) => ({
             ID: recipe._id || recipe.id,
@@ -164,6 +165,7 @@ export const useRecipeData = () => {
           ingredients: recipeData.ingredients || [],
           description: recipeData.description,
           variations: variants, // Include variants for editing
+          yield: recipeData.yield || 1,
         };
         hook.openEditModal(fullRecipe as any);
       } else {

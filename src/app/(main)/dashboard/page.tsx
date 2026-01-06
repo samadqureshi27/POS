@@ -19,7 +19,7 @@ import { getPeriodLabel } from "@/lib/util/Dashboardutils";
 import { useDashboardData } from "@/lib/hooks/useDashboardData";
 
 // Components
-import { Toaster } from "@/components/ui/sonner";
+
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PageHeader } from "@/components/ui/page-header";
 import { PeriodSelector } from "@/components/ui/period-selector";
@@ -102,7 +102,7 @@ const Dashboard = () => {
 
   return (
     <div className="w-full bg-[#F7F7F8] p-4 sm:p-6 lg:p-6">
-      <Toaster position="top-right" />
+
 
       <div className="w-full">
         <PageHeader title="Dashboard" />

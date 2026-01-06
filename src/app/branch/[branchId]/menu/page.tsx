@@ -7,7 +7,7 @@ import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { GridActionButtons } from "@/components/ui/grid-action-buttons";
-import { Toaster } from "@/components/ui/sonner";
+
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -116,7 +116,7 @@ const BranchMenuPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+
 
       <div className="pt-6">
         <PageHeader
