@@ -6,7 +6,7 @@ import { LicenseInfo, ApiResponse } from '@/lib/types/billing';
 
 // Hooks
 import { Toast } from "@/lib/util/toast-helpers";
-import { Toaster } from "@/components/ui/sonner";
+
 import { useLicense } from '@/lib/hooks/useLicense';
 
 // Components
@@ -18,7 +18,7 @@ import { ResourcesAllocationCard } from './_components/resource-allocation-card'
 import { UpdateLicenseCard } from './_components/update-license-card';
 
 const BillingLicensePage = () => {
-  
+
 
   const {
     licenseInfo,
@@ -39,7 +39,7 @@ const BillingLicensePage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+
 
       {/* Header - Better spacing and centering */}
       <PageHeader handleRecheck={handleRecheck} rechecking={rechecking} />

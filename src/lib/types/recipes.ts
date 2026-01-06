@@ -23,6 +23,7 @@ export interface RecipeOption {
   IngredientPrice: number[];
   Priority: number;
   type?: "sub" | "final"; // Recipe type (sub/final)
+  yield?: number;
   totalCost?: number; // Total cost for display
   ingredients?: any[]; // Lowercase for display compatibility
   Ingredients?: RecipeIngredient[];

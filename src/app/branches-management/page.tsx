@@ -10,7 +10,7 @@ import { Building2, Plus, MapPin } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from '@/components/ui/sonner';
+
 import { cn } from "@/lib/utils";
 import { GridActionButtons } from "@/components/ui/grid-action-buttons";
 import BranchModal from "./_components/branch-modal";
@@ -83,7 +83,7 @@ const BranchManagementPage = () => {
 
   return (
     <PageContainer>
-      <Toaster position="top-right" />
+
 
       <PageHeader
         title="Branch Management"

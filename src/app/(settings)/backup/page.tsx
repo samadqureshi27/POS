@@ -8,7 +8,7 @@ import { useBackup } from '@/lib/hooks/useBackup';
 
 // Components
 import { BackupModal } from './_components/backup-modal';
-import { Toaster } from "@/components/ui/sonner";
+
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { BackupPageHeader } from './_components/backup-page-header';
 import { BackupSettingsCard } from './_components/backup-settings-card';
@@ -17,9 +17,9 @@ import { PageContainer } from "@/components/ui/page-container";
 
 const BackupRecoveryPage = () => {
   // Custom hooks
-  
+
   const { modal, showModal, closeModal } = useModal();
-  
+
   const {
     settings,
     backupHistory,
@@ -44,7 +44,7 @@ const BackupRecoveryPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+
 
       <BackupModal
         isOpen={modal.isOpen}

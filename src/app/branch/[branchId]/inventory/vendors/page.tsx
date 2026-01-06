@@ -6,7 +6,7 @@ import { Truck, Plus, Edit2, Trash2, AlertCircle } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
+
 import { Toast } from "@/lib/util/toast-helpers";
 import VendorModal from "./_components/vendor-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -20,7 +20,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 const VendorsPage = () => {
   const params = useParams();
   const branchId = parseInt(params?.branchId as string) || 1;
-  
+
 
   const {
     // State
@@ -102,7 +102,7 @@ const VendorsPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+
 
       {/* Coming Soon Content */}
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">

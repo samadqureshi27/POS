@@ -6,7 +6,7 @@ import { Toast } from "@/lib/util/toast-helpers";
 import { Package, Plus, Upload, Download, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { Toaster } from "@/components/ui/sonner";
+
 
 import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
@@ -495,7 +495,7 @@ function ItemsPageContent() {
 
   return (
     <PageContainer className="pt-6">
-      <Toaster position="top-right" />
+
 
       <PageHeader
         title="Inventory Hub"
