@@ -21,7 +21,9 @@
       "Bash(git diff:*)",
       "Bash(findstr:*)",
       "Bash(done)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(Select-String -Pattern \"menu-item-modal-batch\")",
+      "Bash(Select-Object -First 10)"
     ],
     "deny": [],
     "ask": []

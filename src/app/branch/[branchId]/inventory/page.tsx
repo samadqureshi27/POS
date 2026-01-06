@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
+
 import { useBranchInventory } from "@/lib/hooks/useBranchInventory";
 import BranchInventoryModal from "./_components/branch-inventory-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -123,7 +123,7 @@ const BranchInventoryPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+
 
       <PageHeader
         title={`Inventory Management - ${branchName || `Branch #${branchId}`}`}
@@ -234,14 +234,14 @@ const BranchInventoryPage = () => {
             render: (item) => (
               <div className="flex items-center gap-3">
                 <div className={`h-10 w-10 rounded-sm flex items-center justify-center border ${item.stockStatus === "High"
-                    ? "bg-green-50 border-green-200"
-                    : item.stockStatus === "Medium"
-                      ? "bg-yellow-50 border-yellow-200"
-                      : "bg-red-50 border-red-200"
+                  ? "bg-green-50 border-green-200"
+                  : item.stockStatus === "Medium"
+                    ? "bg-yellow-50 border-yellow-200"
+                    : "bg-red-50 border-red-200"
                   }`}>
                   <Package className={`h-5 w-5 ${item.stockStatus === "High" ? "text-green-600" :
-                      item.stockStatus === "Medium" ? "text-yellow-600" :
-                        "text-red-600"
+                    item.stockStatus === "Medium" ? "text-yellow-600" :
+                      "text-red-600"
                     }`} />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -273,10 +273,10 @@ const BranchInventoryPage = () => {
             header: "Stock Status",
             render: (item) => (
               <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${item.stockStatus === "High"
-                  ? "bg-green-100 text-green-700"
-                  : item.stockStatus === "Medium"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-red-100 text-red-700"
+                ? "bg-green-100 text-green-700"
+                : item.stockStatus === "Medium"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-red-100 text-red-700"
                 }`}>
                 {item.stockStatus}
               </span>

@@ -5,7 +5,7 @@ import { UtensilsCrossed, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
 import { Toast } from "@/lib/util/toast-helpers";
-import { Toaster } from "@/components/ui/sonner";
+
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import MenuItemModal from "./_components/menu-item-modal-batch";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -146,7 +146,7 @@ const MenuItemsManagementPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" richColors expand={true} duration={5000} />
+
 
       <PageHeader
         title="Menu Items"

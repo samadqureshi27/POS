@@ -4,14 +4,12 @@ import { useRouter } from "next/navigation";
 import { UtensilsCrossed, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
 import { Toast } from "@/lib/util/toast-helpers";
 import RecipeModalNew from "./_components/recipe-modal-new";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { useRecipeData } from "@/lib/hooks/useRecipeData";
 import { RecipeOption } from "@/lib/types/recipes";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { formatPrice, formatCurrency } from "@/lib/util/formatters";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { cn } from "@/lib/utils";
@@ -83,7 +81,7 @@ const RecipesManagementPage = () => {
       // No need to refresh - optimistic update in hook handles it
     } else {
       // Show error if submission failed
-      Toast.error(result.error || result.message || "Failed to save recipe", { duration: 5000 });
+      Toast.error(result.error || "Failed to save recipe", { duration: 5000 });
     }
     return result;
   };
@@ -97,7 +95,7 @@ const RecipesManagementPage = () => {
     if (!recipeToDelete) return;
 
     // Get the actual MongoDB _id or fallback to ID
-    const recipeId = (recipeToDelete as any)._id || recipeToDelete.ID;
+    const recipeId = recipeToDelete._id || recipeToDelete.ID;
 
     if (!recipeId) {
       console.error("❌ Recipe ID is missing");
@@ -114,7 +112,7 @@ const RecipesManagementPage = () => {
         setConfirmDialogOpen(false);
         setRecipeToDelete(null);
       } else {
-        Toast.error(result.error || result.message || "Failed to delete recipe", { duration: 5000 });
+        Toast.error(result.error || "Failed to delete recipe", { duration: 5000 });
       }
     } catch (error: any) {
       console.error("Error deleting recipe:", error);
@@ -125,7 +123,7 @@ const RecipesManagementPage = () => {
   // Apply recipe type filter to the filtered items (must be before early return)
   const typeFilteredItems = useMemo(() => {
     if (recipeTypeFilter === "all") return filteredItems;
-    return filteredItems.filter((item: any) => item.type === recipeTypeFilter);
+    return filteredItems.filter((item: RecipeOption) => item.type === recipeTypeFilter);
   }, [filteredItems, recipeTypeFilter]);
 
   // Show skeleton loading during initial load
@@ -135,8 +133,6 @@ const RecipesManagementPage = () => {
 
   return (
     <PageContainer>
-      <Toaster position="top-right" />
-
       {/* Page Header */}
       <PageHeader
         title="Recipes Management"
@@ -185,7 +181,7 @@ const RecipesManagementPage = () => {
         emptyIcon={<UtensilsCrossed className="h-16 w-16 text-gray-300" />}
         emptyTitle="No recipes found"
         emptyDescription="Start by adding your first recipe"
-        getItemId={(item) => String((item as any)._id || item.ID || 'unknown')}
+        getItemId={(item) => String(item._id || item.ID || 'unknown')}
         onEdit={openEditModal}
         onDelete={handleDelete}
         columns={[
@@ -194,20 +190,18 @@ const RecipesManagementPage = () => {
             header: "Recipe Name",
             render: (item) => (
               <div className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-sm flex items-center justify-center border ${
-                  (item as any).type === "final"
+                <div className={`h-10 w-10 rounded-sm flex items-center justify-center border ${item.type === "final"
                     ? "bg-blue-50/50 border-blue-100/50"
-                    : (item as any).type === "sub"
-                    ? "bg-purple-50/50 border-purple-100/50"
-                    : "bg-gray-50/50 border-gray-100/50"
-                }`}>
-                  <UtensilsCrossed className={`h-5 w-5 ${
-                    (item as any).type === "final"
+                    : item.type === "sub"
+                      ? "bg-purple-50/50 border-purple-100/50"
+                      : "bg-gray-50/50 border-gray-100/50"
+                  }`}>
+                  <UtensilsCrossed className={`h-5 w-5 ${item.type === "final"
                       ? "text-blue-600"
-                      : (item as any).type === "sub"
-                      ? "text-purple-600"
-                      : "text-gray-600"
-                  }`} />
+                      : item.type === "sub"
+                        ? "text-purple-600"
+                        : "text-gray-600"
+                    }`} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-gray-900">{item.Name}</div>
@@ -221,14 +215,14 @@ const RecipesManagementPage = () => {
           {
             key: "type",
             header: "Type",
-            render: (item: any) => (
+            render: (item) => (
               <span className={cn(
                 "px-2 py-0.5 rounded-[2px] text-[9px] font-black tracking-widest border",
                 item.type === "final"
                   ? "bg-blue-50 text-blue-600 border-blue-100"
                   : item.type === "sub"
-                  ? "bg-purple-50 text-purple-600 border-purple-100"
-                  : "bg-gray-50 text-gray-600 border-gray-100"
+                    ? "bg-purple-50 text-purple-600 border-purple-100"
+                    : "bg-gray-50 text-gray-600 border-gray-100"
               )}>
                 {item.type ? (item.type === "final" ? "FINAL" : "SUB") : "—"}
               </span>
@@ -238,7 +232,7 @@ const RecipesManagementPage = () => {
           {
             key: "ingredients",
             header: "Ingredients",
-            render: (item: any) => {
+            render: (item) => {
               const ingredientCount = item.ingredients?.length || 0;
               return (
                 <span className="text-sm font-bold text-gray-900">
@@ -262,7 +256,7 @@ const RecipesManagementPage = () => {
             className: "w-28",
           },
         ]}
-        renderGridCard={(item: any, actions) => {
+        renderGridCard={(item, actions) => {
           const recipeType = item.type || "unknown";
           const typeLabel = recipeType === "final" ? "FINAL" : recipeType === "sub" ? "SUB" : "RECIPE";
           const ingredientCount = item.ingredients?.length || 0;
@@ -295,8 +289,8 @@ const RecipesManagementPage = () => {
                     recipeType === "final"
                       ? "bg-blue-50/50 border-blue-100/50 text-blue-600"
                       : recipeType === "sub"
-                      ? "bg-purple-50/50 border-purple-100/50 text-purple-600"
-                      : "bg-gray-50/50 border-gray-100/50 text-gray-600"
+                        ? "bg-purple-50/50 border-purple-100/50 text-purple-600"
+                        : "bg-gray-50/50 border-gray-100/50 text-gray-600"
                   )}>
                     <UtensilsCrossed className="h-5 w-5 stroke-[1.5]" />
                   </div>

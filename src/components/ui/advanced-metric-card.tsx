@@ -19,7 +19,7 @@ export interface AdvancedMetricCardProps {
   };
   status?: 'good' | 'warning' | 'critical' | 'neutral';
   icon?: 'revenue' | 'customers' | 'orders' | 'inventory' | 'time' | 'percentage' | 'target';
-  format?: 'currency' | 'number' | 'percentage';
+  format?: 'currency' | 'number' | 'percentage' | 'text';
   className?: string;
 }
 

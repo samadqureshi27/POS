@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { FolderTree, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
+
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import CategoryModal from "./_components/category-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -127,7 +127,7 @@ const CategoriesManagementPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" richColors expand={true} duration={5000} />
+
 
       <PageHeader
         title="Menu Categories"

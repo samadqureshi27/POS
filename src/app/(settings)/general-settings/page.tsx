@@ -6,7 +6,7 @@ import { Toast } from "@/lib/util/toast-helpers";
 import { useSettings } from '@/lib/hooks/gsettings';
 
 // Components
-import { Toaster } from "@/components/ui/sonner";
+
 import ActionButtons from '@/components/ui/setting-buttons';
 import SettingsCards from './_components/cards';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -15,7 +15,7 @@ import { PageHeader } from "@/components/ui/page-header";
 
 
 const GeneralSettingsPage = () => {
-  
+
 
   const {
     settings,
@@ -37,7 +37,7 @@ const GeneralSettingsPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+
 
       <PageHeader
         title="General Settings"

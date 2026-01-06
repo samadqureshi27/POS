@@ -10,7 +10,7 @@ import { useCustomers, useCustomerFiltering, useCustomerSummary } from "@/lib/ho
 import { exportCustomersToCSV } from "@/lib/util/customer-details-utils";
 import { Toast } from "@/lib/util/toast-helpers";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
-import { Toaster } from "@/components/ui/sonner";
+
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 
@@ -42,7 +42,7 @@ const CustomerManagementPage = () => {
 
   return (
     <PageContainer>
-      <Toaster position="top-right" />
+
 
       <PageHeader
         title="Loyal Customers"

@@ -4,7 +4,7 @@ import { CreditCard, Plus, Edit2, Trash2 } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
+
 import { Toast } from "@/lib/util/toast-helpers";
 import PaymentModal from "./_components/payment-modal";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const PaymentManagementPage = () => {
-  
+
   const {
     // State
     filteredItems,
@@ -91,7 +91,7 @@ const PaymentManagementPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+
 
       <PageHeader
         title="Payment Management"

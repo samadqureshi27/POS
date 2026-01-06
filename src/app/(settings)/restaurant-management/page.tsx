@@ -4,7 +4,7 @@ import React from "react";
 import ActionButtons from '@/components/ui/setting-buttons';
 import { Toast } from "@/lib/util/toast-helpers";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
-import { Toaster } from '@/components/ui/sonner';
+
 import { PageContainer } from '@/components/ui/page-container';
 import { PageHeader } from '@/components/ui/page-header';
 import { useRestaurantProfile } from '@/lib/hooks/useRestaurantProfile';
@@ -33,7 +33,7 @@ const RestaurantProfilePage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+
 
       <PageHeader
         title="Restaurant Profile"

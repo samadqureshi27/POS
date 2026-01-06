@@ -1,5 +1,5 @@
 // Types
-import { ApiResponse } from "./common";
+export type { ApiResponse } from "./common";
 
 export interface LicenseInfo {
     licensedTo: string;

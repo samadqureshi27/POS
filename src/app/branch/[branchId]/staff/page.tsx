@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
-import { Toaster } from "@/components/ui/sonner";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -128,7 +127,7 @@ const StaffManagementPage = () => {
 
   return (
     <PageContainer hasSubmenu={true}>
-      <Toaster position="top-right" />
+
 
       <div className="pt-6">
         <PageHeader
@@ -223,7 +222,7 @@ const StaffManagementPage = () => {
         emptyDescription="Start by adding your first staff member"
         getItemId={(item) => item._id || item.id || ""}
         customActions={(item) => {
-          const actions = [
+          const actions: any[] = [
             {
               label: "Edit",
               onClick: () => openEditModal(item),
