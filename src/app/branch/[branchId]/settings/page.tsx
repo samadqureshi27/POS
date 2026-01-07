@@ -39,7 +39,7 @@ const BranchSettingsPage = () => {
   } = useBranchPOSConfig(branchId);
 
   // Local state for collapsible sections
-  const [expandedSection, setExpandedSection] = useState<string | null>("general-settings");
+  const [expandedSection, setExpandedSection] = useState<string | null>("payment-mode");
 
   // Local state for forms
   const [localPaymentMode, setLocalPaymentMode] = useState<"payNow" | "payLater">(paymentMode);
@@ -128,92 +128,6 @@ const BranchSettingsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Settings Sections */}
         <div className="lg:col-span-2 space-y-4">
-          {/* General Settings Section */}
-          <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
-            <button
-              onClick={() => toggleSection("general-settings")}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-sm bg-indigo-50 border border-indigo-100 flex items-center justify-center">
-                  <Settings className="h-5 w-5 text-indigo-600" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-gray-900">General Settings</h3>
-                  <p className="text-xs text-gray-500">Configure order prefix, footer, and hold orders</p>
-                </div>
-              </div>
-              <div
-                className={cn(
-                  "h-5 w-5 text-gray-400 transition-transform",
-                  expandedSection === "general-settings" ? "rotate-180" : ""
-                )}
-              >
-                ▼
-              </div>
-            </button>
-
-            {expandedSection === "general-settings" && (
-              <div className="px-6 pb-6 space-y-4 border-t border-gray-100">
-                <div className="space-y-4 pt-4">
-                  {/* Order Prefix */}
-                  <div>
-                    <Label htmlFor="orderPrefix" className="text-sm font-semibold">
-                      Order Prefix
-                    </Label>
-                    <Input
-                      id="orderPrefix"
-                      placeholder="ORD"
-                      value={localOrderPrefix}
-                      onChange={(e) => setLocalOrderPrefix(e.target.value)}
-                      className="mt-1"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Prefix for order numbers (e.g., ORD-001234)</p>
-                  </div>
-
-                  {/* Receipt Footer */}
-                  <div>
-                    <Label htmlFor="receiptFooter" className="text-sm font-semibold">
-                      Receipt Footer (Legacy)
-                    </Label>
-                    <Textarea
-                      id="receiptFooter"
-                      placeholder="Thank you!"
-                      value={localReceiptFooter}
-                      onChange={(e) => setLocalReceiptFooter(e.target.value)}
-                      className="mt-1"
-                      rows={2}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Legacy footer text (consider using Receipt Config instead)</p>
-                  </div>
-
-                  {/* Enable Hold Orders */}
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-sm border border-gray-100">
-                    <div>
-                      <Label className="text-sm font-semibold">Enable Hold Orders</Label>
-                      <p className="text-xs text-gray-500">Allow orders to be put on hold</p>
-                    </div>
-                    <Switch
-                      checked={localEnableHoldOrders}
-                      onCheckedChange={setLocalEnableHoldOrders}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-4 border-t border-gray-100">
-                  <Button
-                    onClick={handleSaveGeneralSettings}
-                    disabled={actionLoading}
-                    className="gap-2"
-                  >
-                    <Save className="h-4 w-4" />
-                    Save General Settings
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Payment Mode Section */}
           <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
             <button
@@ -294,6 +208,202 @@ const BranchSettingsPage = () => {
                   >
                     <Save className="h-4 w-4" />
                     Save Payment Mode
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Payment Methods Section */}
+          <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
+            <button
+              onClick={() => toggleSection("payment-methods")}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-sm bg-purple-50 border border-purple-100 flex items-center justify-center">
+                  <CreditCard className="h-5 w-5 text-purple-600" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-bold text-gray-900">Payment Methods</h3>
+                  <p className="text-xs text-gray-500">Configure accepted payment methods</p>
+                </div>
+              </div>
+              <div
+                className={cn(
+                  "h-5 w-5 text-gray-400 transition-transform",
+                  expandedSection === "payment-methods" ? "rotate-180" : ""
+                )}
+              >
+                ▼
+              </div>
+            </button>
+
+            {expandedSection === "payment-methods" && (
+              <div className="px-6 pb-6 space-y-4 border-t border-gray-100">
+                <div className="space-y-4 pt-4">
+                  {/* Cash Payment */}
+                  <div className="p-4 bg-gray-50 rounded-sm border border-gray-100 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-sm font-semibold">Cash Payment</Label>
+                        <p className="text-xs text-gray-500">Accept cash payments</p>
+                      </div>
+                      <Switch
+                        checked={localPaymentMethods.cash?.enabled !== false}
+                        onCheckedChange={(checked) =>
+                          setLocalPaymentMethods({
+                            ...localPaymentMethods,
+                            cash: { ...localPaymentMethods.cash, enabled: checked },
+                          })
+                        }
+                      />
+                    </div>
+                    {localPaymentMethods.cash?.enabled !== false && (
+                      <div>
+                        <Label htmlFor="cashTaxRate" className="text-xs font-semibold">
+                          Tax Rate Override (%)
+                        </Label>
+                        <Input
+                          id="cashTaxRate"
+                          type="number"
+                          placeholder="Leave empty for default"
+                          value={localPaymentMethods.cash?.taxRateOverride ?? ""}
+                          onChange={(e) =>
+                            setLocalPaymentMethods({
+                              ...localPaymentMethods,
+                              cash: {
+                                ...localPaymentMethods.cash,
+                                enabled: true,
+                                taxRateOverride: e.target.value ? parseFloat(e.target.value) : null,
+                              },
+                            })
+                          }
+                          className="mt-1"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Payment */}
+                  <div className="p-4 bg-gray-50 rounded-sm border border-gray-100 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-sm font-semibold">Card Payment</Label>
+                        <p className="text-xs text-gray-500">Accept card payments</p>
+                      </div>
+                      <Switch
+                        checked={localPaymentMethods.card?.enabled !== false}
+                        onCheckedChange={(checked) =>
+                          setLocalPaymentMethods({
+                            ...localPaymentMethods,
+                            card: { ...localPaymentMethods.card, enabled: checked },
+                          })
+                        }
+                      />
+                    </div>
+                    {localPaymentMethods.card?.enabled !== false && (
+                      <>
+                        <div>
+                          <Label htmlFor="cardTaxRate" className="text-xs font-semibold">
+                            Tax Rate Override (%)
+                          </Label>
+                          <Input
+                            id="cardTaxRate"
+                            type="number"
+                            placeholder="Leave empty for default"
+                            value={localPaymentMethods.card?.taxRateOverride ?? ""}
+                            onChange={(e) =>
+                              setLocalPaymentMethods({
+                                ...localPaymentMethods,
+                                card: {
+                                  ...localPaymentMethods.card,
+                                  enabled: true,
+                                  taxRateOverride: e.target.value ? parseFloat(e.target.value) : null,
+                                },
+                              })
+                            }
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="cardMinAmount" className="text-xs font-semibold">
+                            Minimum Amount
+                          </Label>
+                          <Input
+                            id="cardMinAmount"
+                            type="number"
+                            placeholder="0"
+                            value={localPaymentMethods.card?.minAmount ?? 0}
+                            onChange={(e) =>
+                              setLocalPaymentMethods({
+                                ...localPaymentMethods,
+                                card: {
+                                  ...localPaymentMethods.card,
+                                  enabled: true,
+                                  minAmount: parseFloat(e.target.value) || 0,
+                                },
+                              })
+                            }
+                            className="mt-1"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Mobile Payment */}
+                  <div className="p-4 bg-gray-50 rounded-sm border border-gray-100 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-sm font-semibold">Mobile Payment</Label>
+                        <p className="text-xs text-gray-500">Accept mobile payments</p>
+                      </div>
+                      <Switch
+                        checked={localPaymentMethods.mobile?.enabled !== false}
+                        onCheckedChange={(checked) =>
+                          setLocalPaymentMethods({
+                            ...localPaymentMethods,
+                            mobile: { ...localPaymentMethods.mobile, enabled: checked },
+                          })
+                        }
+                      />
+                    </div>
+                    {localPaymentMethods.mobile?.enabled !== false && (
+                      <div>
+                        <Label htmlFor="mobileTaxRate" className="text-xs font-semibold">
+                          Tax Rate Override (%)
+                        </Label>
+                        <Input
+                          id="mobileTaxRate"
+                          type="number"
+                          placeholder="Leave empty for default"
+                          value={localPaymentMethods.mobile?.taxRateOverride ?? ""}
+                          onChange={(e) =>
+                            setLocalPaymentMethods({
+                              ...localPaymentMethods,
+                              mobile: {
+                                ...localPaymentMethods.mobile,
+                                enabled: true,
+                                taxRateOverride: e.target.value ? parseFloat(e.target.value) : null,
+                              },
+                            })
+                          }
+                          className="mt-1"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4 border-t border-gray-100">
+                  <Button
+                    onClick={handleSavePaymentMethods}
+                    disabled={actionLoading}
+                    className="gap-2"
+                  >
+                    <Save className="h-4 w-4" />
+                    Save Payment Methods
                   </Button>
                 </div>
               </div>
@@ -533,196 +643,86 @@ const BranchSettingsPage = () => {
             )}
           </div>
 
-          {/* Payment Methods Section */}
+          {/* General Settings Section */}
           <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
             <button
-              onClick={() => toggleSection("payment-methods")}
+              onClick={() => toggleSection("general-settings")}
               className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-sm bg-purple-50 border border-purple-100 flex items-center justify-center">
-                  <CreditCard className="h-5 w-5 text-purple-600" />
+                <div className="h-10 w-10 rounded-sm bg-indigo-50 border border-indigo-100 flex items-center justify-center">
+                  <Settings className="h-5 w-5 text-indigo-600" />
                 </div>
                 <div className="text-left">
-                  <h3 className="font-bold text-gray-900">Payment Methods</h3>
-                  <p className="text-xs text-gray-500">Configure accepted payment methods</p>
+                  <h3 className="font-bold text-gray-900">General Settings</h3>
+                  <p className="text-xs text-gray-500">Configure order prefix, footer, and hold orders</p>
                 </div>
               </div>
               <div
                 className={cn(
                   "h-5 w-5 text-gray-400 transition-transform",
-                  expandedSection === "payment-methods" ? "rotate-180" : ""
+                  expandedSection === "general-settings" ? "rotate-180" : ""
                 )}
               >
                 ▼
               </div>
             </button>
 
-            {expandedSection === "payment-methods" && (
+            {expandedSection === "general-settings" && (
               <div className="px-6 pb-6 space-y-4 border-t border-gray-100">
                 <div className="space-y-4 pt-4">
-                  {/* Cash Payment */}
-                  <div className="p-4 bg-gray-50 rounded-sm border border-gray-100 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label className="text-sm font-semibold">Cash Payment</Label>
-                        <p className="text-xs text-gray-500">Accept cash payments</p>
-                      </div>
-                      <Switch
-                        checked={localPaymentMethods.cash?.enabled !== false}
-                        onCheckedChange={(checked) =>
-                          setLocalPaymentMethods({
-                            ...localPaymentMethods,
-                            cash: { ...localPaymentMethods.cash, enabled: checked },
-                          })
-                        }
-                      />
-                    </div>
-                    {localPaymentMethods.cash?.enabled !== false && (
-                      <div>
-                        <Label htmlFor="cashTaxRate" className="text-xs font-semibold">
-                          Tax Rate Override (%)
-                        </Label>
-                        <Input
-                          id="cashTaxRate"
-                          type="number"
-                          placeholder="Leave empty for default"
-                          value={localPaymentMethods.cash?.taxRateOverride ?? ""}
-                          onChange={(e) =>
-                            setLocalPaymentMethods({
-                              ...localPaymentMethods,
-                              cash: {
-                                ...localPaymentMethods.cash,
-                                enabled: true,
-                                taxRateOverride: e.target.value ? parseFloat(e.target.value) : null,
-                              },
-                            })
-                          }
-                          className="mt-1"
-                        />
-                      </div>
-                    )}
+                  {/* Order Prefix */}
+                  <div>
+                    <Label htmlFor="orderPrefix" className="text-sm font-semibold">
+                      Order Prefix
+                    </Label>
+                    <Input
+                      id="orderPrefix"
+                      placeholder="ORD"
+                      value={localOrderPrefix}
+                      onChange={(e) => setLocalOrderPrefix(e.target.value)}
+                      className="mt-1"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Prefix for order numbers (e.g., ORD-001234)</p>
                   </div>
 
-                  {/* Card Payment */}
-                  <div className="p-4 bg-gray-50 rounded-sm border border-gray-100 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label className="text-sm font-semibold">Card Payment</Label>
-                        <p className="text-xs text-gray-500">Accept card payments</p>
-                      </div>
-                      <Switch
-                        checked={localPaymentMethods.card?.enabled !== false}
-                        onCheckedChange={(checked) =>
-                          setLocalPaymentMethods({
-                            ...localPaymentMethods,
-                            card: { ...localPaymentMethods.card, enabled: checked },
-                          })
-                        }
-                      />
-                    </div>
-                    {localPaymentMethods.card?.enabled !== false && (
-                      <>
-                        <div>
-                          <Label htmlFor="cardTaxRate" className="text-xs font-semibold">
-                            Tax Rate Override (%)
-                          </Label>
-                          <Input
-                            id="cardTaxRate"
-                            type="number"
-                            placeholder="Leave empty for default"
-                            value={localPaymentMethods.card?.taxRateOverride ?? ""}
-                            onChange={(e) =>
-                              setLocalPaymentMethods({
-                                ...localPaymentMethods,
-                                card: {
-                                  ...localPaymentMethods.card,
-                                  enabled: true,
-                                  taxRateOverride: e.target.value ? parseFloat(e.target.value) : null,
-                                },
-                              })
-                            }
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="cardMinAmount" className="text-xs font-semibold">
-                            Minimum Amount
-                          </Label>
-                          <Input
-                            id="cardMinAmount"
-                            type="number"
-                            placeholder="0"
-                            value={localPaymentMethods.card?.minAmount ?? 0}
-                            onChange={(e) =>
-                              setLocalPaymentMethods({
-                                ...localPaymentMethods,
-                                card: {
-                                  ...localPaymentMethods.card,
-                                  enabled: true,
-                                  minAmount: parseFloat(e.target.value) || 0,
-                                },
-                              })
-                            }
-                            className="mt-1"
-                          />
-                        </div>
-                      </>
-                    )}
+                  {/* Receipt Footer */}
+                  <div>
+                    <Label htmlFor="receiptFooter" className="text-sm font-semibold">
+                      Receipt Footer (Legacy)
+                    </Label>
+                    <Textarea
+                      id="receiptFooter"
+                      placeholder="Thank you!"
+                      value={localReceiptFooter}
+                      onChange={(e) => setLocalReceiptFooter(e.target.value)}
+                      className="mt-1"
+                      rows={2}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Legacy footer text (consider using Receipt Config instead)</p>
                   </div>
 
-                  {/* Mobile Payment */}
-                  <div className="p-4 bg-gray-50 rounded-sm border border-gray-100 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label className="text-sm font-semibold">Mobile Payment</Label>
-                        <p className="text-xs text-gray-500">Accept mobile payments</p>
-                      </div>
-                      <Switch
-                        checked={localPaymentMethods.mobile?.enabled !== false}
-                        onCheckedChange={(checked) =>
-                          setLocalPaymentMethods({
-                            ...localPaymentMethods,
-                            mobile: { ...localPaymentMethods.mobile, enabled: checked },
-                          })
-                        }
-                      />
+                  {/* Enable Hold Orders */}
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-sm border border-gray-100">
+                    <div>
+                      <Label className="text-sm font-semibold">Enable Hold Orders</Label>
+                      <p className="text-xs text-gray-500">Allow orders to be put on hold</p>
                     </div>
-                    {localPaymentMethods.mobile?.enabled !== false && (
-                      <div>
-                        <Label htmlFor="mobileTaxRate" className="text-xs font-semibold">
-                          Tax Rate Override (%)
-                        </Label>
-                        <Input
-                          id="mobileTaxRate"
-                          type="number"
-                          placeholder="Leave empty for default"
-                          value={localPaymentMethods.mobile?.taxRateOverride ?? ""}
-                          onChange={(e) =>
-                            setLocalPaymentMethods({
-                              ...localPaymentMethods,
-                              mobile: {
-                                ...localPaymentMethods.mobile,
-                                enabled: true,
-                                taxRateOverride: e.target.value ? parseFloat(e.target.value) : null,
-                              },
-                            })
-                          }
-                          className="mt-1"
-                        />
-                      </div>
-                    )}
+                    <Switch
+                      checked={localEnableHoldOrders}
+                      onCheckedChange={setLocalEnableHoldOrders}
+                    />
                   </div>
                 </div>
 
                 <div className="flex justify-end pt-4 border-t border-gray-100">
                   <Button
-                    onClick={handleSavePaymentMethods}
+                    onClick={handleSaveGeneralSettings}
                     disabled={actionLoading}
                     className="gap-2"
                   >
                     <Save className="h-4 w-4" />
-                    Save Payment Methods
+                    Save General Settings
                   </Button>
                 </div>
               </div>
