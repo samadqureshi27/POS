@@ -475,18 +475,24 @@ class AuthService {
           const parsed = JSON.parse(raw);
           return {
             success: res.ok,
-            message: parsed.message || 'OTP verified successfully',
+            message: res.ok ? (parsed.message || 'OTP verified successfully') : undefined,
+            error: !res.ok ? (parsed.message || 'Invalid OTP') : undefined,
             data: parsed.result
           };
         } catch {
-          return { success: res.ok, message: raw };
+          return {
+            success: res.ok,
+            message: res.ok ? raw : undefined,
+            error: !res.ok ? raw : undefined
+          };
         }
       }
 
       const obj = raw as any;
       return {
         success: res.ok,
-        message: obj.message || 'OTP verified successfully',
+        message: res.ok ? (obj.message || 'OTP verified successfully') : undefined,
+        error: !res.ok ? (obj.message || 'Invalid OTP') : undefined,
         data: obj.result
       };
     } catch (error) {
