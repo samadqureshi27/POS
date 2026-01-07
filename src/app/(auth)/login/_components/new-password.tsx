@@ -36,6 +36,7 @@ const NewPasswordOverlay: React.FC = () => {
     setShowForgotContainer,
     setError,
     otpCode,
+    resetEmail,
   } = useLoginContext();
 
   const handleUpdatePassword = async () => {
@@ -49,14 +50,19 @@ const NewPasswordOverlay: React.FC = () => {
       return;
     }
 
+    if (!resetEmail) {
+      setValidationErrors({
+        confirmPassword: "Email is missing. Please restart the password reset process."
+      });
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      // Convert OTP array to string to use as token
-      const token = otpCode.join("");
-
-      const response = await authService.resetPassword(token, newPassword);
+      // Use new OTP-based password reset flow
+      const response = await authService.resetPasswordWithOtp(resetEmail, newPassword);
 
       if (response.success) {
 
@@ -70,7 +76,7 @@ const NewPasswordOverlay: React.FC = () => {
         setEmail("");
         setPassword("");
         setResetEmail("");
-        setOtpCode(["", "", "", "", ""]);
+        setOtpCode(["", "", "", "", "", ""]);
         setResetEmailError("");
 
         // Set up the login container to be revealed underneath

@@ -123,7 +123,7 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
   const [showNewPasswordContainer, setShowNewPasswordContainer] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetEmailError, setResetEmailError] = useState("");
-  const [otpCode, setOtpCode] = useState(["", "", "", "", ""]);
+  const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validationErrors, setValidationErrors] = useState<{
@@ -355,7 +355,7 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
     setEmail("");
     setPassword("");
     setResetEmail("");
-    setOtpCode(["", "", "", "", ""]);
+    setOtpCode(["", "", "", "", "", ""]);
     setNewPassword("");
     setConfirmPassword("");
     setPinCode(["", "", "", "", "", ""]);
