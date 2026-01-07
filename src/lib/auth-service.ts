@@ -60,6 +60,10 @@ const AUTH_PROFILE_PATH = process.env.NEXT_PUBLIC_API_AUTH_PROFILE || '/t/auth/m
 const AUTH_REFRESH_PATH = process.env.NEXT_PUBLIC_API_AUTH_REFRESH || '/t/auth/token/refresh';
 const AUTH_FORGOT_PASSWORD_PATH = process.env.NEXT_PUBLIC_API_AUTH_FORGOT_PASSWORD || '/t/auth/forgot-password';
 const AUTH_RESET_PASSWORD_PATH = process.env.NEXT_PUBLIC_API_AUTH_RESET_PASSWORD || '/t/auth/reset-password';
+// OTP-based password reset paths (new flow)
+const AUTH_REQUEST_OTP_PATH = process.env.NEXT_PUBLIC_API_AUTH_REQUEST_OTP || '/t/auth/password-reset/request-otp';
+const AUTH_VERIFY_OTP_PATH = process.env.NEXT_PUBLIC_API_AUTH_VERIFY_OTP || '/t/auth/password-reset/verify-otp';
+const AUTH_RESET_PASSWORD_OTP_PATH = process.env.NEXT_PUBLIC_API_AUTH_RESET_PASSWORD_OTP || '/t/auth/password-reset/reset';
 // Users & staff management (env-driven, with sensible defaults)
 const AUTH_CREATE_STAFF_PATH = process.env.NEXT_PUBLIC_API_AUTH_CREATE_STAFF || '/t/auth/create-staff';
 const AUTH_USERS_BASE_PATH = process.env.NEXT_PUBLIC_API_AUTH_USERS || '/t/auth/users';
@@ -412,6 +416,118 @@ class AuthService {
       return { success: obj.success ?? obj.status ?? res.ok, message: obj.message, data: obj.result };
     } catch (error) {
       console.error('Reset password error:', error);
+      return { success: false, error: 'Network error' };
+    }
+  }
+
+  // New OTP-based password reset flow methods
+  async requestPasswordResetOtp(email: string): Promise<ApiResponse> {
+    try {
+      const url = buildUrl(AUTH_REQUEST_OTP_PATH);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: buildHeaders(undefined, undefined, false),
+        body: JSON.stringify({ email })
+      });
+
+      const contentType = res.headers.get('content-type') || 'application/json';
+      const raw = contentType.includes('application/json') ? await res.json() : await res.text();
+
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          return {
+            success: res.ok,
+            message: parsed.message || 'OTP sent to your email',
+            data: parsed.result
+          };
+        } catch {
+          return { success: res.ok, message: 'OTP sent to your email' };
+        }
+      }
+
+      const obj = raw as any;
+      return {
+        success: res.ok,
+        message: obj.message || 'OTP sent to your email',
+        data: obj.result
+      };
+    } catch (error) {
+      console.error('Request OTP error:', error);
+      return { success: false, error: 'Network error' };
+    }
+  }
+
+  async verifyPasswordResetOtp(email: string, otp: string): Promise<ApiResponse> {
+    try {
+      const url = buildUrl(AUTH_VERIFY_OTP_PATH);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: buildHeaders(undefined, undefined, false),
+        body: JSON.stringify({ email, otp })
+      });
+
+      const contentType = res.headers.get('content-type') || 'application/json';
+      const raw = contentType.includes('application/json') ? await res.json() : await res.text();
+
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          return {
+            success: res.ok,
+            message: parsed.message || 'OTP verified successfully',
+            data: parsed.result
+          };
+        } catch {
+          return { success: res.ok, message: raw };
+        }
+      }
+
+      const obj = raw as any;
+      return {
+        success: res.ok,
+        message: obj.message || 'OTP verified successfully',
+        data: obj.result
+      };
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      return { success: false, error: 'Network error' };
+    }
+  }
+
+  async resetPasswordWithOtp(email: string, password: string): Promise<ApiResponse> {
+    try {
+      const url = buildUrl(AUTH_RESET_PASSWORD_OTP_PATH);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: buildHeaders(undefined, undefined, false),
+        body: JSON.stringify({ email, password })
+      });
+
+      const contentType = res.headers.get('content-type') || 'application/json';
+      const raw = contentType.includes('application/json') ? await res.json() : await res.text();
+
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          return {
+            success: res.ok,
+            message: parsed.message || 'Password reset successful',
+            data: parsed.result
+          };
+        } catch {
+          return { success: res.ok, message: raw };
+        }
+      }
+
+      const obj = raw as any;
+      return {
+        success: res.ok,
+        message: obj.message || 'Password reset successful',
+        data: obj.result
+      };
+    } catch (error) {
+      console.error('Reset password with OTP error:', error);
       return { success: false, error: 'Network error' };
     }
   }
