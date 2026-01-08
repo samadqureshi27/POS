@@ -152,15 +152,25 @@ const EmailVerificationOverlay: React.FC = () => {
       try {
         const response = await authService.verifyPasswordResetOtp(resetEmail, otp);
 
-        if (response.success) {
+        console.log("OTP Verification Response:", response);
+
+        // Check if response is successful (handle both success field and HTTP status)
+        if (response.success && !response.error) {
           Toast.success(response.message || "OTP verified successfully");
           setShowNewPassword(true);
           setTimeout(() => {
             setShowNewPasswordContainer(true);
           }, 100);
         } else {
-          setOtpError(response.message || response.error || "Invalid OTP. Please try again.");
-          Toast.error(response.message || response.error || "Invalid OTP");
+          // Extract error message from various possible formats
+          const errorMessage =
+            response.error ||
+            response.message ||
+            (response.data && response.data.message) ||
+            "Invalid OTP. Please try again.";
+
+          setOtpError(errorMessage);
+          Toast.error(errorMessage);
         }
       } catch (error) {
         console.error("OTP verification error:", error);
