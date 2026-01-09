@@ -152,7 +152,6 @@ export const StaffService = {
       if ((payload as any).isStaff !== undefined) apiPayload.isStaff = (payload as any).isStaff;
 
       // Debug: Log the final payload being sent to backend
-      console.log("🔧 StaffService.createStaff - Final API Payload:", JSON.stringify(apiPayload, null, 2));
 
       const res = await fetch(url, {
         method: "POST",

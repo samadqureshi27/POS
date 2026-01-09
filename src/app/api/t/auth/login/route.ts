@@ -72,7 +72,6 @@ export async function POST(req: Request) {
 
     return response;
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy POST /t/auth/login failed" },
       { status: 500 }

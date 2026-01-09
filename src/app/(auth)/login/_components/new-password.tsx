@@ -108,7 +108,6 @@ const NewPasswordOverlay: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error("Password reset error:", error);
       setValidationErrors({
         confirmPassword: "Network error. Please try again."
       });

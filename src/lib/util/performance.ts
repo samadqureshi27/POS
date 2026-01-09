@@ -316,7 +316,6 @@ export async function measurePerformance<T>(
     const duration = end - start;
 
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`[Performance] ${name}: ${duration.toFixed(2)}ms`);
     }
 
     return result;
@@ -325,7 +324,6 @@ export async function measurePerformance<T>(
     const duration = end - start;
 
     if (process.env.NODE_ENV === 'development') {
-      console.error(`[Performance] ${name} failed after ${duration.toFixed(2)}ms`);
     }
 
     throw error;

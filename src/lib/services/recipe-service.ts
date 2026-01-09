@@ -1,3 +1,4 @@
+
 // Recipe Service
 import { buildHeaders } from "@/lib/util/service-helpers";
 import { logError } from "@/lib/util/logger";
@@ -101,14 +102,6 @@ export class RecipeService {
         recipes = data.items;
       }
 
-      console.log("📋 RecipeService.listRecipes - Raw API response:", data);
-      console.log("📋 RecipeService.listRecipes - Extracted recipes:", recipes);
-      console.log("📋 RecipeService.listRecipes - Recipe count:", Array.isArray(recipes) ? recipes.length : 0);
-      if (Array.isArray(recipes) && recipes.length > 0) {
-        console.log("📋 RecipeService.listRecipes - First recipe:", recipes[0]);
-        console.log("📋 RecipeService.listRecipes - Sub recipes:", recipes.filter((r: any) => r.type === "sub").length);
-      }
-
       return {
         success: true,
         data: recipes,
@@ -133,7 +126,6 @@ export class RecipeService {
         ? `/api/recipes/with-variants/${id}`
         : `/api/recipes/${id}`;
 
-      console.log(`📖 Fetching recipe ${id} with includeVariants=${includeVariants} from ${url}`);
 
       const response = await fetch(url, {
         method: "GET",
@@ -166,7 +158,6 @@ export class RecipeService {
         variants = data.data.variants || [];
       }
 
-      console.log(`✅ Recipe fetched successfully. Variants count: ${variants.length}`);
 
       return {
         success: true,
@@ -303,19 +294,11 @@ export class RecipeService {
       const isFinalRecipe = updates.type === "final";
       const hasVariations = updates.variations && updates.variations.length > 0;
 
-      console.log(`🔄 Updating recipe ${id}`, {
-        isFinalRecipe,
-        hasVariations,
-        variationsCount: hasVariations ? updates.variations?.length : 0,
-        recipeType: updates.type,
-      });
-
       // Always use with-variants endpoint for final recipes to ensure variants are properly handled
       const endpoint = isFinalRecipe
         ? `/api/recipes/with-variants/${id}`
         : `/api/recipes/${id}`;
 
-      console.log(`📡 Using endpoint: ${endpoint}`);
 
       const response = await fetch(endpoint, {
         method: "PUT",
@@ -370,10 +353,6 @@ export class RecipeService {
    */
   static async updateRecipeWithVariants(id: string, updates: Partial<Recipe>): Promise<ApiResponse<Recipe>> {
     try {
-      console.log(`🔄 Updating recipe with variants ${id}`, {
-        variationsCount: updates.variations?.length || 0,
-      });
-
       const response = await fetch(`/api/recipes/with-variants/${id}`, {
         method: "PUT",
         headers: buildHeaders(),
@@ -418,60 +397,6 @@ export class RecipeService {
         success: false,
         message: parsedError.message,
         error: parsedError,
-      };
-    }
-  }
-
-  /**
-   * Update recipe with variants using the dedicated endpoint
-   */
-  static async updateRecipeWithVariants(id: string, updates: Partial<Recipe>): Promise<ApiResponse<Recipe>> {
-    try {
-      console.log(`🔄 Updating recipe with variants ${id}`, {
-        variationsCount: updates.variations?.length || 0,
-      });
-
-      const response = await fetch(`/api/recipes/with-variants/${id}`, {
-        method: "PUT",
-        headers: buildHeaders(),
-        body: JSON.stringify(updates),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to update recipe with variants",
-        };
-      }
-
-      // Handle different API response structures
-      let updatedRecipe = data;
-      if (data.result) {
-        updatedRecipe = data.result;
-      } else if (data.data) {
-        updatedRecipe = data.data;
-      }
-
-      // If the response has recipe property, extract just the recipe
-      if (updatedRecipe.recipe) {
-        updatedRecipe = updatedRecipe.recipe;
-      }
-
-      return {
-        success: true,
-        data: updatedRecipe,
-        message: data.message || "Recipe with variants updated successfully",
-      };
-    } catch (error: any) {
-      logError("Error updating recipe with variants", error, {
-        component: "RecipeService",
-        action: "updateRecipeWithVariants",
-      });
-      return {
-        success: false,
-        message: error.message || "Failed to update recipe with variants",
       };
     }
   }

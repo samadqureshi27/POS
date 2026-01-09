@@ -116,8 +116,8 @@ const OptionValuesForm: React.FC<OptionValuesFormProps> = ({ formData, onFormDat
     if (item.sourceType === "inventory") {
       const invItem = inventoryItems.find(i => (i._id || i.id) === sourceId);
       name = invItem?.name || "";
-      // Fetch unit from inventory item (check multiple possible property names)
-      unit = invItem?.baseUnit || invItem?.Unit || invItem?.unit || "unit";
+      // Fetch unit from inventory item
+      unit = invItem?.baseUnit || "unit";
     } else {
       const recipe = recipes.find(r => r._id === sourceId);
       name = recipe?.name || "";

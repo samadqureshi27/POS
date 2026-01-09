@@ -23,8 +23,13 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({
     onInputChange,
 }) => {
     // Use default data when formData fields are empty or undefined
-    const getFieldValue = (fieldName: keyof typeof defaultContactData) => {
-        return formData[fieldName] || defaultContactData[fieldName] || '';
+    const getFieldValue = (fieldName: keyof typeof defaultContactData): string => {
+        const value = formData[fieldName];
+        const defaultValue = defaultContactData[fieldName];
+        // Ensure we only return strings, not File objects
+        if (typeof value === 'string' && value) return value;
+        if (typeof defaultValue === 'string') return defaultValue;
+        return '';
     };
 
     return (

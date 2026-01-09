@@ -1,6 +1,9 @@
 // types/customer.ts
 import { ApiResponse } from "./common";
 
+// Re-export ApiResponse for consumers of this module
+export type { ApiResponse };
+
 export interface CustomerItem {
     Customer_ID: number;
     Name: string;

@@ -139,7 +139,6 @@ const StaffModal: React.FC<StaffModalProps> = ({
         setPosIds((fullStaff as any).posIds || []);
       }
     } catch (error) {
-      console.error("Error loading full staff details:", error);
       // Don't show error toast as the item prop might still have basic data
     }
   };
@@ -177,7 +176,6 @@ const StaffModal: React.FC<StaffModalProps> = ({
         setBranches(response.data);
       }
     } catch (error) {
-      console.error("Error loading branches:", error);
       Toast.error("Failed to load branches");
     } finally {
       setLoadingBranches(false);
@@ -200,7 +198,6 @@ const StaffModal: React.FC<StaffModalProps> = ({
         setPosTerminals([]);
       }
     } catch (error) {
-      console.error("Error loading POS terminals:", error);
       Toast.error("Failed to load POS terminals");
       setPosTerminals([]);
     } finally {
@@ -317,11 +314,6 @@ const StaffModal: React.FC<StaffModalProps> = ({
     }
 
     // Debug: Log payload before sending
-    console.log("Payload being sent:", JSON.stringify(payload, null, 2));
-    console.log("Roles:", formData.roles);
-    console.log("Has cashier/manager:", hasCashierOrManager);
-    console.log("Is cashier only:", isCashierOnly);
-    console.log("Selected Branch ID:", selectedBranchId);
 
     // Include password if provided (NOT for cashier-only role)
     if (!isCashierOnly && formData.password) {
@@ -351,40 +343,31 @@ const StaffModal: React.FC<StaffModalProps> = ({
       await onUpdate(item._id || item.id!, payload);
     } else {
       // Step 1: Create staff member (with temporary PIN for cashiers)
-      console.log("📝 Creating staff member...");
       const createdStaff = await onSave(payload);
-      console.log("✅ Staff created:", createdStaff);
 
       // Step 2: If cashier role, set the REAL PIN via dedicated endpoint
       if (isCashier && formData.pin && formData.pin.length === 6) {
         if (!createdStaff) {
-          console.error("❌ Cannot set PIN: createdStaff is null/undefined");
           Toast.error("Staff created but PIN setup failed: No staff ID returned");
           return;
         }
 
         const staffId = createdStaff._id || createdStaff.id;
         if (!staffId) {
-          console.error("❌ Cannot set PIN: No staff ID found in response");
           Toast.error("Staff created but PIN setup failed: No staff ID");
           return;
         }
 
-        console.log("🔐 Setting real PIN for staff:", staffId, "PIN:", formData.pin, "Branch:", selectedBranchId);
 
         try {
           const pinResponse = await StaffService.setPin(staffId, formData.pin, selectedBranchId);
-          console.log("📌 Set PIN response:", JSON.stringify(pinResponse, null, 2));
 
           if (pinResponse.success) {
-            console.log("✅ PIN set successfully!");
             Toast.success("Cashier created and PIN set successfully!");
           } else {
-            console.error("❌ PIN setup failed:", pinResponse.message);
             Toast.error(`Staff created but PIN setup failed: ${pinResponse.message}`);
           }
         } catch (pinError: any) {
-          console.error("❌ Exception while setting PIN:", pinError);
           Toast.error(`Staff created but PIN setup error: ${pinError.message}`);
         }
       }

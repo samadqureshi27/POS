@@ -325,7 +325,6 @@ export const useMenuOptions = () => {
             const count = idsToDelete.length;
             Toast.success(`${count} modifier${count > 1 ? 's' : ''} deleted successfully`);
         } catch (error) {
-            console.error("Error deleting modifiers:", error);
             Toast.error(error instanceof Error ? error.message : "Failed to delete some modifiers");
         } finally {
             setActionLoading(false);

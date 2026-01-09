@@ -86,7 +86,6 @@ export async function POST(req: Request) {
 
     return response;
   } catch (err: any) {
-    console.error('❌ Proxy Error (accept-invite):', err);
     return NextResponse.json(
       { 
         success: false, 

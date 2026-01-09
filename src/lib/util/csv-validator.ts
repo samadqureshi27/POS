@@ -214,7 +214,6 @@ export async function validateInventoryCSV(file: File): Promise<CSVValidationRes
       invalidRows: errors.length
     };
   } catch (error) {
-    console.error('Error validating CSV:', error);
     return {
       isValid: false,
       errors: [{

@@ -123,7 +123,6 @@ export default function CategoryModal({
       await onSubmit(payload as MenuCategoryPayload);
       onClose();
     } catch (error) {
-      console.error("Error saving category:", error);
     }
   };
 

@@ -57,7 +57,6 @@ const ForgotPasswordOverlay: React.FC = () => {
         setResetEmailError(errorMessage);
       }
     } catch (error: any) {
-      console.error("Password reset request error:", error);
       setResetEmailError("Network error. Please try again.");
     } finally {
       setIsLoading(false);

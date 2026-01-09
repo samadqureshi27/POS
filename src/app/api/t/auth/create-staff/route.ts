@@ -62,7 +62,6 @@ export async function POST(req: Request) {
       headers: { "content-type": contentType },
     });
   } catch (err: any) {
-    console.error("Create staff error:", err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy POST /t/auth/create-staff failed" },
       { status: 500 }

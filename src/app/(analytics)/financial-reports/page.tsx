@@ -79,7 +79,6 @@ const AnalyticsDashboard = () => {
       setShowDatePicker(false);
       await loadDashboardData(period, false);
     } catch (error) {
-      console.error("Error changing period:", error);
       setError("Failed to load data for selected period");
     }
   }, [setSelectedPeriod, setShowDatePicker, loadDashboardData, setError]);
@@ -93,14 +92,12 @@ const AnalyticsDashboard = () => {
       const { startDate: start, endDate: end } = handleCustomDateRange(startDate, endDate);
       await loadCustomRangeData(startDateObj, endDateObj);
     } catch (error) {
-      console.error("Error handling custom date range:", error);
       setError("Failed to load custom date range data");
     }
   }, [handleCustomDateRange, setError]);
 
   const loadCustomRangeData = useCallback(async (startDate?: Date, endDate?: Date) => {
     if (!customDateRange?.[0]?.startDate || !customDateRange?.[0]?.endDate) {
-      console.warn("Custom date range not properly set");
       return;
     }
 
@@ -113,7 +110,6 @@ const AnalyticsDashboard = () => {
     try {
       handleCustomDateRange(startDateStr, endDateStr);
     } catch (error) {
-      console.error("Error fetching custom range data:", error);
       setError("Failed to load custom date range data");
     }
   }, [customDateRange, handleCustomDateRange, setError]);

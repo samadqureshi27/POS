@@ -126,7 +126,6 @@ const SetPasswordContent: React.FC = () => {
         router.push("/login");
       }, 2000);
     } catch (error) {
-      console.error("Error setting password:", error);
       setValidationErrors({
         general: "An unexpected error occurred. Please try again.",
       });

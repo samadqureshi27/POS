@@ -194,15 +194,6 @@ export function handleApiError(
 ): ParsedError {
   const parsed = parseApiError(error, fallbackMessage || `Failed to ${context}`);
 
-  // Log technical details for debugging
-  console.error(`❌ Error in ${context}:`, {
-    type: parsed.type,
-    message: parsed.message,
-    technical: parsed.technical,
-    details: parsed.details,
-    originalError: error
-  });
-
   return parsed;
 }
 

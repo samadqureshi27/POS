@@ -31,7 +31,6 @@ export class PersistentLogger {
       const trimmed = logs.slice(-MAX_LOGS);
       localStorage.setItem(LOG_KEY, JSON.stringify(trimmed));
     } catch (e) {
-      console.error('Failed to save persistent logs:', e);
     }
   }
 
@@ -44,7 +43,6 @@ export class PersistentLogger {
     };
 
     // Console log
-    console.log(`📝 [PERSISTENT] ${message}`, data || '');
 
     // Persistent log
     const logs = this.getLogs();
@@ -60,7 +58,6 @@ export class PersistentLogger {
       data
     };
 
-    console.warn(`⚠️ [PERSISTENT] ${message}`, data || '');
 
     const logs = this.getLogs();
     logs.push(entry);
@@ -75,22 +72,18 @@ export class PersistentLogger {
       data
     };
 
-    console.error(`❌ [PERSISTENT] ${message}`, data || '');
 
     const logs = this.getLogs();
     logs.push(entry);
     this.saveLogs(logs);
   }
 
-  static viewLogs(): void {
+  static viewLogs(): LogEntry[] {
     const logs = this.getLogs();
-    console.group('📋 Persistent Logs (survives redirects)');
     logs.forEach(log => {
       const time = new Date(log.timestamp).toLocaleTimeString();
       const emoji = log.level === 'error' ? '❌' : log.level === 'warn' ? '⚠️' : 'ℹ️';
-      console.log(`${emoji} [${time}] ${log.message}`, log.data || '');
     });
-    console.groupEnd();
 
     return logs;
   }
@@ -98,7 +91,6 @@ export class PersistentLogger {
   static clear(): void {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(LOG_KEY);
-    console.log('✅ Persistent logs cleared');
   }
 
   static exportLogs(): string {
@@ -113,12 +105,7 @@ if (typeof window !== 'undefined') {
   (window as any).clearLogs = () => PersistentLogger.clear();
   (window as any).exportLogs = () => {
     const logs = PersistentLogger.exportLogs();
-    console.log(logs);
     return logs;
   };
 
-  console.log('💡 Persistent logging available:');
-  console.log('   window.viewLogs() - View all logs');
-  console.log('   window.clearLogs() - Clear logs');
-  console.log('   window.exportLogs() - Export as JSON');
 }

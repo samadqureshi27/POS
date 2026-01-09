@@ -112,8 +112,8 @@ export const useMenuItemData = () => {
   // Return with backwards-compatible API
   return {
     menuItems: hook.items,
-    categories: hook.categories || [],
-    recipes: hook.recipes || [],
+    categories: (hook as any).categories || [],
+    recipes: (hook as any).recipes || [],
     filteredItems: hook.filteredItems,
     selectedItems: hook.selectedItems,
     loading: hook.loading,

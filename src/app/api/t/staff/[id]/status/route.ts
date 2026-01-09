@@ -27,7 +27,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy POST /t/staff/:id/status failed" },
       { status: 500 }

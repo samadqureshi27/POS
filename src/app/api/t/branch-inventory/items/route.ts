@@ -40,8 +40,6 @@ export async function POST(req: Request) {
   // Request populated data with item details when creating
   const url = `${getRemoteBase()}/t/branch-inventory/items?populate=itemId`;
 
-  console.log("🔵 POST to backend:", url);
-  console.log("🔵 Payload:", payload);
 
   const res = await fetch(url, {
     method: "POST",
@@ -52,7 +50,6 @@ export async function POST(req: Request) {
   const contentType = res.headers.get("content-type");
   if (contentType?.includes("application/json")) {
     const data = await res.json();
-    console.log("🔵 Backend response:", JSON.stringify(data).substring(0, 500));
     return NextResponse.json(data, { status: res.status });
   }
 
