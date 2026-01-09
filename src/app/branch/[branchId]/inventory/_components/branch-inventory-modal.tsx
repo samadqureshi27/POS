@@ -69,9 +69,14 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
   // Update form data when editing item changes or branchObjectId changes
   useEffect(() => {
     if (editingItem) {
+      // Extract itemId as string (handle populated objects)
+      const itemIdValue = typeof editingItem.itemId === 'object' && editingItem.itemId?._id
+        ? editingItem.itemId._id
+        : editingItem.itemId;
+
       setFormData({
         branchId: editingItem.branchId,
-        itemId: editingItem.itemId,
+        itemId: typeof itemIdValue === 'string' ? itemIdValue : '',
         quantity: editingItem.quantity || 0,
         reorderPoint: editingItem.reorderPoint || 0,
         minStock: editingItem.minStock || 0,
@@ -104,7 +109,6 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
         setAvailableItems(response.data);
       }
     } catch (error) {
-      console.error("Error loading items:", error);
       Toast.error("Failed to load available items");
     } finally {
       setLoadingItems(false);
@@ -195,13 +199,13 @@ const BranchInventoryModal: React.FC<BranchInventoryModalProps> = ({
               {editingItem ? (
                 <Input
                   id="itemId"
-                  value={formData.itemId}
+                  value={typeof formData.itemId === 'string' ? formData.itemId : ''}
                   disabled
                   className="mt-1.5"
                 />
               ) : (
                 <Select
-                  value={formData.itemId}
+                  value={typeof formData.itemId === 'string' ? formData.itemId : ''}
                   onValueChange={(value) => handleChange("itemId", value)}
                   disabled={loadingItems || actionLoading}
                 >

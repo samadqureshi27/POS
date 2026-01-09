@@ -27,7 +27,6 @@ export async function POST(req: Request) {
       }
     );
   } catch (err: any) {
-    console.error("❌ Proxy Error (forgot-password):", err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy POST /t/auth/forgot-password failed" },
       { status: 500 }

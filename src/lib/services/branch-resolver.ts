@@ -25,7 +25,6 @@ export async function resolveBranchObjectId(
   // Check cache first
   const cached = branchCache.get(identifier);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    console.log("✅ Branch ObjectId from cache:", cached.objectId);
     return cached.objectId;
   }
 
@@ -54,13 +53,11 @@ export async function resolveBranchObjectId(
 
     // Retry once if authentication failed (token might not be loaded yet)
     if (!listResponse.success && listResponse.message?.includes("login")) {
-      console.log("⚠️ Authentication failed, retrying in 1 second...");
       await new Promise(resolve => setTimeout(resolve, 1000));
       listResponse = await BranchService.listBranches({ limit: 1000 });
     }
 
     if (!listResponse.success || !listResponse.data) {
-      console.error("❌ Failed to list branches:", listResponse.message);
       return null;
     }
 
@@ -82,14 +79,10 @@ export async function resolveBranchObjectId(
           objectId,
           timestamp: Date.now(),
         });
-        console.log(
-          `✅ Resolved branch "${identifier}" to ObjectId: ${objectId}`
-        );
         return objectId;
       }
     }
 
-    console.error(`❌ Branch not found with identifier: ${identifier}`);
     return null;
   } catch (error: any) {
     logError("Error resolving branch ObjectId", error, {
@@ -106,7 +99,6 @@ export async function resolveBranchObjectId(
  */
 export function clearBranchCache(): void {
   branchCache.clear();
-  console.log("🗑️ Branch cache cleared");
 }
 
 /**
@@ -136,9 +128,6 @@ export async function warmBranchCache(): Promise<void> {
           }
         }
       });
-      console.log(
-        `✅ Branch cache warmed with ${listResponse.data.length} branches`
-      );
     }
   } catch (error) {
     logError("Error warming branch cache", error, {

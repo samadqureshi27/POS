@@ -183,7 +183,6 @@ export const useBranchManagement = () => {
             const count = idsToDelete.length;
             Toast.success(`${count} branch${count > 1 ? 'es' : ''} deleted successfully`);
         } catch (error) {
-            console.error("Failed to delete branches:", error);
             Toast.error("Failed to delete some branches");
         } finally {
             setActionLoading(false);

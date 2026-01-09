@@ -160,14 +160,12 @@ export default function RecipeModalNew({
         // If we got fewer items than requested, we've reached the end
         setInventoryHasMore(newItems.length >= ITEMS_PER_PAGE);
       } else {
-        console.error('Failed to fetch inventory:', response.message);
         if (reset) {
           setLocalInventory([]);
         }
         setInventoryHasMore(false);
       }
     } catch (error) {
-      console.error('Error fetching inventory:', error);
       if (reset) {
         setLocalInventory([]);
       }
@@ -180,7 +178,6 @@ export default function RecipeModalNew({
   // Initial load when modal opens or panel expands
   useEffect(() => {
     if (isOpen && inventoryExpanded && localInventory.length === 0) {
-      console.log('📦 Initial inventory load...');
       setInventoryPage(1);
       setInventoryHasMore(true);
       fetchInventory(1, inventorySearch, true);
@@ -192,7 +189,6 @@ export default function RecipeModalNew({
     if (!isOpen || !inventoryExpanded) return;
 
     const debounceTimer = setTimeout(() => {
-      console.log('🔍 Inventory search changed:', inventorySearch);
       setInventoryPage(1);
       setInventoryHasMore(true);
       fetchInventory(1, inventorySearch, true);
@@ -211,7 +207,6 @@ export default function RecipeModalNew({
 
     if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
       const nextPage = inventoryPage + 1;
-      console.log('📜 Loading more inventory, page:', nextPage);
       setInventoryPage(nextPage);
       fetchInventory(nextPage, inventorySearch, false);
     }
@@ -221,7 +216,6 @@ export default function RecipeModalNew({
     if (isOpen) {
       // Refresh recipes when modal opens to get latest sub recipes
       if (onRefreshRecipes) {
-        console.log('🔄 Modal opened - refreshing recipes...');
         onRefreshRecipes();
       }
 
@@ -350,13 +344,6 @@ export default function RecipeModalNew({
       (rec) => String(rec._id || rec.ID) === draggedRecipe
     );
 
-    console.log('🎯 Recipe Drop:', {
-      draggedRecipeId: draggedRecipe,
-      foundRecipe: recipe,
-      allRecipesCount: allRecipes.length,
-      localSubRecipesCount: localSubRecipes.length
-    });
-
     if (recipe) {
       const recipeId = String(recipe._id || recipe.ID);
       const recipeName = recipe.Name || "";
@@ -392,7 +379,6 @@ export default function RecipeModalNew({
 
       Toast.success(`Added ${recipeName} to ingredients`, { duration: 2000 });
     } else {
-      console.warn('⚠️ Recipe not found for drop:', draggedRecipe);
     }
 
     setDraggedRecipe(null);
@@ -601,7 +587,6 @@ export default function RecipeModalNew({
 
         const result = await onSubmit(submitData);
 
-        console.log('🔍 Sub Recipe Creation Result:', result);
 
         if (result.success) {
           Toast.success(`"${newRecipe.name}" created successfully`, {
@@ -622,11 +607,9 @@ export default function RecipeModalNew({
             createdRecipe = createdRecipe.recipe;
           }
 
-          console.log('🔍 Extracted Recipe Data:', createdRecipe);
 
           // If we still don't have recipe data, use the submitted data with a temporary ID
           if (!createdRecipe || !createdRecipe._id) {
-            console.warn('⚠️ No recipe data in response, using submitted data');
             createdRecipe = {
               _id: `temp-${Date.now()}`,
               ...submitData,
@@ -647,17 +630,14 @@ export default function RecipeModalNew({
               ingredients: createdRecipe.ingredients || submitData.ingredients || [],
             };
 
-            console.log('✅ Adding to localSubRecipes:', newSubRecipe);
             setLocalSubRecipes(prev => {
               const updated = [...prev, newSubRecipe];
-              console.log('📋 Updated localSubRecipes:', updated);
               return updated;
             });
           }
 
           // Refresh recipes in background to update parent list
           if (onRefreshRecipes) {
-            console.log('🔄 Sub recipe created - refreshing recipes in background...');
             setTimeout(() => onRefreshRecipes(), 100);
           }
 
@@ -679,7 +659,6 @@ export default function RecipeModalNew({
           );
         }
       } catch (error) {
-        console.error('Error creating sub recipe:', error);
         Toast.error(error);
       } finally {
         setAddingToList(false);
@@ -809,7 +788,6 @@ export default function RecipeModalNew({
     // 3. Execution Phase
     setLoading(true);
     try {
-      console.log('📤 Submitting recipes:', finalRecipesToSubmit);
 
       // Submit each recipe in the queue
       for (const recipe of finalRecipesToSubmit) {
@@ -876,7 +854,6 @@ export default function RecipeModalNew({
         Toast.success(`Successfully created ${finalRecipesToSubmit.length} recipes`, { duration: 3000 });
       }
     } catch (error) {
-      console.error('Submit error:', error);
       Toast.error(error, { duration: 5000 });
     } finally {
       setLoading(false);
@@ -895,16 +872,6 @@ export default function RecipeModalNew({
     const newLocalRecipes = localSubRecipes.filter(r => !existingIds.has(r._id || r.ID));
     const merged = [...existingRecipes, ...newLocalRecipes];
 
-    console.log('🔄 Merging sub recipes:', {
-      existingCount: existingRecipes.length,
-      localCount: localSubRecipes.length,
-      newLocalCount: newLocalRecipes.length,
-      totalCount: merged.length,
-      localSubRecipes,
-      newLocalRecipes,
-      merged
-    });
-
     return merged;
   }, [availableRecipeOptions, localSubRecipes]);
 
@@ -913,13 +880,6 @@ export default function RecipeModalNew({
       const name = (recipe.Name || "").toLowerCase();
       const search = recipeSearch.toLowerCase();
       return name.includes(search);
-    });
-
-    console.log('🔍 Filtered Recipes:', {
-      searchTerm: recipeSearch,
-      allCount: allSubRecipes.length,
-      filteredCount: filtered.length,
-      filtered
     });
 
     return filtered;
@@ -1499,14 +1459,6 @@ export default function RecipeModalNew({
             </div>
 
             <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {(() => {
-                console.log('🎨 Rendering Sub Recipes Panel:', {
-                  filteredRecipesCount: filteredRecipes.length,
-                  localSubRecipesCount: localSubRecipes.length,
-                  filteredRecipes: filteredRecipes.map(r => ({ id: r._id || r.ID, name: r.Name })),
-                });
-                return null;
-              })()}
               {filteredRecipes.length === 0 ? (
                 <div className="text-center py-8">
                   <ChefHat className="h-10 w-10 text-[#d1d5db] mx-auto mb-2" />

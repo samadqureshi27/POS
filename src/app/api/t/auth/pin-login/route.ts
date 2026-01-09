@@ -60,7 +60,6 @@ export async function POST(req: Request) {
       headers: { "content-type": contentType },
     });
   } catch (err: any) {
-    console.error("PIN login error:", err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy POST /t/auth/pin-login failed" },
       { status: 500 }

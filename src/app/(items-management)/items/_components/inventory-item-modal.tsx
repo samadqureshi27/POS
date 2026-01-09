@@ -135,7 +135,6 @@ export default function InventoryItemModal({
     if (unitsRes.success && unitsRes.data) {
       setUnits(unitsRes.data);
     } else {
-      console.error('Failed to load units:', unitsRes.message);
     }
 
     if (categoriesRes.success && categoriesRes.data) setCategories(categoriesRes.data);
@@ -218,7 +217,6 @@ export default function InventoryItemModal({
         Toast.error(response.message || "Failed to create category");
       }
     } catch (error) {
-      console.error("Error creating category:", error);
       Toast.error("Failed to create category. Please try again.");
     }
     setAddingCategory(false);
@@ -367,7 +365,7 @@ export default function InventoryItemModal({
                 {!showNewCategoryInput ? (
                   <div className="grid grid-cols-[1fr_auto] gap-2 mt-1.5">
                     <Select
-                      value={formData.categoryId}
+                      value={typeof formData.categoryId === 'string' ? formData.categoryId : ''}
                       onValueChange={(value) => {
                         if (value === "__new__") {
                           setShowNewCategoryInput(true);

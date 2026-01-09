@@ -25,7 +25,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy GET /t/branch-menu/:id failed" },
       { status: 500 }
@@ -59,7 +58,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy PUT /t/branch-menu failed" },
       { status: 500 }
@@ -91,7 +89,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy DELETE /t/branch-menu failed" },
       { status: 500 }

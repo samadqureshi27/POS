@@ -34,7 +34,6 @@ export async function GET(req: Request) {
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy GET /t/branches failed" },
       { status: 500 }
@@ -67,7 +66,6 @@ export async function POST(req: Request) {
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy POST /t/branches failed" },
       { status: 500 }

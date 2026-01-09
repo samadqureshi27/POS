@@ -33,7 +33,6 @@ export const decodeJWT = (token: string): JWTPayload | null => {
     const parts = token.split('.');
 
     if (parts.length !== 3) {
-      console.error('Invalid JWT format');
       return null;
     }
 
@@ -51,7 +50,6 @@ export const decodeJWT = (token: string): JWTPayload | null => {
 
     return JSON.parse(jsonPayload) as JWTPayload;
   } catch (error) {
-    console.error('Error decoding JWT:', error);
     return null;
   }
 };

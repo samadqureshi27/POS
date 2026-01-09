@@ -34,7 +34,6 @@ export async function GET(
 
     return NextResponse.json(data, { status: 200 });
   } catch (error: any) {
-    console.error("❌ [Menu variation API] GET error:", error);
     return NextResponse.json(
       { success: false, message: error.message || "Internal server error" },
       { status: 500 }
@@ -72,7 +71,6 @@ export async function PUT(
 
     return NextResponse.json(data, { status: 200 });
   } catch (error: any) {
-    console.error("❌ [Menu variation API] PUT error:", error);
     return NextResponse.json(
       { success: false, message: error.message || "Internal server error" },
       { status: 500 }
@@ -108,7 +106,6 @@ export async function DELETE(
 
     return NextResponse.json(data, { status: 200 });
   } catch (error: any) {
-    console.error("❌ [Menu variation API] DELETE error:", error);
     return NextResponse.json(
       { success: false, message: error.message || "Internal server error" },
       { status: 500 }

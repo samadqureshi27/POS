@@ -78,7 +78,6 @@ const BranchMenuPage = () => {
           setBranchName(response.data.name);
         }
       } catch (error) {
-        console.error("Error fetching branch name:", error);
       }
     };
 

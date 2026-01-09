@@ -28,7 +28,6 @@ export async function POST(req: Request) {
       }
     );
   } catch (err: any) {
-    console.error("❌ Proxy Error (reset-password):", err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy POST /t/auth/reset-password failed" },
       { status: 500 }

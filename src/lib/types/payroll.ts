@@ -1,6 +1,9 @@
 import { ReactNode } from "react";
 import { ApiResponse } from "./common";
 
+// Re-export ApiResponse for consumers of this module
+export type { ApiResponse };
+
 // API and Data Types
 export interface PayrollStaffItem {
     STAFF_ID: string;

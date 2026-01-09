@@ -31,7 +31,6 @@ export function useBranchMenu(branchId: string | number) {
         return objectId;
       }
 
-      console.error("❌ Branch not found with ID:", branchId);
       Toast.error(`Branch "${branchId}" not found.`);
       return null;
     } catch (error: any) {
@@ -259,10 +258,8 @@ export function useBranchMenu(branchId: string | number) {
       if (!objectId) {
         const isObjectId = /^[0-9a-fA-F]{24}$/.test(String(branchId));
         if (isObjectId) {
-          console.log("⚠️ Using branchId directly as ObjectId:", branchId);
           setBranchObjectId(String(branchId));
         } else {
-          console.log("⚠️ Could not resolve branch ObjectId, using branchId as-is:", branchId);
           setBranchObjectId(String(branchId));
         }
       }

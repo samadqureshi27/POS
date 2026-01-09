@@ -92,7 +92,6 @@ const AddOnsPage = () => {
         });
       }
     } catch (error) {
-      console.error("Error deleting add-on:", error);
       Toast.error(error instanceof Error ? error.message : "Failed to delete add-on", {
         duration: 5000,
         position: "top-right",

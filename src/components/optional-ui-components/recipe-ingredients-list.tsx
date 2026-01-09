@@ -66,9 +66,6 @@ export function RecipeIngredientsList({
       });
     } else {
       // For recipes, only show sub recipes
-      console.log("🔍 RecipeIngredientsList - Filtering sub recipes");
-      console.log("🔍 Available recipes:", availableRecipes.length, availableRecipes);
-      console.log("🔍 Sub recipes (type='sub'):", availableRecipes.filter((opt) => opt.type === "sub"));
 
       filteredRecipes = availableRecipes
         .filter((opt) => opt.type === "sub")
@@ -77,7 +74,6 @@ export function RecipeIngredientsList({
           return name.includes(query);
         });
 
-      console.log("🔍 Filtered sub recipes (after search):", filteredRecipes.length, filteredRecipes);
     }
 
     return { inventory: filteredInventory, recipes: filteredRecipes };

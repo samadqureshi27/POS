@@ -171,7 +171,6 @@ export function useDataManager<TRaw = any, TTransformed = any>(
         response = await listFn({ page: pageNum, limit: ITEMS_PER_PAGE });
       } catch (error) {
         // If pagination fails, try without params
-        console.log(`Service ${entityName} may not support pagination, loading all items`);
         response = await listFn();
       }
 
@@ -322,9 +321,6 @@ export function useDataManager<TRaw = any, TTransformed = any>(
 
       const response = await createFn(itemData);
 
-      console.log("🟢 useDataManager createItem - Full response:", response);
-      console.log("🟢 useDataManager createItem - response.data:", response.data);
-      console.log("🟢 useDataManager createItem - response.data.name:", response.data?.name);
 
       if (response.success && response.data) {
         // Optimistic update: Add new item to local state
@@ -332,9 +328,6 @@ export function useDataManager<TRaw = any, TTransformed = any>(
           ? transformData(response.data, items.length, additionalStateRef.current)
           : response.data;
 
-        console.log("🟢 useDataManager createItem - Transformed newItem:", newItem);
-        console.log("🟢 useDataManager createItem - newItem.Name:", newItem.Name);
-        console.log("🟢 useDataManager createItem - newItem.name:", newItem.name);
 
         setItems(prevItems => [...prevItems, newItem]);
 

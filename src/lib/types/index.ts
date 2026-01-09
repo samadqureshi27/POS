@@ -1,6 +1,9 @@
 // _components/types.ts
 import { ApiResponse } from "./common";
 
+// Re-export ApiResponse for consumers of this module
+export type { ApiResponse };
+
 export interface OrderItem {
   Order: string;
   Name: string;

@@ -19,7 +19,6 @@ export class SettingsAPI {
         message: "Settings loaded successfully",
       };
     } catch (error) {
-      console.error('API Error - getSettings:', error);
       return {
         success: false,
         data: { ...DEFAULT_SETTINGS }, // Return defaults on error
@@ -41,7 +40,6 @@ export class SettingsAPI {
         message: "Settings updated successfully",
       };
     } catch (error) {
-      console.error('API Error - updateSettings:', error);
       return {
         success: false,
         data: this.mockSettings,
@@ -61,7 +59,6 @@ export class SettingsAPI {
         message: "Settings reset to defaults successfully",
       };
     } catch (error) {
-      console.error('API Error - resetToDefaults:', error);
       return {
         success: false,
         data: this.mockSettings,

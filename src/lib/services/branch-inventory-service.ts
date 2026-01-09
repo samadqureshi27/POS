@@ -240,7 +240,6 @@ export const BranchInventoryService = {
       if (payload.costPerUnit !== undefined) apiPayload.costPerUnit = payload.costPerUnit;
       if (payload.sellingPrice !== undefined) apiPayload.sellingPrice = payload.sellingPrice;
 
-      console.log("📤 Creating branch inventory item with payload:", apiPayload);
 
       const res = await fetch(url, {
         method: "POST",
@@ -250,7 +249,6 @@ export const BranchInventoryService = {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        console.error("❌ API Error Response:", data);
         const parsedError = handleApiError(
           { ...data, status: res.status },
           'create item'
@@ -262,21 +260,11 @@ export const BranchInventoryService = {
         };
       }
 
-      console.log("✅ Successfully created branch inventory item:", data);
 
       const item: BranchInventoryItem = data?.result ?? data?.data ?? data;
 
-      console.log("📋 Extracted item:", item);
-      console.log("🏷️ ItemId type:", typeof item.itemId);
-      console.log("🏷️ ItemId is populated object?", typeof item.itemId === 'object' && item.itemId !== null);
       if (typeof item.itemId === 'object') {
-        console.log("🏷️ Populated itemId:", item.itemId);
-        console.log("🏷️ Name from populated itemId:", (item.itemId as any)?.name);
       }
-      console.log("🏷️ Item has nested 'item' object?", !!item.item);
-      console.log("🏷️ Item name from nested 'item':", item.item?.name);
-      console.log("🏷️ Item name snapshot:", item.itemNameSnapshot);
-      console.log("🏷️ Item name direct:", item.itemName);
 
       item.stockStatus = calculateStockStatus(item);
 

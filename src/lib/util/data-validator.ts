@@ -41,7 +41,6 @@ export function safeGet<T>(
 
     return result !== undefined && result !== null ? result : defaultValue;
   } catch (error) {
-    console.warn(`Safe get failed for path: ${path}`, error);
     return defaultValue;
   }
 }
@@ -107,14 +106,6 @@ export function validateInventoryItem(item: any): ValidationResult<any> {
     updatedAt: item.updatedAt || item.updated_at || '',
   };
 
-  // Log warnings and errors
-  if (warnings.length > 0) {
-    console.warn('⚠️ Data validation warnings:', {
-      itemName: item.name,
-      warnings
-    });
-  }
-
   if (errors.length > 0) {
     logError('Data validation errors', new Error('Invalid item data'), {
       component: 'DataValidator',
@@ -150,7 +141,6 @@ function sanitizeCategoryId(categoryId: any): string | { _id: string; name: stri
     const hasName = categoryId.name;
 
     if (!hasId || !hasName) {
-      console.warn('⚠️ Invalid category object, missing _id or name:', categoryId);
       return undefined;
     }
 
@@ -160,7 +150,6 @@ function sanitizeCategoryId(categoryId: any): string | { _id: string; name: stri
     };
   }
 
-  console.warn('⚠️ Unexpected categoryId type:', typeof categoryId, categoryId);
   return undefined;
 }
 
@@ -195,7 +184,6 @@ export function validateInventoryItems(items: any[]): {
       validItems.push(result.data);
     } else {
       invalidCount++;
-      console.error(`❌ Invalid item at index ${index}:`, result.errors);
     }
 
     if (result.warnings.length > 0) {
@@ -204,7 +192,6 @@ export function validateInventoryItems(items: any[]): {
   });
 
   if (invalidCount > 0) {
-    console.error(`❌ Found ${invalidCount} invalid items out of ${items.length} total items`);
   }
 
   return {

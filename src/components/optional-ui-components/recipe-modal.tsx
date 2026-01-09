@@ -103,9 +103,6 @@ export default function RecipeModal({
   useEffect(() => {
     if (isOpen) {
       // Debug logging
-      console.log("🔍 Recipe Modal Opened");
-      console.log("📦 Available Inventory Items:", ingredients?.length || 0, ingredients);
-      console.log("🍲 Available Recipe Options:", availableRecipeOptions?.length || 0);
 
       if (editingItem) {
         const existingIngredients = editingItem.ingredients || [];

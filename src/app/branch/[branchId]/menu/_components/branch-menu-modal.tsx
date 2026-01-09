@@ -126,7 +126,6 @@ const BranchMenuModal: React.FC<BranchMenuModalProps> = ({
         setAvailableMenuItems(response.data);
       }
     } catch (error) {
-      console.error("Error loading menu items:", error);
       Toast.error("Failed to load available menu items");
     } finally {
       setLoadingMenuItems(false);
