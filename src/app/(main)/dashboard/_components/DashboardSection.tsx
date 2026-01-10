@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Maximize2, Minimize2, ChevronDown, ChevronUp } from "lucide-react";
+import { Maximize2, Minimize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DashboardSectionProps {

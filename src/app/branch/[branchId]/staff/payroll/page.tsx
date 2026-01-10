@@ -14,7 +14,6 @@ import { PageHeader } from "@/components/ui/page-header";
 import { useDateFilter } from "@/lib/hooks/useDateFilter";
 import { useStaffData } from "@/lib/hooks/usePayrollStaffData";
 import { useFilters } from "@/lib/hooks/payrollFilter";
-import { formatCurrency } from "@/lib/util/formatters";
 
 const StaffManagementPage = () => {
   const params = useParams();

@@ -76,7 +76,6 @@ export const GlobalSkeleton: React.FC<GlobalSkeletonProps> = ({
           )}
 
           
-
           {/* Dashboard Section Skeleton 1 - Daily Snapshot */}
           <div className="mb-8">
             {/* Section Header with Title Box + Divider */}

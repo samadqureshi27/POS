@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { ChefHat } from 'lucide-react';
 import BaseSubmenu from '../base-submenu';
 

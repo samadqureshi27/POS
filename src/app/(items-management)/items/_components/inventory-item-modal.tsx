@@ -2,7 +2,7 @@
 
 import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
-import { Save, Loader2, Plus, Trash2, Building2, ChevronDown, Package, Info } from "lucide-react";
+import { Save, Loader2, Plus, Trash2, Building2, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
-import { InventoryService, UnitsService, type InventoryItem, type Unit } from "@/lib/services/inventory-service";
+import { UnitsService, type InventoryItem, type Unit } from "@/lib/services/inventory-service";
 import { CategoriesService, type Category } from "@/lib/services/categories-service";
 import { InventoryAPI, type Vendor, type Branch } from "@/lib/util/inventoryApi";
 

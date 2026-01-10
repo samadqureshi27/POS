@@ -2,7 +2,7 @@
 
 import { buildHeaders } from "@/lib/util/service-helpers";
 import { logError } from "@/lib/util/logger";
-import { validateInventoryItems, validateInventoryItem } from "@/lib/util/data-validator";
+import { validateInventoryItems } from "@/lib/util/data-validator";
 import { handleApiError, ParsedError } from "@/lib/util/error-handler";
 
 // ==================== Types ====================

@@ -1,7 +1,7 @@
 // src/lib/hooks/useBranchMenu.ts
 
 import { useState, useEffect, useMemo } from "react";
-import { BranchMenuService, type EffectiveMenuItem, type BranchMenuConfig } from "@/lib/services/branch-menu-service";
+import { BranchMenuService, EffectiveMenuItem, BranchMenuConfig } from "@/lib/services/branch-menu-service";
 import { resolveBranchObjectId } from "@/lib/services/branch-resolver";
 import { Toast } from "@/lib/util/toast-helpers";
 import { logError } from "@/lib/util/logger";

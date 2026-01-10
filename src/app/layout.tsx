@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import DashboardWrapper from "@/components/dashboard-wrapper";
 import { ConditionalLayoutWrapper } from '@/components/conditional-layout-wrapper';
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/lib/hooks/useAuth";

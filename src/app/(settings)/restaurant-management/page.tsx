@@ -1,8 +1,6 @@
 // pages/RestaurantProfilePage.tsx
 "use client";
-import React from "react";
 import ActionButtons from '@/components/ui/setting-buttons';
-import { Toast } from "@/lib/util/toast-helpers";
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
 
 import { PageContainer } from '@/components/ui/page-container';

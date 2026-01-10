@@ -1,7 +1,6 @@
 // pages/NotificationsPage.tsx
 "use client";
 
-import React, { useState } from "react";
 import { FilterType } from "@/lib/types/notifications";
 import { useNotifications } from "@/lib/hooks/useNotifications";
 import { filterNotifications, getUnreadCount } from "@/lib/util/notifications";

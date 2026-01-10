@@ -1,9 +1,7 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import { LogOut, Home, Package, Package2, ChefHat, Building2, DollarSign, User, ShoppingCart, Settings } from 'lucide-react';
-import { NewBadge } from '../ui/new-badge';
 
 interface MobileDrawerProps {
     user: any;

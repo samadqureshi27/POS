@@ -1,5 +1,5 @@
 // types/branch.ts
-import { ApiResponse, ToastState } from "./common";
+import { ToastState } from "./common";
 
 export interface BranchItem {
   "Branch-ID": number; // Local sequential ID for UI

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { MenuItemOptions, OptionValuesFormProps, AddonItemValue } from '@/lib/types/menuItemOptions';
+import { OptionValuesFormProps, AddonItemValue } from '@/lib/types/menuItemOptions';
 import { InventoryService, InventoryItem } from '@/lib/services/inventory-service';
 import { RecipeService, Recipe } from '@/lib/services/recipe-service';
 import { logError } from '@/lib/util/logger';

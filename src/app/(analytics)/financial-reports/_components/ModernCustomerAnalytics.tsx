@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from "recharts";
-import { Users, TrendingUp, Heart, Target, DollarSign, Sparkles } from "lucide-react";
+import { Users, TrendingUp, Heart, Target, Sparkles } from "lucide-react";
 
 interface CustomerAnalyticsProps {
   analyticsData: any;

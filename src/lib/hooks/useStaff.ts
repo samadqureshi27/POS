@@ -1,7 +1,7 @@
 // src/lib/hooks/useStaff.ts
 
 import { useState, useEffect, useMemo } from "react";
-import { StaffService, type TenantStaff } from "@/lib/services/staff-service";
+import { StaffService, TenantStaff } from "@/lib/services/staff-service";
 import { Toast } from "@/lib/util/toast-helpers";
 import { logError } from "@/lib/util/logger";
 

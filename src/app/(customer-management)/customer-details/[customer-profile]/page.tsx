@@ -1,7 +1,6 @@
 // app/customers-details/[customer-profile]/page.tsx
 "use client";
 
-import React from "react";
 import { useRouter } from "next/navigation";
 
 import { useCustomerId } from '@/lib/hooks/useCustomerID';

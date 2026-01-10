@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CustomTooltip } from '@/components/ui/custom-tooltip';
-import { MenuItemOptions, DetailsFormProps } from '@/lib/types/menuItemOptions';
+import { DetailsFormProps } from '@/lib/types/menuItemOptions';
 import { MenuCategoryService } from '@/lib/services/menu-category-service';
 import { AddonsGroupsService, AddonGroup } from '@/lib/services/addons-groups-service';
 import { Plus, Loader2, ChevronDown, Info } from 'lucide-react';
