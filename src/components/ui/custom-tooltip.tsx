@@ -20,14 +20,20 @@ export function CustomTooltip({
     delay = 400
 }: CustomTooltipProps) {
     const [isVisible, setIsVisible] = useState(false);
+    const [shouldRender, setShouldRender] = useState(false);
     const [position, setPosition] = useState({ top: 0, left: 0 });
     const [mounted, setMounted] = useState(false);
     const triggerRef = useRef<HTMLDivElement>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         setMounted(true);
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+        };
     }, []);
 
     const calculatePosition = useCallback(() => {
@@ -120,10 +126,19 @@ export function CustomTooltip({
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
+        if (hideTimeoutRef.current) {
+            clearTimeout(hideTimeoutRef.current);
+        }
         timeoutRef.current = setTimeout(() => {
-            setIsVisible(true);
+            setShouldRender(true);
             // Calculate position after a brief delay to ensure tooltip is rendered
             setTimeout(calculatePosition, 0);
+            // Wait for element to mount before triggering fade-in
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setIsVisible(true);
+                });
+            });
         }, delay);
     };
 
@@ -131,7 +146,14 @@ export function CustomTooltip({
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
+        if (hideTimeoutRef.current) {
+            clearTimeout(hideTimeoutRef.current);
+        }
         setIsVisible(false);
+        // Delay unmounting to allow fade-out animation
+        hideTimeoutRef.current = setTimeout(() => {
+            setShouldRender(false);
+        }, 300); // Match duration-300
     };
 
     const containerClasses = {
@@ -191,7 +213,7 @@ export function CustomTooltip({
         };
     }, [isVisible]);
 
-    const tooltipContent = mounted && isVisible && (
+    const tooltipContent = mounted && shouldRender && (
         <div
             ref={tooltipRef}
             className="fixed z-[1002] pointer-events-none"
@@ -200,7 +222,10 @@ export function CustomTooltip({
                 left: `${position.left}px`,
             }}
         >
-            <div className="relative bg-white border border-gray-200 rounded-sm px-5 py-2 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] whitespace-nowrap animate-in fade-in-0 zoom-in-95 duration-200">
+            <div className={cn(
+                "relative bg-white border border-[#d5d5dd] rounded-sm px-5 py-2 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] whitespace-nowrap transition-opacity duration-300",
+                isVisible ? "opacity-100" : "opacity-0"
+            )}>
                 <span className="text-base font-medium text-black">{label}</span>
 
                 {/* Tooltip Arrow (Rotated Square) */}
@@ -208,7 +233,7 @@ export function CustomTooltip({
                     className={cn(
                         "absolute w-3 h-3 bg-white rotate-[-45deg] z-10",
                         arrowClasses[direction],
-                        "border-gray-200"
+                        "border-[#d5d5dd]"
                     )}
                 />
             </div>
@@ -234,8 +259,13 @@ export function CustomTooltip({
                         if (isVisible) {
                             hideTooltip();
                         } else {
-                            setIsVisible(true);
+                            setShouldRender(true);
                             setTimeout(calculatePosition, 0);
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    setIsVisible(true);
+                                });
+                            });
                         }
                     }
                 }}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { BellIcon } from 'lucide-react';
 import { cn } from "@/lib/utils";
@@ -33,19 +34,50 @@ export function NotificationDropdown({
     formatTimeAgo,
     navItemClass
 }: NotificationDropdownProps) {
+    const [shouldRender, setShouldRender] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        if (showNotifications) {
+            // Show: mount then fade in
+            setShouldRender(true);
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setIsVisible(true);
+                });
+            });
+        } else {
+            // Hide: fade out then unmount
+            setIsVisible(false);
+            if (hideTimeoutRef.current) {
+                clearTimeout(hideTimeoutRef.current);
+            }
+            hideTimeoutRef.current = setTimeout(() => {
+                setShouldRender(false);
+            }, 300);
+        }
+
+        return () => {
+            if (hideTimeoutRef.current) {
+                clearTimeout(hideTimeoutRef.current);
+            }
+        };
+    }, [showNotifications]);
+
     return (
         <div className="relative h-full">
             <button
                 onClick={toggleNotifications}
                 className={cn(navItemClass, "relative h-full rounded-none border-none outline-none", showNotifications && "bg-[#2E2E2E]")}
             >
-                <BellIcon className="h-8 w-8" strokeWidth={1} />
+                <BellIcon className="h-7 w-7" strokeWidth={1} />
                 {notifications.filter(n => !n.read).length > 0 && (
                     <span className="absolute top-5 right-3 bg-red-500 rounded-full h-2 w-2 ring-2 ring-[#1F1E1F]" />
                 )}
             </button>
 
-            {showNotifications && (
+            {shouldRender && (
                 <>
                     <div
                         className="fixed inset-0 z-[55] cursor-default"
@@ -53,7 +85,10 @@ export function NotificationDropdown({
                         aria-hidden="true"
                     />
                     <div
-                        className="fixed top-[64px] right-0 left-auto w-72 bg-[#2E2E2E] text-white shadow-2xl z-[100] outline-none animate-in fade-in-0 transition-standard border-none"
+                        className={cn(
+                            "fixed top-[64px] right-0 left-auto w-66 bg-[#2E2E2E] text-white shadow-2xl z-[100] outline-none border-none transition-opacity duration-300",
+                            isVisible ? "opacity-100" : "opacity-0"
+                        )}
                     >
                         <div className="p-5 border-b border-[#464646] flex justify-between items-center">
                             <h3 className="font-semibold text-base">Notifications</h3>

@@ -1124,293 +1124,295 @@ export default function RecipeModalNew({
           </div>
 
           {recipeFormExpanded && (
-            <div className="p-4">
-              <div className="space-y-5">
-                {/* Name */}
-                <div>
-                  <Label className="text-sm font-medium text-[#374151] mb-1.5 block">
-                    Recipe Name <span className="text-[#ef4444]">*</span>
-                  </Label>
-                  <Input
-                    value={formData.name}
-                    onChange={(e) => handleFieldChange("name", e.target.value)}
-                    placeholder={
-                      recipeType === "sub"
-                        ? "e.g., Burger Sauce, Grilled Patty"
-                        : "e.g., Cheeseburger, Caesar Salad"
-                    }
-                    className="h-14 text-[15px]"
-                  />
-                </div>
-
-                {/* Description */}
-                <div>
-                  <Label className="text-sm font-medium text-[#374151] mb-1.5 block">Description (Optional)</Label>
-                  <Textarea
-                    value={formData.description}
-                    onChange={(e) => handleFieldChange("description", e.target.value)}
-                    placeholder="Brief description..."
-                    className="min-h-[72px] resize-none text-[15px]"
-                    rows={2}
-                  />
-                </div>
-
-                {/* Yield & Active Status Row */}
-                <div className="grid grid-cols-2 gap-4">
+            <>
+              <div className="p-4">
+                <div className="space-y-5">
+                  {/* Name */}
                   <div>
                     <Label className="text-sm font-medium text-[#374151] mb-1.5 block">
-                      Yield (Portions)
+                      Recipe Name <span className="text-[#ef4444]">*</span>
                     </Label>
                     <Input
-                      type="number"
-                      min="1"
-                      value={formData.yield ?? ""}
-                      onChange={(e) => {
-                        handleFieldChange("yield", e.target.value);
-                      }}
-                      onFocus={(e) => e.target.select()}
-                      placeholder="1"
-                      className="h-14 text-[15px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      value={formData.name}
+                      onChange={(e) => handleFieldChange("name", e.target.value)}
+                      placeholder={
+                        recipeType === "sub"
+                          ? "e.g., Burger Sauce, Grilled Patty"
+                          : "e.g., Cheeseburger, Caesar Salad"
+                      }
+                      className="h-14 text-[15px]"
                     />
                   </div>
+
+                  {/* Description */}
                   <div>
-                    <Label className="text-sm font-medium text-[#374151] mb-1.5 block">Status</Label>
-                    <div className="flex items-center justify-between rounded-sm border border-[#d5d5dd] bg-[#f8f8fa] px-4 h-14 w-full">
-                      <span className="text-[#111827] text-sm font-medium">Active</span>
-                      <Switch
-                        checked={formData.isActive === true}
-                        onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
+                    <Label className="text-sm font-medium text-[#374151] mb-1.5 block">Description (Optional)</Label>
+                    <Textarea
+                      value={formData.description}
+                      onChange={(e) => handleFieldChange("description", e.target.value)}
+                      placeholder="Brief description..."
+                      className="min-h-[72px] resize-none text-[15px]"
+                      rows={2}
+                    />
+                  </div>
+
+                  {/* Yield & Active Status Row */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium text-[#374151] mb-1.5 block">
+                        Yield (Portions)
+                      </Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={formData.yield ?? ""}
+                        onChange={(e) => {
+                          handleFieldChange("yield", e.target.value);
+                        }}
+                        onFocus={(e) => e.target.select()}
+                        placeholder="1"
+                        className="h-14 text-[15px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                     </div>
-                  </div>
-                </div>
-
-                {/* Ingredients Drop Zone */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Label className="text-sm font-medium text-[#374151]">
-                      Ingredients <span className="text-[#ef4444]">*</span>
-                    </Label>
-                    <CustomTooltip
-                      label="Drag items from the side panels"
-                      direction="right"
-                    >
-                      <Info className="h-3.5 w-3.5 text-[#9ca3af] cursor-pointer" />
-                    </CustomTooltip>
-                    {recipeIngredients.length > 0 && (
-                      <span className="text-[10px] font-semibold bg-[#111827] text-white px-2 py-0.5 rounded-full">
-                        {recipeIngredients.length}
-                      </span>
-                    )}
-                  </div>
-
-                  <div
-                    onDragOver={(e) => {
-                      handleInventoryDragOver(e);
-                      handleRecipeDragOver(e);
-                    }}
-                    onDrop={(e) => {
-                      if (draggedInventory) handleInventoryDrop(e);
-                      if (draggedRecipe) handleRecipeDrop(e);
-                    }}
-                    className={cn(
-                      "rounded-sm border-2 border-dashed transition-all hover:border-[#111827] hover:bg-gray-50 cursor-pointer",
-                      recipeIngredients.length > 0
-                        ? "bg-[#f8f8fa] border-[#d5d5dd] p-4"
-                        : "bg-[#f8f8fa] border-[#d5d5dd] px-12 py-16 text-center"
-                    )}
-                  >
-                    {recipeIngredients.length === 0 ? (
-                      <div className="relative z-10 flex flex-col items-center">
-                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#111827] shadow-lg">
-                          <Package className="h-8 w-8 text-white" />
-                        </div>
-                        <h3 className="mb-2 text-lg font-bold text-[#111827]">No Ingredients Yet</h3>
-                        <p className="mx-auto max-w-sm text-sm text-[#656565]">
-                          Start building your recipe by dragging items from the <span className="font-semibold text-[#111827]">side panels</span>
-                        </p>
+                    <div>
+                      <Label className="text-sm font-medium text-[#374151] mb-1.5 block">Status</Label>
+                      <div className="flex items-center justify-between rounded-sm border border-[#d5d5dd] bg-[#f8f8fa] px-4 h-14 w-full">
+                        <span className="text-[#111827] text-sm font-medium">Active</span>
+                        <Switch
+                          checked={formData.isActive === true}
+                          onCheckedChange={(checked) => handleFieldChange("isActive", checked)}
+                        />
                       </div>
-                    ) : (
-                      <div className="space-y-3 p-1">
-                        {recipeIngredients.map((ingredient, index) => (
-                          <div
-                            key={index}
-                            className="p-3 border border-[#d5d5dd] rounded-sm bg-white transition-colors"
-                          >
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center gap-2 min-w-0 flex-1">
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-[14px] font-semibold text-[#111827] truncate">
-                                    {ingredient.nameSnapshot}
-                                  </div>
-                                  <div className="flex items-center gap-1 mt-0.5">
-                                    <span className={cn(
-                                      "text-[9px] font-bold uppercase tracking-wider text-[#656565]"
-                                    )}>
-                                      {ingredient.sourceType}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveIngredient(index)}
-                                className="text-[#9ca3af] hover:text-[#ef4444] transition-colors p-1"
-                              >
-                                <X size={16} />
-                              </button>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                              <div>
-                                <Label className="text-[11px] font-medium text-[#656565] mb-1 block">Quantity</Label>
-                                <Input
-                                  ref={(el) => {
-                                    ingredientRefs.current[index] = el;
-                                  }}
-                                  type="number"
-                                  min="0"
-                                  step="0.01"
-                                  value={ingredient.quantity ?? ""}
-                                  onChange={(e) => {
-                                    handleUpdateIngredient(index, "quantity", e.target.value);
-                                  }}
-                                  onFocus={(e) => e.target.select()}
-                                  placeholder="0"
-                                  className="h-9 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-[11px] font-medium text-[#656565] mb-1 block">Unit</Label>
-                                <div className="flex h-9 items-center px-4 rounded-sm bg-[#f8f8fa] border border-[#d5d5dd] text-xs font-medium text-[#656565]">
-                                  {ingredient.unit || "—"}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Variants Section - Only for Final Recipes */}
-                {recipeType === "final" && (
-                  <div className="mt-8">
+                  {/* Ingredients Drop Zone */}
+                  <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <Label className="text-sm font-medium text-[#374151]">Recipe Variants</Label>
-                      <CustomTooltip label="Add size, flavor, or crust variants" direction="right">
+                      <Label className="text-sm font-medium text-[#374151]">
+                        Ingredients <span className="text-[#ef4444]">*</span>
+                      </Label>
+                      <CustomTooltip
+                        label="Drag items from the side panels"
+                        direction="right"
+                      >
                         <Info className="h-3.5 w-3.5 text-[#9ca3af] cursor-pointer" />
                       </CustomTooltip>
-                      {variants.length > 0 && (
+                      {recipeIngredients.length > 0 && (
                         <span className="text-[10px] font-semibold bg-[#111827] text-white px-2 py-0.5 rounded-full">
-                          {variants.length}
+                          {recipeIngredients.length}
                         </span>
                       )}
                     </div>
 
-                    {variants.length === 0 ? (
-                      <div className="relative overflow-hidden rounded-sm border-2 border-dashed border-[#d5d5dd] bg-[#f8f8fa] p-12 text-center transition-all mb-4 hover:border-[#111827] hover:bg-gray-50 cursor-pointer">
+                    <div
+                      onDragOver={(e) => {
+                        handleInventoryDragOver(e);
+                        handleRecipeDragOver(e);
+                      }}
+                      onDrop={(e) => {
+                        if (draggedInventory) handleInventoryDrop(e);
+                        if (draggedRecipe) handleRecipeDrop(e);
+                      }}
+                      className={cn(
+                        "rounded-sm border-2 border-dashed transition-all hover:border-[#111827] hover:bg-gray-50 cursor-pointer",
+                        recipeIngredients.length > 0
+                          ? "bg-[#f8f8fa] border-[#d5d5dd] p-4"
+                          : "bg-[#f8f8fa] border-[#d5d5dd] px-12 py-16 text-center"
+                      )}
+                    >
+                      {recipeIngredients.length === 0 ? (
                         <div className="relative z-10 flex flex-col items-center">
                           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#111827] shadow-lg">
-                            <Sparkles className="h-8 w-8 text-white" />
+                            <Package className="h-8 w-8 text-white" />
                           </div>
-                          <h3 className="mb-2 text-lg font-bold text-[#111827]">No Variants Yet</h3>
+                          <h3 className="mb-2 text-lg font-bold text-[#111827]">No Ingredients Yet</h3>
                           <p className="mx-auto max-w-sm text-sm text-[#656565]">
-                            Create standard sizes or a custom variant below to expand your menu
+                            Start building your recipe by dragging items from the <span className="font-semibold text-[#111827]">side panels</span>
                           </p>
                         </div>
+                      ) : (
+                        <div className="space-y-3 p-1">
+                          {recipeIngredients.map((ingredient, index) => (
+                            <div
+                              key={index}
+                              className="p-3 border border-[#d5d5dd] rounded-sm bg-white transition-colors"
+                            >
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="text-[14px] font-semibold text-[#111827] truncate">
+                                      {ingredient.nameSnapshot}
+                                    </div>
+                                    <div className="flex items-center gap-1 mt-0.5">
+                                      <span className={cn(
+                                        "text-[9px] font-bold uppercase tracking-wider text-[#656565]"
+                                      )}>
+                                        {ingredient.sourceType}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveIngredient(index)}
+                                  className="text-[#9ca3af] hover:text-[#ef4444] transition-colors p-1"
+                                >
+                                  <X size={16} />
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label className="text-[11px] font-medium text-[#656565] mb-1 block">Quantity</Label>
+                                  <Input
+                                    ref={(el) => {
+                                      ingredientRefs.current[index] = el;
+                                    }}
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={ingredient.quantity ?? ""}
+                                    onChange={(e) => {
+                                      handleUpdateIngredient(index, "quantity", e.target.value);
+                                    }}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder="0"
+                                    className="h-9 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-[11px] font-medium text-[#656565] mb-1 block">Unit</Label>
+                                  <div className="flex h-9 items-center px-4 rounded-sm bg-[#f8f8fa] border border-[#d5d5dd] text-xs font-medium text-[#656565]">
+                                    {ingredient.unit || "—"}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Variants Section - Only for Final Recipes */}
+                  {recipeType === "final" && (
+                    <div className="mt-8">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Label className="text-sm font-medium text-[#374151]">Recipe Variants</Label>
+                        <CustomTooltip label="Add size, flavor, or crust variants" direction="right">
+                          <Info className="h-3.5 w-3.5 text-[#9ca3af] cursor-pointer" />
+                        </CustomTooltip>
+                        {variants.length > 0 && (
+                          <span className="text-[10px] font-semibold bg-[#111827] text-white px-2 py-0.5 rounded-full">
+                            {variants.length}
+                          </span>
+                        )}
                       </div>
-                    ) : (
-                      <div className="space-y-3 p-1 mb-6">
-                        {variants.map((variant, index) => (
-                          <div key={index} ref={el => { variantRefs.current[index] = el; }}>
-                            <RecipeVariantInput
-                              variant={variant}
-                              index={index}
-                              ingredients={ingredients}
-                              availableRecipeOptions={availableRecipeOptions}
-                              onUpdate={handleUpdateVariant}
-                              onRemove={handleRemoveVariant}
-                              onIngredientUpdate={handleUpdateVariantIngredient}
-                              onIngredientRemove={handleRemoveVariantIngredient}
-                              onIngredientDrop={handleVariantIngredientDrop}
-                            />
+
+                      {variants.length === 0 ? (
+                        <div className="relative overflow-hidden rounded-sm border-2 border-dashed border-[#d5d5dd] bg-[#f8f8fa] p-12 text-center transition-all mb-4 hover:border-[#111827] hover:bg-gray-50 cursor-pointer">
+                          <div className="relative z-10 flex flex-col items-center">
+                            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-[#111827] shadow-lg">
+                              <Sparkles className="h-8 w-8 text-white" />
+                            </div>
+                            <h3 className="mb-2 text-lg font-bold text-[#111827]">No Variants Yet</h3>
+                            <p className="mx-auto max-w-sm text-sm text-[#656565]">
+                              Create standard sizes or a custom variant below to expand your menu
+                            </p>
                           </div>
-                        ))}
-                      </div>
-                    )}
+                        </div>
+                      ) : (
+                        <div className="space-y-3 p-1 mb-6">
+                          {variants.map((variant, index) => (
+                            <div key={index} ref={el => { variantRefs.current[index] = el; }}>
+                              <RecipeVariantInput
+                                variant={variant}
+                                index={index}
+                                ingredients={ingredients}
+                                availableRecipeOptions={availableRecipeOptions}
+                                onUpdate={handleUpdateVariant}
+                                onRemove={handleRemoveVariant}
+                                onIngredientUpdate={handleUpdateVariantIngredient}
+                                onIngredientRemove={handleRemoveVariantIngredient}
+                                onIngredientDrop={handleVariantIngredientDrop}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Center Panel - Dynamic Action Slabs (Inline at end of scroll) */}
+              <div className="flex flex-col shrink-0 mt-4">
+                {/* Variant Creation Slabs - Only for Final Recipes */}
+                {recipeType === "final" && (
+                  <div className="flex flex-col">
+                    {/* Size Slabs Row */}
+                    {(() => {
+                      const availableSizes = [
+                        { name: "Small", multiplier: 1 },
+                        { name: "Medium", multiplier: 1.5 },
+                        { name: "Large", multiplier: 2 }
+                      ].filter(size => !variants.some(v => v.name.toLowerCase() === size.name.toLowerCase()));
+
+                      if (availableSizes.length === 0) return null;
+
+                      return (
+                        <div className="flex bg-white h-[41px] border-t border-[#d5d5dd]">
+                          {availableSizes.map(size => (
+                            <button
+                              key={size.name}
+                              type="button"
+                              onClick={() => handleAddStandardSize(size.name, size.multiplier)}
+                              className="flex-1 flex flex-col items-center justify-center border-r last:border-r-0 border-[#d5d5dd] hover:bg-[#111827] group transition-all"
+                            >
+                              <span className="text-[12px] font-bold text-[#111827] group-hover:text-white leading-none mb-0.5">
+                                {size.name}
+                              </span>
+                              <span className="text-[9px] font-medium text-[#656565] group-hover:text-gray-300 leading-none">
+                                {size.multiplier}x Yield
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      );
+                    })()}
+
+                    <Button
+                      type="button"
+                      onClick={handleAddVariant}
+                      variant="outline"
+                      className="shrink-0 w-full h-[41px] rounded-none border-t border-x-0 border-b-0 border-[#d5d5dd] bg-white text-[15px] font-medium transition-all duration-200 hover:bg-[#111827] hover:text-white hover:border-[#111827] text-[#374151] group"
+                    >
+                      <Plus className="h-4 w-4 mr-2 text-[#6b7280] group-hover:text-white transition-colors" />
+                      Add Custom Recipe Variant
+                    </Button>
                   </div>
                 )}
-              </div>
-            </div>
-          )}
 
-          {/* Center Panel - Dynamic Action Slabs (Inline at end of scroll) */}
-          <div className="flex flex-col shrink-0 mt-4">
-            {/* Variant Creation Slabs - Only for Final Recipes */}
-            {recipeType === "final" && (
-              <div className="flex flex-col">
-                {/* Size Slabs Row */}
-                {(() => {
-                  const availableSizes = [
-                    { name: "Small", multiplier: 1 },
-                    { name: "Medium", multiplier: 1.5 },
-                    { name: "Large", multiplier: 2 }
-                  ].filter(size => !variants.some(v => v.name.toLowerCase() === size.name.toLowerCase()));
-
-                  if (availableSizes.length === 0) return null;
-
-                  return (
-                    <div className="flex bg-white h-[41px] border-t border-[#d5d5dd]">
-                      {availableSizes.map(size => (
-                        <button
-                          key={size.name}
-                          type="button"
-                          onClick={() => handleAddStandardSize(size.name, size.multiplier)}
-                          className="flex-1 flex flex-col items-center justify-center border-r last:border-r-0 border-[#d5d5dd] hover:bg-[#111827] group transition-all"
-                        >
-                          <span className="text-[12px] font-bold text-[#111827] group-hover:text-white leading-none mb-0.5">
-                            {size.name}
-                          </span>
-                          <span className="text-[9px] font-medium text-[#656565] group-hover:text-gray-300 leading-none">
-                            {size.multiplier}x Yield
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  );
-                })()}
-
-                <Button
-                  type="button"
-                  onClick={handleAddVariant}
-                  variant="outline"
-                  className="shrink-0 w-full h-[41px] rounded-none border-t border-x-0 border-b-0 border-[#d5d5dd] bg-white text-[15px] font-medium transition-all duration-200 hover:bg-[#111827] hover:text-white hover:border-[#111827] text-[#374151] group"
-                >
-                  <Plus className="h-4 w-4 mr-2 text-[#6b7280] group-hover:text-white transition-colors" />
-                  Add Custom Recipe Variant
-                </Button>
-              </div>
-            )}
-
-            {/* Core Action Slab */}
-            {!editingItem && (
-              <Button
-                type="button"
-                onClick={handleAddToList}
-                variant="outline"
-                className={cn(
-                  "shrink-0 w-full h-[41px] rounded-none border-t border-x-0 border-b-0 border-[#d5d5dd] bg-white text-[15px] font-medium transition-all duration-200 hover:bg-[#111827] hover:text-white hover:border-[#111827] text-[#374151]",
-                  (!formData.name || recipeIngredients.length === 0) && "opacity-50 grayscale cursor-not-allowed"
+                {/* Core Action Slab */}
+                {!editingItem && (
+                  <Button
+                    type="button"
+                    onClick={handleAddToList}
+                    variant="outline"
+                    className={cn(
+                      "shrink-0 w-full h-[41px] rounded-none border-t border-x-0 border-b-0 border-[#d5d5dd] bg-white text-[15px] font-medium transition-all duration-200 hover:bg-[#111827] hover:text-white hover:border-[#111827] text-[#374151]",
+                      (!formData.name || recipeIngredients.length === 0) && "opacity-50 grayscale cursor-not-allowed"
+                    )}
+                    disabled={!formData.name || recipeIngredients.length === 0}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Another Recipe
+                  </Button>
                 )}
-                disabled={!formData.name || recipeIngredients.length === 0}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Another Recipe
-              </Button>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

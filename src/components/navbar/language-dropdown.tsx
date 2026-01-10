@@ -21,12 +21,12 @@ export function LanguageDropdown({
     return (
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger className={cn(navItemClass, "h-full rounded-none data-[state=open]:bg-[#2E2E2E]")}>
-                <div className="h-8 w-8 rounded-full border border-[#D4AF37] flex items-center justify-center text-xs">
+                <div className="h-7 w-7 rounded-full border border-[#D4AF37] flex items-center justify-center text-xs">
                     {selectedLanguage === 'English' ? 'En' : 'Ur'}
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                className="w-72 bg-[#2E2E2E] border-none text-white rounded-none shadow-2xl p-0 mt-[0px] z-[100]"
+                className="w-66 bg-[#2E2E2E] border-none text-white rounded-none shadow-2xl p-0 mt-[0px] z-[100]"
                 alignOffset={0}
                 sideOffset={0}
             >
@@ -39,7 +39,7 @@ export function LanguageDropdown({
                         <button
                             key={language}
                             onClick={() => setSelectedLanguage(language)}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-base text-gray-300 hover:bg-[#363636] hover:text-white transition-all transition-standard text-left"
+                            className="w-full flex items-center gap-3 px-4 py-3 text-base text-gray-300 transition-all transition-standard text-left"
                         >
                             <div className="h-4 w-4 flex items-center justify-center">
                                 {selectedLanguage === language ? (

@@ -18,11 +18,11 @@ export function PlanDropdown({ user, navItemClass }: PlanDropdownProps) {
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger className={cn(navItemClass, "gap-12 h-full border-none rounded-none px-6 data-[state=open]:bg-[#2E2E2E]")}>
                 <div className="flex flex-col items-start gap-2">
-                    <span className="text-sm text-[#D4AF37] leading-none">Hi,</span>
-                    <span className="text-sm font-bold text-[#D4AF37] leading-none">{user?.fullName || user?.username || "Backoffice"}</span>
+                    <span className="text-xs text-[#D4AF37] leading-none">Hi,</span>
+                    <span className="text-sm font-medium text-[#D4AF37] leading-none">{user?.fullName || user?.username || "Backoffice"}</span>
                 </div>
                 <div className="bg-[#2E2E2E] h-4 w-4 flex items-center justify-center rounded-full ml-2">
-                    <ChevronDown className="h-4 w-4 text-white" />
+                    <ChevronDown className="h-4 w-4 text-white" strokeWidth={1} />
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent

@@ -103,30 +103,32 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar - Left side, vertical */}
-      <aside className="hidden lg:block fixed left-0 top-0 h-screen bg-[#D1AB35] w-16 z-30">
+      <aside className="hidden lg:flex flex-col fixed left-0 top-[64px] h-[calc(100vh-64px)] bg-[#D1AB35] w-16 z-30">
         {/* Menu Items */}
-        <nav className="h-full flex flex-col justify-center items-center gap-2 p-4">
-          {menuItems.map((item, idx) => (
-            <CustomTooltip key={idx} label={item.label} direction="right">
-              <Link
-                href={item.href}
-                className={`group relative flex items-center justify-center p-2.5 rounded hover:bg-[#454545] transition-all transition-standard ${isItemActive(item) ? 'bg-[#454545]' : ''
-                  }`}
-              >
-                <span className={`transition-colors transition-standard ${isItemActive(item)
-                  ? 'text-white'
-                  : 'text-black group-hover:text-white'
-                  }`}>
-                  {item.icon}
-                </span>
+        <nav className="h-full w-full overflow-y-auto hide-scrollbar" style={{ paddingTop: '0px', paddingBottom: '0px' }}>
+          <div className="w-full flex flex-col items-center gap-2" style={{ paddingTop: 'calc(50vh - 200px)', paddingBottom: 'calc(50vh - 200px)' }}>
+            {menuItems.map((item, idx) => (
+              <CustomTooltip key={idx} label={item.label} direction="right">
+                <Link
+                  href={item.href}
+                  className={`group relative flex items-center justify-center p-2.5 rounded hover:bg-[#454545] transition-all transition-standard ${isItemActive(item) ? 'bg-[#454545]' : ''
+                    }`}
+                >
+                  <span className={`transition-colors transition-standard ${isItemActive(item)
+                    ? 'text-white'
+                    : 'text-black group-hover:text-white'
+                    }`}>
+                    {item.icon}
+                  </span>
 
-                {/* NEW Badge at bottom border */}
-                {item.hasNewBadge && (
-                  <NewBadge className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20" />
-                )}
-              </Link>
-            </CustomTooltip>
-          ))}
+                  {/* NEW Badge at bottom border */}
+                  {item.hasNewBadge && (
+                    <NewBadge className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20" />
+                  )}
+                </Link>
+              </CustomTooltip>
+            ))}
+          </div>
         </nav>
       </aside>
 

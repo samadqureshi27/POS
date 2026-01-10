@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { LogOut, Home, Package, Package2, ChefHat, Building2, DollarSign, User, ShoppingCart, Settings } from 'lucide-react';
 
@@ -26,7 +27,69 @@ export function MobileDrawer({
     setSelectedLanguage,
     handleLogout
 }: MobileDrawerProps) {
-    if (!isMobileMenuOpen) return null;
+    // Smooth animation for drawer
+    const [shouldRenderDrawer, setShouldRenderDrawer] = useState(false);
+    const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+    const drawerHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Smooth animation for language dropdown
+    const [shouldRenderLang, setShouldRenderLang] = useState(false);
+    const [isLangVisible, setIsLangVisible] = useState(false);
+    const langHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Handle drawer animation
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            setShouldRenderDrawer(true);
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setIsDrawerVisible(true);
+                });
+            });
+        } else {
+            setIsDrawerVisible(false);
+            if (drawerHideTimeoutRef.current) {
+                clearTimeout(drawerHideTimeoutRef.current);
+            }
+            drawerHideTimeoutRef.current = setTimeout(() => {
+                setShouldRenderDrawer(false);
+            }, 300);
+        }
+
+        return () => {
+            if (drawerHideTimeoutRef.current) {
+                clearTimeout(drawerHideTimeoutRef.current);
+            }
+        };
+    }, [isMobileMenuOpen]);
+
+    // Handle language dropdown animation
+    useEffect(() => {
+        if (isLanguageExpanded) {
+            setShouldRenderLang(true);
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setIsLangVisible(true);
+                });
+            });
+        } else {
+            setIsLangVisible(false);
+            if (langHideTimeoutRef.current) {
+                clearTimeout(langHideTimeoutRef.current);
+            }
+            langHideTimeoutRef.current = setTimeout(() => {
+                setShouldRenderLang(false);
+            }, 300);
+        }
+
+        return () => {
+            if (langHideTimeoutRef.current) {
+                clearTimeout(langHideTimeoutRef.current);
+            }
+        };
+    }, [isLanguageExpanded]);
+
+    if (!shouldRenderDrawer) return null;
 
     // Define POS specific menu items here for the mobile drawer
     const menuItems = [
@@ -45,13 +108,13 @@ export function MobileDrawer({
         <div className="lg:hidden">
             {/* Invisible Backdrop to handle click-outside */}
             <div
-                className="fixed inset-0 top-[64px] z-[500] bg-black/20 cursor-default"
+                className={`fixed inset-0 top-[64px] z-[500] bg-black/20 cursor-default transition-opacity duration-300 ${isDrawerVisible ? 'opacity-100' : 'opacity-0'}`}
                 onClick={() => setIsMobileMenuOpen(false)}
                 aria-hidden="true"
             />
 
             {/* Drawer Panel */}
-            <div className="fixed top-[64px] right-0 sm:left-auto left-0 bottom-0 w-full sm:w-72 bg-[#1F1E1F] z-[501] shadow-2xl flex flex-col animate-in slide-in-from-right transition-standard">
+            <div className={`fixed top-[64px] right-0 sm:left-auto left-0 bottom-0 w-full sm:w-72 bg-[#1F1E1F] z-[501] shadow-2xl flex flex-col transition-all duration-300 ${isDrawerVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
                 {/* User Info Section */}
                 <div className="px-6 py-6 flex justify-between items-start">
                     <div>
@@ -104,8 +167,8 @@ export function MobileDrawer({
                         </button>
 
                         {/* Language Options - Shown when expanded */}
-                        {isLanguageExpanded && (
-                            <div className="bg-[#363636]">
+                        {shouldRenderLang && (
+                            <div className={`bg-[#363636] transition-opacity duration-300 ${isLangVisible ? 'opacity-100' : 'opacity-0'}`}>
                                 {['English', 'Urdu'].map((language) => (
                                     <button
                                         key={language}

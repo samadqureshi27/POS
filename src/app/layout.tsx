@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { ConditionalLayoutWrapper } from '@/components/conditional-layout-wrapper';
-import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "@/lib/hooks/useAuth";
-import { Toaster } from "@/components/ui/sonner";
+import { Providers } from '@/components/providers';
 
 
 const manrope = Manrope({
@@ -30,19 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${manrope.variable} ${jetbrainsMono.variable} antialiased`} suppressHydrationWarning>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <ConditionalLayoutWrapper>
-              {children}
-            </ConditionalLayoutWrapper>
-            <Toaster position="top-right" richColors />
-          </AuthProvider>
-        </ThemeProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )

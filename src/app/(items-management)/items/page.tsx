@@ -726,12 +726,54 @@ function ItemsPageContent() {
           const archivedConfig = { label: "ARCHIVED", color: "text-gray-500 bg-gray-50 border-gray-200", bar: "bg-gray-400", iconBg: "bg-gray-50/50 border-gray-200/50 text-gray-400" };
           const status = isActive ? (typeConfig[item.type] || typeConfig.stock) : archivedConfig;
 
+          // Calculate threshold bar for stock items
+          const quantity = item.quantity || 0;
+          const reorderPoint = item.reorderPoint || 0;
+          const hasThreshold = isStock && reorderPoint > 0;
+
+          // Calculate fill percentage (max 100%)
+          const fillPercentage = hasThreshold
+            ? Math.min((quantity / (reorderPoint * 2)) * 100, 100)
+            : 0;
+
+          // Determine threshold status and color
+          let thresholdStatus: 'critical' | 'low' | 'good' | 'none' = 'none';
+          let thresholdColor = status.bar;
+
+          if (hasThreshold && isActive) {
+            if (quantity === 0) {
+              thresholdStatus = 'critical';
+              thresholdColor = 'bg-red-500';
+            } else if (quantity <= reorderPoint) {
+              thresholdStatus = 'low';
+              thresholdColor = 'bg-amber-500';
+            } else {
+              thresholdStatus = 'good';
+              thresholdColor = 'bg-green-500';
+            }
+          }
+
           return (
             <div className={cn(
               "group relative border border-[#d5d5dd] rounded-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-200",
               isActive ? "bg-white" : "bg-gray-50/30 opacity-75"
             )}>
-              <div className={cn("h-0.5 w-full shrink-0 transition-colors", status.bar)} />
+              {/* Threshold Bar - Dynamic based on stock level */}
+              {hasThreshold && isActive ? (
+                <div className="h-1 w-full shrink-0 bg-gray-100/80 relative overflow-hidden">
+                  <div
+                    className={cn("h-full transition-all duration-500 ease-out", thresholdColor)}
+                    style={{ width: `${fillPercentage}%` }}
+                  />
+                  {/* Reorder point indicator */}
+                  <div
+                    className="absolute top-0 bottom-0 w-px bg-gray-900/20"
+                    style={{ left: '50%' }}
+                  />
+                </div>
+              ) : (
+                <div className={cn("h-0.5 w-full shrink-0 transition-colors", status.bar)} />
+              )}
 
               <div className="p-4 flex flex-col flex-1">
                 <div className="flex items-center justify-between mb-4">
@@ -777,9 +819,22 @@ function ItemsPageContent() {
                     <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">
                       {isStock ? 'Stock' : 'Price'}
                     </span>
-                    <span className="text-sm font-bold text-gray-900 tracking-tight pr-2">
-                      {isStock ? `${item.quantity || 0} ${item.baseUnit || 'pcs'}` : `PKR ${Number(item.sellingPrice || 0).toLocaleString()}`}
-                    </span>
+                    {isStock ? (
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-sm font-bold text-gray-900 tracking-tight">
+                          {item.quantity || 0} {item.baseUnit || 'pcs'}
+                        </span>
+                        {item.purchaseUnit && item.purchaseUnit !== item.baseUnit && (
+                          <span className="text-[10px] font-bold text-gray-400">
+                            ({item.purchaseUnit})
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-sm font-bold text-gray-900 tracking-tight pr-2">
+                        PKR {Number(item.sellingPrice || 0).toLocaleString()}
+                      </span>
+                    )}
                   </div>
 
                   <div className="hidden lg:block opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all duration-200">

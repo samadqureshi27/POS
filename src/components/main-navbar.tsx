@@ -1,6 +1,7 @@
 // Enhanced MainNavbar.tsx with real API data
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -126,7 +127,7 @@ export default function Navbar({ title }: NavbarProps) {
           </div>
 
           {/* Desktop Right: Icons */}
-          <div className="hidden lg:flex items-center h-full flex-shrink-0 mr-8">
+          <div className="hidden lg:flex items-center h-full flex-shrink-0 mr-6">
             <NotificationDropdown
               notifications={notifications}
               notificationsLoading={notificationsLoading}
@@ -144,8 +145,8 @@ export default function Navbar({ title }: NavbarProps) {
               className={cn(navItemClass, "h-full rounded-none")}
               aria-label="API Documentation"
             >
-              <div className="w-8 h-8 flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div className="w-7 h-7 flex items-center justify-center">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#D4AF37" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M12 16V12" stroke="#D4AF37" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M12 8H12.01" stroke="#D4AF37" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />

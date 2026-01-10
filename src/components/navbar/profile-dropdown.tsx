@@ -19,10 +19,10 @@ export function ProfileDropdown({ user, handleLogout, navItemClass }: ProfileDro
     return (
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger className={cn(navItemClass, "gap-2 pr-4 h-full data-[state=open]:bg-[#2E2E2E] rounded-none")}>
-                <UserCircle2 className="h-8 w-8" strokeWidth={1} />
+                <UserCircle2 className="h-7 w-7" strokeWidth={1} />
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                className="w-72 bg-[#2E2E2E] border-none text-white rounded-none shadow-2xl p-0 mt-[0px] z-[100]"
+                className="w-66 bg-[#2E2E2E] border-none text-white rounded-none shadow-2xl p-0 mt-[0px] z-[100]"
                 alignOffset={0}
                 sideOffset={0}
             >
@@ -32,13 +32,13 @@ export function ProfileDropdown({ user, handleLogout, navItemClass }: ProfileDro
                 </div>
 
                 <div className="py-1">
-                    <Link href="/Profile" className="flex items-center gap-3 px-4 py-3 text-base text-gray-300 hover:bg-[#363636] hover:text-white transition-all transition-standard">
+                    <Link href="/Profile" className="flex items-center gap-3 px-4 py-3 text-base text-gray-300 transition-all transition-standard">
                         <UserCircle2 className="h-4 w-4" />
                         My profile
                     </Link>
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-base text-gray-300 hover:bg-[#363636] hover:text-white transition-all transition-standard text-left"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-base text-gray-300 transition-all transition-standard text-left"
                     >
                         <LogOut className="h-4 w-4" />
                         Log out
