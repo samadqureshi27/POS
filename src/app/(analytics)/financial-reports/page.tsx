@@ -4,20 +4,10 @@ import { Toast } from "@/lib/util/toast-helpers";
 import React, { useEffect, useRef, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 // Components
-import { StarRating } from '@/components/ui/StarRating';
 import { GlobalSkeleton } from '@/components/ui/global-skeleton';
-import { formatCurrency, formatDisplayDate } from "@/lib/util/formatters";
-import { MetricCard } from '@/components/ui/MetricCard';
 import { AdvancedMetricCard } from '@/components/ui/advanced-metric-card';
 import { StatCardsGrid } from '@/components/ui/stat-cards-grid';
 import { DashboardSection } from '@/app/(main)/dashboard/_components/DashboardSection';
-import { CustomerGrowthChart } from './_components/CustomerGrowthChart';
-import { RevenueTrendsChart } from './_components/RevenueTrendsChart';
-import { OrderTypesChart } from './_components/OrderTypesChart';
-import { MonthlyComparisonChart } from './_components/MonthlyComparisonChart';
-import { CustomerSegmentsChart } from './_components/CustomerSegmentsChart';
-import { TopCustomersTable } from './_components/TopCustomersTable';
-import { RecentOrdersTable } from './_components/RecentOrdersTable';
 import { ProfitLossChart } from './_components/ProfitLossChart';
 import { CashFlowChart } from './_components/CashFlowChart';
 import { PeriodSelector } from '@/components/ui/period-selector';
@@ -79,7 +69,6 @@ const AnalyticsDashboard = () => {
       setShowDatePicker(false);
       await loadDashboardData(period, false);
     } catch (error) {
-      console.error("Error changing period:", error);
       setError("Failed to load data for selected period");
     }
   }, [setSelectedPeriod, setShowDatePicker, loadDashboardData, setError]);
@@ -93,14 +82,12 @@ const AnalyticsDashboard = () => {
       const { startDate: start, endDate: end } = handleCustomDateRange(startDate, endDate);
       await loadCustomRangeData(startDateObj, endDateObj);
     } catch (error) {
-      console.error("Error handling custom date range:", error);
       setError("Failed to load custom date range data");
     }
   }, [handleCustomDateRange, setError]);
 
   const loadCustomRangeData = useCallback(async (startDate?: Date, endDate?: Date) => {
     if (!customDateRange?.[0]?.startDate || !customDateRange?.[0]?.endDate) {
-      console.warn("Custom date range not properly set");
       return;
     }
 
@@ -113,7 +100,6 @@ const AnalyticsDashboard = () => {
     try {
       handleCustomDateRange(startDateStr, endDateStr);
     } catch (error) {
-      console.error("Error fetching custom range data:", error);
       setError("Failed to load custom date range data");
     }
   }, [customDateRange, handleCustomDateRange, setError]);

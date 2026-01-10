@@ -25,7 +25,7 @@ export interface ApiResponse<T> {
   success: boolean;
 
   /** The payload data (type varies by endpoint) */
-  data: T;
+  data?: T;
 
   /** Optional message (success or error description) */
   message?: string;

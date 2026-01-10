@@ -2,7 +2,6 @@
 
 import React, { useRef, useEffect } from "react";
 import { Info, X, ChevronDown, ChevronUp } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export interface BatchItem {
     id: string;

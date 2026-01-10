@@ -1,7 +1,6 @@
 // components/DashboardHeader.tsx
 
 import React from "react";
-import { RefreshCw } from "lucide-react";
 
 interface DashboardHeaderProps {
   lastUpdated: string;

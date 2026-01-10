@@ -144,7 +144,6 @@ export const MenuItemService = {
     });
     const data = await res.json().catch(() => ({}));
 
-    console.log("🔧 MenuItemService.createItem - API response:", data);
 
     if (!res.ok) {
       return { success: false, message: data?.message || `Create item failed (${res.status})` };
@@ -152,7 +151,6 @@ export const MenuItemService = {
 
     // Handle different API response structures
     const item: TenantMenuItem = data?.result ?? data?.data ?? data;
-    console.log("🔧 MenuItemService.createItem - Extracted item:", item);
 
     return { success: true, data: item };
   },

@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Plus, Trash2, Search, Grid3x3, List, Upload, Download, FileDown } from 'lucide-react';
+import { Plus, Search, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SearchBar from './search-bar';
 import { cn } from '@/lib/utils';

@@ -12,7 +12,6 @@ export async function GET(
   const params = await context.params;
   const { id } = params;
 
-  console.log(`🔍 GET /api/recipes/with-variants/${id}`, { id, params });
 
   if (!id) {
     return NextResponse.json(
@@ -24,7 +23,6 @@ export async function GET(
   const url = `${getRemoteBase()}/t/recipes/with-variants/${id}`;
   const headers = buildTenantHeaders(req, true);
 
-  console.log(`📡 Proxying GET ${url}`);
 
   try {
     const res = await fetch(url, {
@@ -41,7 +39,6 @@ export async function GET(
     const text = await res.text();
     return new NextResponse(text, { status: res.status });
   } catch (error: any) {
-    console.error("Error fetching recipe with variants:", error);
     return NextResponse.json(
       { success: false, message: error.message || "Failed to fetch recipe" },
       { status: 500 }
@@ -60,7 +57,6 @@ export async function PUT(
   const params = await context.params;
   const { id } = params;
 
-  console.log(`🔍 PUT /api/recipes/with-variants/${id}`, { id, params });
 
   if (!id) {
     return NextResponse.json(
@@ -72,12 +68,6 @@ export async function PUT(
   const payload = await req.json().catch(() => ({}));
   const url = `${getRemoteBase()}/t/recipes/with-variants/${id}`;
   const headers = buildTenantHeaders(req, true);
-
-  console.log(`📡 Proxying PUT ${url}`, {
-    type: payload.type,
-    hasVariations: payload.variations && payload.variations.length > 0,
-    variationsCount: payload.variations?.length || 0
-  });
 
   try {
     const res = await fetch(url, {
@@ -95,7 +85,6 @@ export async function PUT(
     const text = await res.text();
     return new NextResponse(text, { status: res.status });
   } catch (error: any) {
-    console.error("Error updating recipe with variants:", error);
     return NextResponse.json(
       { success: false, message: error.message || "Failed to update recipe" },
       { status: 500 }

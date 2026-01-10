@@ -1,10 +1,14 @@
 // types/menu.ts
 import { ApiResponse } from "./common";
 
+// Re-export ApiResponse for consumers of this module
+export type { ApiResponse };
+
 // ===== MENU CATEGORY TYPES =====
 
 export interface MenuCategory {
   _id?: string;
+  id?: string;
   name: string;
   slug: string;
   code: string;

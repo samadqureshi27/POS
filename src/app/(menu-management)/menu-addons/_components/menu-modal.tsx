@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import DetailsForm from './detail-form';
 import OptionValuesForm from './option-value-form';
-import { MenuItemOptions, MenuModalProps } from '@/lib/types/menuItemOptions';
+import { MenuModalProps } from '@/lib/types/menuItemOptions';
 
 const MenuModal: React.FC<MenuModalProps> = ({
   isOpen,

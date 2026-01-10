@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import { UserCircle2, LogOut } from 'lucide-react';
 import {

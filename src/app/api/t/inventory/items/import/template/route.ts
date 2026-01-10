@@ -25,7 +25,6 @@ export async function GET(req: Request) {
 
 
     if (!res.ok) {
-      console.error("❌ Template Error:", res.status, res.statusText);
       return NextResponse.json(
         { success: false, message: `Failed to download template: ${res.status} ${res.statusText}` },
         { status: res.status }
@@ -44,7 +43,6 @@ export async function GET(req: Request) {
       }
     });
   } catch (error: any) {
-    console.error("❌ Template Proxy Error:", error);
     
     if (error.name === 'AbortError') {
       return NextResponse.json(

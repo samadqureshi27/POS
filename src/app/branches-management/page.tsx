@@ -6,7 +6,7 @@ import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { Building2, Plus, MapPin } from "lucide-react";
+import { Building2, Plus } from "lucide-react";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";

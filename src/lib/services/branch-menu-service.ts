@@ -178,7 +178,6 @@ export const BranchMenuService = {
 
       // Ensure items is always an array
       if (!Array.isArray(items)) {
-        console.warn("⚠️ API response is not an array, wrapping in array:", items);
         items = [];
       }
 
@@ -214,7 +213,6 @@ export const BranchMenuService = {
       if (payload.labels !== undefined) apiPayload.labels = payload.labels;
       if (payload.metadata !== undefined) apiPayload.metadata = payload.metadata;
 
-      console.log("📤 Creating branch menu config with payload:", apiPayload);
 
       const res = await fetch(url, {
         method: "POST",
@@ -224,11 +222,9 @@ export const BranchMenuService = {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        console.error("❌ API Error Response:", data);
         return { success: false, message: data?.message || data?.error?.message || `Create config failed (${res.status})` };
       }
 
-      console.log("✅ Successfully created branch menu config:", data);
 
       const item: BranchMenuConfig = data?.result ?? data?.data ?? data;
 

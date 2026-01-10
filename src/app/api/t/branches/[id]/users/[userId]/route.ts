@@ -26,7 +26,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy POST /t/branches/:id/users/:userId failed" },
       { status: 500 }
@@ -59,7 +58,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy DELETE /t/branches/:id/users/:userId failed" },
       { status: 500 }

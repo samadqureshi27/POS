@@ -106,7 +106,6 @@ export const setTenantInfo = (slug: string, name?: string, id?: string): void =>
     setCookie(TENANT_KEYS.ID, id);
   }
 
-  console.log('Tenant info stored in cookies:', slug);
 };
 
 /**
@@ -152,10 +151,8 @@ export const migrateLegacyTenantData = (): void => {
       localStorage.removeItem('tenant_name');
       localStorage.removeItem('tenant_id');
 
-      console.log('✅ Migrated tenant data from localStorage to cookies');
     }
   } catch (error) {
-    console.warn('Failed to migrate tenant data:', error);
   }
 };
 
@@ -167,7 +164,6 @@ export const getTenantHeaders = (): Record<string, string> => {
   const slug = getTenantSlug();
 
   if (!slug) {
-    console.warn('No tenant slug found in cookies');
     return {};
   }
 

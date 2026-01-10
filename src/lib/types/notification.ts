@@ -1,5 +1,8 @@
 import { ApiResponse } from "./common";
 
+// Re-export ApiResponse for consumers of this module
+export type { ApiResponse };
+
 export interface NotificationSettings {
   // Order Management
   newOrderAlerts: boolean;

@@ -31,7 +31,6 @@ export async function GET(
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy GET /t/pos/terminals/:id failed" },
       { status: 500 }
@@ -72,7 +71,6 @@ export async function PUT(
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy PUT /t/pos/terminals/:id failed" },
       { status: 500 }
@@ -110,7 +108,6 @@ export async function DELETE(
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy DELETE /t/pos/terminals/:id failed" },
       { status: 500 }

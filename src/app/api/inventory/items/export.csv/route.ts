@@ -22,7 +22,6 @@ export async function GET(req: Request) {
 
 
     if (!res.ok) {
-      console.error("❌ Export Error:", res.status, res.statusText);
       return NextResponse.json(
         { success: false, message: `Failed to export items: ${res.status} ${res.statusText}` },
         { status: res.status }
@@ -41,7 +40,6 @@ export async function GET(req: Request) {
       }
     });
   } catch (error: any) {
-    console.error("❌ Export Proxy Error:", error);
     
     if (error.name === 'AbortError') {
       return NextResponse.json(

@@ -13,17 +13,6 @@ const ENABLE_API_LOGGING = true;
  */
 function logApiRequest(method: string, url: string, headers: Record<string, string>, body?: any) {
   if (!ENABLE_API_LOGGING) return;
-
-  console.log('\n🌐 API REQUEST:', {
-    method,
-    url,
-    headers: {
-      'x-tenant-id': headers['x-tenant-id'],
-      'Authorization': headers['Authorization'] ? 'Bearer ***' : 'None',
-      'Content-Type': headers['Content-Type']
-    },
-    body: body ? JSON.stringify(body).substring(0, 200) : undefined
-  });
 }
 
 /**
@@ -31,13 +20,6 @@ function logApiRequest(method: string, url: string, headers: Record<string, stri
  */
 function logApiResponse(url: string, status: number, data?: any) {
   if (!ENABLE_API_LOGGING) return;
-
-  const statusEmoji = status >= 200 && status < 300 ? '✅' : '❌';
-  console.log(`${statusEmoji} API RESPONSE:`, {
-    url,
-    status,
-    data: data ? JSON.stringify(data).substring(0, 200) + '...' : undefined
-  });
 }
 
 /**
@@ -67,7 +49,6 @@ export function getTenantSlug(req: Request): string {
   // Fallback to env var (for development or initial setup)
   const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG;
   if (envSlug) {
-    console.warn('⚠️ Using tenant slug from environment. Login to store it in cookies.');
     return envSlug;
   }
 

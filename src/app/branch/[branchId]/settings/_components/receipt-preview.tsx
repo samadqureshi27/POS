@@ -1,9 +1,5 @@
 "use client";
 
-import React from "react";
-import { type ReceiptConfig } from "@/lib/services/branch-pos-config-service";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
 
 interface ReceiptPreviewProps {
   receiptConfig: ReceiptConfig;

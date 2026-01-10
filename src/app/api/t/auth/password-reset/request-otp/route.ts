@@ -28,7 +28,6 @@ export async function POST(req: NextRequest) {
       return new NextResponse(text, { status: response.status });
     }
   } catch (error: any) {
-    console.error('Request OTP proxy error:', error);
     return NextResponse.json(
       {
         success: false,

@@ -1,8 +1,8 @@
 "use client";
 
-import { Toast } from "@/lib/util/toast-helpers";
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus, UtensilsCrossed, Sparkles, ChevronDown, ChevronUp, Info } from "lucide-react";
+import { Toast } from "@/lib/util/toast-helpers";
+import { Loader2, Plus, Sparkles, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -103,9 +103,6 @@ export default function RecipeModal({
   useEffect(() => {
     if (isOpen) {
       // Debug logging
-      console.log("🔍 Recipe Modal Opened");
-      console.log("📦 Available Inventory Items:", ingredients?.length || 0, ingredients);
-      console.log("🍲 Available Recipe Options:", availableRecipeOptions?.length || 0);
 
       if (editingItem) {
         const existingIngredients = editingItem.ingredients || [];

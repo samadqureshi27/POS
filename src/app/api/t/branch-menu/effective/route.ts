@@ -33,7 +33,6 @@ export async function GET(req: Request) {
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy GET /t/branch-menu/effective failed" },
       { status: 500 }

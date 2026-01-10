@@ -38,12 +38,6 @@ const setCookie = (name: string, value: string, days: number = 30): void => {
   const cookieString = `${name}=${encoded};expires=${expires.toUTCString()};max-age=${maxAge};path=/;SameSite=Lax;${secure}`;
   document.cookie = cookieString;
 
-  // Debug logging
-  console.log(`🍪 Setting cookie: ${name}`, {
-    length: value.length,
-    cookieString: cookieString.substring(0, 100) + '...'
-  });
-
   // Persistent logging (survives redirect)
   if (typeof window !== 'undefined') {
     import('./persistent-logger').then(({ PersistentLogger }) => {
@@ -55,8 +49,6 @@ const setCookie = (name: string, value: string, days: number = 30): void => {
   if (process.env.NODE_ENV !== 'production') {
     const verification = getCookie(name);
     if (!verification) {
-      console.error(`❌ Failed to set cookie: ${name}`);
-      console.error('Current cookies:', document.cookie);
 
       // Persistent error log
       if (typeof window !== 'undefined') {
@@ -65,7 +57,6 @@ const setCookie = (name: string, value: string, days: number = 30): void => {
         });
       }
     } else {
-      console.log(`✅ Cookie verified: ${name} (length: ${verification.length})`);
 
       // Persistent success log
       if (typeof window !== 'undefined') {
@@ -93,7 +84,6 @@ const getCookie = (name: string): string | null => {
       try {
         return decodeURIComponent(c.substring(nameEQ.length, c.length));
       } catch (e) {
-        console.error('Failed to decode cookie:', name, e);
         return c.substring(nameEQ.length, c.length);
       }
     }
@@ -131,7 +121,6 @@ export const waitForAccessToken = async (maxAttempts: number = 10, delayMs: numb
     if (token) {
       // Log only if we had to retry (indicates cookie access delay)
       if (i > 0 && process.env.NODE_ENV !== 'production') {
-        console.debug(`✅ Token found after ${i + 1} attempt(s) (${i * delayMs}ms delay)`);
       }
       return token;
     }
@@ -144,7 +133,6 @@ export const waitForAccessToken = async (maxAttempts: number = 10, delayMs: numb
 
   // Only log warning if we actually tried multiple times
   if (process.env.NODE_ENV !== 'production') {
-    console.warn(`⚠️ No access token found after ${maxAttempts} attempts (${maxAttempts * delayMs}ms total)`);
   }
   return null;
 };
@@ -166,23 +154,11 @@ export const getRefreshToken = (): string | null => {
 export const setTokens = (accessToken: string, refreshToken?: string): void => {
   if (typeof window === 'undefined') return;
 
-  console.log('🔐 setTokens called with:', {
-    accessTokenLength: accessToken?.length,
-    refreshTokenLength: refreshToken?.length,
-    accessTokenKey: TOKEN_KEYS.ACCESS_TOKEN,
-    refreshTokenKey: TOKEN_KEYS.REFRESH_TOKEN
-  });
-
   // Set access token
   setCookie(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
 
   // Immediately verify it was set
   const verifyAccess = getCookie(TOKEN_KEYS.ACCESS_TOKEN);
-  console.log('🔍 Access token verification:', {
-    wasSet: !!verifyAccess,
-    length: verifyAccess?.length,
-    allCookies: document.cookie
-  });
 
   if (refreshToken) {
     setCookie(TOKEN_KEYS.REFRESH_TOKEN, refreshToken);
@@ -192,10 +168,6 @@ export const setTokens = (accessToken: string, refreshToken?: string): void => {
   setTimeout(() => {
     const finalAccess = getCookie(TOKEN_KEYS.ACCESS_TOKEN);
     const finalRefresh = getCookie(TOKEN_KEYS.REFRESH_TOKEN);
-    console.log('✅ Final cookie check:', {
-      accessToken: finalAccess ? 'SET' : 'MISSING',
-      refreshToken: finalRefresh ? 'SET' : 'MISSING'
-    });
   }, 100);
 };
 
@@ -222,7 +194,6 @@ export const clearTokens = (): void => {
   try {
     localStorage.removeItem('user');
   } catch (error) {
-    console.warn('Failed to clear user from localStorage:', error);
   }
 };
 
@@ -256,7 +227,6 @@ export const migrateLegacyTokens = (): void => {
       deleteCookie('accessToken');
       deleteCookie('refreshToken');
     } catch (error) {
-      console.debug('Failed to clean up legacy tokens:', error);
     }
     return;
   }
@@ -267,7 +237,6 @@ export const migrateLegacyTokens = (): void => {
     const oldRefreshToken = getCookie('refreshToken');
 
     if (oldAccessToken) {
-      console.log('✅ Migrating from old accessToken cookie to auth_session');
       setTokens(oldAccessToken, oldRefreshToken || undefined);
       deleteCookie('accessToken');
       deleteCookie('refreshToken');
@@ -280,7 +249,6 @@ export const migrateLegacyTokens = (): void => {
     for (const key of legacyKeys) {
       const token = localStorage.getItem(key);
       if (token && !getAccessToken()) {
-        console.log(`✅ Migrated token from localStorage key: ${key}`);
         setTokens(token);
         break;
       }
@@ -289,7 +257,6 @@ export const migrateLegacyTokens = (): void => {
     // Priority 3: Check sessionStorage
     const sessionToken = sessionStorage.getItem('access_token');
     if (sessionToken && !getAccessToken()) {
-      console.log('✅ Migrated token from sessionStorage');
       setTokens(sessionToken);
     }
 
@@ -301,7 +268,6 @@ export const migrateLegacyTokens = (): void => {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('refresh_token');
   } catch (error) {
-    console.warn('Failed to migrate tokens:', error);
   }
 };
 
@@ -311,45 +277,33 @@ export const migrateLegacyTokens = (): void => {
  */
 export const testCookieSetting = (): void => {
   if (typeof window === 'undefined') {
-    console.error('Cannot test cookies - not in browser environment');
     return;
   }
 
-  console.group('🧪 Cookie Setting Test');
 
   // Test 1: Can we set a test cookie?
   const testValue = 'test_' + Date.now();
   setCookie('test_cookie', testValue);
   const testResult = getCookie('test_cookie');
-  console.log('Test cookie:', testResult === testValue ? '✅ SUCCESS' : '❌ FAILED');
 
   // Test 2: Can we set accessToken specifically?
   const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test';
   setCookie(TOKEN_KEYS.ACCESS_TOKEN, testToken);
   const accessResult = getCookie(TOKEN_KEYS.ACCESS_TOKEN);
-  console.log('accessToken cookie:', accessResult === testToken ? '✅ SUCCESS' : '❌ FAILED');
 
   // Test 3: Show all cookies
-  console.log('All cookies:', document.cookie);
 
   // Test 4: Check cookie size limits
   const largeToken = 'x'.repeat(4000); // ~4KB token
   setCookie('large_test', largeToken);
   const largeResult = getCookie('large_test');
-  console.log('Large cookie (4KB):', largeResult === largeToken ? '✅ SUCCESS' : '❌ FAILED');
 
   // Cleanup
   deleteCookie('test_cookie');
   deleteCookie(TOKEN_KEYS.ACCESS_TOKEN);
   deleteCookie('large_test');
 
-  console.groupEnd();
 
-  console.log('\n💡 If accessToken test FAILED, there may be:');
-  console.log('  - Browser security settings blocking it');
-  console.log('  - Cookie size limits');
-  console.log('  - Third-party cookie blocking');
-  console.log('\nRun this in console: testCookieSetting()');
 };
 
 // Make test function globally available

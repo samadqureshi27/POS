@@ -4,7 +4,6 @@ import { Store } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { RestaurantDropdown } from './restaurant-dropdown';
 import { RestaurantData } from '@/lib/types';
 
@@ -40,8 +39,13 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
     ];
 
     // Use default data when formData fields are empty or undefined
-    const getFieldValue = (fieldName: keyof typeof defaultRestaurantData) => {
-        return formData[fieldName] || defaultRestaurantData[fieldName] || '';
+    const getFieldValue = (fieldName: keyof typeof defaultRestaurantData): string => {
+        const value = formData[fieldName];
+        const defaultValue = defaultRestaurantData[fieldName];
+        // Ensure we only return strings, not File objects
+        if (typeof value === 'string' && value) return value;
+        if (typeof defaultValue === 'string') return defaultValue;
+        return '';
     };
 
     return (
@@ -97,7 +101,6 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
                 </div>
 
                 
-
                 <div>
                     <Label className="mb-2" htmlFor="website">Website</Label>
                     <Input

@@ -2,7 +2,7 @@
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
-import { getInventoryStatusColor, type InventoryStatus } from "@/lib/util/status-helpers";
+import { getInventoryStatusColor, InventoryStatus } from "@/lib/util/status-helpers";
 
 // Sample data that would come from your inventory system
 const inventoryData = [

@@ -1,8 +1,8 @@
 "use client";
 
+import React, { useState } from "react";
 import { Toast } from "@/lib/util/toast-helpers";
 
-import React, { useState } from "react";
 import { Settings, Plus } from "lucide-react";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
@@ -92,7 +92,6 @@ const AddOnsPage = () => {
         });
       }
     } catch (error) {
-      console.error("Error deleting add-on:", error);
       Toast.error(error instanceof Error ? error.message : "Failed to delete add-on", {
         duration: 5000,
         position: "top-right",

@@ -2,7 +2,7 @@
 
 import { buildHeaders } from "@/lib/util/service-helpers";
 import { logError } from "@/lib/util/logger";
-import { validateInventoryItems, validateInventoryItem } from "@/lib/util/data-validator";
+import { validateInventoryItems } from "@/lib/util/data-validator";
 import { handleApiError, ParsedError } from "@/lib/util/error-handler";
 
 // ==================== Types ====================
@@ -200,7 +200,6 @@ export const InventoryService = {
 
       // Check if authorization header exists (token is available)
       if (!headers['Authorization']) {
-        console.warn('⚠️ No authentication token available for API call');
         // Don't return error here - let the API call happen
         // The backend will return 401 if token is missing
         // This prevents false positives where token exists but header wasn't built yet
@@ -212,7 +211,6 @@ export const InventoryService = {
       if (!res.ok) {
         // Handle 401 Unauthorized specifically
         if (res.status === 401) {
-          console.error('❌ Unauthorized: Token may be expired or invalid');
           return {
             success: false,
             message: 'You are not allowed and need to login first'
@@ -229,11 +227,9 @@ export const InventoryService = {
 
       // Log validation results
       if (invalidCount > 0) {
-        console.error(`❌ Removed ${invalidCount} invalid items from response`);
       }
 
       if (warnings.length > 0) {
-        console.warn('⚠️ Data validation warnings:', warnings);
       }
 
       // Note: Stats are now fetched from dedicated /t/inventory/stats endpoint

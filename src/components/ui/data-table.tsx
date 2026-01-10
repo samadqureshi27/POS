@@ -1,7 +1,7 @@
 "use client";
 // Reusable Data Table Component following shadcn/ui patterns
 import React from "react";
-import { MoreHorizontal, Edit, Edit2 } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import { Button } from "./button";
 import {
   DropdownMenu,

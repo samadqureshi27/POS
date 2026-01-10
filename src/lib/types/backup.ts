@@ -1,6 +1,9 @@
 // Types for Backup & Recovery
 import { ApiResponse, ToastState } from "./common";
 
+// Re-export ApiResponse for consumers of this module
+export type { ApiResponse };
+
 export interface BackupSettings {
     // Automated Backup Settings
     autoBackupEnabled: boolean;

@@ -26,7 +26,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy PUT /t/branches/:id/default failed" },
       { status: 500 }

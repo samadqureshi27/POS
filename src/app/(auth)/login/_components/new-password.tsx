@@ -1,7 +1,6 @@
 // components/login/NewPasswordOverlay.tsx
 "use client";
 import React from "react";
-import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,7 +107,6 @@ const NewPasswordOverlay: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error("Password reset error:", error);
       setValidationErrors({
         confirmPassword: "Network error. Please try again."
       });

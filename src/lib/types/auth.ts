@@ -1,7 +1,7 @@
 // src/types/auth.ts
 import { ApiResponse } from "./common";
 
-export type UserRole = 'superadmin' | 'admin' | 'manager' | 'cashier' | 'waiter';
+export type UserRole = 'superadmin' | 'admin' | 'owner' | 'manager' | 'cashier' | 'waiter';
 
 export interface User {
   id: string;
