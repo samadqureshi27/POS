@@ -1,7 +1,6 @@
 
 // Recipe Service
 import { buildHeaders } from "@/lib/util/service-helpers";
-import { logError } from "@/lib/util/logger";
 import { handleApiError, ParsedError } from "@/lib/util/error-handler";
 
 // Recipe Ingredient structure matching Postman API

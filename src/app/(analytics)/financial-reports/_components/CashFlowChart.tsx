@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from "recharts";
-import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
+import { TrendingUp, DollarSign } from "lucide-react";
 import { formatTickValue, formatCompactNumber } from "@/lib/util/formatters";
 
 // Sample cash flow data

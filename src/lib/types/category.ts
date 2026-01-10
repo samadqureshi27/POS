@@ -1,5 +1,5 @@
 // Types for category management
-import { ApiResponse, ToastState } from "./common";
+import { ToastState } from "./common";
 
 export interface CategoryItem {
   ID: number;

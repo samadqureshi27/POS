@@ -1,7 +1,6 @@
 // src/lib/services/branch-inventory-service.ts
 
 import { buildHeaders } from "@/lib/util/service-helpers";
-import { logError } from "@/lib/util/logger";
 import { handleApiError, ParsedError } from "@/lib/util/error-handler";
 
 // ==================== Types ====================

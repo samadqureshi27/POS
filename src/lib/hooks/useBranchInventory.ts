@@ -1,7 +1,7 @@
-// src/lib/hooks/useBranchInventory.ts
+    // src/lib/hooks/useBranchInventory.ts
 
 import { useState, useEffect, useMemo } from "react";
-import { BranchInventoryService, type BranchInventoryItem, type BranchInventoryStats } from "@/lib/services/branch-inventory-service";
+import { BranchInventoryService, BranchInventoryItem, BranchInventoryStats } from "@/lib/services/branch-inventory-service";
 import { BranchService } from "@/lib/services/branch-service";
 import { resolveBranchObjectId } from "@/lib/services/branch-resolver";
 import { Toast } from "@/lib/util/toast-helpers";

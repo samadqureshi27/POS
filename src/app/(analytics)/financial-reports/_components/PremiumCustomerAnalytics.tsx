@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LineChart, Line, ResponsiveContainer, Tooltip, AreaChart, Area, XAxis, YAxis, PieChart, Pie, Cell } from "recharts";
+import { ResponsiveContainer, Tooltip, AreaChart, Area, XAxis, YAxis, PieChart, Pie, Cell } from "recharts";
 import { Users, TrendingUp, Heart, Target, DollarSign, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { formatTickValue } from "@/lib/util/formatters";
 

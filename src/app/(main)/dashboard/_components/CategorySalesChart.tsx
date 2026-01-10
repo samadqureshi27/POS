@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { formatCurrency } from "@/lib/util/formatters";
 
 // Sample data that would come from your POS system

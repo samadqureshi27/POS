@@ -1,7 +1,7 @@
 // page.tsx - Refactored Main Component
 "use client";
+import React, { useState, useEffect, useCallback } from "react";
 import { Toast } from "@/lib/util/toast-helpers";
-import React, { useState, useEffect } from "react";
 import { GlobalSkeleton } from "@/components/ui/global-skeleton";
 
 // Import all our new components
@@ -9,7 +9,6 @@ import { PeriodSelector } from "@/components/ui/period-selector";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import { DashboardSection } from "@/app/(main)/dashboard/_components/DashboardSection";
 import ActionBar from "@/components/ui/action-bar";
-import OrderTypeChart from "./_components/order-type-chart";
 import ModernOrderChart from "./_components/modern-order-chart";
 import ModernTopItems from "./_components/modern-top-items";
 import OrderTable from "./_components/order-table";

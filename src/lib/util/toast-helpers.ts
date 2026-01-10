@@ -5,7 +5,7 @@
  */
 
 import { toast } from "sonner";
-import { ParsedError, formatErrorForToast, parseApiError } from "./error-handler";
+import { ParsedError, parseApiError } from "./error-handler";
 
 export interface ToastOptions {
   duration?: number;

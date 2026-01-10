@@ -2,8 +2,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AreaChart, Area, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, RadialBarChart, RadialBar } from "recharts";
-import { TrendingUp, Crown, Zap, Target, DollarSign, Activity } from "lucide-react";
+import { AreaChart, Area, ResponsiveContainer, Tooltip } from "recharts";
+import { TrendingUp, Crown, Target, Activity } from "lucide-react";
 import { formatTickValue, formatCompactNumber } from "@/lib/util/formatters";
 
 interface FuturisticSalesVisualProps {

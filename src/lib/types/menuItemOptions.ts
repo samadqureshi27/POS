@@ -50,7 +50,6 @@ export interface MenuTableProps {
 }
 
 
-
 export interface DetailsFormProps {
   formData: Omit<MenuItemOptions, "ID">;
   onFormDataChange: (data: Omit<MenuItemOptions, "ID">) => void;

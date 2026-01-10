@@ -1,4 +1,4 @@
-import { ApiResponse, ToastState } from "./common";
+import { ToastState } from "./common";
 
 export interface VendorItem {
     ID: number;
