@@ -1,14 +1,10 @@
 import { VendorItem } from "@/lib/types/vendors";
-import { BaseMockAPI } from "./base-mock-api";
 
 /**
- * Vendor API - Refactored to use BaseMockAPI
- *
- * This eliminates ~100 lines of duplicate CRUD code by inheriting
- * from the generic BaseMockAPI class.
+ * Vendor API - Mock implementation for vendor management
  */
-export class VendorAPI extends BaseMockAPI<VendorItem> {
-    protected static override mockData: VendorItem[] = [
+export class VendorAPI {
+    private static mockData: VendorItem[] = [
         {
             ID: 1,
             Company_Name: "Al-1",
@@ -65,15 +61,16 @@ export class VendorAPI extends BaseMockAPI<VendorItem> {
         },
     ];
 
-    // Specify the ID and Branch ID field names for this entity
-    protected static override idField = "ID" as const;
-    protected static override branchIdField = "Branch_ID_fk" as const;
-
-    // Public API methods that delegate to BaseMockAPI
+    private static nextId = 7;
 
     // GET /api/vendors/branch/{branchId}
     static async getVendorItemsByBranch(branchId: number) {
-        return this.getItemsByBranch(branchId);
+        try {
+            const items = this.mockData.filter(item => item.Branch_ID_fk === branchId);
+            return { success: true, data: items };
+        } catch (error) {
+            return { success: false, error: "Failed to fetch vendors" };
+        }
     }
 
     // POST /api/vendors/branch/{branchId}
@@ -81,7 +78,17 @@ export class VendorAPI extends BaseMockAPI<VendorItem> {
         item: Omit<VendorItem, "ID">,
         branchId: number
     ) {
-        return this.createItem(item, branchId);
+        try {
+            const newItem: VendorItem = {
+                ...item,
+                ID: this.nextId++,
+                Branch_ID_fk: branchId,
+            };
+            this.mockData.push(newItem);
+            return { success: true, data: newItem };
+        } catch (error) {
+            return { success: false, error: "Failed to create vendor" };
+        }
     }
 
     // PUT /api/vendors/{id}/
@@ -89,12 +96,30 @@ export class VendorAPI extends BaseMockAPI<VendorItem> {
         id: number,
         item: Partial<VendorItem>
     ) {
-        return this.updateItem(id, item);
+        try {
+            const index = this.mockData.findIndex(v => v.ID === id);
+            if (index === -1) {
+                return { success: false, error: "Vendor not found" };
+            }
+            this.mockData[index] = { ...this.mockData[index], ...item };
+            return { success: true, data: this.mockData[index] };
+        } catch (error) {
+            return { success: false, error: "Failed to update vendor" };
+        }
     }
 
     // DELETE /api/vendors/{id}/
     static async deleteVendorItem(id: number, branchId: number) {
-        return this.deleteItem(id);
+        try {
+            const index = this.mockData.findIndex(v => v.ID === id);
+            if (index === -1) {
+                return { success: false, error: "Vendor not found" };
+            }
+            this.mockData.splice(index, 1);
+            return { success: true, message: "Vendor deleted successfully" };
+        } catch (error) {
+            return { success: false, error: "Failed to delete vendor" };
+        }
     }
 
     // DELETE /api/vendors/branch/{branchId}/bulk-delete/
@@ -102,6 +127,11 @@ export class VendorAPI extends BaseMockAPI<VendorItem> {
         ids: number[],
         branchId: number
     ) {
-        return this.bulkDeleteItems(ids);
+        try {
+            this.mockData = this.mockData.filter(v => !ids.includes(v.ID));
+            return { success: true, message: `Deleted ${ids.length} vendors` };
+        } catch (error) {
+            return { success: false, error: "Failed to bulk delete vendors" };
+        }
     }
 }

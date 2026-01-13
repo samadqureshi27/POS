@@ -25,7 +25,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy GET /t/staff/:id failed" },
       { status: 500 }
@@ -59,7 +58,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       }
     );
   } catch (err: any) {
-    console.error('❌ Proxy Error:', err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy PUT /t/staff/:id failed" },
       { status: 500 }

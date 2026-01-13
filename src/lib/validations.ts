@@ -22,7 +22,7 @@ export const validatePin = (pin: string[]): string | null => {
 
 export const validateOtp = (otp: string[]): string | null => {
   const otpString = otp.join('');
-  if (otpString.length !== 5) return 'Please enter the 5-digit code';
+  if (otpString.length !== 6) return 'Please enter the 6-digit code';
   if (!/^\d+$/.test(otpString)) return 'Code must contain only numbers';
   return null;
 };

@@ -1,18 +1,16 @@
 "use client";
 
+import React, { useCallback, useState } from "react";
 import { Toast } from "@/lib/util/toast-helpers";
 
 // Dashboard.tsx - Main Dashboard Component
 
-import React, { useState, useCallback } from "react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 // Types
-import { DashboardData } from "@/lib/types/Dtypes";
 
 // API
-import { dashboardAPI } from "@/lib/util/DashboardApi";
 
 // Utils
 import { getPeriodLabel } from "@/lib/util/Dashboardutils";
@@ -370,7 +368,6 @@ const Dashboard = () => {
           </div>
         </DashboardSection>
       </div>
-
 
 
       <ExpenseInputModal

@@ -1,11 +1,12 @@
 // components/login/EmailVerificationOverlay.tsx
 "use client";
 import { Toast } from "@/lib/util/toast-helpers";
-import React from "react";
-import { User, X } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLoginContext } from "./login-context";
+import authService from "@/lib/auth-service";
 
 const EmailVerificationOverlay: React.FC = () => {
   const {
@@ -16,30 +17,166 @@ const EmailVerificationOverlay: React.FC = () => {
     otpCode,
     setOtpCode,
     isLoading,
+    setIsLoading,
     setShowNewPassword,
     setShowNewPasswordContainer,
+    resetEmail,
   } = useLoginContext();
 
-  const handleOtpChange = (index: number, value: string) => {
-    if (value.length <= 1 && /^\d*$/.test(value)) {
-      const newOtp = [...otpCode];
+  const [otpError, setOtpError] = useState("");
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Auto-focus first input when component mounts
+  useEffect(() => {
+    if (showVerificationContainer && inputRefs.current[0]) {
+      inputRefs.current[0].focus();
+    }
+  }, [showVerificationContainer]);
+
+  const handleOtpChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // Only allow digits
+    if (!/^\d*$/.test(value)) {
+      return;
+    }
+
+    const newOtp = [...otpCode];
+
+    if (value.length === 0) {
+      // User cleared the input
+      newOtp[index] = "";
+      setOtpCode(newOtp);
+      setOtpError("");
+    } else if (value.length === 1) {
+      // User entered a single digit
       newOtp[index] = value;
       setOtpCode(newOtp);
+      setOtpError("");
 
-      if (value && index < 4) {
-        const nextInput = document.getElementById(`otp-${index + 1}`);
-        nextInput?.focus();
+      // Move to next input
+      if (index < otpCode.length - 1) {
+        setTimeout(() => {
+          inputRefs.current[index + 1]?.focus();
+        }, 10);
+      }
+    } else if (value.length > 1) {
+      // User pasted or entered multiple characters
+      const digits = value.slice(0, 6 - index).split("");
+
+      digits.forEach((digit, i) => {
+        if (index + i < otpCode.length && /^\d$/.test(digit)) {
+          newOtp[index + i] = digit;
+        }
+      });
+
+      setOtpCode(newOtp);
+      setOtpError("");
+
+      // Focus on the next empty box or the last box
+      const nextIndex = Math.min(index + digits.length, otpCode.length - 1);
+      setTimeout(() => {
+        inputRefs.current[nextIndex]?.focus();
+      }, 10);
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+
+    if (e.key === "Backspace") {
+      e.preventDefault();
+
+      const newOtp = [...otpCode];
+
+      if (otpCode[index]) {
+        // Clear current box
+        newOtp[index] = "";
+        setOtpCode(newOtp);
+      } else if (index > 0) {
+        // Move to previous box and clear it
+        newOtp[index - 1] = "";
+        setOtpCode(newOtp);
+        inputRefs.current[index - 1]?.focus();
+      }
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      e.preventDefault();
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === "ArrowRight" && index < otpCode.length - 1) {
+      e.preventDefault();
+      inputRefs.current[index + 1]?.focus();
+    } else if (e.key === "Delete") {
+      e.preventDefault();
+      const newOtp = [...otpCode];
+      newOtp[index] = "";
+      setOtpCode(newOtp);
+    } else if (/^\d$/.test(e.key)) {
+      // If there's already a value, prevent default and replace it
+      if (otpCode[index]) {
+        e.preventDefault();
+        const newOtp = [...otpCode];
+        newOtp[index] = e.key;
+        setOtpCode(newOtp);
+
+        // Move to next
+        if (index < otpCode.length - 1) {
+          setTimeout(() => {
+            inputRefs.current[index + 1]?.focus();
+          }, 10);
+        }
       }
     }
   };
 
-  const handleVerifyOtp = () => {
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text/plain").trim();
+
+    // Only process if it's 6 digits
+    if (/^\d{6}$/.test(pastedData)) {
+      const digits = pastedData.split("");
+      setOtpCode(digits);
+      setOtpError("");
+
+      // Focus on the last input
+      inputRefs.current[5]?.focus();
+    }
+  };
+
+  const handleVerifyOtp = async () => {
     const otp = otpCode.join("");
-    if (otp.length === 5) {
-      setShowNewPassword(true);
-      setTimeout(() => {
-        setShowNewPasswordContainer(true);
-      }, 100);
+    if (otp.length === 6 && resetEmail) {
+      setIsLoading(true);
+      setOtpError("");
+
+      try {
+        const response = await authService.verifyPasswordResetOtp(resetEmail, otp);
+
+
+        // Check if response is successful (handle both success field and HTTP status)
+        if (response.success && !response.error) {
+          Toast.success(response.message || "OTP verified successfully");
+          setShowNewPassword(true);
+          setTimeout(() => {
+            setShowNewPasswordContainer(true);
+          }, 100);
+        } else {
+          // Extract error message from various possible formats
+          const errorMessage =
+            response.error ||
+            response.message ||
+            (response.data && response.data.message) ||
+            "Invalid OTP. Please try again.";
+
+          setOtpError(errorMessage);
+          Toast.error(errorMessage);
+        }
+      } catch (error) {
+        setOtpError("Failed to verify OTP. Please try again.");
+        Toast.error("Failed to verify OTP");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -47,14 +184,33 @@ const EmailVerificationOverlay: React.FC = () => {
     setShowVerificationContainer(false);
     setTimeout(() => {
       setShowVerification(false);
-      setOtpCode(["", "", "", "", ""]);
+      setOtpCode(["", "", "", "", "", ""]);
+      setOtpError("");
     }, 300);
   };
 
   const handleResendEmail = async () => {
-    // Note: The reset email is stored in the context
-    // You can add a resend API call here if needed
-    Toast.success("Reset email has been resent!");
+    if (!resetEmail) {
+      Toast.error("Email not found. Please try again.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await authService.requestPasswordResetOtp(resetEmail);
+
+      if (response.success) {
+        Toast.success(response.message || "Reset email has been resent!");
+        setOtpCode(["", "", "", "", "", ""]);
+        setOtpError("");
+      } else {
+        Toast.error(response.message || response.error || "Failed to resend email");
+      }
+    } catch (error) {
+      Toast.error("Failed to resend email");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!showVerification) return null;
@@ -98,13 +254,6 @@ const EmailVerificationOverlay: React.FC = () => {
           >
             <X size={18} strokeWidth={1.5} />
           </Button>
-
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center">
-            <User size={20} className="sm:size-6 text-gray-600" />
-          </div>
-          <span className="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 font-medium">
-            Olivia Rhye
-          </span>
         </div>
         <h2 className="text-xl sm:text-xl md:text-2xl font-semibold text-gray-900 mb-2 sm:mb-4">
           Check your email
@@ -112,11 +261,11 @@ const EmailVerificationOverlay: React.FC = () => {
         <p className="text-gray-500 text-sm mb-1 sm:mb-2">
           We sent a reset link to{" "}
           <span className="font-medium text-gray-700">
-            contact@ui.com
+            {resetEmail || "your email"}
           </span>
         </p>
         <p className="text-gray-500 text-sm">
-          Enter the 5 digit code mentioned in the email
+          Enter the 6 digit code mentioned in the email
         </p>
       </div>
 
@@ -125,20 +274,32 @@ const EmailVerificationOverlay: React.FC = () => {
           {otpCode.map((digit, index) => (
             <Input
               key={index}
+              ref={(el) => {
+                inputRefs.current[index] = el;
+              }}
               id={`otp-${index}`}
               type="text"
-              maxLength={1}
+              inputMode="numeric"
+              pattern="\d*"
               value={digit}
-              onChange={(e) => handleOtpChange(index, e.target.value)}
-              className="w-11 h-11 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold rounded-sm"
+              onChange={(e) => handleOtpChange(index, e)}
+              onKeyDown={(e) => handleOtpKeyDown(index, e)}
+              onPaste={handleOtpPaste}
+              onFocus={(e) => e.target.select()}
+              className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold rounded-sm"
               style={{
                 backgroundColor: digit ? "#fff5f0" : "white",
-                borderColor: digit ? "#fb923c" : "#d1d5db",
+                borderColor: otpError ? "#ef4444" : digit ? "#fb923c" : "#d1d5db",
               }}
               disabled={isLoading}
+              autoComplete="off"
             />
           ))}
         </div>
+
+        {otpError && (
+          <p className="text-red-500 text-sm text-center -mt-2">{otpError}</p>
+        )}
 
         <div className="pt-2 sm:pt-4">
           <Button
@@ -146,10 +307,10 @@ const EmailVerificationOverlay: React.FC = () => {
             variant="ghost"
             size="lg"
             className="w-full h-12 sm:h-14 bg-black text-[#d1ab35] hover:bg-gray-800 font-semibold tracking-widest rounded-sm text-xs sm:text-sm"
-            disabled={isLoading || otpCode.join("").length !== 5}
+            disabled={isLoading || otpCode.join("").length !== 6}
             onClick={handleVerifyOtp}
           >
-            VERIFY & PROCEED
+            {isLoading ? "VERIFYING..." : "VERIFY & PROCEED"}
           </Button>
         </div>
 

@@ -36,7 +36,6 @@ export async function POST(req: Request) {
     const text = await res.text();
     return new NextResponse(text, { status: res.status });
   } catch (error: any) {
-    console.error("❌ Import Proxy Error:", error);
     
     if (error.name === 'AbortError') {
       return NextResponse.json(

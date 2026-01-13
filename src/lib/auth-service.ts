@@ -5,16 +5,16 @@ import { extractTenantFromToken } from './util/jwt-helper';
 
 export interface User {
   _id?: string;
-  id?: string;
+  id: string;
   fullName?: string;
-  username?: string;
+  username: string;
   email: string;
   roles?: string[];
-  role?: 'superadmin' | 'admin' | 'owner' | 'manager' | 'cashier' | 'waiter';
+  role: 'superadmin' | 'admin' | 'owner' | 'manager' | 'cashier' | 'waiter';
   branchIds?: string[];
-  is_active?: boolean;
+  is_active: boolean;
   isActive?: boolean;
-  created_at?: string;
+  created_at: string;
   createdAt?: string;
   created_by?: string;
   createdBy?: string;
@@ -60,6 +60,10 @@ const AUTH_PROFILE_PATH = process.env.NEXT_PUBLIC_API_AUTH_PROFILE || '/t/auth/m
 const AUTH_REFRESH_PATH = process.env.NEXT_PUBLIC_API_AUTH_REFRESH || '/t/auth/token/refresh';
 const AUTH_FORGOT_PASSWORD_PATH = process.env.NEXT_PUBLIC_API_AUTH_FORGOT_PASSWORD || '/t/auth/forgot-password';
 const AUTH_RESET_PASSWORD_PATH = process.env.NEXT_PUBLIC_API_AUTH_RESET_PASSWORD || '/t/auth/reset-password';
+// OTP-based password reset paths (new flow)
+const AUTH_REQUEST_OTP_PATH = process.env.NEXT_PUBLIC_API_AUTH_REQUEST_OTP || '/t/auth/password-reset/request-otp';
+const AUTH_VERIFY_OTP_PATH = process.env.NEXT_PUBLIC_API_AUTH_VERIFY_OTP || '/t/auth/password-reset/verify-otp';
+const AUTH_RESET_PASSWORD_OTP_PATH = process.env.NEXT_PUBLIC_API_AUTH_RESET_PASSWORD_OTP || '/t/auth/password-reset/reset';
 // Users & staff management (env-driven, with sensible defaults)
 const AUTH_CREATE_STAFF_PATH = process.env.NEXT_PUBLIC_API_AUTH_CREATE_STAFF || '/t/auth/create-staff';
 const AUTH_USERS_BASE_PATH = process.env.NEXT_PUBLIC_API_AUTH_USERS || '/t/auth/users';
@@ -82,7 +86,6 @@ function getTenantSlug(required: boolean = true): string {
   // Fallback to env var (for initial setup or development)
   const envSlug = process.env.NEXT_PUBLIC_TENANT_SLUG || '';
   if (envSlug) {
-    console.warn('⚠️ Using tenant slug from environment. Please login to store it properly.');
     return envSlug;
   }
 
@@ -165,7 +168,6 @@ class AuthService {
       const contentType = response.headers.get('content-type') || '';
       if (!contentType.includes('application/json')) {
         const text = await response.text();
-        console.error('❌ Non-JSON response:', text.substring(0, 200));
         return { success: false, error: 'Server returned invalid response' };
       }
 
@@ -186,14 +188,11 @@ class AuthService {
         // Store tenant information from JWT in cookies
         if (tenantInfo.slug) {
           setTenantInfo(tenantInfo.slug, tenantInfo.name || undefined, tenantInfo.id || undefined);
-          console.log('✅ Tenant information stored from login:', tenantInfo.slug);
         } else {
-          console.warn('⚠️ No tenant slug found in JWT token');
         }
 
         return { success: true, user };
       } else {
-        console.error('❌ Login failed:', data);
 
         // Extract error message from various possible formats
         let errorMessage = 'Invalid credentials';
@@ -213,7 +212,6 @@ class AuthService {
         };
       }
     } catch (error: unknown) {
-      console.error('💥 Login error:', error);
       if (error instanceof Error) {
         return { success: false, error: `Network error: ${error.message}` };
       }
@@ -240,7 +238,6 @@ class AuthService {
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
       const text = await response.text();
-      console.error('PIN login non-JSON response:', text);
       return { success: false, error: 'Unexpected response from server', message: text };
     }
     const data: LoginResponse = await response.json();
@@ -260,7 +257,6 @@ class AuthService {
       // Store tenant information from JWT in cookies
       if (tenantInfo.slug) {
         setTenantInfo(tenantInfo.slug, tenantInfo.name || undefined, tenantInfo.id || undefined);
-        console.log('✅ Tenant information stored from PIN login:', tenantInfo.slug);
       }
 
       return { success: true, user: user };
@@ -273,7 +269,6 @@ class AuthService {
       };
     }
   } catch (error) {
-    console.error('PIN login error:', error);
     return { success: false, error: 'Network error' };
   }
 }
@@ -292,7 +287,6 @@ class AuthService {
       const data: ApiResponse<User> = await response.json();
       return data;
     } catch (error) {
-      console.error('Create staff error:', error);
       return { success: false, error: 'Network error' };
     }
   }
@@ -309,7 +303,6 @@ class AuthService {
       const data: ApiResponse<User> = await response.json();
       return data;
     } catch (error) {
-      console.error('Reset password error:', error);
       return { success: false, error: 'Network error' };
     }
   }
@@ -324,7 +317,6 @@ class AuthService {
       const data: ApiResponse<User[]> = await response.json();
       return data;
     } catch (error) {
-      console.error('Get users error:', error);
       return { success: false, error: 'Network error' };
     }
   }
@@ -341,7 +333,6 @@ class AuthService {
       const data: ApiResponse<User> = await response.json();
       return data;
     } catch (error) {
-      console.error('Update PIN error:', error);
       return { success: false, error: 'Network error' };
     }
   }
@@ -357,7 +348,6 @@ class AuthService {
       const data: ApiResponse<User> = await response.json();
       return data;
     } catch (error) {
-      console.error('Toggle user status error:', error);
       return { success: false, error: 'Network error' };
     }
   }
@@ -384,7 +374,6 @@ class AuthService {
       const obj = raw as any;
       return { success: obj.success ?? obj.status ?? res.ok, message: obj.message, data: obj.result };
     } catch (error) {
-      console.error('Forgot password error:', error);
       return { success: false, error: 'Network error' };
     }
   }
@@ -411,7 +400,121 @@ class AuthService {
       const obj = raw as any;
       return { success: obj.success ?? obj.status ?? res.ok, message: obj.message, data: obj.result };
     } catch (error) {
-      console.error('Reset password error:', error);
+      return { success: false, error: 'Network error' };
+    }
+  }
+
+  // New OTP-based password reset flow methods
+  async requestPasswordResetOtp(email: string): Promise<ApiResponse> {
+    try {
+      const url = buildUrl(AUTH_REQUEST_OTP_PATH);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: buildHeaders(undefined, undefined, false),
+        body: JSON.stringify({ email })
+      });
+
+      const contentType = res.headers.get('content-type') || 'application/json';
+      const raw = contentType.includes('application/json') ? await res.json() : await res.text();
+
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          return {
+            success: res.ok,
+            message: parsed.message || 'OTP sent to your email',
+            data: parsed.result
+          };
+        } catch {
+          return { success: res.ok, message: 'OTP sent to your email' };
+        }
+      }
+
+      const obj = raw as any;
+      return {
+        success: res.ok,
+        message: obj.message || 'OTP sent to your email',
+        data: obj.result
+      };
+    } catch (error) {
+      return { success: false, error: 'Network error' };
+    }
+  }
+
+  async verifyPasswordResetOtp(email: string, otp: string): Promise<ApiResponse> {
+    try {
+      const url = buildUrl(AUTH_VERIFY_OTP_PATH);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: buildHeaders(undefined, undefined, false),
+        body: JSON.stringify({ email, otp })
+      });
+
+      const contentType = res.headers.get('content-type') || 'application/json';
+      const raw = contentType.includes('application/json') ? await res.json() : await res.text();
+
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          return {
+            success: res.ok,
+            message: res.ok ? (parsed.message || 'OTP verified successfully') : undefined,
+            error: !res.ok ? (parsed.message || 'Invalid OTP') : undefined,
+            data: parsed.result
+          };
+        } catch {
+          return {
+            success: res.ok,
+            message: res.ok ? raw : undefined,
+            error: !res.ok ? raw : undefined
+          };
+        }
+      }
+
+      const obj = raw as any;
+      return {
+        success: res.ok,
+        message: res.ok ? (obj.message || 'OTP verified successfully') : undefined,
+        error: !res.ok ? (obj.message || 'Invalid OTP') : undefined,
+        data: obj.result
+      };
+    } catch (error) {
+      return { success: false, error: 'Network error' };
+    }
+  }
+
+  async resetPasswordWithOtp(email: string, password: string): Promise<ApiResponse> {
+    try {
+      const url = buildUrl(AUTH_RESET_PASSWORD_OTP_PATH);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: buildHeaders(undefined, undefined, false),
+        body: JSON.stringify({ email, password })
+      });
+
+      const contentType = res.headers.get('content-type') || 'application/json';
+      const raw = contentType.includes('application/json') ? await res.json() : await res.text();
+
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          return {
+            success: res.ok,
+            message: parsed.message || 'Password reset successful',
+            data: parsed.result
+          };
+        } catch {
+          return { success: res.ok, message: raw };
+        }
+      }
+
+      const obj = raw as any;
+      return {
+        success: res.ok,
+        message: obj.message || 'Password reset successful',
+        data: obj.result
+      };
+    } catch (error) {
       return { success: false, error: 'Network error' };
     }
   }
@@ -432,7 +535,6 @@ class AuthService {
         return { success: false, error: data.message || 'Profile fetch failed' };
       }
     } catch (error) {
-      console.error('Get profile error:', error);
       return { success: false, error: 'Network error' };
     }
   }
@@ -457,7 +559,6 @@ class AuthService {
       }
       return false;
     } catch (error) {
-      console.error('Token refresh error:', error);
       return false;
     }
   }
@@ -473,25 +574,18 @@ class AuthService {
         });
       }
     } catch (error) {
-      console.error('Logout error:', error);
     } finally {
       this.clearTokens();
     }
   }
 
   private setTokens(accessToken: string, refreshToken: string): void {
-    console.log('🔐 AuthService.setTokens called', {
-      tokenLength: accessToken?.length,
-      refreshTokenLength: refreshToken?.length
-    });
-
     this.token = accessToken;
     this.refreshToken = refreshToken;
 
     // Use centralized token manager
     setTokens(accessToken, refreshToken);
 
-    console.log('🔐 Tokens set in centralized manager');
   }
 
   private setUser(user: User): void {
@@ -569,11 +663,9 @@ class AuthService {
         return data;
       } else {
         const text = await response.text();
-        console.error('Non-JSON response for authenticated request:', text);
         return { success: false, error: 'Unexpected non-JSON response', message: text } as ApiResponse<T>;
       }
     } catch (error) {
-      console.error('Authenticated request error:', error);
       return { success: false, error: 'Request failed' };
     }
   }

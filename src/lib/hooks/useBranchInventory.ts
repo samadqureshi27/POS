@@ -1,7 +1,7 @@
-// src/lib/hooks/useBranchInventory.ts
+    // src/lib/hooks/useBranchInventory.ts
 
 import { useState, useEffect, useMemo } from "react";
-import { BranchInventoryService, type BranchInventoryItem, type BranchInventoryStats } from "@/lib/services/branch-inventory-service";
+import { BranchInventoryService, BranchInventoryItem, BranchInventoryStats } from "@/lib/services/branch-inventory-service";
 import { BranchService } from "@/lib/services/branch-service";
 import { resolveBranchObjectId } from "@/lib/services/branch-resolver";
 import { Toast } from "@/lib/util/toast-helpers";
@@ -41,17 +41,9 @@ export function useBranchInventory(branchId: string | number) {
         return objectId;
       }
 
-      console.error("❌ Branch not found with ID:", branchId);
 
       // Log available branches to help debugging
       const allResponse = await BranchService.listBranches({ limit: 100 });
-      if (allResponse.success && allResponse.data) {
-        console.log("📋 Available branches:", allResponse.data.map(b => ({
-          _id: b._id,
-          code: b.code,
-          name: b.name
-        })));
-      }
 
       Toast.error(`Branch "${branchId}" not found. Check console for available branches.`);
       return null;
@@ -98,15 +90,6 @@ export function useBranchInventory(branchId: string | number) {
             itemName,
           };
         });
-
-        console.log("📦 Loaded", itemsWithNames.length, "items with names:",
-          itemsWithNames.slice(0, 2).map(i => ({
-            id: typeof i.itemId === 'object' ? i.itemId._id : i.itemId,
-            name: i.itemName,
-            fromPopulatedItemId: !!(typeof i.itemId === 'object' && i.itemId.name),
-            fromNestedItem: !!i.item?.name,
-            fromSnapshot: !!i.itemNameSnapshot
-          })));
 
         setItems(itemsWithNames);
 
@@ -166,13 +149,6 @@ export function useBranchInventory(branchId: string | number) {
         }
       }
 
-      console.log("🔍 Creating inventory item with:", {
-        branchId: objectId,
-        itemId: data.itemId,
-        quantity: data.quantity,
-        fullData: { ...data, branchId: objectId }
-      });
-
       const response = await BranchInventoryService.createItem({
         ...data,
         branchId: objectId,
@@ -187,14 +163,6 @@ export function useBranchInventory(branchId: string | number) {
         // Check if itemId is populated (becomes an object with name)
         const populatedItemId = typeof createdItem.itemId === 'object' && createdItem.itemId !== null ? createdItem.itemId : null;
         const itemName = populatedItemId?.name || createdItem.item?.name || createdItem.itemNameSnapshot || createdItem.itemName || String(createdItem.itemId);
-
-        console.log("✅ Created item with name:", itemName, "from:", {
-          populatedItemId: populatedItemId?.name,
-          nestedItem: createdItem.item?.name,
-          snapshot: createdItem.itemNameSnapshot,
-          direct: createdItem.itemName,
-          rawItemId: createdItem.itemId
-        });
 
         // Optimistic update: Add new item to local state with populated name
         const newItemWithName = {
@@ -236,7 +204,6 @@ export function useBranchInventory(branchId: string | number) {
         const populatedItemId = typeof updatedItem.itemId === 'object' && updatedItem.itemId !== null ? updatedItem.itemId : null;
         const itemName = populatedItemId?.name || updatedItem.item?.name || updatedItem.itemNameSnapshot || updatedItem.itemName || String(updatedItem.itemId);
 
-        console.log("✅ Updated item with name:", itemName);
 
         // Optimistic update: Update item in local state with populated name
         const updatedItemWithName = {
@@ -317,11 +284,9 @@ export function useBranchInventory(branchId: string | number) {
       if (!objectId) {
         const isObjectId = /^[0-9a-fA-F]{24}$/.test(String(branchId));
         if (isObjectId) {
-          console.log("⚠️ Using branchId directly as ObjectId:", branchId);
           setBranchObjectId(String(branchId));
         } else {
           // As a last resort, use the branchId as-is and let the API handle validation
-          console.log("⚠️ Could not resolve branch ObjectId, using branchId as-is:", branchId);
           setBranchObjectId(String(branchId));
         }
       }

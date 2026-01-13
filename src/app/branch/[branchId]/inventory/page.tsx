@@ -58,7 +58,7 @@ const BranchInventoryPage = () => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(21);
+  const [itemsPerPage] = useState<number>(24);
 
   // Delete confirmation
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -75,7 +75,6 @@ const BranchInventoryPage = () => {
           setBranchName(response.data.name);
         }
       } catch (error) {
-        console.error("Error fetching branch name:", error);
       }
     };
 

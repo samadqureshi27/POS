@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { BranchModalProps } from "@/lib/types/branch";
 
 const BranchModal: React.FC<BranchModalProps> = ({

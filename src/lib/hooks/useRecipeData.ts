@@ -87,7 +87,6 @@ export const useRecipeData = () => {
   // Transform inventory to ingredients format
   const ingredients: Ingredient[] = useMemo(() => {
     const inventoryItems = (hook as any).inventoryItems || [];
-    console.log("🔄 useRecipeData - Transforming inventory items:", inventoryItems.length, inventoryItems);
     const transformed = inventoryItems.map((item: any, index: number) => ({
       ID: item._id || item.id || index,
       Name: item.name,
@@ -100,15 +99,12 @@ export const useRecipeData = () => {
       name: item.name, // Add lowercase name for compatibility
       baseUnit: item.baseUnit || "pc", // Add baseUnit for compatibility
     }));
-    console.log("✅ useRecipeData - Transformed ingredients:", transformed.length, transformed);
     return transformed;
   }, [(hook as any).inventoryItems]);
 
   // Debug log for available recipe options
   const availableRecipeOptions = useMemo(() => {
     const recipes = (hook as any).availableRecipeOptions || [];
-    console.log("🔄 useRecipeData - Available recipe options:", recipes.length, recipes);
-    console.log("🔍 useRecipeData - Sub recipes only:", recipes.filter((r: any) => r.type === "sub").length);
     return recipes;
   }, [(hook as any).availableRecipeOptions]);
 
@@ -192,13 +188,6 @@ export const useRecipeData = () => {
         type: data.type || (hook.editingItem as any).type || "final",
       };
 
-      console.log('🔍 handleModalSubmit - UPDATE MODE', {
-        recipeId,
-        type: updateData.type,
-        hasVariations: updateData.variations && updateData.variations.length > 0,
-        variationsCount: updateData.variations?.length || 0,
-      });
-
       const result = await hook.update(recipeId as any, updateData);
       if (result.success) {
         hook.closeModal();
@@ -206,11 +195,6 @@ export const useRecipeData = () => {
       }
       return result;
     } else {
-      console.log('🔍 handleModalSubmit - CREATE MODE', {
-        type: data.type,
-        hasVariations: data.variations && data.variations.length > 0,
-      });
-
       const result = await hook.create(data);
       if (result.success) {
         // Only close modal for final recipes, keep it open for sub recipes

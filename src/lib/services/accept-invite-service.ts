@@ -41,9 +41,7 @@ export class AcceptInviteService {
       
       // If response is not JSON, handle as error
       if (!contentType || !contentType.includes("application/json")) {
-        console.error("Non-JSON response received:", contentType);
         const text = await response.text();
-        console.error("Response body:", text);
         
         return {
           success: false,
@@ -74,7 +72,6 @@ export class AcceptInviteService {
         user: result.result?.user || result.user,
       };
     } catch (error: any) {
-      console.error("AcceptInviteService Error:", error);
       return {
         success: false,
         error: error?.message || "Network error. Please try again.",

@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
-import { Users, Plus, Edit2, Settings, AlertCircle } from "lucide-react";
+import { Users, Plus, AlertCircle } from "lucide-react";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import ResponsiveGrid from "@/components/ui/responsive-grid";
@@ -76,7 +74,6 @@ const StaffManagementPage = () => {
           setBranchName(response.data.name);
         }
       } catch (error) {
-        console.error("Error fetching branch name:", error);
       }
     };
 

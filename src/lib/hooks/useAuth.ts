@@ -45,7 +45,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
             // If profile fetch fails, we keep the cached user
             // The user will only be logged out if they make a request that gets 401
           }).catch(err => {
-            console.debug('Background profile fetch failed (user remains logged in):', err);
           });
         } else {
           // Token exists but no user in localStorage
@@ -60,7 +59,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
               await handleLogout();
             }
           } catch (error) {
-            console.error('Failed to fetch user profile:', error);
             await handleLogout();
           }
         }
@@ -71,7 +69,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         action: "initializeAuth"
       });
       // Don't logout on initialization errors - just log them
-      console.error('Auth initialization failed, but keeping existing session');
     } finally {
       setIsLoading(false);
     }

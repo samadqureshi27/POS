@@ -1,6 +1,5 @@
 // app/customers-details/page.tsx
 "use client";
-import React from "react";
 import { useRouter } from 'next/navigation';
 import EnhancedActionBar from "@/components/ui/enhanced-action-bar";
 import CustomerSummaryCards from "./_components/customer-summary-cards";

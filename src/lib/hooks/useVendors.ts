@@ -47,7 +47,7 @@ export const useVendorManagement = (branchId: number) => {
             if (response.success) {
                 setVendorItems(response.data);
             } else {
-                throw new Error(response.message || "Failed to fetch vendor items");
+                throw new Error(response.error || "Failed to fetch vendor items");
             }
         } catch (error) {
             logError("Error fetching vendor items", error, {
@@ -84,7 +84,7 @@ export const useVendorManagement = (branchId: number) => {
                 await loadVendorItems();
                 closeModal();
                 setSearchTerm("");
-                Toast.success(response.message || "Vendor created successfully");
+                Toast.success("Vendor created successfully");
             }
         } catch (error) {
             logError("Error creating vendor", error, {
@@ -116,7 +116,7 @@ export const useVendorManagement = (branchId: number) => {
                     )
                 );
                 closeModal();
-                Toast.success(response.message || "Vendor updated successfully");
+                Toast.success("Vendor updated successfully");
             }
         } catch (error) {
             Toast.error("Failed to update vendor");

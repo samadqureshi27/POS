@@ -1,5 +1,8 @@
 import { ApiResponse, ToastState } from "./common";
 
+// Re-export ApiResponse for consumers of this module
+export type { ApiResponse };
+
 export interface PaymentMethod {
     ID: number;
     Name: string;

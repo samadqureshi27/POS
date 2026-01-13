@@ -32,7 +32,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data, { status: 200 });
   } catch (error: any) {
-    console.error("❌ [Menu variations API] GET error:", error);
     return NextResponse.json(
       { success: false, message: error.message || "Internal server error" },
       { status: 500 }
@@ -66,7 +65,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data, { status: response.status });
   } catch (error: any) {
-    console.error("❌ [Menu variations API] POST error:", error);
     return NextResponse.json(
       { success: false, message: error.message || "Internal server error" },
       { status: 500 }

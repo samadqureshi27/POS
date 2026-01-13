@@ -54,12 +54,31 @@ function parseCSV(content: string): string[][] {
 }
 
 /**
- * Get column index by header name (case-insensitive)
+ * Get column index by header name (case-insensitive, supports multiple variations)
  */
 function getColumnIndex(headers: string[], columnName: string): number {
-  return headers.findIndex(h =>
-    h.toLowerCase().trim() === columnName.toLowerCase()
-  );
+  // Define column name variations
+  const columnVariations: Record<string, string[]> = {
+    'name': ['name', 'item name', 'itemname'],
+    'type': ['type', 'item type', 'itemtype'],
+    'baseunit': ['baseunit', 'base unit', 'unit'],
+    'quantity': ['quantity', 'qty', 'stock'],
+    'reorderpoint': ['reorderpoint', 'reorder point', 'reorder'],
+    'sellingprice': ['sellingprice', 'selling price', 'price'],
+    'sku': ['sku', 'code', 'item code'],
+    'categoryname': ['categoryname', 'category name', 'category'],
+    'isactive': ['isactive', 'is active', 'active', 'status'],
+  };
+
+  const normalizedColumnName = columnName.toLowerCase().replace(/\s+/g, '');
+  const variations = columnVariations[normalizedColumnName] || [columnName];
+
+  return headers.findIndex(h => {
+    const normalizedHeader = h.toLowerCase().trim().replace(/\s+/g, '');
+    return variations.some(variation =>
+      normalizedHeader === variation.replace(/\s+/g, '')
+    );
+  });
 }
 
 /**
@@ -195,7 +214,6 @@ export async function validateInventoryCSV(file: File): Promise<CSVValidationRes
       invalidRows: errors.length
     };
   } catch (error) {
-    console.error('Error validating CSV:', error);
     return {
       isValid: false,
       errors: [{

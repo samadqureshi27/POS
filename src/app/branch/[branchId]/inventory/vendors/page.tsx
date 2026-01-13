@@ -14,7 +14,6 @@ import { useVendorManagement } from "@/lib/hooks/useVendors";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const VendorsPage = () => {

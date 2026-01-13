@@ -34,7 +34,6 @@ class Logger {
 
     // Always log to console in development
     if (this.isDevelopment) {
-      console.error(`❌ ${errorDetails.message}`, errorDetails.error || '', errorDetails.context || '');
     }
 
     // In production, send to external service (e.g., Sentry, LogRocket)
@@ -52,7 +51,6 @@ class Logger {
     const logDetails = this.formatLog(message, context);
 
     if (this.isDevelopment) {
-      console.warn(`⚠️ ${logDetails.message}`, logDetails.context || '');
     }
 
     if (!this.isDevelopment) {
@@ -68,7 +66,6 @@ class Logger {
   info(message: string, context?: LogContext): void {
     if (this.isDevelopment) {
       const logDetails = this.formatLog(message, context);
-      console.info(`ℹ️ ${logDetails.message}`, logDetails.context || '');
     }
   }
 
@@ -79,7 +76,6 @@ class Logger {
    */
   debug(message: string, data?: any): void {
     if (this.isDevelopment) {
-      console.log(`🔍 ${message}`, data || '');
     }
   }
 
@@ -122,7 +118,6 @@ class Logger {
     // Example: Sentry.captureException(details.error, { extra: details.context });
 
     // For now, just log to console in production with minimal output
-    console.error(`[${level.toUpperCase()}]`, details.message);
   }
 }
 

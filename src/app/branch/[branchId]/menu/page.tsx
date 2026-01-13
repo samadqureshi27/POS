@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { UtensilsCrossed, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { AdvancedMetricCard } from "@/components/ui/advanced-metric-card";
@@ -61,7 +61,7 @@ const BranchMenuPage = () => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(21);
+  const [itemsPerPage] = useState<number>(24);
 
   // Delete confirmation
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -78,7 +78,6 @@ const BranchMenuPage = () => {
           setBranchName(response.data.name);
         }
       } catch (error) {
-        console.error("Error fetching branch name:", error);
       }
     };
 

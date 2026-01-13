@@ -37,7 +37,7 @@ function ItemsPageContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(21);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(24);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Modals
@@ -121,7 +121,6 @@ function ItemsPageContent() {
       // Handle authentication errors - but be more conservative
       // Only redirect to login on clear authentication failures
       if (response.message?.includes('not allowed') || response.message?.includes('login')) {
-        console.error('❌ Authentication error loading items:', response.message);
 
         // Check if we actually have a token - if yes, this might be a backend issue
         const { getAccessToken } = await import('@/lib/util/token-manager');
@@ -129,7 +128,6 @@ function ItemsPageContent() {
 
         if (token) {
           // We have a token but backend rejected it - it might be expired
-          console.warn('Token exists but was rejected by backend. Token might be expired.');
           Toast.error('Your session has expired. Please login again.');
           setTimeout(() => {
             window.location.href = '/login';
@@ -272,7 +270,6 @@ function ItemsPageContent() {
   };
 
   const handleItemSave = async (data: Partial<InventoryItem>) => {
-    console.log("🔥 handleItemSave called with data:", data);
     try {
       let response;
       if (editingItem) {
@@ -286,7 +283,6 @@ function ItemsPageContent() {
         response = await InventoryService.createItem(data);
       }
 
-      console.log("API Response:", response);
 
       if (response.success) {
         // Show success toast FIRST
@@ -340,7 +336,6 @@ function ItemsPageContent() {
         Toast.error(`Failed to save item: ${response.message}`);
       }
     } catch (error: any) {
-      console.error("Error saving item:", error);
       Toast.error(error?.message || "Failed to save item");
     }
   };

@@ -38,10 +38,11 @@ const ForgotPasswordOverlay: React.FC = () => {
     setError(null);
 
     try {
-      const response = await authService.forgotPassword(resetEmail);
+      // Use new OTP-based password reset flow
+      const response = await authService.requestPasswordResetOtp(resetEmail);
 
       if (response.success) {
-        // Show verification screen
+        // Show verification screen for OTP entry
         setShowVerification(true);
         setTimeout(() => {
           setShowVerificationContainer(true);
@@ -52,11 +53,10 @@ const ForgotPasswordOverlay: React.FC = () => {
           ? response.error
           : typeof response.message === 'string'
           ? response.message
-          : "Failed to send reset email";
+          : "Failed to send OTP. Please try again.";
         setResetEmailError(errorMessage);
       }
     } catch (error: any) {
-      console.error("Password reset request error:", error);
       setResetEmailError("Network error. Please try again.");
     } finally {
       setIsLoading(false);

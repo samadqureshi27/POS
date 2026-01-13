@@ -3,7 +3,6 @@ import { Shield, Lock, Clock, AlertTriangle, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GeneralSettings } from '@/lib/types';
 import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

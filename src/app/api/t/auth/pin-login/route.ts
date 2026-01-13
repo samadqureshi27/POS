@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { PinLoginRequestSchema } from "@/lib/validations/api-schemas";
 
 const REMOTE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE || "https://api.tritechtechnologyllc.com";
@@ -60,7 +59,6 @@ export async function POST(req: Request) {
       headers: { "content-type": contentType },
     });
   } catch (err: any) {
-    console.error("PIN login error:", err);
     return NextResponse.json(
       { success: false, message: err?.message || "Proxy POST /t/auth/pin-login failed" },
       { status: 500 }

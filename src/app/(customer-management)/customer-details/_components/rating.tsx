@@ -1,8 +1,7 @@
 // components/CustomerComponents.tsx
 "use client";
 
-import React from 'react';
-import { AlertCircle, CheckCircle, X, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { getInitials } from '@/lib/util/customer-details-utils';
 
 // Toast Component

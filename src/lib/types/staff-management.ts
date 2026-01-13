@@ -1,5 +1,4 @@
 // Staff Management Types
-import { ApiResponse } from "./common";
 
 export interface StaffItem {
     Staff_ID: string;

@@ -123,7 +123,7 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
   const [showNewPasswordContainer, setShowNewPasswordContainer] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetEmailError, setResetEmailError] = useState("");
-  const [otpCode, setOtpCode] = useState(["", "", "", "", ""]);
+  const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validationErrors, setValidationErrors] = useState<{
@@ -201,7 +201,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
           for (let i = 0; i < 10; i++) {
             const token = getAccessToken();
             if (token) {
-              console.log('✅ Cookie verified before redirect');
               PersistentLogger.log('Cookie verified, redirecting...', {
                 tokenLength: token.length,
                 attempt: i + 1
@@ -220,7 +219,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
           }
 
           // If we get here, cookie wasn't set - something went wrong
-          console.error('❌ Cookie not set after login - trying redirect anyway');
           PersistentLogger.error('Cookie not set after 10 attempts!', {
             allCookies: document.cookie,
             localStorage: localStorage.getItem('user') ? 'HAS USER' : 'NO USER'
@@ -244,7 +242,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
         Toast.error(errorMessage);
       }
     } catch (error: any) {
-      console.error("Admin login error:", error);
       const errorMsg = "Network error. Please check your connection.";
       setError(errorMsg);
       Toast.error(errorMsg);
@@ -271,7 +268,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
           for (let i = 0; i < 10; i++) {
             const token = getAccessToken();
             if (token) {
-              console.log('✅ Cookie verified before redirect (PIN login)');
               // Cookie is set, safe to redirect
               const next = searchParams.get('next');
               if (next) {
@@ -299,7 +295,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
           }
 
           // If we get here, cookie wasn't set - something went wrong
-          console.error('❌ Cookie not set after PIN login - trying redirect anyway');
           const next = searchParams.get('next');
           if (next) {
             window.location.href = next;
@@ -327,7 +322,6 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
         setError(errorMessage);
       }
     } catch (error: any) {
-      console.error("Manager login error:", error);
       setError("Network error. Please check your connection.");
     } finally {
       setIsLoading(false);
@@ -355,7 +349,7 @@ const LoginProviderContent: React.FC<{ children: React.ReactNode }> = ({ childre
     setEmail("");
     setPassword("");
     setResetEmail("");
-    setOtpCode(["", "", "", "", ""]);
+    setOtpCode(["", "", "", "", "", ""]);
     setNewPassword("");
     setConfirmPassword("");
     setPinCode(["", "", "", "", "", ""]);

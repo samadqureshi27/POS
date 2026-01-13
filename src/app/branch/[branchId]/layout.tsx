@@ -1,7 +1,6 @@
 "use client";
 
 import { useParams, usePathname } from "next/navigation";
-import { Building2 } from "lucide-react";
 import BaseSubmenu from "@/components/base-submenu";
 
 export default function BranchLayout({ children }: { children: React.ReactNode }) {
@@ -31,6 +30,7 @@ export default function BranchLayout({ children }: { children: React.ReactNode }
       ]
     },
     { label: "Menu", href: `/branch/${branchId}/menu` },
+    { label: "Settings", href: `/branch/${branchId}/settings` },
   ];
 
   return (
