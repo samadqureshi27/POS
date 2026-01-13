@@ -23,8 +23,7 @@
       "Bash(done)",
       "Bash(xargs:*)",
       "Bash(Select-String -Pattern \"menu-item-modal-batch\")",
-      "Bash(Select-Object -First 10)",
-      "Bash(node remove-unused-imports.js:*)"
+      "Bash(Select-Object -First 10)"
     ],
     "deny": [],
     "ask": []

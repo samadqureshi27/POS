@@ -337,8 +337,10 @@ export default function MenuItemModalBatch({
           ParentCategory: response.data.parentId || null,
         };
 
+        console.log('✅ Adding to localCategories:', newCategory);
         setLocalCategories(prev => {
           const updated = [...prev, newCategory];
+          console.log('📋 Updated localCategories:', updated);
           return updated;
         });
 
@@ -353,6 +355,7 @@ export default function MenuItemModalBatch({
 
         // Refresh parent categories list in background
         if (onSuccess) {
+          console.log('🔄 Category created - refreshing in background...');
           setTimeout(() => onSuccess(), 100);
         }
       } else {
@@ -444,6 +447,7 @@ export default function MenuItemModalBatch({
 
         // Refresh parent categories list in background
         if (onSuccess) {
+          console.log('🔄 Category updated - refreshing in background...');
           setTimeout(() => onSuccess(), 100);
         }
       } else {
@@ -515,6 +519,7 @@ export default function MenuItemModalBatch({
 
         // Refresh parent categories list in background
         if (onSuccess) {
+          console.log('🔄 Category deleted - refreshing in background...');
           setTimeout(() => onSuccess(), 100);
         }
       } else {
@@ -867,6 +872,13 @@ export default function MenuItemModalBatch({
     const existingIds = new Set(existingCategories.map(c => c._id || c.id || c.ID));
     const newLocalCategories = localCategories.filter(c => !existingIds.has(c._id || c.id || c.ID));
     const merged = [...existingCategories, ...newLocalCategories];
+
+    console.log('🔄 Merging categories:', {
+      existingCount: existingCategories.length,
+      localCount: localCategories.length,
+      newLocalCount: newLocalCategories.length,
+      totalCount: merged.length,
+    });
 
     return merged;
   }, [categories, localCategories]);

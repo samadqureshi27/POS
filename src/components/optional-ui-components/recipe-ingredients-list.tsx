@@ -1,8 +1,11 @@
 "use client";
 
-import { Package, UtensilsCrossed, ChevronDown, AlertCircle, X } from "lucide-react";
+import React from "react";
+import { Trash2, Package, UtensilsCrossed, ChevronDown, AlertCircle, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface RecipeIngredient {
   sourceType: "inventory" | "recipe";
@@ -63,6 +66,9 @@ export function RecipeIngredientsList({
       });
     } else {
       // For recipes, only show sub recipes
+      console.log("🔍 RecipeIngredientsList - Filtering sub recipes");
+      console.log("🔍 Available recipes:", availableRecipes.length, availableRecipes);
+      console.log("🔍 Sub recipes (type='sub'):", availableRecipes.filter((opt) => opt.type === "sub"));
 
       filteredRecipes = availableRecipes
         .filter((opt) => opt.type === "sub")
@@ -71,6 +77,7 @@ export function RecipeIngredientsList({
           return name.includes(query);
         });
 
+      console.log("🔍 Filtered sub recipes (after search):", filteredRecipes.length, filteredRecipes);
     }
 
     return { inventory: filteredInventory, recipes: filteredRecipes };

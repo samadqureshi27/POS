@@ -58,6 +58,8 @@ const RecipesManagementPage = () => {
 
   // Debug logging
   React.useEffect(() => {
+    console.log("🏪 Recipes Page - Ingredients loaded:", ingredients?.length || 0);
+    console.log("🍲 Recipes Page - Recipe Options loaded:", availableRecipeOptions?.length || 0);
   }, [ingredients, availableRecipeOptions]);
 
   // Enhanced action handlers with consistent toast notifications
@@ -96,6 +98,7 @@ const RecipesManagementPage = () => {
     const recipeId = recipeToDelete._id || recipeToDelete.ID;
 
     if (!recipeId) {
+      console.error("❌ Recipe ID is missing");
       Toast.error("Recipe ID is missing", { duration: 5000 });
       return;
     }
@@ -112,6 +115,7 @@ const RecipesManagementPage = () => {
         Toast.error(result.error || "Failed to delete recipe", { duration: 5000 });
       }
     } catch (error: any) {
+      console.error("Error deleting recipe:", error);
       Toast.error(error, { duration: 5000 });
     }
   };
